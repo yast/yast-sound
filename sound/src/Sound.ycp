@@ -902,7 +902,7 @@ could make your system unstable.
             $["Master":70, "PCM":70, "CD":70, "Synth": 70]);
 
 	// now let's merge settings from volume_settings list
-	if (size(volume_settings) != 0)
+	if (volume_settings[card_id]:[] != [])
 	{
 	    foreach (`channel, volume_settings[card_id]:[], ``{
 		devs = add (devs, channel[0]:"Master", channel[1]:70);
