@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Jul 19 03:42:23 PDT 2002 - arvin@suse.de
+
+- use correct path for sound card database
+
+-------------------------------------------------------------------
 Fri Jul 12 15:44:19 CEST 2002 - arvin@suse.de
 
 - use proper namespace for Args and CallFunction (#16776)
