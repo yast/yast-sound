@@ -400,7 +400,7 @@ before pressing <B>Test</B> or <B>Next</B>.</P>");
 	));
 	joylist = flatten ((list<list>)joylist);
 
-	joylist = sort (list j1, list j2, joylist, ``( j1[1]:"" <= j2[1]:""));
+	joylist = sort (list j1, list j2, joylist, ``( j1[1]:"" < j2[1]:""));
 
 	joylist = prepend (joylist,
 	    ["analog", Joystick::generic_joystick_translated]);
