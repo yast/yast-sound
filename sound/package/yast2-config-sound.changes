@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu May 10 12:07:56 CEST 2001 - dmeszar@suse.cz
+
+- fixed to work with new libhd
+
+-------------------------------------------------------------------
 Mon May  7 17:16:08 CEST 2001 - dmeszar@suse.cz
 
 - module options fixed, card removing fixed 
