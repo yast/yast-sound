@@ -110,7 +110,8 @@
 
 
 	}
-	
+
+	    // dialog title
 	    UI(`SetContents (_("Sound cards"), con, help_text, back, next));
 	
 	    any ui = nil;
@@ -165,6 +166,7 @@
 			unsuccess = false;
 		    }
 
+			// dialog title
 		    UI(`SetContents (_("Sound cards"), con, help_text, back, next));
 		}
 		

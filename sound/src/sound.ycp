@@ -294,6 +294,7 @@ Sound support requires the <b>ALSA</b> package.\
  You can find it in the <b>SuSE</b> distribution (series 'snd')\
  or you can download it from <i>http://www.alsa-project.org</i>"));
 
+		    // dialog title
 		UI(`SetContents (_("Sound cards"),
 				 `HVCenter (
 				// This label is displayed when no alsa package is not installed
@@ -319,6 +320,7 @@ An internal <b>YaST2</b> file is missing or corrupted.\
  Please try to reinstall <b>YaST2</b>.\
  You can find it in the <b>SuSE</b> distribution, series 'a'."));
 
+		    // dialog title
 		UI(`SetContents (_("Sound cards"),
 				 `HVCenter (
 				// To translators: label message
@@ -363,7 +365,8 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 				// To translators: label message (if longer than 50 chars, must be devided by '\n' 
 	    locale msg = _("Searching for a sound card on your system...");
 	    term con = `ReplacePoint (`id (`rp), `Label (msg));
-	    
+
+		// dialog title
 	    UI(`SetContents (_("Sound cards"), con, help_text, false, false));
 
 	    return GetAudio ();
@@ -436,10 +439,10 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 
 			term lab = `VBox (
 			    `VStretch (),
-				// To translators: label message 1/2 The sound card XY will be configured
+				// To translators: label message 1/2 "The sound card XY will be configured" - split due the different widget
 			    `Label (_("The sound card\n")),
 			    `Label (`opt(`outputField), soundcard_name (ret)),
-				// To translators: label message 2/2 The sound card XY will be configured
+				// To translators: label message 2/2 "The sound card XY will be configured" - split due the different widget
 			    `Label (_("\nwill be configured."))
 			    );
 			con = add (con, lab);
@@ -484,6 +487,7 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 
 	    }
 
+		// dialog title
 	    UI(`SetContents (_("Sound cards"), con, help_text, prev, next));
 
 	    any ui = nil;
@@ -553,10 +557,10 @@ Do you want to select the driver manually?"),
 
 				term lab = `VBox (
 				    `VStretch (),
-					// To translators: label message 1/2 The sound card XY will be configured
+					// To translators: label message 1/2 "The sound card XY will be configured" - split due the different widget
 				    `Label (_("The sound card\n")),
 				    `Label (`opt(`outputField), soundcard_name (ret)),
-					// To translators: label message 2/2 The sound card XY will be configured
+					// To translators: label message 2/2 "The sound card XY will be configured" - split due the different widget
 				    `Label (_("\nwill be configured."))
 				    );
 				con = add (con, `ReplacePoint (`id(`rp), `HVCenter(lab)));
@@ -613,7 +617,7 @@ Do you want to select the driver manually?"),
 
 		    }
 		    
-
+			// dialog title
 		    UI(`SetContents (_("Sound cards"), con, help_text, prev, next));
 		}
 
@@ -654,10 +658,10 @@ Do you want to select the driver manually?"),
 
 			term lab = `VBox (
 			    `VStretch (),
-				// To translators: label message 1/2 The sound card XY will be configured
+				// To translators: label message 1/2 "The sound card XY will be configured" - split due the different widget
 			    `Label (_("The sound card\n")),
 			    `Label (`opt(`outputField), soundcard_name (ret)),
-				// To translators: label message 2/2 The sound card XY will be configured
+				// To translators: label message 2/2 "The sound card XY will be configured" - split due the different widget
 			    `Label (_("\nwill be configured."))
 			    );
 			con = add (con, `ReplacePoint (`id(`rp), `HVCenter(lab)));
@@ -673,7 +677,7 @@ Do you want to select the driver manually?"),
 			selected_manually = false;
 		    }
 		    
-		    
+			// dialog title
 		    UI(`SetContents (_("Sound cards"), con, help_text, prev, next));
 
 		    continue;

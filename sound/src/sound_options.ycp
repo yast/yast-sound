@@ -298,7 +298,8 @@
 			 `HVCenter (`Label (_("There are no options for this module"))));
 	    
 	}
-	
+
+	    // dialog title
 	UI(`SetContents (_("Sound cards"), con, help_text, prev, next));
 
 	any ui = nil;

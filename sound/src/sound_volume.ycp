@@ -240,6 +240,7 @@
 		);
 	}
 
+	    // dialog title
 	UI(`SetContents (_("Sound cards"), con, help_text, back, next));
 	    // "Finish" button: Proceed to finish the configuration
 	UI(`ChangeWidget (`id(`next), `Label, _("&Finish")));
