@@ -1,6 +1,8 @@
 #
 # Makefile.am for y2a_audio/doc/autodocs
 #
+# $Id$
+#
 
 docdir = @DOCDIR@
 htmldir = $(docdir)/autodocs
@@ -12,5 +14,4 @@ index.html: $(srcdir)/../../src/*.h
 	cd $(srcdir)/../../src && @YAST2DIR@/bin/ydoc @RPMNAME@ *.h
 	mv -f $(srcdir)/../../src/*.html .
 
-clean-local:
-	$(RM) $(html_DATA)
+CLEANFILES = $(html_DATA)
