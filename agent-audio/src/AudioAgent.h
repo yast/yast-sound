@@ -42,11 +42,11 @@ public:
 				const YCPValue& arg = YCPNull(),
 				const YCPValue& opt = YCPNull());
 
-    virtual YCPValue Write (	const YCPPath &path,
+    virtual YCPBoolean Write (	const YCPPath &path,
 				const YCPValue& value,
 				const YCPValue& arg = YCPNull());
     
-    virtual YCPValue Dir (	const YCPPath& path);
+    virtual YCPList Dir (	const YCPPath& path);
     
     virtual YCPValue Execute (	const YCPPath& path,
 				const YCPValue& value = YCPNull(),

@@ -80,7 +80,7 @@ int ossDevice(const string channel) {
  * @example SCR (`Write (.volume, 50)) -> true
  * @example SCR (`Write (.volume.1, 50)) -> false
  */
-YCPValue ossSetVolume(const string card, const string channel, const int value) {
+YCPBoolean ossSetVolume(const string card, const string channel, const int value) {
 
     string mixerfile = "/dev/mixer";
     mixerfile += card;
@@ -100,8 +100,8 @@ YCPValue ossSetVolume(const string card, const string channel, const int value) 
 	device = ossDevice(channel);
 	if(device == -1)
 	{
-	    string error = string("bad channel specification: ") + channel.c_str();
-	    return YCPError(error);
+	    y2error("bad channel specification: %s", channel.c_str());
+	    return YCPBoolean(false);
 	}
     }
 
@@ -115,14 +115,16 @@ YCPValue ossSetVolume(const string card, const string channel, const int value) 
 			+ string(mixerfile) 
 			+ "' : " 
 			+ string(strerror(errno))).c_str();
-	return YCPError(error, YCPBoolean(false));
+	y2error(error.c_str());
+	return YCPBoolean(false);
     }
 
     if(ioctl(mixer_fd,MIXER_WRITE(device),&volume) == -1) {
 	string error = string("ioctl failed : ")
 			+ strerror(errno);
 	close(mixer_fd);
-	return YCPError(error, YCPBoolean(false));
+	y2error(error.c_str());
+	return YCPBoolean(false);
     }
 
     close(mixer_fd);

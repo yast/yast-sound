@@ -36,7 +36,7 @@ using std::map;
  *  @param value volume 0..100
  */
 
-YCPValue alsaSetVolume(int card, const string& channel, int value);
+YCPBoolean alsaSetVolume(int card, const string& channel, int value);
 
 /**
  * volume reading
@@ -53,7 +53,7 @@ YCPValue alsaGetVolume(int card, const string& channel);
  * @param value boolean mute/unmute
  */
 
-YCPValue alsaSetMute(int card, const string& channel, bool value);
+YCPBoolean alsaSetMute(int card, const string& channel, bool value);
 YCPValue alsaGetMute(int card, const string& channel);
 
 /**
@@ -62,13 +62,13 @@ YCPValue alsaGetMute(int card, const string& channel);
  *
  */
 
-YCPValue alsaGetChannels(int card);
+YCPList alsaGetChannels(int card);
 
 /** getCards
  *  returns list of running cards- list of strings
  */
 
-YCPValue alsaGetCards();
+YCPList alsaGetCards();
 
 /** alsaGetCardName
  * returns (long) name of card

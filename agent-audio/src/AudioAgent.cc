@@ -99,7 +99,7 @@ YCPValue AudioAgent::Read ( const YCPPath &path, const YCPValue& arg,
 /**
  * Write
  */
-YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCPValue& arg)
+YCPBoolean AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCPValue& arg)
 {
     // Do nothing
     if(path->length()==0) {
@@ -116,7 +116,8 @@ YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCP
 			+ value->toString().c_str()
 			+ ") passed to Write(): .audio"
 			+ path->toString().c_str();
-	return YCPError(error);
+	y2error(error.c_str());
+	return YCPBoolean(false);
     }
 
 
@@ -155,14 +156,14 @@ YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCP
         }
     }
 
-    string error = string("Wrong path in Write(): .audio") + path->toString().c_str();
-    return YCPError(error);
+    y2error("Wrong path in Write(): .audio%s", path->toString().c_str());
+    return YCPBoolean(false);
 }
 
 /**
  * Dir
  */
-YCPValue AudioAgent::Dir(const YCPPath& path) {
+YCPList AudioAgent::Dir(const YCPPath& path) {
 
     YCPList list;
 
@@ -224,8 +225,8 @@ YCPValue AudioAgent::Dir(const YCPPath& path) {
 	    break;
     }
 
-    string error = string("Wrong path in Dir(): .audio") + path->toString().c_str();
-    return YCPError(error);
+    y2error("Wrong path in Dir(): .audio%s", path->toString().c_str());
+    return YCPList();
 }
 
 YCPValue AudioAgent::Execute(const YCPPath& path, const YCPValue& value,

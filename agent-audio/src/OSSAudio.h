@@ -26,7 +26,7 @@ using std::map;
  *  @param channel name eg. "Master" ("Master" if empty)
  *  @param value volume 0..100
  */
-YCPValue ossSetVolume(const string card, const string channel, const int value);
+YCPBoolean ossSetVolume(const string card, const string channel, const int value);
 
 /**
  * volume reading
