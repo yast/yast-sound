@@ -353,7 +353,7 @@ in order to configure sound cards."));
     // module initialization
     Sound::LoadDatabase(); // FIXME TODO read on demand
 //    Sound::DetectHardware();
-    Sound::Read();
+    Sound::Read(``{});
 
     /*
      * this variable will not be touched.
@@ -528,7 +528,7 @@ in order to configure sound cards."));
 
     if (ui == `finish && (Sound::modules_conf != save_info_backup || Sound::rc_vars != rc_vars_backup))
     {
-	Sound::Write(); // CallFunction (`sound_write(Sound::modules_conf, Sound::rc_vars));
+	Sound::Write(``{}, ``{}); // CallFunction (`sound_write(Sound::modules_conf, Sound::rc_vars));
     }
 
     UI::CloseDialog ();
