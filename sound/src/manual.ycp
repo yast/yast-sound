@@ -162,7 +162,7 @@
 		    `SelectionBox (`id (`sel_keys), `opt(`notify),
 			(keys == "vendors") ?
 			    // selection box title
-			    _("Sound card &vendor") :
+			    _("Sound Card &Vendor") :
 			    // selection box title
 			    _("Sound card &driver"),
 			keys_names)
@@ -176,7 +176,7 @@
 	    Sound::use_alsa ?
 	    `Left(`CheckBox (`id(`ch_sets), `opt(`notify),
 		// checkbox label
-		_("Show list of kernel modules"), false))
+		_("Show List of Kernel Modules"), false))
 	    : `VSpacing(),
 	    // textentry label
 	    `TextEntry (`id(`search), `opt(`notify), _("&Search")),
@@ -239,7 +239,7 @@
 		    `SelectionBox (`id (`sel_keys), `opt(`notify),
 			(keys == "vendors") ?
 			    // selection box title
-			    _("Sound card &vendor") :
+			    _("Sound Card &Vendor") :
 			    // selection box title
 			    _("Sound card &driver"),
 			keys_names));
