@@ -1,0 +1,56 @@
+/**
+ * File:
+ *   sound_auto.ycp
+ *
+ * Package:
+ *   Configuration of sound
+ *
+ * Summary:
+ *   Client for autoinstallation
+ *
+ * Authors:
+ *   Dan Meszaros <dmeszar@suse.cz>
+ *
+ * $Id$
+ *
+ * This is a client for autoinstallation. It takes its arguments,
+ * goes through the configuration and return the setting.
+ * Does not do any changes to the configuration.
+ */
+
+/**
+ * @param first a map of x settings
+ * @return boolean success of operation
+ * @example map mm = $[ "FAIL_DELAY" : "77" ];
+ * @example map ret = CallModule ("x_auto", [ mm ]);
+ */
+
+{
+    textdomain "sound";
+
+    import "Sound";
+
+    Sound::autoinstallation = true;
+
+    list args = Args ();
+    if ( size (args) <= 0 )
+    {
+	y2error ("Did not get the settings, probably some mistake...");
+	return false;
+    }
+    if ( !is ( Args (0), map ) )
+    {
+	y2error ("Bad argument for lilo_auto: %1", Args (0));
+	return false;
+    }
+
+    // The settings are in the first argument
+    map settings = select (args, 0, $[]);
+    y2milestone("Imported: (%1)", settings);
+
+    Sound::Import ( settings );
+
+    CallFunction(`sound());
+
+    return Sound::Export ();
+}

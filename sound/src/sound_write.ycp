@@ -89,7 +89,13 @@
     list save_info	= Args (0);
     boolean use_alsa	= true;
     boolean autoinstall = false;
-      
+
+    map settings = Args(0);
+    save_info = lookup(settings, "modules_conf", []);
+    rc_vars = lookup(settings, "rc_vars", []);
+    volume_settings = lookup(settings, "volume_settings", []);
+    autoinstall = lookup(settings, "autoinstall", false);
+/*
     if (size (Args ()) > 1)
     {
 	rc_vars = Args (1);
@@ -104,7 +110,7 @@
     {
 	autoinstall = Args(3);
     }
-
+*/
     if (autoinstall)
     {
 //	UI::Wizard::CreateDialog();
@@ -124,47 +130,45 @@
 	    _("Starting sound card..."),
 	    _("Storing volume settings")];
 
-    Progress::New (_("Saving sound card settings."), " ", size(stones) - 1,
-		stones, stones2, "TODO: help");
 
 
     if (!autoinstall)
     {
+	Progress::New (_("Saving sound card settings."), " ", size(stones) - 1,
+		stones, stones2, "TODO: help");
         Wizard::DisableAbortButton();
     }
 
     integer step = 0;
 
-    Progress::NextStage();
+    if (!autoinstall) { Progress::NextStage(); }
+
     step = step + 1;
     SaveModulesEntry(save_info, [], false);
-    sleep(100);
 
-    Progress::NextStage();
+    if (!autoinstall) { sleep(100); Progress::NextStage(); }
     step = step + 1;
     save_unique_keys (maplist(`e, save_info, ``(lookup(e, "unique_key", ""))));
-    sleep(100);
 
-    Progress::NextStage();
+    if (!autoinstall) { sleep(100); Progress::NextStage(); }
     step = step + 1;
     SaveRCValues(rc_vars);
-    sleep(100);
 
-    Progress::NextStage();
+    if (!autoinstall) { sleep(100); Progress::NextStage(); }
     step = step + 1;
 
-    if (autoinstall)
+    if (!autoinstall)
     {
 	map out = SCR::Execute(.target.bash_output, "/usr/sbin/rcalsasound start", nil);
     }
 
-    Progress::NextStage();
+    if (!autoinstall) { Progress::NextStage(); }
     if (size(Args()) >= 4)
     {
-	set_vol_settings(Args(4));
+	set_vol_settings(volume_settings);
     }
     SaveVolume();
-    sleep(100);
+    if (!autoinstall) sleep(100);
 
     return (size (err_msg) == 0);
 }

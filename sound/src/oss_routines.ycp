@@ -95,7 +95,7 @@
      *
      */
 
-    global define void sound_start_tmp(boolean restore, integer unused) ``{
+    global define void sound_start_tmp(boolean restore/*, integer unused*/) ``{
         string cmd = "/sbin/depmod -C " + get_tmp_modules_conf() + " /dev/null 2>&1";
         SCR::Execute(.target.bash, cmd, $[]);
 

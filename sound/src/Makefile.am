@@ -28,7 +28,8 @@ include_DATA = \
 clients_DATA = 	\
 	sound.ycp 		\
 	sound_write.ycp		\
-	sound_summary.ycp
+	sound_summary.ycp	\
+	sound_auto.ycp
 
 menu_DATA = menuentry_sound.y2cc
 
