@@ -106,7 +106,7 @@
 	    {	
 		if(ReallyAbort())
 		{   
-		    ui=`cancel;
+		    ui=`abort;
 		    break;
 		}
 	    }	

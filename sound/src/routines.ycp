@@ -20,6 +20,23 @@
     include "misc_defines.ycp";
     include "lan/lan_routines.ycp";
 
+    /**
+     *
+     *
+     *
+     *
+     */
+    global define get_card_label(map card)
+    ``{
+        list lab=splitstring(hardware_name(card),"\n");
+        if(select(lab, 1)=="")
+        {
+            return select(lab, 0);
+        }
+        return select(lab, 1);
+    }
+
+
     global define add_card_manually(list save_info) ``{
 	symbol ui=nil;
 	map entry=$["unique_key": isa_uniq(), "options": $[]];
@@ -34,10 +51,10 @@
             }
             else
             {
-                ui=lookup(res, "ui");
+                ui=lookup(res, "ui", nil);
                 if(ui==`abort || ui==`cancel)
                 {
-                    return $["ui": `abort];
+                    ui= `abort;
                 }
                 break;
             }
@@ -266,36 +283,12 @@
 
 
     /**
-     * Reads /proc/asound/cards and removes entries form save_info with no corresponding entry in /proc/asound/cards
-     *
-     * @param list save_info
-     * @return list modified list of save_info
-     */
-
-    global define remove_invalid_save_info(list save_info) ``{
-	list cards=nil;
-	if(fileexist("/proc/asound/cards"))
-	{
-	    cards = SCR(`Read(.proc.asound.cards));
-/*            if (is(select (asound, 0), map))
-            {
-                return asound;
-            }
-*/ 
-	    return save_info;
-	}
-	// no /proc/asound/cards exists -> no cards configured
-	return [];
-    }
-
-    /**
      * returns sound card database
      * @return list
      */
 
     global define GetCardDatabase() ``{
 	any database=SCR(`Read (.target.yast2, "sndcards.ycp"));
-	y2error("### Reading sndcards.ycp");
 	textdomain "sound_db";
 	database = UI (database);
 	textdomain "sound";
@@ -322,70 +315,6 @@
             pos = pos + 1;
         };
         return -1;
-    }
-
-    /**
-     * creates "libhd entry" from db info
-     * @return map
-     */
-    /* !!! variable db is inherited from module sound.ycp*/
-    global define get_card (string module_name, string card_name) ``{
-        map ret = $[];
-        map db_entry = $[];
-
-        if (module_name == "All") //UI(_("All")))
-        {
-            list tmp = filter (`e, db, ``(contains(lookup (e, "cards", []), card_name)));
-            if (size (tmp) > 0)
-            {
-                db_entry = select (tmp, 0);
-            }
-            else
-            {
-                db_entry = select (filter (`e, db, ``(lookup (e, "name", []) == card_name)), 0, $[]);
-            }
-        }
-        else
-        {
-            db_entry = select (filter (`e, db, ``(lookup (e, "name", "") == module_name)), 0, $[]);
-        }
-
-
-
-        if (size (db_entry) == 0)
-        {
-            y2error ("Db entry not found");
-            return ret;
-        }
-
-        map module_entry = $["params" : lookup (db_entry, "params", []),
-                            "module"  : lookup (db_entry, "module", $[])];
-
-        ret = add (ret, "module", module_entry);
-        ret = add (ret, "sub_vendor", card_name);
-        if (tolower (module_name) == "all")
-        {
-            ret = add (ret, "sub_device", sformat ("(%1)", lookup(db_entry, "name", card_name)));
-        }
-        else
-        {
-            ret = add (ret, "sub_device", sformat ("(%1)", module_name));
-        }
-        map libhd = select (lookup (db_entry, "libhd", []), 0, $[]);
-        ret = add (ret, "vendor_id", lookup (libhd, "vendor_id", 0));
-
-        if (is (lookup (libhd, "device_id", 0), list))
-        {
-            ret = add (ret, "device_id", select (lookup (libhd, "device_id", 0), 0));
-            ret = add (ret, "bus", "PCI");
-        }
-        else
-        {
-            ret = add (ret, "device_id", lookup (libhd, "device_id", 0));
-            ret = add (ret, "bus", "ISA");
-        }
-        return ret;
-
     }
 
     /**
@@ -455,86 +384,6 @@
         return [];
     }
 
-        /**
-     *
-     *
-     * @return list with configred cards. eg:
-     *  [
-     *      $["unique" : "asdas.asdasd", "state" : "configured", "model" : "SoundBlaster16"],
-     *      $[...]
-     *  ]
-     */
-
-    global define read_configured_cards() ``{
-        if (SCR(`Read(.target.size, "/var/lib/YaST/unique.inf")) == 0)
-        {
-            return [];
-        }
-        list uniq_inf=SCR (`Read(.var.lib.yast.unique));
-        list snd_uniq=[];
-        foreach(`e, uniq_inf,
-        ``{
-            if(lookup(e, "section", "")=="sound")
-            {
-                snd_uniq=lookup(e, "contents", []);
-            }
-        });
-        // now the "configured" values look like 'configured:SoundBlaster16'
-        // we must deivide this and create new key
-
-        string state="";
-        list strings=[];
-
-        list probedcards=[];
-
-        snd_uniq=maplist(`e, snd_uniq,
-        ``{
-            state=lookup(e, "state", ":");
-            strings=splitstring(state, ":");
-            e=add(e, "state", select(strings, 0));
-            if(size(strings)>1)
-            {
-		string modname=select(strings, 1);
-		// substitute underscores by spaces
-		modname=mergestring(splitstring(modname, "_"), " ");
-                e=add(e, "model", modname);
-            }
-            else
-            {
-                string modelname=UI(_("Unknown model"));
-
-                // this probably means, that the system has been upgraded
-                if(probedcards==[])
-                {
-                    probedcards=SCR(`Read(.probe.sound));
-                }
-                foreach(`g, probedcards,
-                ``{
-                    if(lookup(g, "unique_key", "")==lookup(e, "unique", ""))
-                    {
-			if(lookup(g, "sub_device", "")!="")
-			{
-			    modelname=lookup(g, "sub_device", modelname);
-			}
-			else 
-			{
-			    modelname=lookup(g, "device", modelname);
-	    		}    
-                    }
-                });
-
-                e=add(e, "model", modelname);
-
-
-            }
-            return e;
-        });
-
-        return snd_uniq;
-    }
-
-
-
 
     /**
      * Returns list of keys read from /var/lib/YaST/unique.inf
@@ -571,72 +420,6 @@
 	already=output;
 
 	return already;
-    }
-
-    /**
-     * difflist 
-     * @return list with positions of members from a that are not present in b
-     *
-     */
-
-    global define difflist(list a, list b) ``{
-	integer i=0;
-	list ret=[];
-	while(i<size(a))
-	{
-	    if(!contains(b, select(a, i)))
-	    {
-		ret=add(ret, i);
-	    }
-	    i=i+1;
-	}   
-	return ret;
-    }
-
-    /**
-     * get_obsoletes
-     * @return list with obsolete indices of unique keys
-     * @param  cards from .probe.sound
-     * @param  keys unique keys from /var/lib/YaST/unique.inf
-     *
-     * e.g. if in /var/lib/YaST/unique.inf in sound section are keys ["a", "b", "c"]
-     * and card with id "b" is not present in computer, then [1] is returned;
-     */
-
-    global define get_obsoletes(list cards, list keys) ``{
-	list audio_keys=[];
-        integer i=0;
-        integer bound=size(cards);
-
-	while(i<bound)
-        {
-            audio_keys=add(audio_keys, lookup(select(cards, i), "unique_key", ""));
-            i=i+1;
-	    
-        }
-   
-        return difflist(keys, audio_keys);
-    }
-
-    /**
-     * get_present_unique_keys
-     * @return list with unique keys. keys of removed hardware are removed
-     * @param cards is passed to get_obsoletes
-     * @param keys  is passed to get_obsoletes
-     *
-     *
-     */
-
-    global define get_present_unique_keys (list cards, list keys) ``{
-	list obs=get_obsoletes(cards, keys);
-	integer i=size(obs)-1;
-
-	while(i>=0)
-	{
-	    keys=remove(keys, select(obs, i));
-	    i=i-1;
-	}		
-	return keys;
     }
 
     /**
@@ -804,79 +587,6 @@
     }
 
     /**
-     * Use another module than alsa
-     * @return boolean
-     */
-    global define no_alsa_exception (map card, boolean config_mode) ``{
-	if (!config_mode)
-	{
-	    return MacRisc ();
-	}
-	return false;
-    }
-
-    /**
-     * true if system is MacRISC
-     * @return boolean
-     */
-
-    global define MacRisc () ``{
-	if (lookup (select (SCR(`Read(.probe.system)), 0), "system", "") == "MacRISC")
-	{
-	    return true;
-	}
-	return false;
-    }
-
-    /**
-     * Creates save information based on card map return by libhd
-     * First list of exceptions is processed (has two keys : "try" with function to 
-     * provide test and "handle" with function to handle (return) the corrected result
-     * otherwise vendor_id, device_id search in sound db is run
-     *
-     * @return map
-     */
-    global define create_save_info (map card, integer card_id) ``{
-	list except_list = []; //[$["try" : ``(MacRisc ()), "handle" : ``(mac_risc ())]];
-	integer exp_id = 0;
-	
-	while (exp_id < size (except_list))
-	{
-	      if (eval(lookup(select (except_list, exp_id), "try", "")))
-	      {
-		  return eval(lookup(select (except_list, exp_id), "handle", ""));
-	      }
-	      exp_id = exp_id + 1;
-	}
-
-	// no exceptions, normal way ...
-
-
-	map mod     = $[];
-	if (haskey (card, "module"))
-	{
-	    mod = lookup (card, "module");
-	}
-	else
-	{
-	    mod = get_module (card);
-	}
-
-	list params = filter (`e, lookup (lookup (card, "module", $[]), "params", []), ``(size (lookup (e, "value")) > 0));
-	map options = listmap (`e, params, ``([lookup (e, "name", ""), lookup (e, "value", "")]));
-
-	if (lookup (lookup (mod, "module", $[]), "name" , "off") != "off") 
-	{
-	    options = add (options, "snd_id", sformat ("card%1", card_id + 1));
-	    options = add (options, "snd_index", sformat ("%1", card_id));
-	}
-
-	return $["name"   : lookup (lookup (mod, "module", $[]), "name" , "off"),
-		"modules" : $["alias"  : sformat ("snd-card-%1", card_id),
-			     "options" : options]];
-    }
-
-    /**
      * command must be string with $CHANNEL and $VALUE included
      * @return any
      */
@@ -926,68 +636,6 @@
         return "";
     };
 
-        /**
-     * tries to insert module with options (if any)
-     * @return string with error message (empty string if ok)
-     */
-
-    global define probe_module (map card, map user_settings) ``{
-
-        string module_name    = lookup (lookup (card, "module", $[]), "name", "");
-        list params           = filter (`e, lookup (lookup (card, "module", $[]), "params", []), ``(size (lookup (e, "value", "")) > 0));
-        string module_options = mergestring (maplist (`e, params, ``(sformat("%1=%2", lookup (e, "name", ""), lookup (e, "value", "")))), " ");
-        boolean probe         = lookup (lookup (card, "module", $[]), "modprobe", true);
-        boolean mod_active    = lookup (lookup (card, "module", $[]), "active", false);
-
-        if (size (module_name) == 0)
-        {
-                // To translators: error message
-            return UI(_("Invalid module name."));
-        }
-
-	SCR(`Execute (.target.bash, "/etc/init.d/alsasound stop"));
-	
-	// create a dummy modules.conf file
-	string dumbconf=SCR (`Read (.target.tmpdir));
-	dumbconf="/tmp/modules.conf.tmp";
-	SCR(`Execute (.target.bash, sformat("/bin/touch %1", dumbconf), $[]));	
-
-	
-
-        SCR(`Execute (.target.bash, sformat("/sbin/depmod -C %1 -a -F /boot/System.map-`uname -r` `uname -r`", dumbconf), $[]));
-
-        if (!mod_active)
-        {
-            if (!probe)
-            {
-		SCR (`Execute (.target.bash, sformat("/sbin/insmod -C %1 %2 %3", dumbconf, module_name, module_options), $[]));
-            }
-            else
-            {
-		SCR(`Execute(.target.bash, sformat("/sbin/modprobe -C %1 %2 %3", dumbconf, module_name, module_options), $[]));
-            }
-        }
-
-        if (no_alsa)
-        {
-            user_settings = add (user_settings, "play_cmd", "/usr/bin/play");
-            user_settings = add (user_settings, "mixer", "/usr/bin/aumix \"$CHANNEL\" $VOLUME");
-        }
-        else
-        {
-            SCR(`Execute (.target.modprobe, "snd-pcm-oss", "")); // backwards OSS compatibility
-        }
-
-        map pm = SCR(`Read(.proc.modules));
-
-        if (!haskey (pm, module_name))
-        {
-
-                // To translators: label to error popup
-            return sformat (UI(_("The kernel module %1 for sound support\ncould not be loaded.")), module_name);
-        }
-        return "";
-    };
 
     /**
      *  Checks whether the module has been successfully loaded
@@ -1019,24 +667,6 @@
 
     global define create_table (list lm, list lk)
     ``{
-/*	integer i = 0;
-        list itemized_list = [];
-        integer s = size (lm);
-        term val = `item ();
-
-        while (i < s)
-        {
-            val = `item (`id(i));
-            foreach (`k, lk,
-            ``{
-                val = add (val, lookup (select (lm, i), k, ""));
-            });
-
-            itemized_list = add (itemized_list, val);
-            i = i + 1;
-        }
-        return itemized_list;
-*/
 	list res=[];
 	integer pos=0;
 	foreach(`m, lm, 
@@ -1217,50 +847,6 @@
 
     }
 
-   /**
-   * Detected, but not configured cards. contains only cards supported by alsa
-   *
-   * @param unique_keys
-   * @return list
-   */
-    global define get_not_yet (list uniques) ``{
-
-
-        list all = get_audio ();
-	all=filter(`e, all,
-	``(!contains(uniques, lookup(e, "unique_key", "##")))
-	);
-
-        return all;
-    }
-
-    /**
-     *	inserts the options values from save_info to card record
-     *
-     *
-     *
-     */    
-    
-    global define InsertOptions(list optionList, map modifiedOptions) ``{
-	integer i=0;
-	integer iopt=0;
-	list ret=[];
-	map option=$[];
-//	string value="";
-	string optname="";
-
-
-	while(i<size(optionList))
-	{
-	    option=select(optionList, i);
-	    optname=lookup(option, "name", "");
-
-	    ret=add(ret, add(option, "value", lookup(modifiedOptions, optname, "")));
-	    i=i+1;
-	}
-	return ret;
-    }    
-
     /**
      * inserts values to already set options
      * @param 1st save_info entry
@@ -1346,65 +932,6 @@
     }
 
     
-    /**
-     *	adds card entry to temporary modules.conf
-     *
-     *
-     */
- 
-    global define add_tmp_module_record(map save_entry, integer cid) ``{
-	string module_name=lookup(save_entry, "module", "off");
-	string cmd=sformat("/bin/echo alias snd-card-%1 %2 >> ", cid, module_name)+get_tmp_modules_conf();
-	SCR(`Execute(.target.bash, cmd, $[]));
-
-	string options="";	
-
-	mapmap(`e, `f, lookup(save_entry, "options", $[]),
-	``{
-	    options=options+" "+e+"="+f;
-	}
-    	);
-
-	cmd=sformat("/bin/echo options %1 %4 >> ", module_name, cid+1, cid, options) +
-	    get_tmp_modules_conf();
-	SCR(`Execute(.target.bash, cmd, $[]));
-
-	// change snd_cards_limit to cid+1
-	cmd=sformat("/bin/sed s/snd_cards_limit=[0-9]*/snd_cards_limit=%1/ %2 >", cid+1, get_tmp_modules_conf())+get_tmp_modules_conf()+"2";
-	SCR(`Execute(.target.bash, cmd, $[]));
-
-	cmd="cp "+get_tmp_modules_conf()+"2 "+get_tmp_modules_conf();
-	SCR(`Execute(.target.bash, cmd, $[]));
-    }
-
-    /**
-     *	removes card entry from temporary modules.conf. 
-     *  functional only for removing the last record.
-     */
-
-    global define remove_tmp_module_record(integer cid) ``{
-	string cmd=sformat("/bin/sed /snd-card-%1/d %2 > %3", cid, get_tmp_modules_conf(), get_tmp_modules_conf()+"2");
-	SCR(`Execute(.target.bash, cmd, $[]));
-
-	cmd=sformat("/bin/sed /snd_index=%1/d %2 > %3", cid, get_tmp_modules_conf()+"2", get_tmp_modules_conf());
-	SCR(`Execute(.target.bash, cmd, $[]));
-    }
-
-    /**
-     *	removes entry from /tmp/modules.conf.tmp by the module name
-     *
-     */
-
-    global define remove_tmp_module_by_name(string mod_name) ``{
-	string cmd=sformat("/bin/sed /%1/d %2 > %3", mod_name, get_tmp_modules_conf(), get_tmp_modules_conf()+"2");	
-	SCR(`Execute(.target.bash, cmd, $[]));
-	
-
-	cmd=sformat("/bin/cp %1 %2", get_tmp_modules_conf()+"2", get_tmp_modules_conf());
-	SCR(`Execute(.target.bash, cmd, $[]));
-
-    }
-
     /** 
      *	@return true if the fonts have already been installed
      *	
@@ -1505,17 +1032,6 @@
 	return true;
     }
 
-    /** 
-     *  function to order card entries to appropriate order given by uniq_keys
-     *  @param cards card list from .probe.sound
-     *  @param uniques unique keys from /var/lib/YaST/unique.inf
-     */
-
-    global define order_cards_by_uniques(list cards, list uniques) ``{
-	return sort(`e1, `e2, cards, 
-	    ``(uniq_order(lookup(e1, "unique_key", ""), lookup(e2, "unique_key", ""), uniques)));
-    }
-
     /**
      * shows warning message when both nm265 and opl3sa2 cards are present
      * @param cards list of sound cards
@@ -1568,7 +1084,6 @@
     global define remove_save_entries(list save_info, list id_list)
     ``{
 	id_list=sort(`x, `y, id_list, ``(x>=y));
-//	save_info=filter(`e, save_info, ``(lookup(e, "name", "")!=mod_name));
 
 	maplist(`e, id_list, ``{if(e<size(save_info)) save_info=remove(save_info, e); });
 
@@ -1584,17 +1099,6 @@
 	    return e;
 	});
 	return save_info;
-    }
-
-    /**
-     * removes unique keys from key_list listed by position in id_list
-     *
-     */
-
-    global define remove_uniques(list key_list, list id_list) ``{
-	id_list=sort(`x, `y, id_list, ``(x>=y));
-	maplist(`e, id_list, ``{ if(e<size(key_list)) key_list=remove(key_list, e); });
-	return key_list;
     }
 
     /**

@@ -80,6 +80,8 @@
 	string modelname=lookup(save_entry, "model", "");
    
 	boolean show_opts=false;
+
+	nm256hack(lookup(save_entry, "module", ""));
  
 	while(state>0)
 	{

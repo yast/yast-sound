@@ -44,12 +44,6 @@
     define VolumeDialog () ``{
 
 	    //unmute these devices
-//	if (use_alsa)
-//	{
-//	    maplist (`dev, ["PCM", "PCM,1", "Wave", "Master Digital", "Synth"], 
-//			   ``(SetVolume (lookup (user_settings, "mixer", "amixer"), dev, sformat ("%1", 70), card_id)));
-//	}
-	
 	/* help text: adjusting volume */
 
 	string help_text=lookup(STRINGS, "VolumeDialog");

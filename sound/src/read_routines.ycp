@@ -42,7 +42,6 @@
 	// since parameters in modules options are separated by comas (eg. options mod snd_id=1,2,3, snd_index=1,2,3)
 	// we have to count occurences for each module
 
-
         if (contains (aliases, "char-major-116"))
         {
               // alsa modules
@@ -124,55 +123,6 @@
 		
 		save=add(save, entry);
 	    });	
-
-/*            if (SCR(`Read(topath(sformat ("%1.modules.alias", prefix)), "char-major-116")) == "snd")
-            {
-                integer cards   = tointeger (lookup (SCR(`Read(topath (sformat ("%1.modules.options", prefix)), "snd")), "snd_cards_limit", 1));
-                map entry       = $[];
-                map mod_entry   = $[];
-
-                string alias    = "";
-                string module_name   = "";
-                string comment  = "";
-
-                    // read the cards
-                while (i < cards)
-                {
-
-                          // == snd-card-X ==
-                    entry = $[];
-                    alias = sformat ("snd-card-%1", i);
-
-                    if (!contains(aliases, alias))
-                    {
-                        i = i + 1; continue; // not found
-                    }
-
-                    module_name  = SCR(`Read(topath (sformat ("%1.modules.alias", prefix)), alias));
-                    if ((module_name == "off") || (module_name == "null"))
-                    {
-                        i = i + 1; continue;
-                    }
-                    comment = SCR(`Read(topath (sformat ("%1.modules.alias.comment", prefix)), alias));
-
-		                        entry = add (entry, "name", module_name);
-                    mod_entry = add (mod_entry, "alias", alias);
-                    if (contains (options, module_name))
-                    {
-                        mod_entry = add (mod_entry, "options", SCR(`Read(topath (sformat ("%1.modules.options", prefix)), module_name)));
-                    }
-                    if (size (comment) > 0)
-                    {
-                        entry = add (entry, "comment", comment);
-                    }
-
-                    entry = add (entry, "modules", mod_entry);
-                    save = add (save, entry);
-
-                    i = i + 1;
-                }
-            }
-*/
 
         }
         else if (contains (aliases, "char-major-14"))
