@@ -91,11 +91,11 @@
 	    {
 		Wizard::SetContents(_("Joystick configuration"), `Empty(), "", false, false);
 
-		string message = (size(cards) > 0) ? _("Already configured cards do not support joystick.") : _("No configured sound card was found.");
+		string message = (size(cards) > 0) ? _("The configured cards do not support the joystick.") : _("No configured sound card was found.");
 
-		message = message + "\n" + _("Do you want to start sound card configuration?");
+		message = message + "\n" + _("Start sound card configuration?");
 
-		if (UI::YesNoHeadlinePopup(_("No joystick port to configure was found"), message) == true)
+		if (UI::YesNoHeadlinePopup(_("No joystick port to configure was found."), message) == true)
 		{
 		    // start sound module - joystick can be configured there
 		    // so after sound config abort this module
@@ -125,7 +125,7 @@
 		    `PushButton(`id(`config), _("&Configure joystick"))
 		);
 
-		Wizard::SetContents(_("Configured souncards with joystick support"), dialog, helptext, true, true);
+		Wizard::SetContents(_("Configured sound cards with joystick support"), dialog, helptext, true, true);
 		Wizard::ReplaceNextButton(`PushButton(`id(`next), `opt(`default), FinishButtonLabel()));
 
 		// preselect first card
