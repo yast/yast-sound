@@ -241,9 +241,10 @@
 	    else if (ui == `b_options)
 	    {
 		integer card_id = UI(`QueryWidget (`id(`configured_table), `CurrentItem));
-		map card=RestoreCardInfo(card_id, save_info);
+		list cards=get_audio (false,false);
+		map card=RestoreCardInfo(select(cards, card_id), save_info);
+		UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
 		map res=CallModule("sound_options", [card]);
-		y2error("#############sound_options: %1", res);
 		if(lookup(res, "ui")==`next)
 		{
 		    map sinfo=create_save_info (lookup(res, "return"), card_id);
@@ -264,8 +265,10 @@
 		    }
 		    save_info=new_save_info;
 		}
+		UI(`ChangeWidget(`id(`next), `Label, _("&Finish")));
 
-		        UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
+		UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
+		UI(`ChangeWidget(`id(`configured_table), `CurrentItem, 0));
 	    }
 	    else if (ui == `b_alsa) 
 	    {

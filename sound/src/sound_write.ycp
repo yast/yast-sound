@@ -67,8 +67,6 @@
     boolean test_mode = false;
     map sound_info = Args (0);
 
-//    BrowseTree (sound_info);
-
     string helptext = "";
     string err_msg = "";
 

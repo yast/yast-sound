@@ -21,6 +21,7 @@
     textdomain "sound";
     include "misc_defines.ycp";
     include "lan/lan_routines.ycp";
+    include "browser.ycp";
 
 // !!!!!!!!!!!!!!!Hack!!!!!!!!!!!!!!!!!!!!
 
@@ -35,7 +36,7 @@ define isnil(any a)
         return listmap (`k, vars, ``([k, SCR(`Read(topath(sformat (".rc.system.%1", k))))]));
     }
 
-
+    
 
     /**
      *  Converts hex num to integer keeps decimal number as is. Hexadecimal
@@ -272,7 +273,7 @@ define isnil(any a)
      */
 
     global define read_unique_keys () ``{
-	list already = nil;
+	list already = [];
 	if (SCR(`Read(.target.size, "/var/lib/YaST/unique.inf")) > 0)
 	{
 	    already = SCR (`Read(.var.lib.yast.unique));
@@ -974,14 +975,70 @@ define isnil(any a)
         return not_yet;
     }
 
-    global define RestoreCardInfo(integer card_id, list save_info) ``{
-	list cards=get_audio(false,false);   
-	cards =  maplist(`e, cards, ``(add (e, "module", get_module (e))));
-	map card_save=select(save_info, card_id);
+    /**
+     * 
+     *
+     *
+     *
+     */    
     
-	y2error(sformat("%1", save_info));
+    define InsertOptions(list optionList, map modifiedOptions) ``{
+	integer i=0;
+	integer iopt=0;
+	list ret=[];
+	map option=$[];
+//	string value="";
+	string optname="";
+	while(i<size(optionList))
+	{
+	    option=select(optionList, i);
+	    optname=lookup(option, "name");
 
-	return select(cards, card_id);
+/*	    while(iopt<size(modifiedOptions))
+	    {
+		if(lookup(select(modifiedOptions, iopt), "name")==optname)
+		{
+		    value=lookup(select(modifiedOptions, iopt), "value");
+		    break;
+		}
+		iopt=iopt+1;
+	    }
+*/	    
+	    ret=add(ret, add(option, "value", lookup(modifiedOptions, optname, "")));
+	    i=i+1;
+	}
+	return ret;
+    }    
+
+    /**
+     * inserts values to already set options
+     * @param 1st card that is going to be modified
+     * @param 2st save_info with card options
+     *
+     *
+     */
+
+    global define RestoreCardInfo(map card, list save_info) ``{
+	card =  add (card, "module", get_module (card));
+
+	string calias=lookup(lookup(lookup(card, "module", "") , "module", ""), "name", "");
+	
+	list save=filter(`s, save_info, ``(calias==lookup(s, "name", "")));
+
+	if(size(save)==0)
+	{
+	    return card;
+	}
+	map save_opts=lookup(lookup(select(save, 0), "modules", []), "options", []);
+	list options=lookup(lookup(card, "module", $[]), "params", []);   
+ 
+	options=InsertOptions(options, save_opts);
+
+	map newModule=lookup(card, "module");
+	newModule=add(newModule, "params", options);
+	card=add(card, "module", newModule);
+
+	return card;
     }
    
 }
