@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue May 15 13:45:09 CEST 2001 - dmeszar@suse.cz
+
+- doubled text fixed. when a new card is manually added, module description is
+  used as a manufacturer name. (bug #8315)  
+
+-------------------------------------------------------------------
 Mon May 14 10:52:29 CEST 2001 - dmeszar@suse.cz
 
 - sound summary for non-pnp cards fixed (bug #8157)
