@@ -19,7 +19,7 @@
 
     /**
      * tries to determine card model name from audio.alsa agent
-     * @param card_id
+     * @param card_id card id
      * @return card name, "Sound card" on failure
      */
 

@@ -20,7 +20,7 @@
     /**
      * common function to extract 'name' of hardware
      * @param hardware_entry map
-     * @return string
+     * @return string readable name of the card
      */
 
     global define string hardware_name (map hardware_entry) ``{
@@ -64,8 +64,8 @@
     }
 
     /**
-     * returns the result of /usr/bin/whoami
-     * @return string
+     * returns the result of /usr/bin/whoami. currently broken. no idea why...
+     * @return string username
      */
 
     global define string whoami() ``{
@@ -84,6 +84,7 @@
      * logtime- logs current time - used for performance
      * improvements. logs comment with current time
      * @param comment string
+     * @return void
      */
 
     global define void logtime(string comment) ``{
@@ -120,7 +121,7 @@
      * returns true if given string is valid sound alias
      * (snd-card-1 .. snd-card-16)
      * @param alias string
-     * @return boolean
+     * @return boolean is/is not
      *
      */
 
@@ -138,7 +139,7 @@
 
     /**
      * unique key for non-pci/pnp cards or virtual cards
-     * @return string
+     * @return string key for legacy isa cards
      */
 
     global define string isa_uniq() ``{
@@ -147,7 +148,6 @@
 
   /**
    * reads variables listed in 'vars' from rc.config
-   * @param vars list of variables to read
    * @return map optname: value
    */
     global define map read_rc_vars () ``{
@@ -165,8 +165,9 @@
 
     /**
      *  writes unique keys of the configured cards to /var/lib/YaST/unique.inf
+     *  this function should not be used
      *  @param keys list with uniq keys
-     *  @return boolean
+     *  @return boolean success/failure
      *
      *
      */
@@ -187,7 +188,7 @@
     /**
      * Used for searching. returns index of the card in the database identified by name
      * @param name card name
-     * @return integer
+     * @return integer position of the card
      */
 
     global define integer search_card_id (string name) ``{
@@ -211,7 +212,7 @@
      * Itemize list for selection box
      * @param l list with values
      * @param default value to select as default
-     * @return list
+     * @return list items to be shown in list widget
      */
     global define list itemize_list (list l, integer default) ``{
         integer i = 0;
@@ -267,7 +268,7 @@
     /**
      *	show a warning popup for nm256 snd cards if needed
      *  @param modname string module name
-     *  @return boolean
+     *  @return boolean continue/abort
      */
 
     global define boolean nm256hack (string modname) ``{
@@ -283,7 +284,7 @@
     /**
      * Looks up in the database for the module
      * @param card map read from .probe.sound
-     * @return map
+     * @return map relevant card info found in db
      */
     global define map get_module (map card) ``{
 
@@ -352,8 +353,8 @@
     /**
      * stores the volume to file. stored volume will be
      * restored after reboot
-     * @param card_id
-     *
+     * @param card_id card id
+     * @return boolean success/failure
      */
 
     global define boolean storeVolume(integer card_id) ``{
@@ -371,8 +372,8 @@
      *  Checks whether the module has been successfully loaded
      *
      * @param save_entry card config map
-     * @param card_id
-     * @return empty string on success/ error message on failure
+     * @param card_id card id
+     * @return string empty on success/ error message on failure
      */
 
     global define string check_module(map save_entry, integer card_id) ``{
@@ -391,11 +392,12 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
     }
 
 
-    /** creates itemized table entries,
+    /**
+     *  creates itemized table entries,
      *  @param lm list of maps to take keys from
      *  @param lk list of keys to look for in 1st param
      *
-     *  @return list
+     *  @return list of items
      */
 
     global define list create_table (list lm, list lk)
@@ -415,13 +417,14 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
     }
 
     /**
+     * !OBSOLETE (probably)
      * tries to extract list of values from description
      * these values are generated from alsa modules
      * and can be in form
      * [list=value,value,..] or
      * [range=1-19] or something not recognized
      * @param des string
-     * @return list
+     * @return list of...
      */
     global define list parse_values (string des) ``{
         list ret = [];
@@ -484,11 +487,11 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
     /**
      * checks whether param #1 is if type of param #2
-     * @param value
+     * @param value value
      * @param type expected type. one of {int, string}
      * @param poss if poss is nonempty, checks if value is one of them
      * returns error message, empty string if ok
-     * @return string
+     * @return string error message
      */
     global define string check_value (string value, string type, list poss) ``{
         if (type == "int")
@@ -566,7 +569,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      *
      */
 
-    global define void restore_mod_params(map params, map values) ``{
+    global define map restore_mod_params(map params, map values) ``{
 	return mapmap(`e, `f, params,
 	``{
 	    f = add(f, "value", lookup(values, e, ""));
@@ -575,20 +578,9 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
     }
 
-    /** get_tmp_modules_conf returns path to the temporary modules.conf
-     * @return
-     */
-
-    global define string get_tmp_modules_conf() ``{
-	// TODO: remove this func
-	string tmpdir = SCR::Read (.target.tmpdir);
-	// TODO: move this file to yast tmp dir
-	return "/tmp/modules.conf";
-    }
-
     /**
      *  checks whether sound fonts have already been installed
-     *	@return boolean
+     *	@return boolean already installed/not installed
      *
      */
 
@@ -596,8 +588,10 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	return SCR::Read(.target.size, "/usr/share/sfbank/creative") >= 0; // fileexist("/usr/share/sfbank/creative");
     }
 
-    /** @return true if the sound card supports sound fonts
-     * @param save_entry
+    /**
+     * return true if the sound card supports sound fonts
+     * @param save_entry save entry
+     * @return boolean	card supports fonts/it doesn't
      */
 
     global define boolean HasFonts(map save_entry) ``{
@@ -614,9 +608,11 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	return false;
     }
 
-    /** this small wizard will install sound fonts for soundblaster live/awe
+    /**
+     *  this small wizard will install sound fonts for soundblaster live/awe
      *  @param symlink is path to default.sf2 that is to be created
      *  @param dontask if true, skip the first messagebox
+     *  @return void
      */
 
     global define void InstallFonts(string symlink, boolean dontask) ``{
@@ -674,11 +670,12 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
     /**
      * does this machine need a nm256/opl3sa warning?
-     * @return boolean
+     * @param sound_cards sound cards
+     * @return boolean see as above
      *
      */
 
-    global define need_nm256_opl3sa2_warn(list sound_cards) ``{
+    global define boolean need_nm256_opl3sa2_warn(list sound_cards) ``{
 	list mods = maplist(`e, sound_cards, lookup(e, "module", ""));
 	if (contains(mods, "snd-nm256") && contains(mods, "snd-opl3sa2"))
 	{
@@ -690,6 +687,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
     /**
      * shows warning message when both nm265 and opl3sa2 cards are present
      * @param sound_cards list of sound cards
+     * @return void
      */
 
     global define void nm256_opl3sa2_warn(list sound_cards) ``{
@@ -710,25 +708,9 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
 
     /**
-     * remove memebers listed in id_list list
-     * @param input
-     * @param id_list
-     * @return list modified list
-     *
-     */
-
-    global define list multi_remove(list input, list id_list) ``{
-	// TODO: remove me
-	id_list = sort(`x, `y, id_list, ``(x >= y));
-	maplist(`e, id_list, ``{if (e < size(input)) input = remove(input, e); });
-	return input;
-    }
-
-    /**
      * removes entries from save_info listed by indices in id_list
      * @param save_info list
-     * @param id_list list of id's to be removed
-     * @return new save_info
+     * @return list new save_info
      */
 
     global define list recalc_save_entries(list save_info)
@@ -747,7 +729,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
     /**
      * stops all programs using sound devices
-     * @return true if nothing's using sound, false otherwise
+     * @return boolean true if nothing's using sound, false otherwise
      *
      */
 
@@ -780,8 +762,8 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
     /**
      * creates hardware-summary-like list of configured cards
      *
-     * @return richtext
-     * @param save_info
+     * @return string richtext
+     * @param save_info save info
      */
 
     global define string ConfCardsRT(list save_info) ``{
