@@ -14,7 +14,7 @@ textdomain "sound";
 
 include "misc_defines.ycp";
 include "sound/sound_routines.ycp";
-include "lan_routines.ycp";
+include "lan/lan_routines.ycp";
 
 /*
  * Detected, but not configured
