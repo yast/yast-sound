@@ -225,6 +225,8 @@ boolean need_restart=true;
 
     boolean quick = false;
 
+    UI(`DisableWizardAbortButton());
+
     if (size (Args ()) > 2)
     {
 	finish = Args (2);

@@ -352,23 +352,6 @@
                 ),
                 `HSpacing (3)
             );
-	if(show_font_but)
-	{
-	    UI(`ReplaceWidget (`id(`id_rep),
-		    `HBox(
-			`VBox
-                         (
-                            `Left(`CheckBox(`id(`b_alsa), `opt(`notify), _("Start ALSA"), start_alsa)),
-                         // check button label
-                            `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("Start sequencer"), start_alsa_seq))
-                         ),
-			`VBox
-			(
-			    `PushButton (`id(`b_fonts), _("Load soundfonts..."))
-			)
-		    )
-                    ));
-	}
 	return con;
     }
     

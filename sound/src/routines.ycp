@@ -132,14 +132,14 @@
 
         if (module_name == "All") //UI(_("All")))
         {
-            list tmp = filter (`e, db, ``(contains(lookup (e, "cards"), card_name)));
+            list tmp = filter (`e, db, ``(contains(lookup (e, "cards", []), card_name)));
             if (size (tmp) > 0)
             {
                 db_entry = select (tmp, 0);
             }
             else
             {
-                db_entry = select (filter (`e, db, ``(lookup (e, "name", "") == card_name)), 0, $[]);
+                db_entry = select (filter (`e, db, ``(lookup (e, "name", []) == card_name)), 0, $[]);
             }
         }
         else
@@ -171,7 +171,7 @@
         map libhd = select (lookup (db_entry, "libhd", []), 0, $[]);
         ret = add (ret, "vendor_id", lookup (libhd, "vendor_id", 0));
 
-        if (is (lookup (libhd, "device_id"), list))
+        if (is (lookup (libhd, "device_id", 0), list))
         {
             ret = add (ret, "device_id", select (lookup (libhd, "device_id", 0), 0));
             ret = add (ret, "bus", "PCI");
@@ -197,8 +197,8 @@
         {	// copy the whole database
         maplist (`e, db,
             ``{
-                if (size (lookup (e, "cards")) > 0) ret = add (ret, lookup (e, "cards"));
-                else ret = add (ret, [lookup (e, "name")]);
+                if (size (lookup (e, "cards", [])) > 0) ret = add (ret, lookup (e, "cards"));
+                else ret = add (ret, [lookup (e, "name", "")]);
             });
         }
         else
@@ -285,7 +285,7 @@
 	``{
 	    if(lookup(e, "state", "")=="configured")
 	    {
-		output=add(output, lookup(e, "unique"));
+		output=add(output, lookup(e, "unique", nil));
 	    }
 	}
 
@@ -338,7 +338,7 @@
 
 	while(i<bound)
         {
-            audio_keys=add(audio_keys, lookup(select(cards, i), "unique_key"));
+            audio_keys=add(audio_keys, lookup(select(cards, i), "unique_key", ""));
             i=i+1;
 	    
         }
@@ -389,7 +389,7 @@
         if (module_name == "snd-card-nm256")
         {
             // special warning message for in a special case
-            string warn_text=lookup(STRINGS, "nm256hackWarning");
+            string warn_text=lookup(STRINGS, "nm256hackWarning", "");
 //          return UI(`WarnDialog (warn_text));
 	    return UI(`YesNoPopup(warn_text));
         }
@@ -550,7 +550,7 @@
 	    return $[];
 	}
 
-	string bus        = lookup (card, "bus");
+	string bus        = lookup (card, "bus", "");
 	integer offset    = condition ((tolower (bus) == "isa"), 0x20000, 0x10000);
 	integer vendor_id = lookup (card, "vendor_id", 0);
 	integer device_id = lookup (card, "device_id", 0);
@@ -565,7 +565,7 @@
 	    {
 		return $["name": lookup(mod, "name", ""),
 			 "module": mod, 
-			 "params": lookup(fmod, "params"),
+			 "params": lookup(fmod, "params", []),
 			 "libhd": [],
 			 "cards": ["Multimedia audio controller"]];
 	    }
@@ -574,14 +574,14 @@
 	if (tolower (bus) == "pci") 
 	{
 	    fc = filter (`d, db, 
-			 ``(filter(`c, lookup (d, "libhd"), ``((lookup (c, "vendor_id") == vendor_id - offset) && 
-							       (contains(lookup(c, "device_id"), device_id - offset)))) != []));
+			 ``(filter(`c, lookup (d, "libhd", []), ``((lookup (c, "vendor_id", 0) == vendor_id - offset) && 
+							       (contains(lookup(c, "device_id", 0), device_id - offset)))) != []));
 	}
 	else 
 	{
 	    fc = filter (`d, db, 
-		   ``(filter(`c, lookup (d, "libhd"), ``((lookup (c, "vendor_id") == vendor_id - offset) &&
-							 (lookup (c, "device_id") == device_id - offset))) != []));
+		   ``(filter(`c, lookup (d, "libhd", []), ``((lookup (c, "vendor_id", 0) == vendor_id - offset) &&
+							 (lookup (c, "device_id", 0) == device_id - offset))) != []));
 	}
 
 	if (fc!=nil)
@@ -609,7 +609,7 @@
      */
 
     global define MacRisc () ``{
-	if (lookup (select (SCR(`Read(.probe.system)), 0), "system") == "MacRISC")
+	if (lookup (select (SCR(`Read(.probe.system)), 0), "system", "") == "MacRISC")
 	{
 	    return true;
 	}
@@ -630,9 +630,9 @@
 	
 	while (exp_id < size (except_list))
 	{
-	      if (eval(lookup(select (except_list, exp_id), "try")))
+	      if (eval(lookup(select (except_list, exp_id), "try", "")))
 	      {
-		  return eval(lookup(select (except_list, exp_id), "handle"));
+		  return eval(lookup(select (except_list, exp_id), "handle", ""));
 	      }
 	      exp_id = exp_id + 1;
 	}
@@ -809,9 +809,9 @@
 
     global define PlayTest (map user_settings, integer card_id) ``{
 
-        if (!fileexist(lookup (user_settings, "audio_file")))
+        if (!fileexist(lookup (user_settings, "audio_file", "")))
         {
-            string file = lookup (user_settings, "audio_file");
+            string file = lookup (user_settings, "audio_file", "");
 
                   // To translators: just one file will be displayed
                   // To translators: if the test audio file can not be found this message is displayed
@@ -846,7 +846,7 @@
     global define probe_module (map card, map user_settings) ``{
 
         string module_name    = lookup (lookup (card, "module", $[]), "name", "");
-        list params           = filter (`e, lookup (lookup (card, "module", $[]), "params", []), ``(size (lookup (e, "value")) > 0));
+        list params           = filter (`e, lookup (lookup (card, "module", $[]), "params", []), ``(size (lookup (e, "value", "")) > 0));
         string module_options = mergestring (maplist (`e, params, ``(sformat("%1=%2", lookup (e, "name", ""), lookup (e, "value", "")))), " ");
         boolean probe         = lookup (lookup (card, "module", $[]), "modprobe", true);
         boolean mod_active    = lookup (lookup (card, "module", $[]), "active", false);
@@ -1152,7 +1152,7 @@
 	while(i<size(optionList))
 	{
 	    option=select(optionList, i);
-	    optname=lookup(option, "name");
+	    optname=lookup(option, "name", "");
 
 	    ret=add(ret, add(option, "value", lookup(modifiedOptions, optname, "")));
 	    i=i+1;
@@ -1184,7 +1184,7 @@
 
 	options=InsertOptions(options, save_opts);
 
-	map newModule=lookup(card, "module");
+	map newModule=lookup(card, "module", "");
 	newModule=add(newModule, "params", options);
 	card=add(card, "module", newModule);
 
@@ -1300,7 +1300,8 @@
 	{
 	    return true;
 	}
-	if(lookup(card, "sub_vendor_id", "0")==69890)	// TODO: change the id for AWE
+	if(issubstring(tolower(lookup(card, "sub_device", "")), "awe"))
+	    // TODO: improve awe detecting
 	{
 	    return true;
 	}

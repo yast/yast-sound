@@ -26,6 +26,7 @@
     include "sound/ui.ycp";
     include "sound/texts.ycp";
 
+
     // text constants for sound module
     map STRINGS=STRINGS_();
   
@@ -112,7 +113,7 @@
 		{
 		    if (act_dialog == ``(CallModule ("sound_options", [card]))) 
 		    {
-			card = lookup (result, "return");
+			card = lookup (result, "return", $[]);
 		    }
 		}
 	    }
@@ -171,6 +172,8 @@
     OpenMainDialog();
     InitializingDialog ();
 
+    UI(`DisableWizardAbortButton());
+
     boolean test_mode     = false;
     boolean config_mode   = false;
     boolean autoinst_mode = false;
@@ -203,7 +206,7 @@
     list save_info    = read_save_info ();
    
     // filter out save_info of non-present hardware
-    list obs=get_obsoletes(sound_cards, read_unique_keys());
+/*    list obs=get_obsoletes(sound_cards, read_unique_keys());
     integer obs_pos=size(obs)-1;
     string pth="";
     while(obs_pos>=0)
@@ -215,7 +218,7 @@
 	save_info=remove(save_info, select(obs, obs_pos));
 	obs_pos=obs_pos-1;
     }   
-
+*/
     // TODO: save modules.conf now if changed
 
     CreateTmpModulesConf();
@@ -239,6 +242,7 @@
 
     // get all the apropriate information from the database
     sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
+
     // filter out modules with unspecified module name (sound card not supported by alsa)
     sound_cards = filter(`e, sound_cards, ``(lookup(e, "module", $[])!=$[]));
 
@@ -250,7 +254,7 @@
 //    y2error(sformat("alredy configured: %1", already));
     configured_unique=already;
 	// filter out cards that had been already configured
-    sound_cards = filter (`e, sound_cards, ``(!contains (already, lookup (e, "unique_key"))));
+    sound_cards = filter (`e, sound_cards, ``(!contains (already, lookup (e, "unique_key", ""))));
     integer new_cards_num=size(sound_cards);
 
     if(exit)
@@ -343,12 +347,12 @@
 	{
 	
       // confirmation popup message
-	    string warn_msg = lookup(STRINGS, "ConfigSaveWarn");
+	    string warn_msg = lookup(STRINGS, "ConfigSaveWarn", "");
 
-	    if (size(filter (`e, lookup (result, "save_info"), ``((size (e) > 0) && (lookup (e, "name") != "off")))) == 0)
+	    if (size(filter (`e, lookup (result, "save_info", $[]), ``((size (e) > 0) && (lookup (e, "name", "off") != "off")))) == 0)
 	    {
 	// confirmation popup message		
-		warn_msg = lookup(STRINGS, "ConfigSaveWarn2");
+		warn_msg = lookup(STRINGS, "ConfigSaveWarn2", "");
 	    }
 
 	// Yes, No - button label
@@ -356,7 +360,7 @@
 	
 	    if (call_complex_dialog) 
 	    {
-		save_info = lookup (result, "save_info");
+		save_info = lookup (result, "save_info", $[]);
 		rc_vars   = lookup (result, "rc", $[]);
 		configured_unique = lookup (result, "configured_unique", []);
 	    }
@@ -385,7 +389,7 @@
 // !!!!!!!!
 	    if (call_complex_dialog)
             {
-                save_info = lookup (result, "save_info");
+                save_info = lookup (result, "save_info", $[]);
                 rc_vars   = lookup (result, "rc", $[]);
                 configured_unique = lookup (result, "configured_unique", []);
             }
@@ -405,7 +409,7 @@
 	{
 	    string snd_name = "off";
 
-	    if (size (filter (`e, save_info, ``(lookup (e, "name") != "off"))) > 0)
+	    if (size (filter (`e, save_info, ``(lookup (e, "name", "off") != "off"))) > 0)
 	    {
 		snd_name = "snd";
 	    }
@@ -444,7 +448,7 @@
     // always save unique keys 
 	save_unique_keys (get_audio (test_mode, config_mode), configured_unique);
 
-	if (lookup (rc_vars, "START_ALSA") == "no")
+	if (lookup (rc_vars, "START_ALSA", "no") == "no")
 	{
 	    SCR(`Execute (.target.bash, "/etc/init.d/alsasound stop", $[]));
 	}
