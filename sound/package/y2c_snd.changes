@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jul  3 10:27:16 CEST 2000 - kkaempf@suse.de
+
+- changed test sound in alsa package
+  version 2.0.7
+
+-------------------------------------------------------------------
 Thu Jun 29 14:31:03 CEST 2000 - kkaempf@suse.de
 
 - requires y2t_snd
