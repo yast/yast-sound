@@ -34,12 +34,13 @@
     global define joy_dialog() ``{
 	string caption = _("Joystick configuration");
 	string helptext =
-_("<P>In this dialog you can specify your joystick type. If your
+_("<P>In this dialog, specify your joystick type. If your
 joystick type is not in the list, select <B>Generic analog joystick</B>
-(the first item in the list).</P>") +
+(the first item in the list).</P>
+") +
 
-_("<P><B>Note:</B> You need to have your joystick plugged in your computer
-before you press the <B>Next</B> button.</P>");
+_("<P><B>Note:</B> Connect your joystick to your computer
+before pressing <B>Next</B>.</P>");
 
 
 	map joysticks = SCR::Read(.target.yast2, "include/sound/joysticks.ycp");

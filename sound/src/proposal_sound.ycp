@@ -42,7 +42,7 @@
 	// Fill return map
 	ret =
 	    $[ "preformatted_proposal" : proposal,
-	       "warning"               : _("This is just a sound proposal!"),
+	       "warning"               : _("This is just a sound proposal."),
 	       "warning_level"         : `blocker
 	    ];
     }
@@ -63,8 +63,8 @@
     {
 	// Fill return map
 	ret =
-	    $[ "rich_text_title" : _( "Sound" ),
-	       "menu_title"      : _( "&Sound" ),
+	    $[ "rich_text_title" : _("Sound"),
+	       "menu_title"      : _("&Sound"),
 	       "id"              : "sound_conf"
 	    ];
     }
