@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Sep 10 14:54:30 CEST 2001 - dmeszar@suse.cz
+
+- use Arch:: instead of user_settings
+
+-------------------------------------------------------------------
 Tue Sep  4 17:55:16 CEST 2001 - dmeszar@suse.cz
 
 - use alias sound-slot-0 -> sound
