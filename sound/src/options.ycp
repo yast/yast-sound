@@ -188,7 +188,6 @@
 //	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_id"));
 //	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_index"));
 	list options = maplist (`e, `f, opts, ``($["description" : lookup (f, "descr", _("No description available")),
-						//mysformat (lookup (e, "descr", [])),
 						// if no option name is available
 						"name"         : e,
 						"value"        : lookup (f, "value", ""),
