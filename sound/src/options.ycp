@@ -139,7 +139,7 @@
      *
      */
 
-    define OptionsDialog (string cardlabel, list options) ``{
+    global define OptionsDialog (string cardlabel, list options) ``{
 
 
 	string help_text = lookup(STRINGS, "OptionsDialog", "");
@@ -290,9 +290,11 @@
 
 // ===== MAIN =====
 
+    global define sound_options(map save_entry) ``{ 
+
     read_db();
 
-    map save_entry	= Args(0);
+//    map save_entry	= Args(0);
     string modname	= lookup(save_entry, "module", "");
     string cardlabel	= lookup(save_entry, "model", "");
     list params		= get_module_params(modname);
@@ -319,4 +321,6 @@
     save_entry = add(save_entry, "options", opts);
 
     return $["ui" : lookup (result, "ui", `cancel), "return" : save_entry];
+}
+
 }

@@ -21,11 +21,13 @@
 {
     textdomain "sound";
     include "ui/summary.ycp";
+
+    global define sound_select(list sound_cards, list save_info) ``{
 //    include "sound/ui.ycp";
 //    include "sound/routines.ycp";
 
-    list sound_cards	= Args(0);
-    list save_info	= Args(1);
+//    list sound_cards	= Args(0);
+//    list save_info	= Args(1);
 
     // show the dialog
     string confhw = ConfCardsRT(save_info);
@@ -67,5 +69,7 @@
     }
 
     return $["ui" : ui, "type" : type, "id" : index];
+
+}
 
 }

@@ -44,7 +44,7 @@ global define _showName()
 
 global define _options()
 ``{
-    map res = CallFunction (`sound_options(save_entry));
+    map res = sound_options(save_entry);
     symbol ui = lookup(res, "ui", nil);
     if (ui == `next)
     {

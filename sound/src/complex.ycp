@@ -26,6 +26,7 @@
     textdomain "sound";
 
     include "sound/mixer.ycp";
+    include "browser.ycp";
 
 //    include "misc_defines.ycp";
 //    include "sound/routines.ycp";
@@ -46,7 +47,7 @@
      * @return table contents
      */
 
-    define createTable(list save_info) ``{
+    global define createTable(list save_info) ``{
 	list runn   = get_running_cards();
 	integer pos = 0;
 	list ret    = maplist(`e, save_info, 
@@ -102,7 +103,7 @@
     }
 
 
-    define enableButtons(boolean val) ``{
+    global define enableButtons(boolean val) ``{
 	UI::ChangeWidget(`id(`b_delete),    `Enabled, val);
         UI::ChangeWidget(`id(`b_options),   `Enabled, val);
 	UI::ChangeWidget(`id(`b_volume),    `Enabled, val);
@@ -115,7 +116,7 @@
      * @return map
      */
 
-    define ComplexDialog () ``{
+    global define ComplexDialog () ``{
 	// help text 
 	any ui = nil;
         string helptext = lookup(STRINGS, "ComplexDialog", "");
@@ -129,6 +130,7 @@ the number of configured cards in your configuration files.
 Try to restart sound system?")))
  
 	    {
+		BrowseTree(save_info);
 		sound_stop();
 		sound_start_tmp(true);
 		// TODO revise
@@ -180,7 +182,7 @@ Try to restart sound system?")))
 
 		map entry = select(save_info, card_id);    
 	
-		map res = CallFunction(`sound_options(entry));
+		map res = sound_options(entry);
 		if (lookup(res, "ui", nil) == `next)
 		{
 		    entry = lookup(res, "return", $[]);
@@ -286,8 +288,9 @@ Try to restart sound system?")))
     }
 
 // ===== MAIN =====
+    global define sound_complex(list save_info) ``{
 
-    list save_info	= Args(0);
+//    list save_info	= Args(0);
     list to_delete	= [];
     boolean config_mode = false;
 
@@ -305,4 +308,6 @@ Try to restart sound system?")))
     }
 
     return ComplexDialog ();
+
+}
 }
