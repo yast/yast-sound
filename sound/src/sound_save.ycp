@@ -4,248 +4,180 @@
  *
  * $Id$
  *
- * no parameters required,
- * returns user input.
+ * Params:
+ *         1st ... map with information to store with these keys:
+ *                 "cards"  : <list> // list with all card-dependent information
+ *                 "system" : <map> // list with all system dependent information
+ *                 "other"  : <term> // function to call to provide some additional work
+ *
+ *                  each element of cards list will be a map with these keys:
+ *
+ *                                   "name"    : <string> // card name
+ *                                   "modules" : <map>    // map for 'modules.conf' with "alias" and
+ *                                                        // "options" keys
+ *                                   "volume"  : <map>    // map for storing volume, map keys should be
+ *                                                        // channels
+ *
+ *                  system will be a map with (possible many more) these keys:
+ *
+ *                                   "modules" : <list> // list of maps for 'modules.conf' - "alias",
+ *                                                      // "options"; it's list because more than one entry
+ *                                                      // to 'modules.conf' will be needed
+ *
+ *                                   "volume"  : <map>  // "mixer" ... mixer command to set-up the volume 
+ *                                                                     (must include $CHANNEL and $VOLUME substrings, i.e:
+ *                                                                      "/usr/bin/amixer set \"$CHANNEL\" $VOLUME% unmute")
+ *                                                      // "store" ... function to call to store the info.
+ *                 
+ *
+ *        2nd ... boolean - testmode
+ *
+ * Steps:
+ *        1. save '/etc/modules/conf'
+ *        2. save volume
+ *        3. call function to provide some additional work
+ *
+ * Return boolean true on success, false if failed
  */
 
 {
 
-
-	SCR(``{			// reads/writes lines from file, deletes blank lines
-	    MountAgent (`ag_anyagent(
-		``Description (
-		    ``File("/etc/modules.conf"),         // real file name
-		    "\n",                     // Comment
-		    false,                     // read-only
-		    ``List (
-			String ("^\n"),
-			"\n"
-			)
-		    )
-		), .lines);
-	    
-	});
+    /*
+     * Saves one '/etc/modules.conf' entry
+     */
+    define SaveOneModulesEntry (string entry_name, map entry) ``{
+	boolean ret = true;
 	
+	if (haskey (entry, "alias")) {
+	    ret = ret && SCR(`Write(.modules.alias, entry_name, lookup(entry, "alias")));
+
+	    if (haskey (entry, "options"))
+		ret = ret && SCR(`Write(.modules.options, lookup(entry, "options"), entry_name));
+	}
+	return ret;
+    }
+
+    /* 
+     * Saves all '/etc/modules.conf' entries
+     */
+    define SaveModulesEntry (list cards, list system) ``{
+
+	if ((contains(maplist (`e, cards, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) {
+	    err_msg = err_msg + UI(_("Error while saving '/etc/modules.conf'.\n"));
+	    return false;
+	}
+
+	if (size (cards) > 0)
+	    SCR(`Write(.modules.alias.comment, "\n#\n# YaST2: sound cards support\n#\n", lookup (lookup (select (cards, 0), "modules", $[]), "alias")));
+
+	if ((contains(maplist (`e, system, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) {
+	    err_msg = err_msg + UI(_("Error while saving '/etc/modules.conf'.\n"));
+	    return false;
+	}
+
+	if (size (system) > 0)
+	    SCR(`Write(.modules.alias.comment, "\n#\n# YaST2: sound system dependent part\n#\n", 
+		       lookup (lookup (select (system, 0), "modules", $[]), "alias")));
+
+	if (!SCR(`Write(.modules, nil))) {
+	    err_msg = err_msg + UI(_("Error while saving '/etc/modules.conf'.\n"));
+	    return false;
+	}
 	
+	return true;
+    }
 
+    /*
+     * command must be string with $CHANNEL and $VALUE included
+     */
+    define SetVolume (string command, string channel, string value) ``{
+	return Shell (command, $["CHANNEL" : channel, "VOLUME" : value]);
+    }
 
-				// writes modules.conf, it makes a
-				// backup and appends to the end of
-				// modules.conf aliases and options
-				// for the configured sound card
+    /*
+     * Sets volume for all channels
+     */
+    define SetAllChannels (list cards, string command) ``{
+	if (contains (maplist (`e, cards, ``(maplist(`ch, `v, lookup (e, "volume", $[]), ``(SetVolume (command, ch, v))))), false)) {
+	    err_msg = err_msg + UI(_("Error while setting volume.\n"));
+	    return false;
+	}
+	return true;
+    }
 
-	define ConfModules (string file) ``{
-		// first comment out all lines containing snd|sound
-	    Shell ("/bin/cp -f $FILE $FILE.old; /usr/bin/sed 's/^\\([^#].*snd.*$\\|[^#].*sound.*$\\)/# \\1/' $FILE > /tmp/$FILE.sed; /bin/mv -f /tmp/$FILE.sed $FILE",
-		   $["FILE" : file]);
-
-
-	    list|void l = SCR(`Read(.lines));
-
-	    if (l == nil) 
-		    // To translators: just one file will be displayed
-		return sformat (UI(_("Cannot find file: %1")), file);
-
-	    l = add (l, "\n");
-	    
-	    list newl = [];
-
-	    integer length = size (l);
-    
-	    integer n = 0;
-	    string|void line = select (l, n);
-
-				// read until ALSA section
-	    while ((line != nil) && (n < length)  &&
-		   (line != "# ALSA section {$#@begin@#$} [don't remove or move this line] vvvvv")) {
-		newl = add (newl, line);
-		line = select (l, n);
-		n = n + 1;
-	    }
-				// skip ALSA section
-	    while ((line != nil) &&  (n < length)  &&
-		   (line != "# ALSA section {$#@_end_@#$} [don't remove or move this line] ^^^^^")) {
-		line = select (l, n);
-		n = n + 1;
-	    }
+    /*
+     * Save volume (for alsa it's alsactl store
+     */
+    define SaveVolume (string function, string mixer_command, list cards) ``{
 	
-	    n = n + 1;
-	    if (n < length)
-		line = select (l, n);
-				// read the rest
-	    while ((line != nil) && (n < length)) {
-		newl = add (newl, line);
-		line = select (l, n);
-		n = n + 1;
-	    }
+	SetAllChannels (cards, mixer_command);
 
-		// possible string for SB Live!
-	    list sb_live_exception = ["SB Live!",
-				     "Sound Blaster Live!"];
-	    boolean sb_live = contains(sb_live_exception, hardware_name (snd_info));
+	return Shell (function);
+    }
 
-	    string module_name = lookup (lookup (lookup (snd_info, "module", $[]), "module", $[]), "name", "snd-card-dummy");
-	    boolean has_isapnp = contains(maplist (`p, lookup (snd_info, "params", []), ``(lookup (p, "name", "") == "snd_isapnp")), true);
-	    string isapnp = condition ((selected_manually && has_isapnp), "snd_isapnp=0", "");
-	    
+    /*
+     * Additional hack to enable ALSA joystick support
+     */
+    define EnableJoystick () ``{
 
-	    newl = add (newl, "# ALSA section {$#@begin@#$} [don't remove or move this line] vvvvv");
-
-	    if (module_name == "dmasound") {
-		newl = add (newl, "# MacRISC sound support, generated by YaST2");
-		newl = add (newl, "alias char-major-14 dmasound");
-		newl = add (newl, "alias sound dmasound");
-		newl = add (newl, "alias midi dmasound");
-		newl = add (newl, "alias sound-slot-0 dmasound");
-		newl = add (newl, "alias sound-service-0-0 dmasound");
-		newl = add (newl, "# end of MacRISC");
-	    } else
-	    {
-				// and write configured card
-	    newl = add (newl, "#");
-	    newl = add (newl, "# ALSA native device support, generated by YaST2");
-	    newl = add (newl, "#");
-	    newl = add (newl, "alias char-major-116 snd");
-	    newl = add (newl, "options snd snd_major=116 snd_cards_limit=1");
-	    newl = add (newl, sformat ("alias snd-card-0 %1", module_name));
-	    newl = add (newl, sformat ("options %1 snd_index=%2 snd_id=%3 %4 %5",
-				       module_name,
-				       lookup (options_entered, "snd_index", 0),
-				       lookup (options_entered, "snd_id", "card1"),
-				       lookup (snd_info, "conf", ""),
-				       isapnp
-				       ));
-	    newl = add (newl, "#");
-	    newl = add (newl, "# OSS/Free emulation");
-	    newl = add (newl, "#");
-	    newl = add (newl, "alias sound-slot-0 snd-card-0");
-	    newl = add (newl, "alias sound-service-0-0 snd-mixer-oss");
-	    newl = add (newl, "alias sound-service-0-1 snd-seq-oss");
-	    newl = add (newl, "alias sound-service-0-3 snd-pcm-oss");
-	    newl = add (newl, "alias sound-service-0-8 snd-seq-oss");
-	    newl = add (newl, "alias sound-service-0-12 snd-pcm-oss");
-	    newl = add (newl, "#");
-
-	    if (sb_live) {
-		newl = add (newl, "#");
-		newl = add (newl, "# Analog joystick support for SBLive! boards");
-		newl = add (newl, "#");
-		newl = add (newl, "# alias char-major-15 joy-analog");
-		newl = add (newl, "# pre-install joy-analog modprobe \"-k\" \"emu10k1-joy\" \"io=0x200\"");
-		newl = add (newl, "# post-install emu10k1-joy modprobe \"-k\" \"joystick\"");
-	    }
-	    
-	    } // not dmasound
-	    
-	    newl = add (newl, "# ALSA section {$#@_end_@#$} [don't remove or move this line] ^^^^^");
-
-
-
-	    if (SCR(`Write(.lines, newl)) != 0)
-		    // To translators: just one file will be displayed in instead parameter %1
-		return sformat (UI(_("Cannot write file: %1.\nThe sound will not be started after next reboot.\nThe sound is not configured well.")), file);
-
-	    return "";
-	};
-
-
-	define EnableJoystick () ``{
-
-	    return Shell ("/usr/sbin/alsactl -f /tmp/asound.conf store;\
+	return Shell ("/usr/sbin/alsactl -f /tmp/asound.conf store;\
 	    /usr/bin/sed '/\"Joystick\"/s/false/true/' /tmp/asound.conf >/etc/asound.conf;\
 	    /bin/rm -f /tmp/asound.conf;\
             /usr/sbin/alsactl restore");	    
-
-	};
-  
-				// 1. depmode 2. save modules.conf 3. depmode 4. alsactl store
-	define save () ``{
-
-	    string err = "";
-	    
-	    if (Shell("/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`") == 127)
-		    // To translators: error popup message
-		return UI (_("Cannot make a list of module dependencies.\nProgram 'depmod' missing,\nplease check to see if the 'modules' package from series 'a' is installed."));
-	    
-	    err = ConfModules (modules_conf);
-
-	    if (size (err) > 0)
-		return err;
-
-	    if (Shell("/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`") == 127)
-		    // To translators: error popup message
-		return UI (_("Cannot make a list of module dependencies.\nProgram 'depmod' missing,\nplease check to see if the 'modules' package from series 'a' is installed."));
-
-		//if (Shell ("/usr/sbin/alsactl store") == 127)
-		//return UI(_("Cannot find 'alsactl'\nPlease check your installation of ALSA package (series 'snd1')"));
-	    if (EnableJoystick () == 127)
-		    // To translators: error popup message
-		return UI(_("Cannot find 'alsactl'\nPlease check your installation of ALSA package (series 'snd')"));
-	    
-	    return "";
-	    
-	};
 	
-
-	    // ======= main ========
-
-	string modules_conf = "/etc/modules.conf";
+    }
 	
-				// Help text - saving configuration/volume 1/2
-	string help_text = UI(_("<p>The previously adjusted <b>volume</b> will be <b>stored</b> for later use.</p>"));
-				// Help text - saving configuration/volume 2/2
-	help_text = help_text + UI(_("<p>The configuration of the sound card will be <b>saved</b>.</p>"));
+    /*
+     * function to finish ALSA instalation
+     */
+    define AlsaFinish () ``{
 
-	boolean next = false;
-	boolean back = false;
+	EnableJoystick ();
+    }
 
-	map snd_info = Args (0);
-	map options_entered = Args (1);
-	
-	term con = `VBox (
-	    `Top (
-		`Label (hardware_name (snd_info))
-		),
-	    `HVCenter (
-		`ReplacePoint(`id(`la),
-				// To translators: label message
-			      `Label (_("Saving ..."))
-			      )));
-	
-	UI(`SetContents (_("Sound cards"), con, help_text, back, next));
+    // ==== MAIN ====
 
-	any ui = nil;
+    boolean test_mode = false;
+    map sound_info = Args (0);
+    string helptext = "";
+    string err_msg = "";
 
-	string err = "";
-	if (!test_mode)
-	    err = save ();
+    
+    if (size (Args ()) > 1)
+	test_mode = Args (1);
 
-	UI(`ChangeWidget (`id(`next), `Label, _("&Next")));
 
-	UI(`ReplaceWidget(`id(`la), `Label("")));
-	
-	if (size (err) > 0) {
-	    
-	    UI(`ChangeWidget(`id(`back), `Enabled, true));
-		// To translators: error label message
-	    UI(`ReplaceWidget(`id(`la), `Label(sformat (UI(_("The sound card configuration could not be saved\n due to following error:\n%1")),
-							err))));
+    term con = `Label(_("Saving ..."));
+    UI(`SetWizardContents (_("Sound configuration"), con, helptext, false, false));
 
-	    repeat {
-		
-		ui = UI(`UserInput ());
-	    
-	    } until (ui == `next || ui == `back || ui == `cancel);
-	    
-	    
-	    return ui;
-	    
-	}
-	else {
+    // Step ONE: save '/etc/modules.conf'
+    if (!test_mode)
+	SaveModulesEntry (lookup (sound_info, "cards", []), lookup (lookup (sound_info, "system", $[]), "modules", []));
 
-		// To translators: label message
-	    UI (`DisplayMessage (_("The sound card was succesfully configured.\nYou can now use it immediately.")));
-	}
+    string mixer_command = lookup (lookup (lookup (sound_info, "system", $[]), "volume", $[]), "mixer", "");
+    string function      = lookup (lookup (lookup (sound_info, "system", $[]), "volume", $[]), "store", "");
 
-	return `next;
+    // Step TWO: save volume
+    if (!test_mode)
+	SaveVolume (function, mixer_command, lookup (sound_info, "cards", []));
+
+
+    // Step THREE: call "other" function to handle some additional workaround
+    if (!test_mode)
+	eval (lookup (sound_info, "other"));
+
+    // Finally let's display message
+
+    string final_msg = "";
+    if (size (err_msg) > 0)
+	final_msg = sformat (UI(_("These errors ocured during saving configuration:\n%1")), err_msg);
+    else
+	final_msg = UI(_("The sound card was succesfully configured.\nYou can now use it immediately."));
+
+    if (test_mode)
+	final_msg = final_msg + " " + UI(_("(TEST MODE)"));
+    
+    UI(`DisplayMessage (final_msg));
+
+    return (size (err_msg) == 0);
 }

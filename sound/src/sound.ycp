@@ -19,6 +19,7 @@
 
 {
     Include (`misc_defines());
+    Include (`sound_routines());
 
 	  // Menuentry for the YaST2 menu
 	if (Args() == [ "get_menuentry" ]) 
@@ -360,6 +361,41 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 	};
 
 
+	// temporal hack to use new sound_save
+	define convert2new_info (map info, map options) ``{
+	    map ret = $[];
+	    
+	    if (lookup (lookup (lookup (info, "module", $[]), "module", $[]), "name", "") == "dmasound")
+		return add (ret, "system", mac_risc ());
+
+
+	    list cards = [$["name"   : "snd",
+			   "modules" : $["alias"  : "char-major-116",
+					"options" : $["snd_cards_limit" : "1", // this should change for more than one card
+						     "snd_major"        : "116"]]]];
+	    
+	    options = add (options, "snd_index", "0");	// first card
+	    options = add (options, "snd_id", "card1");
+
+	    cards = add (cards, $["name"   : lookup (lookup (lookup (info, "module", $[]), "module", $[]), "name", "snd-card-dummy"),
+				 "modules" : $["alias" : "snd-card-0", // first card
+					      "options" : options]]);
+
+
+	    ret = add (ret, "system", $["modules" : alsa_oss (1), // one card
+				       "volume" : $[
+					   "mixer" : "/usr/bin/amixer set \"$CHANNEL\" $VOLUME% unmute",
+					   "store" : "/usr/sbin/alsactl store"]]);
+	    
+	    ret = add (ret, "other",  ``AlsaFinish ());
+	    ret = add (ret, "cards",  cards);
+
+	    return ret;
+
+	    
+	}
+
+
 
 // ============= dialogs ============
 
@@ -456,7 +492,7 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 			    // Help text 1/2 (one sound card found)
 			help_text = UI (_("<p>The sound card was
  found. If you want to configure this sound card press <i>Next</i>
- otherwise quit by pressing <i>Back</i><p/>"));
+ otherwise quit by pressing <i>Back</i></p>"));
 
 			    // Help text 2/2 (one sound card found)
 			help_text = help_text + UI (_("<p>You can
@@ -773,8 +809,11 @@ Do you want to select the driver manually?"),
 			while (cont) {
 			    any vol_ui = CallFunction (`sound_volume (snd_info));
 			    cont = (vol_ui != `next);
-			    if (vol_ui == `next)
-				cont = (CallFunction (`sound_save (snd_info, options_entered)) != `next);
+			    if (vol_ui == `next) {
+				map sound_save_info = convert2new_info (snd_info, options_entered);
+				cont = false;
+				CallFunction (`sound_save (sound_save_info));
+			    }
 			    else if (vol_ui == `back) {
 				found = FindCard ();
 				break;

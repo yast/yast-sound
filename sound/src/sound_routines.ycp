@@ -1,0 +1,60 @@
+{
+
+/*
+ * Simply returns list with ALSA OSS/Free emulation modules
+ * Params: "number" ... number of sound cards
+ */
+define alsa_oss (integer number) ``{
+
+
+    list modules = [];
+    integer i = 0;
+    // map with minor as a key and module as value
+    map oss_list = $[		
+	0  : "snd-mixer-oss",
+	11 : "snd-mixer-oss",
+	3  : "snd-pcm-oss",
+	12 : "snd-pcm-oss",
+	1  : "snd-seq-oss",
+	8  : "snd-seq-oss"
+	];
+    
+    while (i < number) {
+	modules = add (modules, $["name"   : sformat ("snd-card-%1", i),
+				 "modules" : $["alias" : sformat ("sound-slot-%1", i)]]);
+
+	modules = union (modules, maplist (`minor, `module, oss_list, ``(
+	    $["name"   : sformat ("%1", module),
+	     "modules" : $["alias" : sformat ("sound-service-%1-%2", i, minor)]])));
+
+	i = i + 1;
+    }
+
+    return modules;
+}
+
+
+/*
+ * This is MacRisc hack function (no ALSA)
+ */
+define mac_risc () ``{
+    return $[
+	"modules" : [
+	    $["name"   : "dmasound",
+	     "modules" : $["alias" :  "char-major-14"]],
+	    $["name"   : "dmasound",
+	     "modules" : $["alias" :  "sound"]],
+	    $["name"   : "dmasound",
+	     "modules" : $["alias" :  "midi"]],
+	    $["name"   : "dmasound",
+	     "modules" : $["alias" :  "sound-slot-0"]],
+	    $["name"   : "dmasound",
+	     "modules" : $["alias" :  "sound-service-0-0"]]	    
+	    ],
+	"volume" : $[
+	    "mixer" : "/usr/bin/aumix \"$CHANNEL\" $VOLUME"
+	    ]
+	];
+}
+
+}
