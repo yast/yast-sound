@@ -267,6 +267,10 @@ Try to restart sound system?")))
 		{
 		    break;
 		}   
+		else
+		{
+		    ui = `skip_event;
+		}
 	    }
 	
 	

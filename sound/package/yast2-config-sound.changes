@@ -1,4 +1,18 @@
 -------------------------------------------------------------------
+Thu Sep 20 13:48:34 CEST 2001 - dmeszar@suse.cz
+
+- bug #10941 ('nil' shown as card label when uniq_id has changed 
+  after update)
+- comment added for translators
+
+-------------------------------------------------------------------
+Tue Sep 18 15:49:56 CEST 2001 - dmeszar@suse.cz
+
+- corrected abort behaviour in complex dialog (#not reported)
+  (when user pressed abort, module ended even if she pressed 
+  'no' in 'really abort' dialog)
+
+-------------------------------------------------------------------
 Mon Sep 17 16:02:57 CEST 2001 - dmeszar@suse.cz
 
 - bug #10750 fixed (don't save when nothing has changed)
