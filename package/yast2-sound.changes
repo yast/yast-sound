@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Jul 31 10:58:49 CEST 2002 - arvin@suse.de
+
+- removed yast2-runlevel from neededforbuild and requires
+
+-------------------------------------------------------------------
 Mon Jul 22 17:43:55 CEST 2002 - arvin@suse.de
 
 - updated sound and joystick databases

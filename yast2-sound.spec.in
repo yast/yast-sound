@@ -1,10 +1,10 @@
 @HEADER-COMMENT@
 
-# neededforbuild  alsa alsa-devel gpp hwinfo libgpp yast2-devel-packages yast2-runlevel yast2-testsuite
+# neededforbuild  alsa alsa-devel gpp hwinfo libgpp yast2-devel-packages
 
 @HEADER@
 
-Requires:	yast2 yast2-core yast2-runlevel hwinfo
+Requires:	yast2 yast2-core hwinfo
 Summary:	Yast2 - Sound configuration
 
 Provides:	yast2-config-sound yast2-agent-audio yast2-agent-audio-devel yast2-db-sound
