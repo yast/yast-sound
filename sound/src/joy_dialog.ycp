@@ -35,7 +35,7 @@
      */
 
     global define symbol joy_dialog(integer card_id, symbol button) ``{
-	string nonejoy = _("None joystick");
+	string nonejoy = _("No joystick");
 
 	if (card_id == nil)
 	{
@@ -48,8 +48,9 @@ _("<P>In this dialog, specify your joystick type. If your
 joystick type is not in the list, select <B>Generic analog joystick</B>.</P>
 ") +
 
-_("<P>If you want to remove configured joystick from system
-or you have no joystick then select <B>None joystick</B>.</P>") +
+_("<P>To remove the configured joystick from system
+or if you do not have a joystick, select <B>No joystick</B>.</P>
+") +
 
 _("<P><B>Note:</B> Connect your joystick to your computer
 before pressing <B>Next</B>.</P>");
@@ -152,7 +153,10 @@ before pressing <B>Next</B>.</P>");
 
 	    if (s == `next && UI::QueryWidget(`id(`os), `CurrentItem) == nil)
 	    {
-		UI::WarningPopup(_("Please select joystick type from list\nbefore pressing Next."));
+		UI::WarningPopup(_("Select the joystick type from the list
+before pressing Next.
+
+"));
 		s = `skip;
 	    }
 
@@ -163,7 +167,7 @@ before pressing <B>Next</B>.</P>");
 	    string modname = lookup(select(Sound::modules_conf, card_id, $[]), "module", "");
 	    map joy_entry = Sound::GetJoystickSettings(modname);
 	    integer joymodidx = UI::QueryWidget(`id(`os), `CurrentItem);
-	    string joymod = select(select(joylist, joymodidx, ["", _("None joystick")]), 0, "");
+	    string joymod = select(select(joylist, joymodidx, ["", _("No joystick")]), 0, "");
 
 	    if (joymod == "")
 	    {
