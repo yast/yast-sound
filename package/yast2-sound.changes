@@ -1,0 +1,549 @@
+-------------------------------------------------------------------
+Mon Jul  1 10:24:03 CEST 2002 - lslezak@suse.cz
+
+- merged yast2 sound packages: yast2-agent-audio,
+  yast2-config-sound, yast2-db-sound
+- renamed to yast2-sound
+
+-------------------------------------------------------------------
+Mon Jun 24 14:24:13 CEST 2002 - lslezak@suse.cz
+
+- fixed missing translation
+- updated to automake-1.6.2
+- version 2.6.5
+
+-------------------------------------------------------------------
+Tue May  7 09:32:13 CEST 2002 - lslezak@suse.cz
+
+- menu entries moved to config dir
+- version 2.6.4
+
+-------------------------------------------------------------------
+Mon Apr 29 11:44:00 CEST 2002 - lslezak@suse.cz
+
+- allow joystick configuration even in quick mode
+- removed unused code (.tmp.modules)
+- fixed most of ycpdoc comments
+- use /etc/init.d/* instead /usr/sbin/rc*
+- write joystick model to sysconfig comment
+- joystick.ycp - new YaST2 client
+- removing joystick configuration is possible
+- Sound:: added joystick related functions
+- removed Start ALSA option in UI
+- use LOAD_SEQUENCER in /etc/sysconfig/sound
+- added joystick documentation
+- test mode in joystick
+- version 2.6.3
+
+-------------------------------------------------------------------
+Mon Apr 15 17:54:55 CEST 2002 - lslezak@suse.cz
+
+- update to automake 1.6.1
+
+-------------------------------------------------------------------
+Fri Apr 12 08:19:12 CEST 2002 - lslezak@suse.cz
+
+- update to automake 1.6
+- version 2.6.1
+
+-------------------------------------------------------------------
+Wed Apr 10 14:57:49 CEST 2002 - lslezak@suse.cz
+
+- SuSE-8_0-Branch merged to the head
+- spec file changes
+- testsuite fixes
+- added includes and imports
+- version 2.6.0
+
+-------------------------------------------------------------------
+Wed Mar 27 12:15:22 CET 2002 - dmeszar@suse.cz
+
+- fixed #15526 (start joystick in init only if there's a configured one)
+
+-------------------------------------------------------------------
+Thu Mar 21 14:44:57 CET 2002 - mvidner@suse.cz
+
+- Fixed rcjoystick invocation. (#14957)
+- 2.5.18
+
+-------------------------------------------------------------------
+Fri Mar 15 14:27:17 CET 2002 - dmeszar@suse.cz
+
+- fixed #14590 (Sound re-configuration broken after update in some cases)
+
+-------------------------------------------------------------------
+Tue Mar 12 15:13:27 CET 2002 - dmeszar@suse.cz
+
+- fixed #14876 (channels are not unmuted when configured via tv module
+  on running system)
+- fixed #14725 (abort confirmation when no changes were made)
+
+-------------------------------------------------------------------
+Wed Mar  6 16:21:35 CET 2002 - dmeszar@suse.cz
+
+- fixed #14539 (infinite loop when setting option value to '')
+- return empty map when aborted in autoyast (#14526)
+
+-------------------------------------------------------------------
+Wed Feb 27 14:44:59 CET 2002 - dmeszar@suse.cz
+
+- fixed #13981 (exit the sound_write module when the proposal
+  is empty (this applies only to proposal mode))
+
+-------------------------------------------------------------------
+Fri Feb 22 14:58:31 CET 2002 - dmeszar@suse.cz
+
+- fixed #13601 (all volumes at zero after installation)
+- screenshot mode implemented
+- fixed proposing of nm256 soundcards
+
+-------------------------------------------------------------------
+Mon Feb 18 19:06:00 CET 2002 - dmeszar@suse.cz
+
+- implemented joystick configuration
+- adaptation for sound db changes (option description can be both
+  string and list of strings)
+
+-------------------------------------------------------------------
+Mon Feb 11 14:29:33 CET 2002 - dmeszar@suse.cz
+
+- speed improvements, proposal implemented
+
+-------------------------------------------------------------------
+Fri Feb  8 18:25:12 CET 2002 - lnussel@suse.de
+
+- command line argument is of type string
+
+-------------------------------------------------------------------
+Mon Jan 28 13:08:04 CET 2002 - dmeszar@suse.cz
+
+- fixed bug #12925 (config of single autodetected card not possible)
+- added proposal_sound.ycp file
+
+-------------------------------------------------------------------
+Thu Jan 17 15:33:51 CET 2002 - dmeszar@suse.cz
+
+- added joystick type selector dialog
+
+-------------------------------------------------------------------
+Mon Jan 14 16:08:24 CET 2002 - dmeszar@suse.cz
+
+- fixed bug #11717 (restart modules after options had changed)
+- moved /etc/sysconfig/alsa to /etc/sysconfig/sound
+
+-------------------------------------------------------------------
+Mon Jan  7 16:33:36 CET 2002 - dmeszar@suse.cz
+
+- removed START_ALSA (moved to runlevel editor) and START_ALSA_SEQ
+  (moved to /etc/sysconfig/alsa) variables.
+- uses new sound database
+
+-------------------------------------------------------------------
+Tue Dec 18 11:34:33 CET 2001 - dmeszar@suse.cz
+
+- Sound module implemented, third param for 'select'
+
+-------------------------------------------------------------------
+Fri Nov  9 14:32:52 CET 2001 - dmeszar@suse.cz
+
+- use Wizard module, Wizard_hw module and other new libycp features
+
+-------------------------------------------------------------------
+Thu Oct  4 14:19:08 CEST 2001 - dmeszar@suse.cz
+
+- setting volume to 75% for test sample for 'daca' cards (ppc)
+  (bug #11339)
+
+-------------------------------------------------------------------
+Fri Sep 21 12:16:42 CEST 2001 - dmeszar@suse.cz
+
+- bug #7198 fixed (warning popup for nm256 sound cards 
+  not shown when the card is configured and module is 
+  launched again)
+
+-------------------------------------------------------------------
+Thu Sep 20 13:48:34 CEST 2001 - dmeszar@suse.cz
+
+- bug #10941 ('nil' shown as card label when uniq_id has changed 
+  after update)
+- comment added for translators
+
+-------------------------------------------------------------------
+Tue Sep 18 15:49:56 CEST 2001 - dmeszar@suse.cz
+
+- corrected abort behaviour in complex dialog (#not reported)
+  (when user pressed abort, module ended even if she pressed 
+  'no' in 'really abort' dialog)
+
+-------------------------------------------------------------------
+Mon Sep 17 16:02:57 CEST 2001 - dmeszar@suse.cz
+
+- bug #10750 fixed (don't save when nothing has changed)
+
+-------------------------------------------------------------------
+Mon Sep 17 12:36:47 CEST 2001 - dmeszar@suse.cz
+
+- bug #10639 fixed (Removing first sound card removes them all)
+- bug #10529 (10662) fixed (YaST2 crashes: Undefined string operation?)
+  resp. (sound/routines.ycp: strange lines)
+
+-------------------------------------------------------------------
+Mon Sep 10 14:54:30 CEST 2001 - dmeszar@suse.cz
+
+- use Arch:: instead of user_settings
+
+-------------------------------------------------------------------
+Tue Sep  4 17:55:16 CEST 2001 - dmeszar@suse.cz
+
+- use alias sound-slot-0 -> sound
+  and	    sound -> char-major-14 for sparcs
+
+-------------------------------------------------------------------
+Tue Sep  4 13:06:27 CEST 2001 - dmeszar@suse.cz
+
+- unmute device "Wave Playback Volume" for ymf sound cards
+- default value for lookup(3) added
+
+-------------------------------------------------------------------
+Fri Aug 31 14:23:51 CEST 2001 - dmeszar@suse.cz
+
+- bug #9993 fixed
+- logs removed
+
+-------------------------------------------------------------------
+Wed Aug 29 10:10:05 CEST 2001 - dmeszar@suse.cz
+
+- fixed typos
+- removed debug logging
+
+-------------------------------------------------------------------
+Mon Aug 27 15:48:05 CEST 2001 - dmeszar@suse.cz
+
+- use module name as alias 'char-major-14' on sparc 
+  instead of 'sound'
+
+-------------------------------------------------------------------
+Mon Aug 27 13:36:53 CEST 2001 - dmeszar@suse.cz
+
+- volume setting implemented for oss
+
+-------------------------------------------------------------------
+Wed Aug 22 17:54:10 CEST 2001 - dmeszar@suse.cz
+
+- oss support added, alpha version
+- volume setting for oss not implemented so far
+
+-------------------------------------------------------------------
+Mon Aug 20 17:41:31 CEST 2001 - dmeszar@suse.cz
+
+- fixed shortcuts
+
+-------------------------------------------------------------------
+Mon Aug 20 13:47:44 CEST 2001 - dmeszar@suse.cz
+
+- bug #8335 fixed, options restoring when deleting card fixed
+
+-------------------------------------------------------------------
+Wed Aug 15 17:16:32 CEST 2001 - dmeszar@suse.cz
+
+- installation of one card much simplified
+
+-------------------------------------------------------------------
+Mon Aug 13 17:05:23 CEST 2001 - dmeszar@suse.cz
+
+- stderr of 'execute' commands redirected to /dev/null
+  when running .target.bash
+
+-------------------------------------------------------------------
+Fri Aug 10 13:03:41 CEST 2001 - dmeszar@suse.cz
+
+- bug #5838 fixed
+- minor code changes  UI(`fn()) -> UI::fn() SCR resp.
+
+-------------------------------------------------------------------
+Mon Jul 30 16:40:33 CEST 2001 - dmeszar@suse.cz
+
+- speed improvements
+
+-------------------------------------------------------------------
+Wed Jul 25 10:52:02 CEST 2001 - dmeszar@suse.cz
+
+- first dialog unified with printconf and tvconf modules
+
+-------------------------------------------------------------------
+Mon Jul 23 12:59:27 CEST 2001 - dmeszar@suse.cz
+
+- fixed 'requires' in rpm, workflow changes, option dialog improvements
+
+-------------------------------------------------------------------
+Tue May 15 15:17:09 CEST 2001 - dmeszar@suse.cz
+
+- doubled text fixed. when a new card is manually added, module description is
+  used as a manufacturer name. (bug #8315, file routines.ycp). 
+- fixed bug in adding sound cards. (not reported)
+  (files routines.ycp, sound_complex- list of all cards was compared 
+  against /var/lib/YaST/unique.inf, which was not correct. dialog
+  with the choice "Add autodetected"/"Select from list" was not shown
+  properly.  now it's compared
+  with local copy of unique keys list. new parameter added to get_not_yet 
+  (function returning list of not configured soundcards))
+- removed commented block of source code from 'sound_summary.ycp'
+
+-------------------------------------------------------------------
+Tue May 15 13:45:09 CEST 2001 - dmeszar@suse.cz
+
+- doubled text fixed. when a new card is manually added, module description is
+  used as a manufacturer name. (bug #8315). fixed bug in adding sound cards. (not reported)
+
+-------------------------------------------------------------------
+Mon May 14 10:52:29 CEST 2001 - dmeszar@suse.cz
+
+- sound summary for non-pnp cards fixed (bug #8157)
+
+-------------------------------------------------------------------
+Fri May 11 13:27:28 CEST 2001 - dmeszar@suse.cz
+
+- soundblater awe card presence enhanced
+
+-------------------------------------------------------------------
+Thu May 10 12:07:56 CEST 2001 - dmeszar@suse.cz
+
+- fixed to work with new libhd (#7918)
+
+-------------------------------------------------------------------
+Mon May  7 17:16:08 CEST 2001 - dmeszar@suse.cz
+
+- module options fixed, card removing fixed 
+
+-------------------------------------------------------------------
+Mon Apr 30 16:21:03 CEST 2001 - dmeszar@suse.cz
+
+- sound fonts loading enabled, abort dialog unified, summary spaces fixed 
+
+-------------------------------------------------------------------
+Tue Apr 24 16:08:09 CEST 2001 - ro@suse.de
+
+- fixed time-stamps in tar
+
+-------------------------------------------------------------------
+Tue Apr 24 07:26:02 PDT 2001 - dmeszar@suse.cz
+
+- sound fonts loading temporarily removed
+
+-------------------------------------------------------------------
+Tue Apr 24 03:39:14 PDT 2001 - dmeszar@suse.cz
+
+- 'install sndfonts' button in summary dialog
+
+-------------------------------------------------------------------
+Mon Apr 23 08:03:09 PDT 2001 - dmeszar@suse.cz
+
+- multiple sound cards installation fixed, volume settings fixed
+- fonts loading feature for soundblaster
+
+-------------------------------------------------------------------
+Tue Apr 17 09:38:36 CEST 2001 - dmeszar@suse.cz
+
+- autodocs build fixed
+
+-------------------------------------------------------------------
+Tue Apr 17 08:58:28 CEST 2001 - dmeszar@suse.cz
+
+- sound summary module added, fixed 'requires'
+
+-------------------------------------------------------------------
+Fri Mar 30 11:35:16 CEST 2001 - dmeszar@suse.cz
+
+- options editing, quick config
+
+-------------------------------------------------------------------
+Sat Mar 17 16:41:04 CET 2001 - dan@suse.cz
+
+- ycpdoc removed from requires 
+
+-------------------------------------------------------------------
+Wed Mar  7 11:12:27 CET 2001 - dan@suse.cz
+
+- package rename 
+
+-------------------------------------------------------------------
+Thu Jan 25 16:39:14 CET 2001 - dan@suse.cz
+
+- y2log fixes
+
+-------------------------------------------------------------------
+Mon Jan 22 16:33:58 CET 2001 - dan@suse.cz
+
+- another locale fix 
+
+-------------------------------------------------------------------
+Mon Jan 22 15:47:20 CET 2001 - dan@suse.cz
+
+- locale problem for displaying all cards fixed 
+
+-------------------------------------------------------------------
+Thu Jan 18 10:20:19 CET 2001 - dan@suse.cz
+
+- options passing fix (bug 5855) 
+
+-------------------------------------------------------------------
+Fri Jan 12 11:52:28 CET 2001 - kkaempf@suse.de
+
+- bump version for latest fixes
+
+-------------------------------------------------------------------
+Fri Jan 12 04:38:11 CET 2001 - dan@suse.de
+
+- dialog sequence for one card fix 
+
+-------------------------------------------------------------------
+Wed Jan 10 16:15:41 CET 2001 - dan@suse.cz
+
+- don't call complex dialog when just one sound card is beeing installed
+- log fixes
+
+-------------------------------------------------------------------
+Tue Jan  9 10:05:13 CET 2001 - dan@suse.cz
+
+- fix playing sound sample on background (bug #5263)
+
+-------------------------------------------------------------------
+Fri Jan  5 13:38:42 CET 2001 - kkaempf@suse.de
+
+- fix frame caption for gettext
+
+-------------------------------------------------------------------
+Thu Jan  4 13:45:39 CET 2001 - dan@suse.cz
+
+- special warning dialog for nm256 cards
+
+-------------------------------------------------------------------
+Fri Dec 15 16:04:20 CET 2000 - dan@suse.cz
+
+- skip/back button sequence fixed (bug #4679)
+
+-------------------------------------------------------------------
+Wed Dec 13 19:15:25 CET 2000 - mike@suse.de
+
+- new menuentry file
+
+-------------------------------------------------------------------
+Tue Dec 12 16:59:11 CET 2000 - kkaempf@suse.de
+
+- use tmpdir instead of /tmp
+
+-------------------------------------------------------------------
+Sat Dec  9 13:29:27 CET 2000 - dan@suse.cz
+
+- options exist test, disabling sound table omitted 
+
+-------------------------------------------------------------------
+Fri Dec  8 13:26:35 CET 2000 - dan@suse.cz
+
+- spec file fix 
+
+-------------------------------------------------------------------
+Fri Dec  8 01:24:50 CET 2000 - kendy@suse.cz
+
+- All /sbin/init.d changed to /etc/init.d
+
+-------------------------------------------------------------------
+Thu Dec  7 16:48:57 CET 2000 - arvin@suse.de
+
+- call sound (not lan) in menu
+
+-------------------------------------------------------------------
+Thu Dec  7 16:00:25 CET 2000 - arvin@suse.de
+
+- fix double quoted symbol
+
+-------------------------------------------------------------------
+Thu Dec  7 09:03:44 CET 2000 - dan@suse.cz
+
+- y2d_snd is required, amixer call differ for more cards 
+
+-------------------------------------------------------------------
+Wed Dec  6 13:08:08 CET 2000 - kkaempf@suse.de
+
+- adapt to new alsa package
+  support multiple cards
+  pack sources with bzip2
+
+-------------------------------------------------------------------
+Fri Sep 29 17:13:48 CEST 2000 - kkaempf@suse.de
+
+- do MacRISC dmasound right
+  version 2.0.13
+
+-------------------------------------------------------------------
+Wed Sep 27 11:18:00 CEST 2000 - dan@suse.cz
+
+- PPC hack added
+
+-------------------------------------------------------------------
+Mon Sep 18 17:00:46 CEST 2000 - dan@suse.cz
+
+- exception for ppc hardcoded 
+
+-------------------------------------------------------------------
+Thu Jul 13 09:21:50 MEST 2000 - dan@suse.de
+
+- minor fixes ('\n' added, etc.) 
+
+-------------------------------------------------------------------
+Tue Jul 11 11:14:06 MEST 2000 - dan@suse.de
+
+- fixed writing of modules.conf (last line) 
+
+-------------------------------------------------------------------
+Tue Jul  4 16:59:01 MEST 2000 - dan@suse.de
+
+- fixed aplay calling 
+
+-------------------------------------------------------------------
+Mon Jul  3 10:27:16 CEST 2000 - kkaempf@suse.de
+
+- changed test sound in alsa package
+  version 2.0.7
+
+-------------------------------------------------------------------
+Thu Jun 29 14:31:03 CEST 2000 - kkaempf@suse.de
+
+- requires y2t_snd
+
+-------------------------------------------------------------------
+Tue Jun 27 13:35:59 MEST 2000 - dan@suse.de
+
+- more comments for translators 
+
+-------------------------------------------------------------------
+Mon Jun 26 18:18:03 CEST 2000 - kkaempf@suse.de
+
+- message fixes
+  version 2.0.5
+
+-------------------------------------------------------------------
+Fri Jun 23 11:16:51 MEST 2000 - dan@suse.de
+
+- comments for translators added 
+
+-------------------------------------------------------------------
+Wed Jun 21 13:19:01 MEST 2000 - dan@suse.de
+
+- messages correction 
+
+-------------------------------------------------------------------
+Tue Jun 20 11:01:17 CEST 2000 - dan@suse.de
+
+- fixed volume setting 
+
+-------------------------------------------------------------------
+Fri Jun 16 10:59:13 MEST 2000 - dan@suse.de
+
+- minor layout changes 
+
+-------------------------------------------------------------------
+Fri May 19 09:44:08 CEST 2000 - kkaempf@suse.de
+
+- initial version
+
