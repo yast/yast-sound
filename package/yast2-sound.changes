@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Mar 17 16:08:24 CET 2004 - jsuchome@suse.cz
+
+- fix of joystick test: look to correct device
+
+-------------------------------------------------------------------
 Wed Mar 17 10:52:05 CET 2004 - jsuchome@suse.cz
 
 - fix: correstly switch the lists with vendors/modules
