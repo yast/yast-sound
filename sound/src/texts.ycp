@@ -278,10 +278,9 @@ Use <b>Add sound card</b> to add a sound card.
 </p>
 ") +
 _("<p>
-Check <b>start sequencer</b> to load modules for playing MIDI 
+Check <b>Start Sequencer</b> to load modules for playing MIDI 
 files during boot. These modules can be loaded on demand.
-</p>
-"));
+</p>\n"));
 /*
 _("<p>
 Use <b>start ALSA</b> to enable or 
