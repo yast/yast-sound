@@ -34,7 +34,7 @@
 //    include "sound/card_wizard.ycp";
 
 
-    map STRINGS=STRINGS_();
+//    map STRINGS=STRINGS_();
 
 
 

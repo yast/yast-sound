@@ -58,7 +58,7 @@
 //    include "sound/texts.ycp";
 
 
-    map STRINGS = STRINGS_();
+ //   map STRINGS = STRINGS_();
 
 //    include "sound/write_routines.ycp";
 

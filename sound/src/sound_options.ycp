@@ -32,7 +32,7 @@
 
 //  include "browser.ycp";
 
-    map STRINGS = STRINGS_();
+//    map STRINGS = STRINGS_();
 
     global define defWidget() ``{
 	return `Label(_("Possible value:\nnot known"));
@@ -113,7 +113,7 @@
 	{
 	    string head = select(slist, 0);
 	    string tail = select(slist, 1);
-	    y2error(sformat("'%1' '%2'", head, tail));
+//	    y2error(sformat("'%1' '%2'", head, tail));
 	    if (head == "list")
 	    {
 		widg = gen_list(tail, default);
@@ -156,7 +156,7 @@
 	term con = `VBox ();
 
 	list origOptions = options;
-	y2error(sformat("%1", origOptions));
+//	y2error(sformat("%1", origOptions));
 				    // always omit these options -- they are assigned dynamically
 	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_id"));
 	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_index"));

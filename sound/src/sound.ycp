@@ -21,8 +21,6 @@
 
     textdomain "sound";
 
-    include "browser.ycp";
-
     include "misc_defines.ycp";
 
     include "wizard/sequencer.ycp";
@@ -39,12 +37,12 @@
 
     boolean __sparc=nil;
     boolean use_alsa = !is_sparc();
-    if(Args(0)==.oss)
+    if (size(Args()) > 0 && Args(0)==.oss)
     {
 	use_alsa=false;
     }	
 
-    if(use_alsa)
+    if (use_alsa)
     {
 	include "sound/alsa_routines.ycp";
     }
@@ -273,13 +271,13 @@
      * ========== MAIN ==========
      *
      */
-if (!use_alsa)
-{
-    UI::MessagePopup("BETA INFO for OSS:\nThis module requires to have 'mpg123' and 'aumix'
-installed on your system. Also copy some (short) mp3 file to
-/usr/share/sounds/test.mp3 . This file will be played as
-test sound.");
-}
+//if (!use_alsa)
+//{
+//    UI::MessagePopup("BETA INFO for OSS:\nThis module requires to have 'mpg123' and 'aumix'
+//installed on your system. Also copy some (short) mp3 file to
+///usr/share/sounds/test.mp3 . This file will be played as
+//test sound.");
+//}
 
     OpenMainDialog();
     InitializingDialog ();

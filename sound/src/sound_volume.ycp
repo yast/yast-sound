@@ -37,7 +37,7 @@
 //    include "sound/write_routines.ycp";
 
 
-    map STRINGS = STRINGS_();
+//    map STRINGS = STRINGS_();
 
     /**
      * This dialog sipmply reads user input and calls apropriate set funtion

@@ -26,6 +26,18 @@
     include "sound/routines.ycp";
     include "sound/read_routines.ycp";
 
+boolean __sparc = nil;
+boolean use_alsa = !is_sparc();
+if (use_alsa) 
+{
+	include "sound/alsa_routines.ycp";
+}
+else
+{
+	include "sound/oss_routines.ycp";
+}
+
+
     integer id = -1;
     global define cid() ``{
 	id = id + 1;
@@ -35,6 +47,8 @@
     list cards	    = get_audio();
     list keys	    = read_unique_keys();
     list save_info  = read_save_info ();
+
+y2error("%1", save_info);
 
     list conflist   = [];	// configured
     list notlist    = [];	// not configured

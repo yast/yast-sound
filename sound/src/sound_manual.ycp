@@ -26,7 +26,7 @@
 //    include "sound/ui.ycp";
 //    include "sound/texts.ycp";
     
-    map STRINGS = STRINGS_();
+//    map STRINGS = STRINGS_();
  
     /**
      *	dialog for manual settings
