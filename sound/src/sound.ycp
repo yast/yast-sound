@@ -233,7 +233,7 @@
 
     boolean exit = false;
     list db = GetCardDatabase(); 
-    if (db==nil)) 
+    if (db==nil) 
     {
 	UI(`MessagePopup (_("The Sound card database cannot be found.\nPlease check your installation")));
 	exit = true;
@@ -324,7 +324,7 @@
 	if (call_complex_dialog) 
 	{
 	    result = CallModule ("sound_complex", [sound_cards, save_info, configured_unique]);
-	    BrowseTree(["result from complex", result]);
+	    //BrowseTree(["result from complex", result]);
 	}
 	else
 	{
@@ -391,7 +391,7 @@
 	    cont = false;
 	}
     }
-BrowseTree(["save_info in sound #1", save_info]);
+    //BrowseTree(["save_info in sound #1", save_info]);
 			    // filter out empty enries
     save_info = filter (`e, save_info, ``(size (e) > 0));
     n_cards = size (save_info);
@@ -432,7 +432,7 @@ BrowseTree(["save_info in sound #1", save_info]);
 
     //UI(`DebugDialog (save_info));
 
-	BrowseTree(save_map);
+	//BrowseTree(save_map);
 
 	CallModule ("sound_write", [save_map, test_mode]);
 
