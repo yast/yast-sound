@@ -273,7 +273,13 @@
      * ========== MAIN ==========
      *
      */
-
+if (!use_alsa)
+{
+    UI::MessagePopup("BETA INFO for OSS:\nThis module requires to have 'mpg123' and 'aumix'
+installed on your system. Also copy some (short) mp3 file to
+/usr/share/sounds/test.mp3 . This file will be played as
+test sound.");
+}
 
     OpenMainDialog();
     InitializingDialog ();
