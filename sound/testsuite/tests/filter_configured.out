@@ -1,10 +1,3 @@
-Read	.target.tmpdir "/tmp"
-Read	.target.size "/etc/install.inf" -1
-Read	.probe.architecture nil
-Read	.probe.has_apm nil
-Read	.probe.has_pcmcia nil
-Read	.probe.has_smp nil
-Read	.probe.system nil
 Return	[]
 Return	[$["device":"SB Live! EMU10000", "unique_key":"CvwD.k1dGGUobcK9", "vendor":"Creative Labs", "vendor_id":69890]]
 Return	[]

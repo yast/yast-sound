@@ -1,4 +1,5 @@
 {
+    // testedfiles: Sound.ycp sound/routines.ycp
     include "testsuite.ycp";
 
     // initialization is needed because module Sound imports the module Arch

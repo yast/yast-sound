@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Mar 29 13:30:48 CEST 2004 - jsuchome@suse.cz
+
+- fix of sound card database (tiwai)
+- fix of testsuites: check only Sound module related files
+- 2.9.17
+
+-------------------------------------------------------------------
 Fri Mar 26 16:05:30 CET 2004 - jsuchome@suse.cz
 
 - fixed joystick options in sound car database (tiwai)
