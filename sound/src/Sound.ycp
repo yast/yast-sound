@@ -239,7 +239,7 @@ The following PCI drivers support the joystick natively.
      * sound module constructor
      */
     global define void Sound() ``{
-	if (Arch::sparc)
+	if (Arch::sparc ())
 	{
 	    use_alsa = false;
 	}

@@ -157,7 +157,7 @@
 	{
 	    if (!Sound::use_alsa)
 	    {
-		if (Arch::sparc)
+		if (Arch::sparc ())
 		{
 		    string modname = save_info[0, "module"]:"off";
 		    SCR::Write(add (mod_alias, "sound"), "sound-slot-0");
