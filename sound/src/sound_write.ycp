@@ -9,7 +9,8 @@
  *   Provides saving /etc/modules.conf and volume.
  *
  * Authors:
- *   Dan Veselý <dan@suse.cz>, Dan Meszaros <dmeszar@suse.cz>
+ *   Dan Veselý <dan@suse.cz>
+ *   Dan Meszaros <dmeszar@suse.cz>
  *
  * $Id$
  *

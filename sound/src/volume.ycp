@@ -1,6 +1,6 @@
 /**
  * File:
- *   sound_manual.ycp
+ *   volume.ycp
  *
  * Module:
  *   Sound
@@ -11,7 +11,8 @@
  *   otherwise error message is displayed
  *
  * Authors:
- *   Dan Vesely <dan@suse.cz>, Dan Meszaros <dmeszar@suse.cz>
+ *   Dan Vesely <dan@suse.cz>
+ *   Dan Meszaros <dmeszar@suse.cz>
  *
  * String corrections by Christian Steinruecken <cstein@suse.de>, 2001/08/01
  *
