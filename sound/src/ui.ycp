@@ -19,8 +19,9 @@
 
 {
     textdomain "sound";
+//    include "sound/texts.ycp";
 
-    map STRINGS = STRINGS_();
+//    map STRINGS = STRINGS_();
 
     /** 
      *	InitializingDialog
@@ -409,7 +410,7 @@
                         `VSpacing (0.3),
                         `RadioButton (`id (`normal), `opt (`hstretch), _("Normal &setup")),
                         `VSpacing (0.3),
-                        `RadioButton (`id (`options), `opt (`hstretch), _("&Advanced setup with possibility to change options"))
+                        `RadioButton (`id (`options), `opt (`hstretch), _("Advanced setup with possibility to change &options"))
                         )
                     )),
                 `VStretch ()
@@ -450,7 +451,7 @@
                         `VSpacing (0.3),
                         `RadioButton (`id (`normal), `opt (`hstretch), _("Normal &setup")),
                         `VSpacing (0.3),
-                        `RadioButton (`id (`intro), `opt (`hstretch), _("More detailed installation of sound cards"))
+                        `RadioButton (`id (`intro), `opt (`hstretch), _("&More detailed installation of sound cards"))
                         )
                     )),
                 `VStretch ()

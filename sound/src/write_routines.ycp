@@ -25,7 +25,7 @@
 //    include "sound/texts.ycp";
 //    include "sound/alsa_routines.ycp";
 
-    map STRINGS = STRINGS_();
+//    map STRINGS = STRINGS_();
 
     /**
      * create special comment for given model
@@ -167,7 +167,7 @@
 
 	if (size(save_info) >0)
 	{
-	    if (size(save_info) > 0 && use_alsa)
+	    if (use_alsa)
 	    {
 		SCR::Write(mod_alias, "snd", "char-major-116");
 		SCR::Write(mod_alias_comment, "\n# Alsa sound support. \n# Warning: please don't modify comments over "+
@@ -178,7 +178,15 @@
 	    }
 	    else
 	    {
-		SCR::Write(mod_alias, "sound", "char-major-14");
+		if (is_sparc())
+		{
+		    string modname = lookup(select(save_info, 0), "module", "off");
+		    SCR::Write(mod_alias, modname, "char-major-14");
+		}
+		else
+		{
+		    SCR::Write(mod_alias, "sound", "char-major-14");
+		}
 	    }
 	}
 
@@ -252,7 +260,6 @@
      */
 
     global define SaveRCValues (map rc) ``{
-	y2error(rc);
         string err_msg = "";
 	if (contains (maplist (`k, `v, rc, ``(SCR::Write(topath(sformat(".rc.system.%1", k)), v))), false) ||
             !SCR::Write(.rc.system, nil))

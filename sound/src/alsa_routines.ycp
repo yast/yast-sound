@@ -18,6 +18,7 @@
  */
 
 {
+    textdomain "sound";
 
     /**
      * volume in percents (0..100)
