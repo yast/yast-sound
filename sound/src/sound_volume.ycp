@@ -54,6 +54,11 @@
 
 	integer vol = 10;
 
+	if (find(lookup(save_entry, "model", ""), "(daca)") >= 0)
+	{
+	    vol = 75;
+	}
+
 	term con = VolumeCon(save_entry, vol);
 	    // dialog title
 	UI::SetWizardContents (_("Sound card volume"), con, help_text, true, true);
