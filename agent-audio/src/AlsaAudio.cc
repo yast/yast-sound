@@ -1,5 +1,5 @@
 #include <math.h>
-#include <sys/asoundlib.h>
+#include "AlsaAudio.h"
 
 #define y2log_component "ag_audio"
 
@@ -7,7 +7,15 @@
 #include <scr/SCRAgent.h>
 #include <scr/SCRInterpreter.h>
 
-#include "AlsaAudio.h"
+
+#if __sparc__ || __s390__
+    #define __HAVE_ALSA 0
+#else
+    #define __HAVE_ALSA 1
+#endif
+
+#if __HAVE_ALSA
+#include <sys/asoundlib.h>
 
 YCPValue alsaGetVolume(int card, const string& channel)
 {
@@ -252,3 +260,52 @@ YCPValue alsaGetCardName(int card_id)
     snd_card_get_name(card_id, &cname);
     return YCPString(cname);
 }
+
+#else // __HAVE_ALSA
+
+YCPValue alsaSetVolume(int card, const string& channel, int value)
+{
+    return YCPVoid();
+}
+
+YCPValue alsaGetVolume(int card, const string& channel)
+{
+    return YCPVoid();
+}
+
+YCPValue alsaSetMute(int card, const string& channel, bool value)
+{
+    return YCPVoid();
+}
+
+YCPValue alsaGetMute(int card, const string& channel)
+{
+    return YCPVoid();
+}
+
+YCPValue alsaGetChannels(int card)
+{
+    return YCPVoid();
+}
+
+YCPValue alsaGetCards()
+{
+    return YCPVoid();
+}
+
+YCPValue alsaGetCardName(int card_id)
+{
+    return YCPVoid();
+}
+
+YCPValue alsaStore(int card=-1)
+{
+    return YCPVoid();
+}
+
+YCPValue alsaRestore(int card=-1)
+{
+    return YCPVoid();
+}
+
+#endif

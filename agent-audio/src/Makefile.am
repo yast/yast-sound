@@ -13,13 +13,13 @@ liby2ag_audio_la_SOURCES =		\
 	OSSAudio.cc	OSSAudio.h	\
 	AudioAgent.cc	AudioAgent.h	\
 	AlsaAudio.cc	AlsaAudio.h
-liby2ag_audio_la_LDFLAGS = $(LDFLAGS) -version-info 2:0 -lasound
+liby2ag_audio_la_LDFLAGS = $(LDFLAGS) -version-info 2:0 `test -e /usr/lib/libasound.so && echo -lasound`
 
 libpy2ag_audio_la_SOURCES =				\
 	$(liby2ag_audio_la_SOURCES)			\
 	Y2CCAudio.cc         Y2CCAudio.h		\
 	Y2AudioComponent.cc  Y2AudioComponent.h
-libpy2ag_audio_la_LDFLAGS = $(LDFLAGS) -version-info 2:0 -lasound
+libpy2ag_audio_la_LDFLAGS = $(LDFLAGS) -version-info 2:0 `test -e /usr/lib/libasound.so && echo -lasound`
 
 INCLUDES = -I$(includedir)
 
