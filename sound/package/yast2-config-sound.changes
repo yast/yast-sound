@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Dec 18 11:34:33 CET 2001 - dmeszar@suse.cz
+
+- Sound module implemented, third param for 'select'
+
+-------------------------------------------------------------------
 Fri Nov  9 14:32:52 CET 2001 - dmeszar@suse.cz
 
 - use Wizard module, Wizard_hw module and other new libycp features
