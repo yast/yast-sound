@@ -38,6 +38,9 @@
       "CoolSound 4000, Chic Techlonogy",
       "XWave4000, Labway"
     ],
+    5 : [
+      "IXP150/200/250, ATI"
+    ],
     6 : [
       " Aureal Vortex Sound Processor, Aureal Semiconductor Inc."
     ],
@@ -459,6 +462,9 @@
     ]
   ],
   "indices" : $[
+    2 : $[
+      2 : 5
+    ],
     1171 : $[
       29008 : 0,
       29057 : 0
@@ -570,6 +576,9 @@
       240 : 56,
       65535 : 58
     ],
+    4098 : $[
+      17217 : 5
+    ],
     4115 : $[
       24577 : 19,
       24579 : 19,
@@ -621,6 +630,7 @@
     4318 : $[
       106 : 38,
       218 : 38,
+      234 : 38,
       433 : 38
     ],
     4334 : $[
@@ -702,6 +712,9 @@
     7766 : $[
       1 : 41
     ],
+    11968 : $[
+      65795 : 5
+    ],
     13027 : $[
       4193 : 0
     ],
@@ -776,6 +789,7 @@
     2 : "snd-ali5451",
     3 : "snd-als100",
     4 : "snd-als4000",
+    5 : "snd-atiixp",
     6 : "snd-au8810",
     7 : "snd-au8820",
     8 : "snd-au8830",
@@ -1035,6 +1049,21 @@
             _("Joystick port address for %1 soundcard."),
             "ALS4000"
           ]
+        ]
+      ]
+    ],
+    "snd-atiixp" : $[
+      "description" : "ATI IXP AC97 controller",
+      "params" : $[
+        "ac97_clock" : $[
+          "default" : "48000",
+          "descr" : _("AC'97 codec clock (default 48000Hz).")
+        ],
+        "spdif_aclink" : $[
+          "allows" : "{{0,Disabled},{1,Enabled}}",
+          "default" : "1",
+          "descr" : _("S/PDIF over AC-link."),
+          "dialog" : "check"
         ]
       ]
     ],
@@ -2188,7 +2217,7 @@
           "descr" : _("AC'97 codec clock (0 = auto-detect).")
         ],
         "ac97_quirk" : $[
-          "allows" : "{{-1,3}}",
+          "allows" : "{{-1,4}}",
           "default" : "-1",
           "descr" : _("AC'97 workaround for strange hardware."),
           "dialog" : "list"
@@ -3214,7 +3243,7 @@
       "description" : "USB Audio",
       "params" : $[
         "nrpacks" : $[
-          "allows" : "{{2,10}}",
+          "allows" : "{{1,10}}",
           "descr" : _("Max. number of packets per URB.")
         ],
         "pid" : $[
@@ -3237,7 +3266,7 @@
           "descr" : _("AC'97 codec clock (default 48000Hz).")
         ],
         "ac97_quirk" : $[
-          "allows" : "{{-1,3}}",
+          "allows" : "{{-1,4}}",
           "default" : "-1",
           "descr" : _("AC'97 workaround for strange hardware."),
           "dialog" : "list"
@@ -3457,6 +3486,9 @@
     ],
     "ASOUND" : [
       "ASONIC-8738"
+    ],
+    "ATI" : [
+      "IXP150/200/250"
     ],
     "Abit" : [
       "AU10"
