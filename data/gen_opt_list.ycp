@@ -1,153 +1,25 @@
 {
     include "browser.ycp";
     include "gen_routines.ycp";
-/*
-    global define find_pair(string input, integer start) ``{
-	integer pos = start+1;
-	integer siz = size(input);
-	integer cnter = 1;
-	while (pos < siz && cnter > 0)
-	{
-	    if (substring(input, pos, 1) == "{")
-	    {
-		cnter = cnter + 1;
-	    }
-	    else if (substring(input, pos, 1) == "}")
-	    {
-		cnter = cnter -1;
-	    }
-	    pos = pos + 1;
-	}
-	return pos -1;
-    }
-
-    global define parse_bracket(string input) ``{
-	integer pos = 0;
-	string inner = input; // substring(input, 1, size(input)-2);
-	integer siz = size(inner);
-	string tmp = "";
-
-	list output = [];
-
-	integer oldpos = 0;
-
-	while(pos < siz)
-	{
-	    if (substring(inner, pos, 1) == "{")
-	    {
-		oldpos = pos;
-		pos = pos + 1;
-		integer cnter = 1;
-		// let's find the pair bracket for '{'
-		while((cnter > 0) && (pos < siz))
-		{
-		    if (substring(inner, pos, 1) == "}")
-		    {
-			cnter = cnter - 1;
-		    }
-		    else if (substring(inner, pos, 1) == "{")
-		    {
-			cnter = cnter + 1;
-		    }
-		    pos = pos + 1;
-		}
-		output = add(output, parse_bracket(substring(inner, oldpos + 1, pos - oldpos - 2)));
-		pos = pos + 1;
-	    }
-	    else
-	    {
-		oldpos = pos;
-		while ((substring(inner, pos, 1) != ",") && pos < siz)
-		{
-		    pos = pos + 1;
-		}
-		output = add(output, substring(inner, oldpos, pos - oldpos));
-		pos = pos + 1;
-	    }
-	}
-	return output;
-    }
-
-    global define parse_line(string input) ``{
-	string token = "";
-	integer pos = 0;
-	integer siz = size(input);
-
-	list tokens = [];
-
-	string value = "";
-
-	integer mode = 0; // 0 reading key, 1 reading value
-
-	while (pos < siz)
-	{
-	    if (substring(input, pos, 1) == ",")
-	    {
-		if (value != "")
-		{
-		    tokens = add(tokens, value);
-		    value = "";
-		}
-	    }
-	    else if (substring(input, pos, 1) == "{")
-	    {
-		integer p = find_pair(input, pos);
-		value = value + substring(input, pos, p - pos + 1);
-		pos = p;
-	    }
-	    else
-	    {
-		value = value + substring(input, pos, 1);
-	    }
-	    pos = pos + 1;
-	}
-	if (value != "")
-        {
-            tokens = add(tokens, value);
-            value = "";
-        }
-
-	map output = $[];
-
-	// now let's split tokens to "key": "value" pairs.
-	foreach(`e, tokens,
-	``{
-	    list l = splitstring(e, ":");
-	    if (size(l) == 2)
-	    {
-		output = add(output, select(l, 0, ""), select(l, 1, ""));
-	    }
-	    else
-	    {
-		output = add(output, select(l, 0, ""), nil);
-	    }
-	});
-
-	return output;
-    }
-*/
-y2error("stage #0");
 
     // collect param descriptions of all snd-card-* modules
-    list mods = SCR::Dir(.modinfo.misc);
-y2error(".");
-    mods = filter(`e, mods, ``(regexpmatch(e, "^snd-card-.*")));
-y2error(".");
+
+    map mod_idx = SCR::Read(.target.ycp, "./module_index.ycp");
+
+    list mods = maplist(`k, `v, mod_idx, ``(v)); // SCR::Dir(.modinfo.misc);
+
+
+//    mods = filter(`e, mods, ``(regexpmatch(e, "^snd-card-.*")));
     map modopts = $[];
     map subopt = $[];
 
-//    BrowseTree(mods);
-
-y2error("stage #1");
 
     foreach(`e, mods, 
     ``{
 	subopt = SCR::Read(add(.modinfo.misc, e));
-//	subopt = filter(`k, `v, subopt, ``(regexpmatch(k, "^snd_.*")));
 	modopts = add(modopts, e, subopt);
     });
 
-y2error("stage #2");
     string mod_name = "";
     string mod_descr = "";
     map mod_params = $[];
@@ -167,16 +39,12 @@ y2error("stage #2");
 			]);
     });
 
-y2error("stage #3");
-
-//    BrowseTree(database);
-
     string kernel_ver = lookup(SCR::Execute(.target.bash_output, "uname -r", $[]), "stdout", "");
     kernel_ver = select(splitstring(kernel_ver, "\n"), 0, "");
     string generic_string = SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.generic_string");
     list gs = splitstring(generic_string, "\n");
 
-    string pattern = "(snd-card-[^ \t]*)[\t ]*info_parm_(snd_[^=]*)=enable:\\(snd_enable\\)(.*)";
+    string pattern = "(snd-[^ \t]*)[\t ]*info_parm_(snd_[^=]*)=enable:\\(snd_enable\\)(.*)";
 
     list ltmp = [];
     list lx = [];
