@@ -116,7 +116,7 @@ define get_audio (boolean test_mode, boolean config_mode) ``{
  */
 define get_module (map card) ``{
  
-    list|void db = ReadY2 ("sndcards.ycp");
+    list|void db = SCR(`Read (.target.yast2, "sndcards.ycp"));
     
     if (db == nil)
 	return $[];

@@ -209,7 +209,7 @@
     // ==== main ====
 
 
-    list|void db = ReadY2 ("sndcards.ycp");
+    list|void db = SCR(`Read (.target.yast2, "sndcards.ycp"));
     
     if (is (db, void)) {
 	UI(`DisplayMessage ("The Sound card database cannot be found!!!"));
