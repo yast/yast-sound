@@ -1,4 +1,6 @@
 {
+    // testedfiles: Sound.ycp sound/routines.ycp
+
     include "testsuite.ycp";
     map READ_I = $[
 	"target" : $[

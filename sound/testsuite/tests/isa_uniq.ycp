@@ -1,4 +1,5 @@
 {
+    // testedfiles: Sound.ycp sound/routines.ycp
     include "testsuite.ycp";
     map READ_I = $[
 	"target" : $[
@@ -9,7 +10,6 @@
 
     TESTSUITE_INIT ([READ_I], nil);
     include "sound/routines.ycp";
-//    include "misc_defines.ycp";
 
 	TEST(``(isa_uniq()), [], nil);
 }
