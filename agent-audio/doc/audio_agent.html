@@ -1,0 +1,89 @@
+@ package yast2-agent-alsamixer
+@ author dan.meszaros <dmeszar@suse.cz>
+<HTML><BODY><PRE>
+Audio Agent
+================
+
+Purpose
+=======
+
+Audio agent is used for setting the volume for sound cards without need
+to call amixer,alsactl,mixer etc.
+
+
+Dependencies
+============
+
+OSS or alsa-lib library, version > 0.5.1
+
+
+Interface
+=========
+
+flags in brackets mean: 
+    d- dir-able (eg. Dir(.audio.alsa.cards)
+    r- readable
+    w- writeable
+    x- executable
+
+.audio
+      .alsa			   # (drw) w-store/r-restore values for all cards
+           .0                      # (drw) w-store values, r-restore
+             .PCM		   # (d)
+                 .volume	   # (rw) integer [0..100]
+                 .mute		   # (rw) boolean
+             .Master
+                    .volume
+                    .mute
+           .1
+             ...
+      .oss
+          .0
+            .volume
+      .common (alias to 'oss' for beginning)
+
+
+Examples for first tree desing:
+===============================
+
+* Dir
+  ===
+
+  Dir(.audio.[alsa/oss]) 
+    => ["0", "1", "2"]  
+    indices of running cards
+
+  Dir(.audio.alsa.1)
+    => ["PCM", "Line", "Phone", "Master Mono"]
+    list of mixer channels for a given card
+
+  Dir(.audio.alsa.1.PCM)
+    => ["mute", "value"]
+    properties for channel PCM. same for all channels
+
+
+
+* Read
+  ====
+
+  Read(.audio.alsa.0.PCM.volume)
+    => 40 (integer)
+    volume in percents for card #0, channel PCM
+
+  Read(.audio.alsa.0.PCM.mute)
+    => true
+    channel PCM is muted
+
+
+
+* Write
+  =====
+
+  Write(.audio.alsa.1.Phone.volume, 40)
+    set volume of 'Phone' channel to 40% of it's range
+
+  Write(.audio.alsa.1.Phone.mute, false)
+    unmute channel 'Phone'
+
+
+</pre></body></html>
