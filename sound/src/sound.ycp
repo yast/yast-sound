@@ -20,7 +20,6 @@
 
 {
     import "Mode";
-
     if (size(WFM::Args()) > 0 && WFM::Args(0) == .test)
     {
 	Mode::test = true;
@@ -579,6 +578,8 @@
 	{
 	    Sound::RestoreSettings();
 	}
+	else
+	    ui = `next; // in installation mode, `finish is end of installation
     }
 
     if (ui == `finish && !Sound::autoinstallation)

@@ -1,4 +1,15 @@
 -------------------------------------------------------------------
+Thu Aug 28 09:05:07 CEST 2003 - jsuchome@suse.cz
+
+- confirm hardware detection in manual mode (#26515)
+
+-------------------------------------------------------------------
+Tue Aug 26 13:21:48 CEST 2003 - jsuchome@suse.cz
+
+- do not return `finish during installation
+- 2.8.6
+
+-------------------------------------------------------------------
 Wed Aug 20 14:23:43 CEST 2003 - jsuchome@suse.de
 
 - removed redundant "initialization dialog" (#28779)
