@@ -120,8 +120,12 @@
 		}
 	    });
 	}
-	// TODO remove also old options
-//	SCR::Write( add (mod_options, modname ), nil);
+	// remove also old options
+	foreach (map card, Sound::modules_conf_b, ``{
+	    string modname = card["module"]:"";
+	    if (modname != "")
+		SCR::Write (add (mod_options, modname ), nil);
+	});
 	SCR::Write (mod, nil);
     }
 

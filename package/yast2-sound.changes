@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Mar 12 15:57:53 CET 2004 - jsuchome@suse.cz
+
+- remove old module options from /etc/modprobe.conf
+- do not write unnecessary lines (#35710)
+
+-------------------------------------------------------------------
 Thu Mar 11 15:14:03 CET 2004 - jsuchome@suse.cz
 
 - remove sound configuration from /etc/modprobe.conf, when it was
