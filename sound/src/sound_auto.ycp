@@ -29,7 +29,8 @@
     textdomain "sound";
 
     import "Sound";
-
+    import "Mode";
+    Mode::config = true;
     Sound::autoinstallation = true;
 
     list args = Args ();
@@ -43,13 +44,74 @@
 	y2error ("Bad argument for lilo_auto: %1", Args (0));
 	return false;
     }
-
+    
     // The settings are in the first argument
-    map settings = select (args, 0, $[]);
+    map settings = $[];
+    boolean cms_mode = false;
+    {
+	integer i = 0;
+	while (i < size (Args()))
+	{
+	    if (is (Args (i), map) && nil != Args (i))	settings = Args (i);
+	    else if (Args (i) == .cms)			cms_mode=true;	   
+	    i = i + 1;
+	}
+    }
+      
     y2milestone("Imported: (%1)", settings);
 
     Sound::Import ( settings );
 
+    define set_contents(map settings) ``{
+	Sound::Import ( settings );
+	term contents =
+	    `VBox(
+		  `VSpacing(1),
+		  `RichText( `id(`summary), Sound::Summary()),
+		  `VSpacing(),
+		  `HBox(
+			`PushButton(`id(`configure), _("&Configure Sound")),
+			`HStretch(),
+			`PushButton(`id(`reset), _("&Reset Configuration"))
+			)
+				
+		  );		
+	Wizard::SetContents(_("Sound Configuration"),	
+			    contents, "", true, true);
+    }
+
+
+    if ( cms_mode) {
+	import "Wizard"; 
+	set_contents(settings);
+	any ret = nil;
+	repeat {
+	    ret = UI::UserInput();
+	    if (ret == `configure)
+	    {
+		map result = CallModule("sound_auto", [settings]);
+		if (result!=$[])
+		    settings = result;
+
+		set_contents(settings);
+	    }
+	    else if (ret == `reset) {
+		settings = $[];		
+		Sound::modules_conf=[];
+		Sound::volume_settings=[];
+		Sound::rc_vars=$[];
+		set_contents(settings);		
+	    }
+	    else if (ret == `help)
+	    {
+		UI::LongTextPopup (_("Help"), `RichText (_("Help")), 50, 15);
+	    }
+	} until ( ret == `key || ret ==`next || ret == `back);
+	return [ret,settings];
+
+    }
+    
+    
     if (CallFunction(`sound()) != `back)
     {
         return Sound::Export ();

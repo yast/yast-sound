@@ -7,6 +7,9 @@ clientsdir = $(YAST2DIR)/clients
 yincludedir = $(YAST2DIR)/include/sound
 modulesdir = $(YAST2DIR)/modules
 bindir = $(YAST2DIR)/bin
+autoinstdir = $(YAST2DIR)/autoinstall
+
+autoinst_DATA = autoinst_*.conf
 
 yinclude_DATA = \
 	routines.ycp \
@@ -41,4 +44,4 @@ modules_DATA = Sound.ycp	\
 
 bin_SCRIPTS = copyfonts
 
-EXTRA_DIST = $(modules_DATA) $(menu_DATA) $(yinclude_DATA) $(bin_SCRIPTS) $(clients_DATA)
+EXTRA_DIST = $(modules_DATA) $(menu_DATA) $(yinclude_DATA) $(bin_SCRIPTS) $(clients_DATA)  $(autoinst_DATA)
