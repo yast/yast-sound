@@ -26,7 +26,6 @@
     include "sound/routines.ycp";
     include "sound/ui.ycp";
     include "sound/texts.ycp";
-    include "browser.ycp";
 
     map STRINGS=STRINGS_();
 
@@ -86,7 +85,7 @@
 
 
 		// dialog title
-	UI(`SetWizardContents (_("Sound cards"), con, help_text, true, true));
+	UI(`SetWizardContents (_("Sound card advanced options"), con, help_text, true, true));
 	if (size (itemized_descriptions) > 0) 
 	{
 	    UI(`ChangeWidget(`id(`table), `CurrentItem, 0));
@@ -191,7 +190,6 @@
     mod = add (mod, "params", params);
     card = add (card, "module", mod);
 
-    y2error(sformat("%1", card));
 
     return $["ui" : lookup (result, "ui", `cancel), "return" : card];
 }

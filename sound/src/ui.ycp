@@ -52,22 +52,19 @@
      * @return map
      */
 	  
-    global define DisplayName (string name, string cname) ``{
+    global define DisplayName (string name, string cname, integer cpos) ``{
 	string helptext=lookup(STRINGS, "DisplayName");
-	term con=AutoconfDlg(name, cname);
+	term con=AutoconfDlg(name, cname, cpos);
 		// dialog title
 	UI(`SetWizardContents (_("Sound card configuration"), con, helptext, true, true));
 		// Next button label    
 	UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
 	symbol input=UI(`UserInput());
-	y2error(sformat("input: %1", input));
 	symbol output=`next;
 	if(input==`back) output=`back;
 	if(input==`next)
 	{
-	    y2error("next");
 	    integer tmp=UI(`QueryWidget(`id(`action), `CurrentButton));
-	    y2error("radio: %1", tmp);
 	    if(tmp==2)
 	    {
 		output=`options;
@@ -85,7 +82,6 @@
 		output=`quick;
 	    }
 	}
-	y2error(sformat("Return: %1", output));
 	return $["ui" : output];
     }
 
@@ -298,7 +294,7 @@
                                 )),
                                 `VSpacing (1),
                        // label of radio button
-                                `Left(`RadioButton (`id(`manual), `opt(`notify), _("&Manual selection"), (size (nc) == 0))),
+                                `Left(`RadioButton (`id(`manual), `opt(`notify), _("&Select from list"), (size (nc) == 0))),
                                 `VSpacing (1)
                             )
                         )
@@ -350,14 +346,25 @@
 	return con;
     }
     
-    global define AutoconfDlg(string name, string cname) ``{
+    global define AutoconfDlg(string name, string cname, integer cpos) ``{
+	string clab="";	
+    
+	if(cpos<3)
+	{
+	    clab="\n"+sformat(select(lookup(STRINGS, "soundCount", ""), cpos), cname);
+	}
+	else
+	{
+	    clab="\n"+sformat(select(lookup(STRING, "soundCard", ""), 3), cname);
+    	}
+
 	term con=
             `VBox (
                 `VSpacing (1),
                 `Label (`opt (`hstretch), _("The sound card\n")),
                 `HBox (`HSpacing (5), `Label (`opt (`hstretch), name)),
-                `Label (`opt (`hstretch), _("\nwill be configured as")),
-                `HBox (`HSpacing (5), `Label (`opt (`hstretch), cname)),
+                `Label (`opt (`hstretch), clab),
+//                `HBox (`HSpacing (5), `Label (`opt (`hstretch), cname)),
                 `VSpacing (1),
                 `HBox (`HSpacing (5), `RadioButtonGroup (
                     `id (`action),

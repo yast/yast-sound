@@ -27,12 +27,12 @@
 
     global define STRINGS_() ``{
 	return $["DisplayName":
-	     UI(_("<p>If you want to configure this sound card and adjust its volume check <b>Normal setup</b></p>"))+
+	     UI(_("<p>If you want to configure this sound card and adjust its volume check <b>Normal setup</b>.</p>"))+
 	     UI (_("<p>If you want to set a special option, check the <b>Advanced setup</b> radio button.
 Most users won't need this.</p>"))+
 	     UI (_("<p>If you have more than one sound card, you can check <b>Skip</b> to
 configure an other card than the one that is displayed on the right.</p>"))+
-	    UI(_("For quick automatic setup check <b>Quick automatic setup")),
+	    UI(_("<p>For quick automatic setup check <b>Quick automatic setup</b>.</p>")),
 
 	    
 	    "ManualDialog":
@@ -137,7 +137,16 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 	    UI(_("Sound volume and the configuration\nfor the sound card will be saved now.")),
 
 	    "ConfigSaveWarn2":
-	    UI (_("The sound configuration will be saved now."))
+	    UI (_("The sound configuration will be saved now.")),
+
+	    "soundCount":
+	    [
+		UI(_("will be configured as a first sound card (%1)")),
+		UI(_("will be configured as a second sound card (%1)")),
+		UI(_("will be configured as a third sound card (%1)")),
+		UI(_("will be configured as a %2th sound card (%1)"))
+	    ]
+
 
 	    ];
     }

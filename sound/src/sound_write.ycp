@@ -56,7 +56,6 @@
 
     textdomain "sound";
     include "sound/texts.ycp";
-    include "browser.ycp";
 
     map STRINGS=STRINGS_();
 

@@ -54,7 +54,7 @@
      */
     global define OneCardWizard (map card, integer card_id, any ui) ``{
 	    // 3rd param for "sound_module" will be defined later
-	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id))),
+	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id), card_id)),
 		    ``(CallModule ("sound_volume", [card, card_id, (size (sound_cards) == 1), quick] ))];
 
 	integer id = 0;
@@ -188,11 +188,8 @@
 	}
 	arg_n = arg_n - 1;
     }
-y2error("checkpoint 0");
     list sound_cards  = get_audio (test_mode, config_mode);
-y2error("checkpoint 0.1");
     list save_info    = read_save_info ();
-y2error("checkpoint 0.2");
     
     map rc_vars       = $[];
     integer card_id   = 0;
@@ -204,7 +201,6 @@ y2error("checkpoint 0.2");
     list configured_unique = []; // list of unique keys, that was configured
 
     boolean exit = false;
-y2error("checkpoint 1");
     list db = GetCardDatabase(); 
     if (isnil (db)) 
     {
@@ -212,7 +208,6 @@ y2error("checkpoint 1");
 	exit = true;
     }
 
-y2error("checkpoint 2");
 
     // get all the apropriate information from the database
     sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));

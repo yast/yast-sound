@@ -27,7 +27,6 @@
     include "sound/routines.ycp";
     include "sound/ui.ycp";
     include "sound/texts.ycp";	
-    include "browser.ycp";
 //    include "lan/lan_routines.ycp";
 
     map STRINGS=STRINGS_();
@@ -79,7 +78,7 @@
 	term con = WhichDlgCon(nc);
 
 	// dialog title
-	UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
+	UI(`SetWizardContents (_("Configure a sound card"), con, helptext, true, true));
 	// Next - button label
 	UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
 
@@ -249,7 +248,6 @@
 		if(lookup(res, "ui")==`next)
 		{
 		    map sinfo=create_save_info (lookup(res, "return"), card_id);
-		    y2error(sformat("save info options: %1 ", sinfo));
 		    integer pos=0;
 		    list new_save_info=[];
 		    while(pos<size(save_info))
