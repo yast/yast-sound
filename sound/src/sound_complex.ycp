@@ -284,7 +284,7 @@ Try to restart sound system?")))
     list to_delete	= [];
     boolean config_mode = false;
 
-    map rc_vars		= read_rc_vars (["START_ALSA", "START_ALSA_SEQ"]);
+//    map rc_vars		= read_rc_vars (["START_ALSA", "START_ALSA_SEQ"]);
 
 
     if (size(lookup (rc_vars, "START_ALSA", "")) == 0)
