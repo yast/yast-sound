@@ -66,7 +66,9 @@
     {
 	// Fill return map
 	ret =
+	    // section name in proposal dialog
 	    $[ "rich_text_title" : _("Sound"),
+		// section name in proposal - menu item
 	       "menu_title"      : _("&Sound"),
 	       "id"              : "sound_conf"
 	    ];

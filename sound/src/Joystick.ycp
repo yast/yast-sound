@@ -43,6 +43,7 @@
     string module_comment = "";
 
     global string generic_joystick = "Generic analog joystick";
+    // database entry
     global string generic_joystick_translated = _("Generic analog joystick");
 
     /**

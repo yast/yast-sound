@@ -60,6 +60,7 @@
 
 	integer chansPerCol = tointeger(tofloat(nchan) / tofloat(ncols) +0.999); // how many channels per column
 
+	// frame label
 	term mainGroup = `Frame(_("&Master volume"));
 
 	// group first two elements to one Frame
@@ -90,12 +91,14 @@
 	ttmp = add(ttmp, `VSpacing(1));
 
 	mainGroup =
+	    // frame label
 	    `Frame(_("&Master volume"),
 		`HBox(
 		    `HSpacing(3),
 		    ttmp,
 		    `HSpacing(3),
 		    `VBox(
+			// push button label
 			`PushButton(`id(`test), _("&Test"))
 		    )
 		)
@@ -139,6 +142,7 @@
 
         widget = add(widget, `Top(col));
 
+	// frame label
         return `VBox(mainGroup, `Frame(_("&Other channels"), widget));
     }
 
@@ -224,10 +228,12 @@ global define map mixerDialog(integer card_id) ``{
 	channels = [["Master", vol]];
     }
 
+    // help text - mixer setting
     string help = _("<P>With this dialog you can set volume for each channel of the selected sound card. 
 Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the original settings.</P>");
 
     term con = mixerWidget(channels);
+    // dialog header
     Wizard::SetContents (sformat(_("Volume settings for card '%1'"), card_name),con, help, true, true);
     UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
 

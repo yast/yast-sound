@@ -72,12 +72,15 @@
 		  `RichText( `id(`summary), Sound::Summary()),
 		  `VSpacing(),
 		  `HBox(
+			// push button label
 			`PushButton(`id(`configure), _("&Configure Sound")),
 			`HStretch(),
+			// push button label
 			`PushButton(`id(`reset), _("&Reset Configuration"))
 			)
 
 		  );
+	// dialog header
 	Wizard::SetContents(_("Sound Configuration"),
 			    contents, "", true, true);
     }

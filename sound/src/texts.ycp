@@ -26,18 +26,20 @@
      */
 
     global define map STRINGS_() ``{
-	// sound-system independent part
+	// help text - setup type selection 1/3
 	map ret = $["DisplayName":
 _("<p>
 To configure this sound card and adjust its 
 volume, check <b>Normal setup</b>.
 </p>
 ") +
+	// help text - setup type selection 2/3
 _("<p>To set a special option, 
 check <b>Advanced setup</b>.
 Most users will not need this.
 </p>
 ") +
+	// help text - setup type selection 3/3
 _("<p>
 If you do not want to adjust volume or set options now, 
 check <b>Quick automatic setup</b>. You can set the volume and 
@@ -46,17 +48,20 @@ change options later.
 "),
 
 	    "quickConfig":
+	// help text - quick configuration 1/3
 _("<p>
 To configure this sound card and adjust its 
 volume, check <b>Normal setup</b>.
 </p>
 ") +
+	// help text - quick configuration 2/3
 _("<p>
 If you do not want to adjust the volume now, check <b>Quick 
 automatic setup</b>. You can set the volume and change options 
 later.
 </p>
 ") +
+	// help text - quick configuration 3/3
 _("<P>
 To configure a card that was not detected, 
 check <B>More detailed installation of sound cards</B>.
@@ -64,14 +69,16 @@ check <B>More detailed installation of sound cards</B>.
 "),
 
 	    "ManualDialog":
-	    // to translators: please don't translate "<b>All</b>"- add there a comment saying
-	    // something like 'all sound cards'
+	    // help text - sound card selection 1/2
 _("<P>
 <b>Manually</b> choose the sound card  to 
 configure. Search for a particular sound card by 
 entering the name in the search box.
 </p>
 ") +
+	    // help text - sound card selection 2/2
+	    // to translators: please don't translate "<b>All</b>"- add there a comment saying
+	    // something like 'all sound cards'
 _("<p>
 Select <b>All</b> to see the entire list of 
 supported sound card models.
@@ -80,10 +87,12 @@ supported sound card models.
 
 
 	    "WhichDialog":
+	    // help text - which sound card to configure 1/2
 _("<p>
 Select the type of card to configure.
 </p>
 ") +
+	    // help text - which sound card to configure 2/2
 _("<p>
 If the list contains <b>autodetected</b> cards not yet 
 configured, select one and continue. Otherwise,
@@ -110,12 +119,14 @@ programs must be terminated. Proceed?
 
 
 	    "OptionsDialog":
+	    // help text - options dialog 1/2
 _("<p>
 Here, modify options for the sound modules. 
 If you are not <b>absolutely sure</b> what you are doing, 
 leave this dialog untouched. 
 </p>
 ") +
+	    // help text - options dialog 2/2
 _("<p>
 Choose the option to set then use <b>Set</b> 
 to enable the new value. If there are known possible values for 
@@ -127,20 +138,24 @@ decimal or hexadecimal (hexadecimal with a <b>0x</b> prefix).
 "),
 
 	    "VolumeDialog":
+	    // help text - mixer setting 1/4
 _("<p>
 Adjust the volume.
 </p>
 ") +
+	    // help text - mixer setting 2/4
 _("<p>
 Test your sound card by pressing <b>Test</b>.
 
 </p>
 ") +
+	    // help text - mixer setting 3/4
 _("<p>
 After configuration is complete, use <b>amixer</b> 
 or any program of your choice to adjust the volume.
 </p>
 ") +
+	    // help text - mixer setting 4/4
 _("<p><b>WARNING:</b> Start testing your
 sound card with <b>very</b> low volume settings to prevent 
 damage.
@@ -148,11 +163,13 @@ damage.
 "),
 
 	    "SuccessDialog":
+	    // message
 _("<P>
 Automatic configuration finished successfully.
 </P>"),
 
 	    "nm256hackWarning":
+	    // warning/question message
 _("Configuring this sound card on some Sony VAIO notebooks 
 may fail if X is running. This can be avoided by setting the
 snd_vaio_hack option value to 1 or by 
@@ -160,12 +177,15 @@ configuring this card outside X. Proceed?
 "),
 
 	    "SaveModuleEntry":
+// error message
 _("Error while saving '/etc/modules.conf'.\n"),
 
 	    "saveFinal1":
+	// list of error
 _("These errors occurred during saving configuration:\n%1"),
 
 	    "saveFinal2":
+	// information message - success
 _("The sound card was successfully configured.
 It is now available for use.
 "),
@@ -174,9 +194,11 @@ It is now available for use.
 _("The sound configuration was saved."),
 
 	    "saveRCValues":
+	// error message
 _("Error while saving file: %1 \n"),
 
 	    "SetAllChannels":
+	// error message
 _("Error while setting volume.\n"),
 
 	    "ConfigSaveWarn":
