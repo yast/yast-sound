@@ -18,6 +18,21 @@
 {
 
     /**
+     * 
+     *
+     */
+
+    global define read_card_name_from_alsa(integer card_id) ``{
+	string pth=topath(sformat(".audio.alsa.cards.%1.name", card_id));
+	string name=SCR(`Read(pth));
+	if(name==nil)
+	{
+	    return "Sound card";
+	}
+	return name;	
+    }
+
+    /**
      * reads already saved info from modules.conf
      * example:
      * [
@@ -30,7 +45,7 @@
      *	    ],
      *	    $[...]
      *	]
-     * @return list 
+     * @return ist 
      */
     global define read_save_info () ``{
         string prefix = "";
@@ -49,28 +64,6 @@
 
 	    list aliases=SCR(`Read(.modules.alias));
 
-/*
-	    aliases=filter(`e, aliases, ``(find(e, "snd-card-")==0));
-   
-	    aliases=filter(`e, aliases, 
-	    ``{
-		// skip aliases like snd-card-asdf
-		integer i=size("snd-card-");
-		if(i==size(e))
-		{
-		    return false;
-		}
-		while(i<size(e))
-		{
-		    if(!contains(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], substring(e, i, 1)))
-		    {
-			return false;
-		    }
-		    i=i+1;
-		}
-		return true;
-	    });
- */
 	    aliases=filter(`e, aliases, ``(is_snd_alias(e)));
 	    integer position=-1;
 
@@ -117,7 +110,8 @@
 		    if(size(keys)<=position)
 		    {
 			uniq=isa_uniq();
-			model="ISA / virtual sound card";
+			model=read_card_name_from_alsa(position);
+			//model="ISA / virtual sound card";
 		    }
 		    else
 		    {
@@ -131,7 +125,8 @@
 			else
 			{
 			    uniq=isa_uniq();
-			    model="ISA / virtual sound card";
+			    model=read_card_name_from_alsa(position);
+			    //model="ISA / virtual sound card";
 			}
 		    }
 		}

@@ -1110,6 +1110,18 @@
     }
 
     /**
+     * remove memebers listed in id_list list
+     *
+     *
+     */
+
+    global define multi_remove(list input, list id_list) ``{
+	id_list=sort(`x, `y, id_list, ``(x>=y));
+	maplist(`e, id_list, ``{if(e<size(input)) input=remove(input, e); });
+	return input;
+    }
+
+    /**
      * removes entries from save_info listed by indices in id_list 
      *
      *
@@ -1117,9 +1129,11 @@
 
     global define remove_save_entries(list save_info, list id_list)
     ``{
-	id_list=sort(`x, `y, id_list, ``(x>=y));
+//	id_list=sort(`x, `y, id_list, ``(x>=y));
 
-	maplist(`e, id_list, ``{if(e<size(save_info)) save_info=remove(save_info, e); });
+//	maplist(`e, id_list, ``{if(e<size(save_info)) save_info=remove(save_info, e); });
+
+	save_info=multi_remove(save_info, id_list);
 
 	integer pos=0;
 	save_info=maplist(`e, save_info, 

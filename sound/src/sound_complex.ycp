@@ -263,13 +263,20 @@ Try to restart sound system?"))))
 
 		string modname=lookup(select(save_info, card_id), "module", "");
 
+		// we have to rember volume/mute settings because after a card removal
+		// everything is muted and set to 0.
+		list vol_settings=get_vol_settings();
+
 		list rem=get_indices_for_removal(save_info, modname);
 		save_info=remove_save_entries(save_info, rem);
+		vol_settings=multi_remove(vol_settings, rem);
 
 		SaveModulesEntry (save_info, [], true);
 
 		SCR(`Execute (.target.bash, "/etc/init.d/alsasound stop ", $[]));
 		alsasound_start_tmp(false);
+		y2error(sformat("%1", vol_settings));
+		set_vol_settings(vol_settings);
 		
 		cc=createTable(save_info);
     
@@ -321,6 +328,22 @@ Try to restart sound system?"))))
 		cc=createTable(save_info);
 		UI(`ChangeWidget (`id(`configured_table), `Items, cc));
 		UI(`ChangeWidget(`id(`configured_table), `CurrentItem, 0));
+	    }
+	    else if (ui == `b_volume)
+	    {
+		integer card_id = UI(`QueryWidget (`id(`configured_table), `CurrentItem));	
+		map res=CallModule("sound_mixer", [card_id]);
+		if(lookup(res, "ui") == `abort || lookup(res, "ui") == `cancel)
+                {       
+                    return $["ui": `abort];
+                }
+
+		UI(`ChangeWidget(`id(`next), `Label, UI(`FinishButtonLabel())));
+        
+                UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
+                cc=createTable(save_info);
+                UI(`ChangeWidget (`id(`configured_table), `Items, cc));
+                UI(`ChangeWidget(`id(`configured_table), `CurrentItem, 0));
 	    }
 	    else if (ui == `b_fonts)
 	    {
