@@ -407,7 +407,7 @@
 	maplist(`e, Sound::modules_conf,
 	``{
 	    Sound::InitMixer(index, lookup(e, "module", ""));
-	    i = i + 1;
+	    index = index + 1;
 	}
 	);
     }
