@@ -1,8 +1,8 @@
 [
-    ["snd-pmac",	    "PowerMac, Apple"],
-    ["snd-pmac",	    "PowerBook, Apple"],
-    ["snd-pmac",	    "iMac, Apple"],
-    ["snd-pmac",	    "iBook, Apple"],
+    ["snd-powermac",	    "PowerMac, Apple"],
+    ["snd-powermac",	    "PowerBook, Apple"],
+    ["snd-powermac",	    "iMac, Apple"],
+    ["snd-powermac",	    "iBook, Apple"],
     ["snd-fm801",	    "512i Digital, TerraTec"],
     ["snd-fm801",	    "AU10, Abit"],
     ["snd-fm801",	    "ASONIC-8738, ASOUND"],
