@@ -252,7 +252,7 @@ boolean need_restart=true;
     string err_msg = "";
     boolean no_alsa = lookup (lookup (module_map, "module", $[]), "no_alsa", false);
 
-    
+    stop_programs();    
 
     if (!test_mode)
     {

@@ -22,7 +22,7 @@
     include "misc_defines.ycp";
     include "lan/lan_routines.ycp";
 
-    include "browser.ycp";
+//    include "browser.ycp";
 
   /**
    * reads variables listed in 'vars' from rc.config
@@ -1557,6 +1557,43 @@
 	id_list=sort(`x, `y, id_list, ``(x>=y));
 	maplist(`e, id_list, ``{if(e<size(id_list)) key_list=remove(key_list, e); });
 	return key_list;
+    }
+
+    /**
+     * stops all programs using sound devices
+     * @return true if nothing's using sound, false otherwise
+     *
+     */
+
+    global define stop_programs() ``{
+	integer fuser = SCR(`Execute (.target.bash, "/bin/fuser /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]));
+	y2error("###1");
+
+	if (fuser == 0)
+        {
+	y2error("###2");
+                  // To translators: To reset the sound configuration these programs must be terminated
+                  // To translators: label message
+	    string msg=lookup(STRINGS, "WhichDialogMsg");
+	y2error("###3");
+                  // Yes, No - button labels
+            boolean terminate = UI(`YesNoPopup (msg));
+	y2error("###4");
+            if (terminate)
+            {
+	y2error("###5");
+		SCR(`Execute (.target.bash, "/bin/fuser -k /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]));
+	y2error("###6");
+            }
+            else
+            {
+	y2error("###7");
+		return false;
+	y2error("###8");
+            }
+        }
+	y2error("###9");
+	return true;
     }
 
 }
