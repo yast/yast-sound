@@ -52,7 +52,7 @@
 
 	term con = `VBox ();
 	
-	if ((Shell ("/bin/ls /proc/asound/cards")) == 0)
+	if ((Shell ("test -f /proc/asound/cards")) == 0)
 	    already_configured = SCR(`Read(.proc.asound.cards));
 
 	if (already_configured == nil) { // no already configured sound cards
@@ -134,7 +134,7 @@
 			Shell ("/etc/rc.d/alsasound stop");
 			
 			already_configured = nil;
-			if ((Shell ("/bin/ls /proc/asound/cards")) == 0)
+			if ((Shell ("test -f /proc/asound/cards")) == 0)
 			    already_configured = SCR(`Read(.proc.asound.cards));
 		    }
 		    else

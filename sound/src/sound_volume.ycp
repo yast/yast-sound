@@ -23,7 +23,7 @@
 
 	define PlayTest () ``{
 	
-	    if ((Shell ("/bin/ls $FILE", $["FILE" : lookup (user_settings, "audio_file")]) != 0)) {
+	    if ((Shell ("test -f $FILE", $["FILE" : lookup (user_settings, "audio_file")]) != 0)) {
 		string file = lookup (user_settings, "audio_file");
 
 		    // To translators: just one file will be displayed
