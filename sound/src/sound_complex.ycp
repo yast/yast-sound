@@ -184,26 +184,6 @@
 	    ui = UI (`UserInput ());
 	    if (ui == `b_delete && UI(`YesNoPopup(_("Really delete this entry?")))) 
 	    {
-	/*	integer fuser = SCR(`Execute (.target.bash, "/bin/fuser /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]));
-
-		if (fuser == 0) 
-		{
-				// To translators: To reset the sound configuration these programs must be terminated
-				// To translators: label message
-		    string msg=lookup(STRINGS, "WhichDialogMsg");
-			// Yes, No - button labels
-		    boolean terminate = UI(`YesNoPopup (msg));
-		    if (terminate)
-		    {
-			SCR(`Execute (.target.bash, "/bin/fuser -k /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]));
-		    }
-		    else
-		    {
-			continue;
-		    }
-		}
-		
-*/		
 		boolean terminate=stop_programs();
 		if(terminate==false)
 		{
@@ -218,6 +198,7 @@
   
 		list rem=get_indices_for_removal(save_info, modname);
 		save_info=remove_save_entries(save_info, rem);
+
 		configured_unique=remove_uniques(configured_unique, rem);
 
 		save_tmp_modules_conf(save_info);
@@ -226,41 +207,6 @@
 		alsasound_start_tmp(false);
 		
 
-/*		if (contains (SCR(`Read(.modules.alias)), sformat ("snd-card-%1", card_id))) 
-		{
-		    // card in modules.conf
-		    string mod = SCR(`Read(.modules.alias, sformat ("snd-card-%1", card_id)));
-		    SCR(`Execute(.target.modprobe, sformat ("-r %1", mod), ""));
-		    to_delete = add (to_delete, mod);
-		   
-		    remove_tmp_module_by_name(mod);
- 
-		    configured_unique=remove(configured_unique, card_id);
-		}
-		else if (size (conf_cards) > card_id) 
-		{
-		    // card just in the internal structure
-
-		    list m = filter (`e, save_info, ``(lookup (lookup (e, "modules", $[]), "alias", "") == sformat ("snd-card-%1", card_id)));
-		    string mod = "";
-
-		    if (size (m) > 0)
-		    {
-			mod = lookup (select (m, 0), "name", "");
-		    }
-
-		    if (size (mod) > 0) 
-		    {
-			SCR(`Execute(.target.modprobe, sformat ("-r %1", mod), ""));
-			to_delete = add (to_delete, mod);
-		    }
-		}
-		else 
-		{
-		    // error popup message
-		    UI (`MessagePopup (_("Cannot delete this entry!")));
-		}
-*/
 		cards=order_cards_by_uniques(cards, configured_unique);
 		conf_cards = get_running_cards ();
 		cc = maplist (`e, conf_cards, 
@@ -471,6 +417,7 @@
 	{
 	    save_info = mark_off (to_delete);
 	}
+
 
 	return $["ui"       : ui,
 		"save_info" : save_info,
