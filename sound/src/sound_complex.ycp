@@ -468,7 +468,7 @@ Try to restart sound system?"))))
 	return $["ui"       : ui,
 		"save_info" : save_info,
 //		"configured_unique" : configured_unique,
-			   "rc"        : rc_vars];
+		"rc_vars"        : rc_vars];
     }
 
 // ===== MAIN =====

@@ -28,6 +28,17 @@
     map STRINGS=STRINGS_();
 
     /**
+     * create special comment for given model
+     * @param model card description
+     * @param uniq_key unique key
+     */
+
+    global define createAliasComment(string model, string uniq_key) ``{
+	string comment="# "+uniq_key+":"+model+"\n";
+	return comment;
+    }
+
+    /**
      * Saves one '/etc/modules.conf' entry
      * @return boolean
      */
@@ -48,7 +59,8 @@
             {
                 ret = ret && SCR(`Write(mod_alias, lookup(entry, "module", "off"), 
 		    lookup(entry, "alias", "off")));
-		string comment="\# "+lookup(entry, "unique_key", "")+":"+lookup(entry, "model", "")+"\n";
+		string comment=createAliasComment(lookup(entry, "model", ""), lookup(entry, "unique_key", ""));
+		// comment="# "+lookup(entry, "unique_key", "")+":"+lookup(entry, "model", "")+"\n";
 		ret = ret && SCR(`Write(mod_alias_comment, comment, lookup(entry, "alias", "off")));
             }
         return ret;
@@ -79,6 +91,7 @@
 		});
 	    });
 	    opts=toset(opts);
+	    opts=filter(`e, opts, ``(e!="snd_id"));
 
 	    map res=$[];
 	    // for each option collect their values
@@ -98,7 +111,8 @@
 		});
 		res=add(res, opname, value);
 	    });
-	    // write result to modules.conf   
+	    // write result to modules.conf
+	    
 	    SCR(`Write(mod_options, res, modname));
 	});
     }
@@ -223,6 +237,7 @@
      */
 
     global define SaveRCValues (map rc) ``{
+	y2error(rc);
         string err_msg="";
 	if (contains (maplist (`k, `v, rc, ``(SCR(`Write(topath(sformat(".rc.system.%1", k)), v)))), false) ||
             !SCR(`Write(.rc.system, nil)))
