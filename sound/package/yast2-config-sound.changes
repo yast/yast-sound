@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Apr 17 09:38:36 CEST 2001 - dmeszar@suse.cz
+
+- autodocs build fixed
+
+-------------------------------------------------------------------
 Tue Apr 17 08:58:28 CEST 2001 - dmeszar@suse.cz
 
 - sound summary module added, fixed 'requires'
