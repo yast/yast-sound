@@ -67,16 +67,6 @@
 	};
 
 
-	define EnableJoystick () ``{
-
-	    Shell ("/usr/sbin/alsactl -f /tmp/asound.conf store;\
-	    /usr/bin/sed '/\"Joystick\"/s/false/true/' /tmp/asound.conf >/tmp/asound.conf.2;\
-            /usr/bin/alsactl -f /tmp/asound.conf.2 restore;\	    
-	    /bin/rm -f /tmp/asound.conf /tmp/asound.conf2");	    
-
-	};
-
-	
 	
 				// tries to insert module with options (if any)
 				// return string with error message (empty string if ok)
@@ -134,8 +124,6 @@
 		
 		return sformat (UI(_("The kernel module %1 for sound support\ncannot be loaded.")), module_name);
 	    }
-
-	    EnableJoystick ();
 
 	    return "";
 	    

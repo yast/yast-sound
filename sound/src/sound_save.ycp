@@ -77,6 +77,10 @@
 		n = n + 1;
 	    }
 
+		// possible string for SB Live!
+	    list sb_live_exception = ["SB Live!",
+				     "Sound Blaster Live!"];
+	    boolean sb_live = contains(sb_live_exception, soundcard_name (snd_info));
 
 	    string module_name = lookup (lookup (lookup (snd_info, "module", $[]), "module", $[]), "name", "snd-card-dummy");
 	    boolean has_isapnp = contains(maplist (`p, lookup (snd_info, "params", []), ``(lookup (p, "name", "") == "snd_isapnp")), true);
@@ -107,6 +111,17 @@
 	    newl = add (newl, "alias sound-service-0-8 snd-seq-oss");
 	    newl = add (newl, "alias sound-service-0-12 snd-pcm-oss");
 	    newl = add (newl, "#");
+
+	    if (sb_live) {
+		newl = add (newl, "#");
+		newl = add (newl, "# Analog joystick support for SBLive! boards");
+		newl = add (newl, "#");
+		newl = add (newl, "# alias char-major-15 joy-analog");
+		newl = add (newl, "# pre-install joy-analog modprobe \"-k\" \"emu10k1-joy\" \"io=0x200\"");
+		newl = add (newl, "# post-install emu10k1-joy modprobe \"-k\" \"joystick\"");
+	    }
+	    
+	    
 	    newl = add (newl, "# ALSA section {$#@_end_@#$} [don't remove or move this line] ^^^^^");
 
 	    if (SCR(`Write(.lines, newl)) != 0)
@@ -116,7 +131,15 @@
 	    return "";
 	};
 
-	
+
+	define EnableJoystick () ``{
+
+	    return Shell ("/usr/sbin/alsactl -f /tmp/asound.conf store;\
+	    /usr/bin/sed '/\"Joystick\"/s/false/true/' /tmp/asound.conf >/etc/asound.conf;\
+	    /bin/rm -f /tmp/asound.conf;\
+            /usr/sbin/alsactl restore");	    
+
+	};
   
 				// 1. depmode 2. save modules.conf 3. depmode 4. alsactl store
 	define save () ``{
@@ -134,7 +157,9 @@
 	    if (Shell("/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`") == 127)
 		return UI (_("Cannot make a list of module dependecies.\nProgram 'depmod' missing,\nplease check 'modules' package (series 'a1')."));
 
-	    if (Shell ("/usr/sbin/alsactl store") == 127)
+		//if (Shell ("/usr/sbin/alsactl store") == 127)
+		//return UI(_("Cannot find 'alsactl'\nPlease check your installation of ALSA package (series 'snd1')"));
+	    if (EnableJoystick () == 127)
 		return UI(_("Cannot find 'alsactl'\nPlease check your installation of ALSA package (series 'snd1')"));
 	    
 	    return "";
