@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Apr 08 15:40:48 CEST 2002 - arvin@suse.de
+
+- fixes for gcc 3.1
+- use yast2-devtools
+
+-------------------------------------------------------------------
 Mon Jan 28 16:24:12 CET 2002 - dmeszar@suse.cz
 
 - debug logging supressed

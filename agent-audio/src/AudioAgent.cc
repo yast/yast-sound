@@ -88,9 +88,9 @@ YCPValue AudioAgent::Read(const YCPPath &path, const YCPValue& arg) {
 			return alsaGetMute(atoi(args[2].c_str()), args[4].c_str());
 		    break;
 		}
-	} 
+	}
     }
-    
+
     string error = string("Wrong path in Read(): .audio") +  path->toString().c_str();
     return YCPError(error);
 }
@@ -98,22 +98,22 @@ YCPValue AudioAgent::Read(const YCPPath &path, const YCPValue& arg) {
 /**
  * Write
  */
-YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCPValue& arg) 
+YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCPValue& arg)
 {
     /* Do nothing */
     if(path->length()==0) {
 	return YCPBoolean(false);
     }
-    
+
     /* Fetch parameters */
     svect args;
     for(int i=0; i<path->length(); i++)
         args.push_back(path->component_str(i));
 
     if(!value->isInteger() && !value->isBoolean()) {
-	string error = string("Wrong argument (") 
-			+ value->toString().c_str() 
-			+ ") passed to Write(): .audio" 
+	string error = string("Wrong argument (")
+			+ value->toString().c_str()
+			+ ") passed to Write(): .audio"
 			+ path->toString().c_str();
 	return YCPError(error);
     }
@@ -158,7 +158,7 @@ YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCP
     return YCPError(error);
 }
 
-/** 
+/**
  * Dir
  */
 YCPValue AudioAgent::Dir(const YCPPath& path) {
@@ -200,7 +200,7 @@ YCPValue AudioAgent::Dir(const YCPPath& path) {
 	    if(args[0]=="alsa") {
 		if(args[1]=="cards" && args[3]=="channels")
 		{
-		    return alsaGetChannels(atoi(args[2].c_str()));  
+		    return alsaGetChannels(atoi(args[2].c_str()));
 		}
 	    }
 	    else if(args[0]=="oss") {
@@ -214,7 +214,7 @@ YCPValue AudioAgent::Dir(const YCPPath& path) {
 	    break;
 	case 5:
 	    if(args[0]=="alsa") {
-		if(args[1]=="cards" && args[3]=="channels") {   
+		if(args[1]=="cards" && args[3]=="channels") {
 		    list->add(YCPString("mute"));
 		    return list;
                 }
@@ -226,8 +226,8 @@ YCPValue AudioAgent::Dir(const YCPPath& path) {
     return YCPError(error);
 }
 
-YCPValue AudioAgent::Execute(const YCPPath& path, const YCPValue& value = YCPNull(),
-                              const YCPValue& arg = YCPNull())
+YCPValue AudioAgent::Execute(const YCPPath& path, const YCPValue& value,
+			     const YCPValue& arg)
 {
     svect args;
     for(int i=0; i<path->length(); i++)
@@ -240,13 +240,13 @@ YCPValue AudioAgent::Execute(const YCPPath& path, const YCPValue& value = YCPNul
 	if(path->length()==4 && args[1]=="cards")
 	{
 	    card_id=atoi(args[2].c_str());
-	}   
-	
+	}
+
 	if(args[path->length()-1]=="store")
 	{
 	    return alsaStore(card_id);
         }
-        else if(args[path->length()-1]=="restore")	
+        else if(args[path->length()-1]=="restore")
         {
 	    return alsaRestore(card_id);
 	}
@@ -257,7 +257,7 @@ YCPValue AudioAgent::Execute(const YCPPath& path, const YCPValue& value = YCPNul
     }
 
     string error = string("Wrong path in Execute(): .audio") + path->toString().c_str();
-    return YCPVoid(); 
+    return YCPVoid();
 }
 
 /**

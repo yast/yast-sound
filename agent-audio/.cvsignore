@@ -9,3 +9,4 @@ stamp-h*
 libtool
 config.log
 aclocal.m4
+Makefile.am
