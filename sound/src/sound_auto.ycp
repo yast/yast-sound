@@ -46,18 +46,18 @@
 	y2error ("Bad argument for sound_auto: %1", Args (0));
 	return false;
     }
-    
+
     // The settings are in the first argument
-    map settings = $[];    
+    map settings = $[];
     {
 	integer i = 0;
 	while (i < size (Args()))
 	{
-	    if (is (Args (i), map) && nil != Args (i))	settings = Args (i);	    
+	    if (is (Args (i), map) && nil != Args (i))	settings = Args (i);
 	    i = i + 1;
 	}
     }
-         
+
     Sound::Import ( settings );
     y2milestone("Imported: (%1)", settings);
 
@@ -65,7 +65,7 @@
      * Set contents of wizard dialog
      */
 
-    define void set_contents() ``{	
+    define void set_contents() ``{
 	term contents =
 	    `VBox(
 		  `VSpacing(1),
@@ -76,9 +76,9 @@
 			`HStretch(),
 			`PushButton(`id(`reset), _("&Reset Configuration"))
 			)
-				
-		  );		
-	Wizard::SetContents(_("Sound Configuration"),	
+
+		  );
+	Wizard::SetContents(_("Sound Configuration"),
 			    contents, "", true, true);
     }
 
@@ -88,13 +88,13 @@
     repeat {
 	ret = UI::UserInput();
 	if (ret == `configure)
-	{	    	       
+	{
 	    result =  CallFunction(`sound());
 	    y2milestone("result: %1", result);
 	    if (result == `next || result == `finish)
 	    {
 		settings = Sound::Export ();
-	    } 
+	    }
 	    Sound::Set(settings);
 	    set_contents();
 	}
@@ -103,9 +103,9 @@
 	    settings= $[];
 	    Sound::Set(settings);
 	    set_contents();
-	}		
-    } until (ret == `back || ret == `next || ret ==`key);   
-  
+	}
+    } until (ret == `back || ret == `next || ret ==`key || ret ==`abort);
+
     return [ret, settings];
-           
+
 }
