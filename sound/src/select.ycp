@@ -22,6 +22,14 @@
     textdomain "sound";
     import "Summary";
 
+    /**
+     * dialog with list of unconfigured hardware
+     * @param sound_cardsunconfigured cards
+     * @param save_info configured cards
+     * @return map result
+     *
+     */
+
     global define map sound_select(list sound_cards, list save_info) ``{
 
     // show the dialog
