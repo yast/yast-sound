@@ -16,6 +16,8 @@
  */
 
 {
+    import "Directory";
+
     textdomain "sound";
 
     /**
@@ -678,7 +680,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	    }
 
 	    // step3: do something
-	    map res = SCR::Execute (.target.bash_output, "/usr/lib/YaST2/bin/copyfonts 2>/dev/null", $[] );
+	    map res = SCR::Execute (.target.bash_output, Directory::ybindir + "/copyfonts 2>/dev/null", $[] );
 	    integer cnt = tointeger(lookup(res, "stdout", 0));
 
 	    // step4:
