@@ -134,6 +134,13 @@
 
 	integer vol = 10;
 				// TODO: add some other device ajusting here (stereo, other devices like CD, etc ...)???
+
+	term slider = `IntField(`id(`volume), `opt(`notify), _("Volume"), 0, 100, vol);
+
+	if (UI(`HasSpecialWidget(`Slider)))
+	    slider = `Slider (`id(`volume), `opt(`notify), _("Volume"), 0, 100, vol);
+
+
 	term con = `HBox(
 	    `HSpacing (3),
 	    `VBox (
@@ -147,7 +154,7 @@
 		    `HSpacing (),
 		    `VBox(
 			`VSpacing (0.5),
-			`Slider (`id(`volume), `opt(`notify), _("Volume"), 0, 100, vol),
+			slider,
 			`VSpacing (),
 			`PushButton (`id (`test), _("&Test")),
 			`VSpacing (0.5),
@@ -176,6 +183,7 @@
 		    PlayTest ();
 		
 	} until ((ui == `back) || (ui == `next) || ui == `cancel);
+
 
 	return ui;
     }
