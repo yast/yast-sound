@@ -131,7 +131,7 @@
 	UI::CloseDialog ();
 	return;
     }
-    SCR::Execute(.target.bash, "rm /tmp/modules.conf; touch /tmp/modules.conf", $[]);
+    SCR::Execute(.target.bash, "rm /tmp/modules.conf > /dev/null 2>&1; touch /tmp/modules.conf > /dev/null 2>&1", $[]);
 //    SaveModulesEntry(save_info, [], true);
     boolean skipped = false;
     if(all_cards_num == 1)

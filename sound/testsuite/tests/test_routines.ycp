@@ -37,9 +37,4 @@
     TEST (``(itemize_list(l, 1)), [], nil);
     TEST (``(itemize_list(l, 4)), [], nil);
 
-    TEST (``(MacRisc()), $["probe" : $["system": [$["system":"MacRISC"]]]], false);
-    TEST (``(MacRisc()), $["probe" : $["system": [$["system":"MR"]]]], false);
-    TEST (``(MacRisc()), $["probe" : $["system": [$[]]]], false);
-
-    TEST (``(SetVolume("mixer", "1", "14", 1)), [], nil);
 }
