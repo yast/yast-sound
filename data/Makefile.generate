@@ -4,8 +4,11 @@ sndcards.ycp: sndcards.ycp.in
 	echo "*/" >> sndcards.ycp
 	cat sndcards.ycp.in >> sndcards.ycp
 	
-sndcards.ycp.in: cardlist.ycp modlist.ycp idlist.ycp
+sndcards.ycp.in: cardlist.ycp modlist.ycp idlist.ycp vendors.ycp
 	/sbin/yast2 src/merge.ycp
+
+vendors.ycp:
+	/sbin/yast2 src/gen_card_list.ycp
 
 #cardlist
 cardlist.ycp: 

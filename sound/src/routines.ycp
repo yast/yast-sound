@@ -200,11 +200,12 @@
 
 
     /**
-     * Used for searching. returns index of the card in the database identified by name
-     * @param name card name
+     * Used for searching. returns index of the card in the database
+     * identified by name (more exactly: returns index of first name matching
+     * the given substring)
+     * @param name card name (or its substring)
      * @return integer position of the card
      */
-
     global define integer search_card_id (string name) ``{
         list all_cards = get_card_names ("all");
         integer pos = 0;
@@ -213,7 +214,7 @@
 	integer bound = size (all_cards);
         while (pos < bound)
         {
-            if (substring (tolower(select (all_cards, pos, "")), 0, len) == name)
+            if (substring (tolower(all_cards[pos]:""), 0, len) == name)
             {
                 return pos;
             }
@@ -264,30 +265,30 @@
      */
     global define map get_module (map card) ``{
 
-	Sound::LoadDatabase();// TODO not needed here
+	Sound::LoadDatabase();
 
-	string bus        = lookup (card, "bus", "");
+	string bus        = card["bus"]:"";
 	integer offset    = (tolower (bus) == "isa") ? 0x20000 : 0x10000;
-	integer vendor_id = lookup (card, "vendor_id", 0) - offset;
-	integer device_id = lookup (card, "device_id", 0) - offset;
+	integer vendor_id = card["vendor_id"]:0 - offset;
+	integer device_id = card["device_id"]:0 - offset;
 
-	map m1 = lookup(Sound::db_indices, vendor_id, $[]);
+	map m1 = Sound::db_indices[vendor_id]:$[];
 	if (m1 == $[])
 	{
 	    y2debug("vendor_id not found...");
 	    return $[];
 	}
 
-	integer m2 = lookup(m1, device_id, -1);
+	integer m2 = m1[device_id]:-1;
 	if (m2 == -1)
 	{
 	    y2debug("device_id not found");
 	    return $[];
 	}
 
-	string modname = lookup(Sound::db_module_index, m2, "");
+	string modname = Sound::db_module_index [m2]:"";
 
-	map ret = lookup(Sound::db_modules, modname, $[]);
+	map ret = Sound::db_modules [modname]:$[];
 
 	if (ret != $[] && !haskey(ret, "name"))
 	{
@@ -577,7 +578,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	    return false;
 	}
 
-	if (contains(["snd-emu10k1", "snd-sbawe", "emu10k1"], lookup(save_entry, "module", "")))
+	if (contains(["snd-emu10k1", "snd-sbawe", "emu10k1"], save_entry["module"]:""))
 	{
 	    return true;
 	}

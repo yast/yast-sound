@@ -222,10 +222,10 @@
 
     global define boolean StartAndEnable() ``{
 
-    if (start == "enable")
+	if (start == "enable")
 	    SCR::Execute(.target.bash, "/etc/init.d/joystick start", $[]);
-    Runlevel::ServiceAdjust("joystick", start);
-    return true;
+	Runlevel::ServiceAdjust("joystick", start);
+	return true;
     }
 
     /**
@@ -247,7 +247,7 @@
 	start = "disable";
 
 	// stop joystick service
-    Stop();
+	Stop();
 
 	while (pos < 4)
 	{
@@ -257,11 +257,11 @@
 	}
 
 	// flush config to file
-    WriteConfig();
+	WriteConfig();
 
 	// start joystick service
 	// enable/disable service
-    StartAndEnable();
+	StartAndEnable();
 
 	y2milestone("%1", "Joystick configuration was written.");
 
