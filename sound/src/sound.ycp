@@ -243,7 +243,9 @@
 	sound_cards = filter (`e, sound_cards, ``(!contains (already, lookup (e, "unique_key"))));
     }
 
-    
+    // TODO: delete entries from save_info that have no corresponding record in /proc/asound/cards 
+
+    save_info=remove_invalid_save_info(save_info);
 
     if(exit)
     {	// no sound cards database present, shutting down

@@ -21,6 +21,29 @@
     textdomain "sound";
 
     /**
+     * Reads /proc/asound/cards and removes entries form save_info with no corresponding entry in /proc/asound/cards
+     *
+     * @param list save_info
+     * @return list modified list of save_info
+     */
+
+    define remove_invalid_save_info(list save_info) ``{
+	void | list cards=nil;
+	if(fileexist("/proc/asound/cards"))
+	{
+	    cards = SCR(`Read(.proc.asound.cards));
+/*            if (is(select (asound, 0), map))
+            {
+                return asound;
+            }
+*/ 
+	    return save_info;
+	}
+	// no /proc/asound/cards exists -> no cards configured
+	return [];
+    }
+
+    /**
      * returns sound card database
      * @return list
      */
