@@ -1,4 +1,15 @@
 -------------------------------------------------------------------
+Tue Apr 24 03:39:14 PDT 2001 - dmeszar@suse.cz
+
+- 'install sndfonts' button in summary dialog
+
+-------------------------------------------------------------------
+Mon Apr 23 08:03:09 PDT 2001 - dmeszar@suse.cz
+
+- multiple sound cards installation fixed, volume settings fixed
+- fonts loading feature for soundblaster
+
+-------------------------------------------------------------------
 Tue Apr 17 09:38:36 CEST 2001 - dmeszar@suse.cz
 
 - autodocs build fixed
