@@ -1,11 +1,12 @@
 -------------------------------------------------------------------
+Thu Jan 17 15:33:51 CET 2002 - dmeszar@suse.cz
+
+- added joystick type selector dialog
+
+-------------------------------------------------------------------
 Mon Jan 14 16:08:24 CET 2002 - dmeszar@suse.cz
 
 - fixed bug #11717 (restart modules after options had changed)
-
--------------------------------------------------------------------
-Tue Jan  8 21:32:04 CET 2002 - dmeszar@suse.cz
-
 - moved /etc/sysconfig/alsa to /etc/sysconfig/sound
 
 -------------------------------------------------------------------
