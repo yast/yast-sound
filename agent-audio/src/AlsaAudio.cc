@@ -1,11 +1,13 @@
-#include <sys/asoundlib.h>
 #include <math.h>
+#include <sys/asoundlib.h>
+
+#define y2log_component "ag_audio"
+
 #include <Y2.h>
 #include <scr/SCRAgent.h>
 #include <scr/SCRInterpreter.h>
 
-#undef y2log_component
-#define y2log_component "ag_audio"
+#include "AlsaAudio.h"
 
 YCPValue alsaGetVolume(int card, const string& channel)
 {
