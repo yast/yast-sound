@@ -30,6 +30,7 @@
     import "Wizard";
 
     include "sound/joy_dialog.ycp";
+    include "sound/write_routines.ycp";
 
     // selected soundcard id
     integer selected_card = nil;
@@ -39,6 +40,16 @@
 
     // abort block for read/write dialogs
     block<boolean> abort_block = ``{ return false; };
+
+    /**
+     * Save to joystick option to the sound card module
+     */
+    define boolean save_sound_card_joy_config () ``{
+
+	// save modules_conf now
+	SaveModulesOptions (Sound::modules_conf);
+	SCR::Write (.modprobe_sound, nil);
+    }
 
     /**
      * First cofiguration dialog - if more than one sound card which support
@@ -176,6 +187,13 @@
      */
     define symbol saveconfig() ``{
 	Joystick::Write (abort_block);
+	// Save possible changed sound configuration
+	// Only when joystick client is run stand alone! Otherwise it is saved
+	// by sound module!
+	if (Sound::Changed ())
+	{
+	    save_sound_card_joy_config ();
+	}
 	return `next;
     }
 
@@ -215,8 +233,12 @@
 
     // read sound card configuration
     Progress::off();
+
     if (!Sound::Read(false))
 	return `abort;
+
+    Sound::StoreSettings ();
+
     Progress::on();
 
     // read joystick configuration

@@ -1,4 +1,16 @@
 -------------------------------------------------------------------
+Fri Mar 26 16:05:30 CET 2004 - jsuchome@suse.cz
+
+- fixed joystick options in sound car database (tiwai)
+
+-------------------------------------------------------------------
+Fri Mar 26 10:25:51 CET 2004 - jsuchome@suse.cz
+
+- fix of volume dialog (#36980)
+- joystick configuration: now update also sound module options (#36994)
+- 2.9.16
+
+-------------------------------------------------------------------
 Tue Mar 23 10:53:58 CET 2004 - jsuchome@suse.cz
 
 - correctly grab option values from the table (#36690)

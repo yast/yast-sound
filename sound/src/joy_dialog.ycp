@@ -23,8 +23,43 @@
 
     include "sound/joysticks.ycp";
     include "sound/ui.ycp";
+    include "sound/volume_routines.ycp";
 
     list joylist = [];
+
+/**
+ * Update the sound card configuration of joystick
+ * @param start	should joystick be used?
+ * @return was sound config changed?
+ */
+define boolean update_sound_card_joy_config (integer card_id, boolean start) ``{
+
+    map sound_options	= Sound::modules_conf[card_id, "options"]:$[];
+    string modname	= Sound::modules_conf[card_id, "module"]:"";
+    if (!haskey (Sound::joystick_configuration, modname))
+    {
+	return false;
+    }
+    map<string,string> joy_option = Sound::joystick_configuration[modname]:$[];
+    string opname	= "";
+    string value	= "0";
+    // there should be only one entry
+    foreach (string name, string val, joy_option, ``{
+	opname		= name;
+	value		= val;
+    });
+    string default_value	=
+	Sound::db_modules [modname, "params", opname, "default"]:"0";
+
+    if ((start && sound_options[opname]:default_value == default_value) ||
+	(!start && sound_options[opname]:default_value != default_value))
+    {
+	sound_options[opname]	= start ? value : default_value;
+	Sound::modules_conf[card_id, "options"]	= sound_options;
+	return true;
+    }
+    return false;
+}
 
 /**
  * Dialog for joystick testing.
@@ -35,11 +70,6 @@
  */
 define boolean joy_test_popup (integer card_id, integer joymodidx,
 				      string joymod) ``{
-
-    // popup text (yes/no)
-    string some_text	= _("For proper joystick initialization,
-restart of sound system is necessary.
-Proceed?");
 
     any ret = nil;
     UI::OpenDialog(`opt(`decorated), `HBox(`HSpacing(1.5),
@@ -85,6 +115,19 @@ Proceed?");
         Joystick::SaveOneJoystick(card_id);
         Joystick::WriteConfig();
         Joystick::StartAndEnable();
+    }
+
+    // sound card configuration must be changed...
+    if (update_sound_card_joy_config (card_id, true))
+    {
+	// popup text (yes/no)
+	if (Popup::YesNo (_("For proper joystick initialization,
+restart of sound system is necessary.
+Proceed?")))
+	{
+	    sound_stop ();
+	    sound_start_tmp(true);
+	}
     }
 
     integer js_id	= card_id; // default number of device
@@ -503,7 +546,6 @@ It is currently not installed. Install it now?</p>")))
 	if (s == `next)
 	{
 	    string modname	= Sound::modules_conf[card_id, "module"]:"";
-	    map sound_options	= Sound::modules_conf[card_id, "options"]:$[];
 	    map joy_entry	= Sound::GetJoystickSettings (modname);
 	    integer joymodidx = (integer)UI::QueryWidget(`id(`os),`CurrentItem);
 	    string joymod	= joylist[joymodidx,0]:"";
@@ -527,7 +569,9 @@ It is currently not installed. Install it now?</p>")))
 
 		joy_entry = add (joy_entry, "JOYSTICK_MODULE", joymod);
 		joy_entry = add (joy_entry, "model", model);
+
 	    }
+	    update_sound_card_joy_config (card_id, joymod != "");
 
 	    Joystick::joystick[card_id] = joy_entry;
 	    Joystick::modified = true;

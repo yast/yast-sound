@@ -204,6 +204,48 @@
 	return snd_prefix_used () ? "snd_" : "";
     }
 
+    /* tiwai: /usr/src/linux/Documentation/sound/alsa/Joystick.txt
+PCI Cards
+---------
+
+For PCI cards, the joystick is enabled when the appropriate module
+option is specified.  Some drivers don't need options, and the
+joystick support is always enabled.  In the former ALSA version, there
+was a dynamic control API for the joystick activation.  It was
+changed, however, to the static module options because of the system
+stability and the resource management.
+
+The following PCI drivers support the joystick natively.
+    */
+    global map joystick_configuration	= $[
+	"snd-als4000": $[
+	    "joystick_port"	: "1",
+	],
+	"snd-azt3328": $[
+	    "joystick"		: "1",
+	],
+	"snd-ens1370": $[
+	    "joystick"		: "1",
+	],
+	"snd-ens1371": $[
+	    "joystick_port"	: "1",
+	],
+	"snd-cmipci": $[
+	    "joystick_port"	: "1",
+	],
+	"snd-es1968": $[
+	    "joystick"		: "1",
+	],
+	"snd-intel8x0": $[
+	    "joystick"		: "1",
+	],
+	"snd-via82xx": $[
+	    "joystick"		: "1",
+	],
+	"snd-ymfpci" : $[
+	    "joystick_port"	: "1",
+	]
+    ];
 
     /**
      * sound module constructor
