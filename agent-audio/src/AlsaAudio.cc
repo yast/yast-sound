@@ -8,7 +8,7 @@
 #include <scr/SCRInterpreter.h>
 
 
-#ifdef __sparc__ 
+#ifdef __sparc__
     #define __HAVE_ALSA 0
 #endif
 #ifdef __s390__
@@ -63,23 +63,23 @@
 YCPValue alsaGetVolume(int card_id, const string& channel)
 {
     INIT_MIXER
-    
+
     long from, to, value;
     long left;
 
     snd_mixer_selem_channel_id_t chn;
-    
+
 
     for (elem = snd_mixer_first_elem(handle); elem; elem = snd_mixer_elem_next(elem))
     {
 	snd_mixer_selem_get_id(elem, sid);
-	if (snd_mixer_selem_id_get_name(sid) == channel 
+	if (snd_mixer_selem_id_get_name(sid) == channel
 	    && snd_mixer_selem_is_active(elem)
 	    && snd_mixer_selem_has_playback_volume(elem))
 	{
 	    snd_mixer_selem_get_playback_volume_range(elem, &from, &to);
 	    for (chn = (snd_mixer_selem_channel_id_t)0;
-                    chn <= SND_MIXER_SCHN_LAST; 
+                    chn <= SND_MIXER_SCHN_LAST;
                     chn=(snd_mixer_selem_channel_id_t)((int)chn+(snd_mixer_selem_channel_id_t)1))
             {
 		if (!snd_mixer_selem_has_playback_channel(elem, chn))
@@ -133,7 +133,7 @@ YCPValue alsaGetMute(int card_id, const string& channel)
     return YCPBoolean(false);
 }
 
-YCPValue alsaSetVolume(int card_id, const string& channel, int value) 
+YCPValue alsaSetVolume(int card_id, const string& channel, int value)
 {
     INIT_MIXER
 
@@ -180,7 +180,7 @@ YCPValue alsaSetMute(int card_id, const string& channel, bool value)
 	    return YCPBoolean(true);
         }
     }
-    
+
     snd_mixer_close(handle);
     return YCPBoolean(false);
 }
@@ -205,11 +205,11 @@ YCPValue alsaGetChannels(int card_id)
 	}
 
 	outlist->add(YCPString(snd_mixer_selem_id_get_name(sid)));
-	
+
     }
 
     snd_mixer_close(handle);
-    
+
     return outlist;
 }
 
@@ -229,7 +229,7 @@ YCPValue alsaGetCards()
     return list;
 }
 
-YCPValue alsaStore(int card=-1)
+YCPValue alsaStore(int card)
 {
 
     string cmd="/usr/sbin/alsactl store";
@@ -251,7 +251,7 @@ YCPValue alsaStore(int card=-1)
 
 }
 
-YCPValue alsaRestore(int card=-1)
+YCPValue alsaRestore(int card)
 {
 
     string cmd="/usr/sbin/alsactl restore";
