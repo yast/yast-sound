@@ -27,7 +27,6 @@
     include "sound/alsa_routines.ycp";
     include "sound/routines.ycp";
 
-    include "browser.ycp";
     import "Summary";
 
     global boolean autoinstallation = false;
@@ -54,6 +53,9 @@
     global map db_modules = nil;
     global map db_indices = nil;
     global map db_module_index = nil;
+
+    // flag for showing/not showing ui stuff (eg when loading alsa database)
+    global boolean use_ui = false;
 
     /**
      * do hardware detection
@@ -172,6 +174,8 @@
 	map sound_db =$[];
 	if (db_cards == nil || db_cards == $[])
 	{
+            string message = _("Loading the sound card database...");
+	    UI::`OpenDialog(`opt(`decorated), `Label(message));
 	    textdomain "sound_db";
 	    y2debug("Reading card database");
 	    sound_db = eval(SCR::Read (.target.yast2, "sndcards.ycp"));
@@ -182,6 +186,7 @@
 	    db_module_index = lookup(sound_db, "mod_idx", $[]);
 
 	    textdomain "sound";
+	    UI::CloseDialog();
 	}
     }
 

@@ -26,7 +26,6 @@
     textdomain "sound";
 
     include "sound/mixer.ycp";
-    include "browser.ycp";
     import  "Wizard";
 
     /**

@@ -241,6 +241,9 @@ its parameters using the 'Advanced setup'.");
     global define map sound_volume(map save_entry, integer card_id, boolean finish,
 				    boolean quick, list save_info) ``{
 
+
+    Sound::LoadDatabase();
+
     boolean need_restart    = true;
     boolean test_mode	    = false;
 

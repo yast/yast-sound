@@ -155,6 +155,7 @@
     global define list get_card_names(string modname) ``{
 	// we need module index :(
 
+	Sound::LoadDatabase();
 
         if (modname == "all")
         {
@@ -209,6 +210,7 @@
      */
 
     global define map get_module_params(string modname) ``{
+	Sound::LoadDatabase();
 	map mod = lookup(Sound::db_modules, modname, $[]);
 	return lookup(mod, "params", $[]);
     }
@@ -219,6 +221,7 @@
      * @return list of items: [`item(`id(module_name), "module label")]
      */
     global define list get_module_names() ``{
+	Sound::LoadDatabase();
 	list mods = maplist(`k, `v, Sound::db_modules,
 	    ``(`item(`id(k), lookup(v, "description", k))));
 
@@ -246,6 +249,7 @@
      */
 
     global define list get_vol_settings() ``{
+	Sound::LoadDatabase();
 	integer bound	= size(SCR::Dir(.audio.alsa.cards));
 	integer i	= 0;
 	list retlist	= [];

@@ -76,7 +76,7 @@
     include "sound/alsa_routines.ycp";
 //    include "ui/progress.ycp";
     import  "Progress";
-    include "ui/wizard_dialog.ycp";
+    import  "Wizard";
 
       // ==== MAIN ====
 

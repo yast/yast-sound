@@ -89,7 +89,17 @@
 
 	ttmp = add(ttmp, `VSpacing(1));
 
-	mainGroup = `Frame(_("&Master volume"), `HBox(`HSpacing(3), ttmp, `HSpacing(3)));
+	mainGroup =
+	    `Frame(_("&Master volume"),
+		`HBox(
+		    `HSpacing(3),
+		    ttmp,
+		    `HSpacing(3),
+		    `VBox(
+			`PushButton(`id(`test), _("&Test"))
+		    )
+		)
+	    );
 
 	// now group elements to columns
 
@@ -142,6 +152,8 @@
  */
 
 global define map mixerDialog(integer card_id) ``{
+
+    Sound::LoadDatabase();
 
     path pth		= topath(sformat(".audio.alsa.cards.%1.channels", card_id));
     list channels	= []; //use_alsa ? SCR::Dir(pth) : ["Master"];
@@ -245,6 +257,11 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
 	    {
 		SetVolume("Master", card_id, UI::QueryWidget(`id(ui), `Value));
 	    }
+	}
+	else if (ui == `test)
+	{
+	    y2error("playing test");
+	    PlayTest(card_id);
 	}
 	else if (ui == `abort && ReallyAbort())
 	{
