@@ -1,6 +1,6 @@
 /* OSSAudio.h
  *
- * Audio agent -- OSS functions.
+ * Audio agent -- OSS functions
  *
  * Authors: Michal Svec <msvec@suse.cz>
  *
@@ -14,13 +14,7 @@
 #include <scr/SCRAgent.h>
 #include <scr/SCRInterpreter.h>
 
-/**
- * stereo volume structure for oss volume settings
- */
-typedef struct {
-    unsigned char left;
-    unsigned char right;
-} stereovolume;
+//int blah(int X = 0, string Y);
 
 /** 
  *  volume setting
@@ -28,13 +22,13 @@ typedef struct {
  *  @param channel name eg. "Master"
  *  @param value volume 0..100
  */
-YCPValue ossSetVolume(const string card, const string channel, int value);
+YCPValue ossSetVolume(const int value, const string channel = "", const string card = "");
 
 /**
  * volume reading
  * @param card card id
  * @param channel channel name
  */
-YCPValue ossGetVolume(const string card, const string& channel);
+YCPValue ossGetVolume(const string channel = "", const string card = "");
 
 #endif
