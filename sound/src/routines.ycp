@@ -974,7 +974,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	    }
 
 	    // step3: do something 
-	    map res=SCR::Execute (.target.bash_output, "/usr/lib/YaST2/bin/copyfonts > /dev/null 2>&1", $[] );
+	    map res=SCR::Execute (.target.bash_output, "/usr/lib/YaST2/bin/copyfonts 2>/dev/null", $[] );
 	    integer cnt=tointeger(lookup(res, "stdout", 0));
 	    
 	    // step4: 
