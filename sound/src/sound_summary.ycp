@@ -21,6 +21,52 @@
     include "ui/summary.ycp";
     include "misc_defines.ycp";
     include "sound/routines.ycp";
+
+    /**
+     * returns true if char is blank
+     */
+    global define isBlank(string s) ``{
+	if(s=="\n" || s=="\t" || s==" ")
+	{
+	    return true;
+	}
+	return false;
+    }
+
+    /**
+     *	removes trailing and leading blank chars from string
+     *
+     *
+     */
+    global define removeBlanks(string str)``{
+	//emtpy  string
+	if(size(str)==0) return "";
+	
+	integer bound=size(str);
+	integer first=0;
+	integer last=size(str)-1;
+	// find first non-blank char
+	while(first<bound && isBlank(substring(str, first, 1)))
+	{
+	    first=first+1;
+	}
+
+	while(last>=0 && isBlank(substring(str, last, 1)))
+	{
+	    last=last-1;
+	}
+	if(last>first)
+	{
+	    return substring(str, first, last-first+1);
+	}
+	return "";
+    }
+
+    
+    y2error(sformat("'%1'", removeBlanks("Ahojky")));
+    y2error(sformat("'%1'", removeBlanks("\n   \t Ahojky")));
+    y2error(sformat("'%1'", removeBlanks("\n \t \t Ahojky\n\n\n")));
+
     
     list cards=get_audio(false, false);
     list keys=read_unique_keys();
@@ -36,11 +82,11 @@
 	key=lookup(card, "unique_key", "");
 	if(contains(keys, key))
         {
-            conflist=add(conflist, hardware_name(card));
+            conflist=add(conflist, removeBlanks(hardware_name(card)));
         }
         else 
         {
-            notlist=add(notlist, hardware_name(card));
+            notlist=add(notlist, removeBlanks(hardware_name(card)));
         }
     });
 
