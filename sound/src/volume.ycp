@@ -129,6 +129,8 @@
 	setVolume ("Headphone", card_id, vol);
 	// some systems have only one speaker (#46555)
 	setVolume ("Master Mono", card_id, vol);
+	// some systems use Front (#72971)
+	setVolume ("Front", card_id, vol);
 
 	symbol ui = nil;
 	do
@@ -141,6 +143,7 @@
 		setVolume (master_elem, card_id, vol);
 		setVolume ("Headphone", card_id, vol);
 		setVolume ("Master Mono", card_id, vol);
+		setVolume ("Front", card_id, vol);
 	    }
 	    else if (ui == `test)
 	    {
@@ -335,6 +338,7 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
 
 	    setVolume (master_elem, card_id, Sound::default_volume);
 	    setVolume ("Headphone", card_id, Sound::default_volume);
+	    setVolume ("Front", card_id, Sound::default_volume);
 
 	    map devs = Sound::db_modules[modname, "mixer"]:$[];
 	    if (haskey (devs, "PCM"))
