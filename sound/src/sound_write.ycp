@@ -70,11 +70,9 @@
 //    include "sound/texts.ycp";
 
 
- //   map STRINGS = STRINGS_();
-
     include "sound/write_routines.ycp";
     include "sound/alsa_routines.ycp";
-//    include "ui/progress.ycp";
+
     import  "Progress";
     import  "Wizard";
     import  "Runlevel";
@@ -85,18 +83,18 @@
       // ==== MAIN ====
 
     boolean test_mode	= false;
-    map rc_vars		= $[];
+    map rc_values		= $[];
 
     string helptext	= "";
     string err_msg	= "";
 
-    list save_info	= []; //WFM::Args (0);
-    boolean use_alsa	= Sound::use_alsa;
+    list save_info	= [];
+    boolean alsa	= Sound::use_alsa;
     boolean autoinstall = false;
 
     map settings = WFM::Args(0);
     save_info = lookup(settings, "modules_conf", []);
-    rc_vars = lookup(settings, "rc_vars", []);
+    rc_values = lookup(settings, "rc_vars", []);
     volume_settings = lookup(settings, "volume_settings", []);
     autoinstall = lookup(settings, "autoinstall", false);
 
@@ -109,12 +107,12 @@
 /*
     if (size (WFM::Args ()) > 1)
     {
-	rc_vars = WFM::Args (1);
+	rc_values = WFM::Args (1);
     }
     
     if (size(WFM::Args ()) > 2)
     {
-	use_alsa = WFM::Args(2);
+	alsa = WFM::Args(2);
     }
 
     if (size(WFM::Args ()) > 3)
@@ -181,7 +179,7 @@
 
     if (!autoinstall) { sleep(100); Progress::NextStage(); }
     step = step + 1;
-    SaveRCValues(rc_vars);
+    SaveRCValues(rc_values);
 
     if (!autoinstall) { sleep(100); Progress::NextStage(); }
     step = step + 1;
@@ -220,8 +218,10 @@
     if (!autoinstall) { sleep(100); Progress::NextStage(); }
 
     // write joystick configuration and restart service
-    Joystick::Write(nil);
-    SCR::Execute(.target.bash, "/etc/init.d/joystick restart", $[]);
+    Joystick::Write(``{ return false;});
+    // TODO: why is it restarted? It was done in Write, wasn't it?
+    if (Joystick::joystick != [])
+        SCR::Execute(.target.bash, "/etc/init.d/joystick restart", $[]);
 
     if (size(configuredcards) > 0)
     {

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Feb 21 14:35:31 CET 2003 - jsuchome@suse.de
+
+- fixes: stderr of some commands (echo, aplay) goes to /dev/null,
+    do not start joystick when not present (#23807)
+
+-------------------------------------------------------------------
 Fri Feb 14 15:14:39 CET 2003 - jsuchome@suse.de
 
 - fixed argument for aplay (#23633)

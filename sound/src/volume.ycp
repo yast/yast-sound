@@ -389,7 +389,7 @@ its parameters using the 'Advanced setup'.");
 
     UI::ChangeWidget (`id(`next), `Label, UI::NextButtonLabel());
 
-    SCR::Execute(.target.bash, "/usr/bin/killall aplay", $[]);
+    SCR::Execute(.target.bash, "/usr/bin/killall aplay 2> /dev/null", $[]);
 
     return $["ui" : ui, "return" : size (err_msg) == 0];
 
