@@ -325,7 +325,7 @@
 	    list larg = (list) arg;
 	    return sformat(larg[0]:"%1", larg[1]:"");
 	}
-	return "";
+	return _("No description available");
     }
 
     /**
@@ -391,7 +391,7 @@
 	map origOptions = opts;
 	list options = maplist (string name, map o, opts, ``($[
 	    // label: description of option is not available
-	    "description" : getDescr(o["descr"]:_("No description available")),
+	    "description" : getDescr(o["descr"]:nil),
 	    "name"	  : name,
 	    "value"	  : o["value"]:"",
 	    "type"        : o["type"]:"string",
