@@ -289,7 +289,7 @@ its parameters using the 'Advanced setup'.");
     else
     {
 	list devs = ["Master", "PCM", "PCM,1", "Wave", "Master Digital", "Synth", 
-			"Speaker", "Line Out", "Wave Playback Volume"];
+			"Speaker", "Line Out", "Wave Playback Volume", "CD"];
         maplist (`dev, devs, ``(SetVolume (dev, card_id, 70)));
 	unmute(devs, card_id);
 	if (!quick)

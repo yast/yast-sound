@@ -1,19 +1,19 @@
 /**
  * File:
- *   modules/Example.ycp
+ *   modules/Sound.ycp
  *
  * Package:
- *   Configuration of example
+ *   Configuration of sound
  *
  * Summary:
  *   Input and output functions.
  *
  * Authors:
- *   My Name <mymail@suse>
+ *   Dan Meszaros <dmeszar@suse.cz>
  *
  * $Id$
  *
- * Representation of the configuration of example.
+ * Representation of the configuration of sound.
  * Input and output routines.
  *
  */
@@ -45,6 +45,7 @@
     // rc settings
     global map rc_vars = $[];
 
+    // alsa sound card database
     global list sound_db = nil;
 
     /**
@@ -77,32 +78,26 @@
 	unconfigured_cards = getConfigurableCards(modules_conf);
     }
 
-    // Settings: Define all variables needed for configuration of exampleX
-    // TODO FIXME: Define all the variables necessary to hold
-    // TODO FIXME: the configuration here (with the appropriate
-    // TODO FIXME: description)
-    // TODO FIXME: For example:
-    //   // List of the configured cards
-    //   list cards = [];
-    //   // Some additional parameter needed for the confgiuration
-    //   boolean additional_parameter
-
     /**
-     * Read all example settings from the SCR
+     * Read all sound settings from the SCR
      * @return boolean True on success
      */
     global define Read(block _unused) ``{
+	// first detect sound cards
 	DetectHardware();
+	// load data from /etc/modules.conf
 	ReadModulesConf();
+	// create list of unconfigured cards
 	UpdateUnconfiguredCards();
+	// read rc.config values
 	rc_vars = read_rc_vars (["START_ALSA", "START_ALSA_SEQ"]);
+	// load volume settings
 	volume_settings = get_vol_settings();
-	sleep(3);
 	return true;
     }
 
     /**
-     * Get all example settings from the first parameter
+     * Get all sound settings from the first parameter
      * (For use by autoinstallation.)
      * @return boolean True on success
      */
@@ -127,7 +122,7 @@
     }
 
     /**
-     * Update the SCR according to example settings
+     * Update the SCR according to sound settings
      * @return boolean True on success
      */
     global define Write(block _unused, block _unused2) ``{
@@ -136,7 +131,7 @@
     }
 
     /**
-     * Dump the example settings to a single map
+     * Dump the sound settings to a single map
      * (For use by autoinstallation.)
      * @return map Dumped settings (later acceptable by Import())
      */
