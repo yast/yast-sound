@@ -19,7 +19,7 @@
 {
 
     textdomain "sound";
-
+    import "Sound";
     /**
      *	Returns map with string values
      *  @return map with translated strings

@@ -22,6 +22,8 @@
 {
     textdomain "sound";
     import "Wizard";
+    import "Sound";
+    import "Label";
 
     /**
      * returns intfield (if we are running in ncurses) or
@@ -235,7 +237,7 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
     term con = mixerWidget(channels);
     // dialog header
     Wizard::SetContents (sformat(_("Volume settings for card '%1'"), card_name),con, help, true, true);
-    UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
+    UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
 
     any	    ui = nil;	// 'any' is essential here- value can be `next `abort... or string (channel name,
 			//  whose name is dynamical)

@@ -27,8 +27,12 @@
 
     textdomain "sound";
 
+    import "Wizard";
+    import "Label";
+    import "Popup";
+
+    import "Sound";
     include "sound/mixer.ycp";
-    import  "Wizard";
 
     /**
      * creates summary table with card labels and thier states (running/not running/dissappeared)
@@ -119,7 +123,7 @@
 	if (!Sound::autoinstallation && Sound::use_alsa && (size(Sound::modules_conf) != size(get_running_cards())))
 	{
 	    // marning popup message text
-	    if (UI::YesNoPopup(_("The number of currently running cards doesn't match 
+	    if (Popup::YesNo(_("The number of currently running cards doesn't match 
 the number of configured cards in your configuration files. 
 Try to restart sound system?")))
 
@@ -140,7 +144,7 @@ Try to restart sound system?")))
         // dialog title
 	Wizard::SetContents (_("Sound configuration"), con, helptext, true, true);
 	// Finish - button label
-	UI::ChangeWidget(`id(`next), `Label, UI::FinishButtonLabel());
+	UI::ChangeWidget(`id(`next), `Label, Label::FinishButton());
 
 	if (size (cc) == 0)
 	{
@@ -197,7 +201,7 @@ Try to restart sound system?")))
 		    if (oldentry != entry)
 		    {
 			// popup question text
-			if (UI::YesNoPopup(_("To apply changes, the sound system
+			if (Popup::YesNo(_("To apply changes, the sound system
 must be restarted.
 Restart sound system now?
 ")))
@@ -211,7 +215,7 @@ Restart sound system now?
 		{
 		    return $["ui" : `abort];
 		}
-		UI::ChangeWidget(`id(`next), `Label, UI::FinishButtonLabel());
+		UI::ChangeWidget(`id(`next), `Label, Label::FinishButton());
 
 		// dialohg header
 		Wizard::SetContents (_("Sound configuration"), con, helptext, true, true);
@@ -228,7 +232,7 @@ Restart sound system now?
                     return $["ui": `abort];
                 }
 
-		UI::ChangeWidget(`id(`next), `Label, UI::FinishButtonLabel());
+		UI::ChangeWidget(`id(`next), `Label, Label::FinishButton());
 
 		// dialog header
                 Wizard::SetContents (_("Sound configuration"), con, helptext, true, true);

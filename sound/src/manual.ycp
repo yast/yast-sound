@@ -23,6 +23,8 @@
 
     textdomain "sound";
     import "Wizard";
+    import "Sound";
+    import "Label";
 
     /**
      *	dialog for manual settings
@@ -66,7 +68,7 @@
 	UI::ChangeWidget(`id(`sel_drv), `CurrentItem, select(select (module_names, 0, []), 1, "")); //!!!
 	UI::ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0, ""));
 	    // Next - button label
-	UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
+	UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
 
 	symbol ui = nil;
 

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Jul 10 18:15:39 CEST 2003 - jsuchome@suse.de
+
+- used Label and Popup interface
+
+-------------------------------------------------------------------
 Thu May 22 11:12:21 CEST 2003 - jsuchome@suse.cz
 
 - fixed: mixed volume settings after removing and adding first card

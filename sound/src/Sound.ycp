@@ -18,6 +18,7 @@
     import "Summary";
     import "Crash";
     import "Progress";
+    import "Label";
 
     include "sound/read_routines.ycp";
     include "sound/routines.ycp";
@@ -135,7 +136,7 @@
     global define string ProbeOldChip (string chip) ``{
 
 	string command = sformat ("/usr/bin/alsaconf -p %1", chip);
-	string name = Sound::db_modules["snd-"+chip,"description"]:chip;
+	string name = db_modules["snd-"+chip,"description"]:chip;
 
 	// yes/no popup text, %1 is chip name
 	if (Crash::AskRun(command, sformat (_("It is looks like probing the chip
@@ -175,7 +176,7 @@ Probe the chip now?"), name)))
 	list probelist = [];
 	foreach (`chip, chips, ``{
 	    // FIXME snd- prefix could be removed from sndcards database?
-	    string name = Sound::db_modules["snd-"+chip,"description"]:"";
+	    string name = db_modules["snd-"+chip,"description"]:"";
 	    if (name != "")
 		name = sformat ("%1 (%2)", name, chip);
 	    else
@@ -206,7 +207,7 @@ could make your system unstable.")),
 		// button label
 		`PushButton(`id(`ok),`opt(`key_F10, `default),_("&Yes, Probe")),
 		// button label
-		`PushButton(`id(`cancel),`opt(`key_F9), UI::CancelButtonLabel())
+		`PushButton(`id(`cancel),`opt(`key_F9), Label::CancelButton())
 	    ),
 	    `VSpacing(0.5)
 	    ),
@@ -229,7 +230,7 @@ could make your system unstable.")),
 		    `ProgressBar(`id(`progress), _("Progress:"), size(chips),0),
 		    `VSpacing(0.5),
 		    `PushButton(
-			`id(`abort), `opt(`key_F9), UI::AbortButtonLabel())
+			`id(`abort), `opt(`key_F9), Label::AbortButton())
 		))
 	    );
 	    boolean aborted = false;
@@ -239,7 +240,7 @@ could make your system unstable.")),
 		aborted = (UI::PollInput() == `abort);
 
 		UI::ChangeWidget (`id(`probed), `Value,
-		    Sound::db_modules["snd-"+chip,"description"]:chip);
+		    db_modules["snd-"+chip,"description"]:chip);
 
 		string ret = ProbeOldChip (chip);
 		if (ret != "")
@@ -250,7 +251,7 @@ could make your system unstable.")),
 		    y2milestone ("probed with alsaconf: %1", returned);
 		    // label (%1 is name of the chip)
 		    string default_name = sformat (_("Card with %1 chip"),
-			Sound::db_modules[chip, "description"]:chip);
+			db_modules[chip, "description"]:chip);
 		    string model = returned[1]:default_name;
 		    if (model == "")
 			model = default_name;
@@ -567,7 +568,7 @@ could make your system unstable.")),
      */
 
     global define void DumpToLog() ``{
-	y2error(sformat("%1", [Sound::modules_conf, rc_vars, true, true, get_vol_settings()]));
+	y2error(sformat("%1", [modules_conf, rc_vars, true, true, get_vol_settings()]));
     }
 
     /**
@@ -578,16 +579,16 @@ could make your system unstable.")),
     global define string Summary() ``{
 	list retlist    = [];       // return value of the module
 
-	list keys = maplist(`e, Sound::modules_conf, ``(lookup(e, "unique_key", "...")));
+	list keys = maplist(`e, modules_conf, ``(lookup(e, "unique_key", "...")));
 
-	retlist = maplist(`card, Sound::modules_conf,
+	retlist = maplist(`card, modules_conf,
 	``(
 	    // to translators: '(sound card is) Configured as snd-card-1'
 	    Summary::Device(lookup(card, "model", "Sound card"), sformat(_("Configured as %1."), 
 		lookup(card, "alias", "snd-card-0")))
 	));
 
-	foreach(`card, Sound::detected_cards,
+	foreach(`card, detected_cards,
 	``{
 	    if (!contains(keys, lookup(card, "unique_key", "...")))
 	    {
@@ -884,9 +885,9 @@ could make your system unstable.")),
 	{
 	    // alsa is not running. probably autoinstallation or someone wants
 	    // to change proposed volume
-	    // store volume to Sound::volume_settings datastricure in autoinstallation
-            map oldmap = Sound::volume_settings[card_id]:$[];
-            Sound::volume_settings[card_id] = add(oldmap, channel, value);
+	    // store volume to volume_settings datastricure in autoinstallation
+            map oldmap = volume_settings[card_id]:$[];
+            volume_settings[card_id] = add(oldmap, channel, value);
             return true;
 	}
     }
@@ -898,7 +899,7 @@ could make your system unstable.")),
      */
 
     global define void  InitMixer(integer card_id, string modname) ``{
-        map devs = lookup(lookup(Sound::db_modules, modname, $[]), "mixer",
+        map devs = lookup(lookup(db_modules, modname, $[]), "mixer",
             $["Master":70, "PCM":70, "CD":70, "Synth": 70]);
 
 	// now let's merge settings from volume_settings list
@@ -967,7 +968,7 @@ could make your system unstable.")),
 	foreach(map m, cards, ``{
 		integer cid = lookup(m, "card_no", nil);
 
-		if (cid != nil && Sound::HasJoystick(cid) == true)
+		if (cid != nil && HasJoystick(cid) == true)
 		{
 		    filtered = add(filtered, m);
 		}

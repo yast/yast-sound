@@ -21,6 +21,8 @@
 {
     textdomain "sound";
 
+    import "Arch";
+    import "Sound";
     include "sound/routines.ycp";
 
     /**

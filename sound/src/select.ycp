@@ -21,6 +21,7 @@
 {
     textdomain "sound";
     import "Summary";
+    import "Label";
 
     /**
      * dialog with list of unconfigured hardware
@@ -38,7 +39,7 @@
     selectHardware( sound_cards,
                     confhw);
 
-    UI::ChangeWidget(`id(`next), `Label, UI::FinishButtonLabel());
+    UI::ChangeWidget(`id(`next), `Label, Label::FinishButton());
 
     symbol ui = nil;
     do

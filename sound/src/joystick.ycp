@@ -23,17 +23,18 @@
     textdomain "sound";
 
     import "Arch";
-
-    include "wizard/sequencer.ycp";
-    import  "Wizard_hw";
-    include "ui/common_popups.ycp";
-    include "sound/joy_dialog.ycp";
+    import "Mode";
     import  "Wizard";
     import  "Progress";
+    import  "Wizard_hw";
 
     import  "Joystick";
     import  "Sound";
 
+    include "wizard/sequencer.ycp";
+    import "Label";
+    import "Popup";
+    include "sound/joy_dialog.ycp";
 
     // global variables:
 
@@ -97,7 +98,7 @@
 
 		message = message + "\n" + _("Start sound card configuration?");
 
-		if (UI::YesNoHeadlinePopup(_("No joystick port to configure was found."), message) == true)
+		if (Popup::YesNoHeadline(_("No joystick port to configure was found."), message) == true)
 		{
 		    // start sound module - joystick can be configured there
 		    // so after sound config abort this module
@@ -128,7 +129,7 @@
 		);
 
 		Wizard::SetContents(_("Configured sound cards with joystick support"), dialog, helptext, true, true);
-		Wizard::ReplaceNextButton(`PushButton(`id(`next), `opt(`default), FinishButtonLabel()));
+		Wizard::ReplaceNextButton(`PushButton(`id(`next), `opt(`default), Label::FinishButton()));
 
 		// preselect first card
 		UI::ChangeWidget(`id(`cards), `CurrentItem, lookup(select(filtered, 0, $[]), "card_no", 0));

@@ -26,6 +26,8 @@
 
     textdomain "sound";
     import "Wizard";
+    import "Label";
+    import "Popup";
 
     /**
      * parses string eg. '{{0,2},{0,100,20}}' to a list [0,1,2,0,20,40,60,80,100]
@@ -346,7 +348,7 @@
 
 		if (size (err) > 0)  // error - wrong value
 		{
-		    UI::MessagePopup (err);
+		    Popup::Message (err);
 		    UI::ChangeWidget(`id(`des), `Value, "");
 
 		}
@@ -367,7 +369,7 @@
 
 	    }
 	    // popup question
-	    else if (ui == `reset && UI::YesNoPopup(_("Do you really want to reset all values?")))
+	    else if (ui == `reset && Popup::YesNo(_("Do you really want to reset all values?")))
 	    {
 		UI::ChangeWidget(`id(`des), `Value, "");
 
@@ -413,7 +415,7 @@
 
     params = restore_mod_params(params, lookup(save_entry, "options", []));
 
-    UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
+    UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
 
     // now show the dialog
     map result  = OptionsDialog (cardlabel, params);

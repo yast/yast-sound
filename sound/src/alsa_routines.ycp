@@ -19,6 +19,7 @@
 
 {
     textdomain "sound";
+    import "Sound";
 
     /**
      * sets volume in percents (0..100) for given card and card_id

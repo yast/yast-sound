@@ -30,6 +30,10 @@
 
     textdomain "sound";
     import "Wizard";
+    import "Popup";
+    import "Label";
+
+    import "Sound";
 
     include "sound/joy_dialog.ycp";
 
@@ -66,7 +70,7 @@
 
 	if (finish)
 	{
-	    UI::ChangeWidget (`id(`next), `Label, UI::FinishButtonLabel());
+	    UI::ChangeWidget (`id(`next), `Label, Label::FinishButton());
 	}
 
 /* Sound fonts installation */
@@ -100,7 +104,7 @@
 		    string msg = PlayTest(card_id);
 		    if (msg != "")
 		    {
-			UI::MessagePopup (msg);
+			Popup::Message (msg);
 		    }
 		}
 	    }
@@ -168,10 +172,10 @@ its parameters using the 'Advanced setup'.");
 	  );
 
 	    // dialog title
-	Wizard::SetContents (ErrorMsg(), con, help_text, true, false);
+	Wizard::SetContents (Label::ErrorMsg(), con, help_text, true, false);
 	if (finish)
 	{
-	    UI::ChangeWidget (`id(`next), `Label, UI::FinishButtonLabel());
+	    UI::ChangeWidget (`id(`next), `Label, Label::FinishButton());
 	}
 
 	UI::SetFocus(`id(`back));
@@ -220,7 +224,7 @@ its parameters using the 'Advanced setup'.");
         Wizard::SetContents (_("Success"), con, help_text, true, true);
         if (finish)
         {
-            UI::ChangeWidget (`id(`next), `Label, UI::FinishButtonLabel());
+            UI::ChangeWidget (`id(`next), `Label, Label::FinishButton());
         }
 
         repeat
@@ -382,7 +386,7 @@ its parameters using the 'Advanced setup'.");
 	SCR::Execute(.audio.alsa.restore, 0 ,0);
     }
 
-    UI::ChangeWidget (`id(`next), `Label, UI::NextButtonLabel());
+    UI::ChangeWidget (`id(`next), `Label, Label::NextButton());
 
     SCR::Execute(.target.bash, "/usr/bin/killall aplay 2> /dev/null", $[]);
 
