@@ -143,8 +143,8 @@
     global define map sound_stop() ``{
 	SCR::Execute (.target.bash, "/etc/init.d/alsasound stop > /dev/null 2>&1", $[]);
     }
-    
-    /** returns card models list 
+
+    /** returns card models list
      *
      * @param modname if "all" returns all models
      * @return list with sound cards driven by given module
