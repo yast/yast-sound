@@ -66,7 +66,7 @@
 	UI(`ChangeWidget(`id(`sel_drv), `CurrentItem, select(select (module_names, 0), 1, select (module_names, 0))));
 	UI(`ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0)));
 	    // Next - button label
-	UI(`ChangeWidget(`id(`next), `Label, NextButtonLabel()));
+	UI(`ChangeWidget(`id(`next), `Label, UI(`NextButtonLabel())));
 
 	any ui = nil;
 

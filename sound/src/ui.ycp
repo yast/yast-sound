@@ -79,7 +79,7 @@
 	    flagc=flagc*2;
 	}
 		// Next button label    
-	UI(`ChangeWidget(`id(`next), `Label, NextButtonLabel()));
+	UI(`ChangeWidget(`id(`next), `Label, UI(`NextButtonLabel())));
 
 	symbol input=`cancel;
 
@@ -229,19 +229,30 @@
                   `Table (`id(`table), `opt (`notify, `immediate), `header(_("Description"), _("Option"),
                                                                                              `Right(_("Value"))), itemized_descriptions),
                   `VSpacing (0.5),
-                  `VBox
-                  (
-                    `TextEntry (`id (`des), current_option_name,
-                                      lookup (select (options, current_option), "value", "")),
-                    `VSpacing (0.5),
-                    `HBox
-                    (
-                              // "set" button: Sets the option value
-                      `PushButton (`id (`set), `opt(`default), _("&Set")),
-                              // "reset" button: Resets all values
-                      `PushButton (`id (`reset), _("&Reset"))
-                    )
-                  ),
+//                  `VBox
+//                  (
+//                    `TextEntry (`id (`des), current_option_name,
+//                                      lookup (select (options, current_option), "value", "")),
+//                    `VSpacing (0.5),
+//                    `HBox
+//                    (
+//                              // "set" button: Sets the option value
+//                      `PushButton (`id (`set), `opt(`default), _("&Set")),
+//                              // "reset" button: Resets all values
+//                      `PushButton (`id (`reset), _("&Reset"))
+//                    )
+//                  ),
+		  `HBox
+		  (
+		    `TextEntry (`id (`des), `opt(`notify), current_option_name,
+			 lookup (select (options, current_option), "value", "")),
+		    `VBox(
+			`Label(""),
+			`PushButton (`id (`reset), _("&Reset all"))
+		    )
+
+		  ),
+		  `Left(`ReplacePoint(`id(`reppoint), `Label("Possible values:"))),
                   `VSpacing (0.5)
                 ),
                 `HSpacing (3)
@@ -379,11 +390,11 @@
                 `HBox (`HSpacing (5), `RadioButtonGroup (
                     `id (`action),
                     `VBox (
-                        `RadioButton (`id (0), `opt (`hstretch), _("Quick automatic setup"), true),
+                        `RadioButton (`id (0), `opt (`hstretch), _("&Quick automatic setup"), true),
                         `VSpacing (0.3),
-                        `RadioButton (`id (1), `opt (`hstretch), _("Normal setup")),
+                        `RadioButton (`id (1), `opt (`hstretch), _("&Normal setup")),
                         `VSpacing (0.3),
-                        `RadioButton (`id (2), `opt (`hstretch), _("Advanced setup with possibility to change options"))
+                        `RadioButton (`id (2), `opt (`hstretch), _("&Advanced setup with possibility to change options"))
 //,
 //                        `VSpacing (0.3),
 //                        `RadioButton (`id (3), `opt (`hstretch), _("Skip sound card"))
@@ -427,7 +438,6 @@
             return `item(`id(index), e);
             });
 
-        UI(``{
         titles=add(titles, _("Hardware detection didn't find any devices"));
             // 1:new 0:already
         titles=add(titles, "Hardware detection found a new device");
@@ -445,7 +455,8 @@
         titles=add(titles, "Hardware detection found a new device and already\ninstalled devices");
             // 2:new 2:already
         titles=add(titles, "Hardware detection found new devices and already\ninstalled devices");
-        });
+
+	titles=UI(titles);
 
         integer pos=0;
         boolean enab1=true; // listbox for new devices enabled flag
@@ -519,7 +530,7 @@
         {
             UI(`ChangeWidget (`id(`action), `CurrentButton, 1));
             UI(`ChangeWidget (`id(`nh), `Enabled, false));
-            UI(`ChangeWidget (`id(0), `Enabled, false));
+            UI(`ChangeWidget (`id(`new), `Enabled, false));
         }
 	else
 	{
@@ -533,7 +544,7 @@
                 UI(`ChangeWidget (`id(`action), `CurrentButton, 2));
             }
             UI(`ChangeWidget (`id(`ch), `Enabled, false));
-            UI(`ChangeWidget (`id(1), `Enabled, false));
+            UI(`ChangeWidget (`id(`configured), `Enabled, false));
         }
 	else 
 	{

@@ -55,7 +55,7 @@
 	UI(`SetWizardContents (_("Sound card volume"), con, help_text, true, true));
 	if (finish)
 	{
-	    UI(`ChangeWidget (`id(`next), `Label, FinishButtonLabel()));
+	    UI(`ChangeWidget (`id(`next), `Label, UI(`FinishButtonLabel())));
 	}
 
 /* Sound fonts installation */
@@ -77,7 +77,7 @@
 	    if (ui == `volume) 
 	    {
 		vol = UI(`QueryWidget(`id(`volume), `Value ));
-		SetVolume ("Master", card_id, vol);
+		SetVolume("Master", card_id, vol);
 	    }
 	    else if (ui == `test) 
 	    {
@@ -105,7 +105,7 @@
 	    {
 		if(ReallyAbort())
 		{
-		    ui=`cancel;
+		    ui=`abort;
 		    break;
 		}
 	    }
@@ -141,7 +141,7 @@
 	UI(`SetWizardContents (ErrorMsg(), con, help_text, true, false));
 	if (finish)
 	{
-	    UI(`ChangeWidget (`id(`next), `Label, FinishButtonLabel()));
+	    UI(`ChangeWidget (`id(`next), `Label, UI(`FinishButtonLabel())));
 	}
 
 	repeat 
@@ -187,7 +187,7 @@
         UI(`SetWizardContents (_("Success"), con, help_text, true, true));
         if (finish)
         {
-            UI(`ChangeWidget (`id(`next), `Label, FinishButtonLabel()));
+            UI(`ChangeWidget (`id(`next), `Label, UI(`FinishButtonLabel())));
         }
 
         repeat
@@ -219,6 +219,7 @@
     map save_entry = Args (0);
     integer card_id = Args (1);
     boolean finish = false;
+    boolean test_mode=false;
 
     boolean quick = false;
 
@@ -286,7 +287,7 @@
     }
 
 
-    UI(`ChangeWidget (`id(`next), `Label, NextButtonLabel()));
+    UI(`ChangeWidget (`id(`next), `Label, UI(`NextButtonLabel())));
 
     return $["ui" : ui, "return" : size (err_msg) == 0];
 
