@@ -2,10 +2,6 @@
 Mon Jan 28 13:08:04 CET 2002 - dmeszar@suse.cz
 
 - fixed bug #12925 (config of single autodetected card not possible)
-
--------------------------------------------------------------------
-Mon Jan 21 14:30:46 CET 2002 - dmeszar@suse.cz
-
 - added proposal_sound.ycp file
 
 -------------------------------------------------------------------
