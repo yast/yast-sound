@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Jul  4 16:59:01 MEST 2000 - dan@suse.de
+
+- fixed aplay calling 
+
+-------------------------------------------------------------------
 Mon Jul  3 10:27:16 CEST 2000 - kkaempf@suse.de
 
 - changed test sound in alsa package
