@@ -494,7 +494,6 @@
 
 	modules_conf = recalc_save_entries(unconfigured_cards);
 	rc_vars = $[
-		"LOAD_ALSA" : "yes",
 		"LOAD_ALSA_SEQ": "yes"
 	    ];
 	proposal_created = true;
@@ -690,6 +689,54 @@
         unmute(devs2, card_id);
 
 	// in addidtion, some other channels can be specified or some volumes may be overriden
+    }
+
+    global define boolean HasJoystick(integer card_id) ``{
+	if (card_id == nil)
+	{
+	    return false;
+	}
+
+	if (use_alsa == true)
+	{
+	    map entry = select(modules_conf, card_id, $[]);
+	    string modname = lookup(entry, "module", "");
+
+	    if (lookup(lookup(db_modules, modname, $[]), "joystick", $[]) == $[])
+	    {
+		return false;
+	    }
+	    else
+	    {
+		return true;
+	    }
+	}
+	else
+	{
+	    return false;
+	}
+    }
+
+    global define list GetSoundCardListWithJoy() ``{
+
+	// get list of installed sound cards
+	list cards = GetSoundCardList();
+
+	// cards which support joysticks
+	list filtered = [];
+
+	// remove cards without joystick support
+	foreach(map m, cards, ``{
+		integer cid = lookup(m, "card_no", nil);
+
+		if (cid != nil && Sound::HasJoystick(cid) == true)
+		{
+		    filtered = add(filtered, m);
+		}
+	    }
+	);
+
+	return filtered;
     }
 
 }

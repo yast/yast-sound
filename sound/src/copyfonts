@@ -1,7 +1,7 @@
 #!/bin/bash
 # 
 # script for copying sound banks from sound blaster cd to localhost
-# $id$
+# $Id$
 # dan meszaros <dmeszar@suse.cz>
 
 # first get the path to cdrom

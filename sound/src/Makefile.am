@@ -26,7 +26,6 @@ yinclude_DATA = \
 	complex.ycp \
 	select.ycp \
 	manual.ycp \
-	joystick.ycp \
 	joysticks.ycp
 
 
@@ -35,9 +34,11 @@ clients_DATA = 	\
 	sound_write.ycp		\
 	sound_summary.ycp	\
 	sound_auto.ycp		\
+	joystick.ycp		\
 	proposal_sound.ycp
 
-menu_DATA = menuentry_sound.y2cc
+menu_DATA = menuentry_sound.y2cc \
+	    menuentry_joystick.y2cc
 
 modules_DATA = Sound.ycp	\
 	Joystick.ycp

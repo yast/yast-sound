@@ -47,7 +47,7 @@
     include "sound/complex.ycp";
     include "sound/select.ycp";
     include "sound/manual.ycp";
-    include "sound/joystick.ycp";
+//    include "sound/joystick.ycp";
 
     boolean autoinstall = false;
 
@@ -594,6 +594,7 @@
 		))
 	{
 	    Sound::Write(``{}, ``{});
+	    // TODO: ask to configure joystick
 	}
     }
 

@@ -27,6 +27,7 @@ configure sound.
 @YAST2DIR@/include/sound/*.ycp
 @YAST2DIR@/clients/sound*.ycp
 @YAST2DIR@/clients/proposal_sound.ycp
+@YAST2DIR@/clients/joystick.ycp
 @YAST2DIR@/scrconf/*.scr
 @YAST2DIR@/menuentries/menu*.y2cc
 @YAST2DIR@/bin/copyfonts

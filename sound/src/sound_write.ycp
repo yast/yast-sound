@@ -35,7 +35,6 @@
  *
  *	   2nd ... rc_values
  *	   $[
- *		"LOAD_ALSA" : "yes",
  *		"LOAD_SEQUENCER" : "yes"
  *         ]
  *
@@ -130,7 +129,7 @@
     list stones = [
 	    _("Save module configuration"),
             _("Save sound card information"),
-	    _("Save RC value"),
+	    _("Save sysconfig values"),
 	    _("Start sound card"),
 	    _("Store volume"),
 	    _("Store joystick settings")];
@@ -138,7 +137,7 @@
     list stones2 = [
 	    _("Saving sound card settings."),
 	    _("Saving card information..."),
-	    _("Saving RC values..."),
+	    _("Saving sysconfig values..."),
 	    _("Starting sound card..."),
 	    _("Storing volume settings"),
 	    _("Storing joystick settings...")];
