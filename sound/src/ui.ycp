@@ -43,7 +43,11 @@
 
     /**  
      *  DisplayName
-     *  
+     *   
+     * @param name card model
+     * @param cname sound card alias for modules conf
+     * @param cpos cards position
+     * @param flags enable/disable radiobuttons accordingly
      *
      * @return map
      */
@@ -103,8 +107,12 @@
     }
 
     /**
-     *
-     *
+     * quick config dialog (is shown when only one card has been detected0
+     * @param name card model
+     * @param cname alias for modules conf
+     * @param cpos position of the soud card
+     * @param flags enable/disable radio buttons
+     * @return symbol of pressed button
      */
 
     global define quickConfig(string name, string cname, integer cpos, integer flags) ``{
@@ -173,7 +181,7 @@
     /**
      *	UI controls for volume setting dialog
      *
-     *  @param card map with card info
+     *  @param save_entry map with card info
      *  @param vol initial volume (0-100)
      *  @return term 
      */
@@ -231,7 +239,7 @@
     /**
      *	UI controls for options setting dialog
      *
-     *  @param card card info
+     *  @param cardlabel card model string
      *  @param itemized_descriptions option list (preformated using 'create_table' with tripples: description, name, value
      *  @param current_option index of initially selected item
      *  @param current_option_name initially selected item name
@@ -318,6 +326,16 @@
 	return con;
     }
 
+    /**
+     * widget for complex dialog
+     * @param cc list of configured cards
+     * @param start_alsa check/ucheck start_alsa checkbox
+     * @param start_alsa_seq as previous
+     * @param show_font_but show button for sound fonts installation
+     * @return widget
+     *
+     */
+
     global define ComplexDlgCon(list cc, boolean start_alsa, boolean start_alsa_seq, boolean show_font_but) ``{
 	term butts = nil;
 	term alsabuts = `Empty();
@@ -383,6 +401,14 @@
 	return con;
     }
     
+    /**
+     * quick config dialog widget
+     * @param name card model
+     * @param cname alias for modules conf
+     * @param cpos position of the card
+     * @return term with widget
+     */
+
     global define AutoconfDlg(string name, string cname, integer cpos) ``{
 	string clab = "";	
     
@@ -420,7 +446,10 @@
 
     /**
      * quick conf dialog widget
-     *
+     * @param name card model
+     * @param cname card alias for module.conf
+     * @param cpos card position
+     * @return term widget
      *
      */
 
@@ -465,7 +494,7 @@
 
     /**
      *  dialog to be displayed when user presses 'Abort' button
-     *
+     *	@return boolean
      */
 
     global define ReallyAbort()
@@ -500,6 +529,12 @@
 	UI::SetWizardContents (_("Sound card configuration"), widget, helptext, true, true);
 
     }
+
+    /**
+     * displays a dialog that offer to configure detected or manually selected card
+     * @param cards detected cards
+     * @return `auto/`manual
+     */
 
     global define WhichDialog (list cards)       ``{
     // help text 

@@ -16,23 +16,11 @@
 
 {
     textdomain "sound";
-//    include "misc_defines.ycp";
-//    include "lan/lan_routines.ycp";
-//    include "ui/summary.ycp";
-
-    global define is_sparc() ``{
-	if (__sparc == nil)
-	{
-	    import "Arch";
-	    __sparc = Arch::sparc;
-	}
-	return __sparc;
-    }
 
     /**
      * fliters out already configured cards
      * @param save_info info from modules.conf
-     * @cards autodetected cards
+     * @param cards autodetected cards
      * @return list of entries of not configured cards
      */
 
@@ -53,6 +41,10 @@
         return cards;
     }
 
+    /**
+     * returns the result of /usr/bin/whoami
+     * @return string
+     */
 
     global define whoami() ``{
 	string cmd = "/usr/bin/whoami";
@@ -68,8 +60,8 @@
 
     /**
      * logtime- logs current time - used for performance 
-     * improvements
-     *
+     * improvements. logs comment with current time
+     * @param comment string
      */    
 
     global define logtime(string comment) ``{
@@ -83,10 +75,11 @@
     /**
      * for a given card detected by libhd this function creates a 
      * label
-     * @param map entry from .probe.audio
+     * @param card map entry from .probe.audio
      * @return string card label
      *
      */
+
     global define get_card_label(map card)
     ``{
         list lab = splitstring(hardware_name(card),"\n");
@@ -104,7 +97,7 @@
     /**
      * returns true if given string is valid sound alias
      * (snd-card-1 .. snd-card-16)
-     * @param string alias
+     * @param alias string
      * @return boolean
      *
      */
@@ -123,7 +116,7 @@
 
     /**
      * unique key for non-pci/pnp cards or virtual cards	
-     *
+     * @return string
      */
 
     global define isa_uniq() ``{
@@ -132,7 +125,8 @@
 
   /**
    * reads variables listed in 'vars' from rc.config
-   * @return list
+   * @param vars list of variables to read
+   * @return map optname: value
    */
     global define read_rc_vars (list vars) ``{
         return listmap (`k, vars, ``([k, SCR::Read(topath(sformat (".rc.system.%1", k)))]));
@@ -143,7 +137,8 @@
     /**
      *  Converts hex num to integer keeps decimal number as is. Hexadecimal
      *  number assumes to have prefix ``0x''. Doesn't  check the syntax.
-     *
+     *	@param num string value
+     *  @return integer
      */
 
     global define hextoi(string num) ``{
@@ -152,8 +147,8 @@
 
     /**
      *  writes unique keys of the configured cards to /var/lib/YaST/unique.inf
-     *  @param list of keys
-     *  @return void
+     *  @param keys list with uniq keys
+     *  @return boolean
      *  
      *
      */
@@ -167,7 +162,7 @@
         list keys = maplist (`e, keys, ``($["unique" : e, "state" : "configured"]));
         orig = filter (`e, orig, ``(lookup(e, "section", "") != "sound"));
 	list final = add (orig, $["contents" : keys, "section" : "sound"]);
-        SCR::Write(.var.lib.yast.unique, final);
+        return SCR::Write(.var.lib.yast.unique, final);
     }
 
 
@@ -187,7 +182,7 @@
      * function for reading sound_db on demand
      * checks if sound_db is empty. if true, loads the database
      * to it. otherwise does nothing
-     *
+     * @return void
      */
 
     global define read_db() ``{
@@ -199,6 +194,7 @@
 
     /**
      * Used for searching. returns index of the card in the database identified by name
+     * @param name card name
      * @return integer
      */
 
@@ -220,7 +216,8 @@
     }
 
     /**
-     * returns list of sound cards. get_cards("all") returns all cards
+     * returns list of sound cards that use module_name. get_cards("all") returns all cards
+     * @param module_name 
      * @return list
      */
 
@@ -251,6 +248,8 @@
 
     /**
      * Itemize list for selection box
+     * @param l list with values
+     * @param default value to select as default
      * @return list
      */
     global define itemize_list (list l, integer default) ``{
@@ -305,9 +304,9 @@
     }
 
     /**
+     *	show a warning popup for nm256 snd cards if needed
+     *  @param modname string module name
      *  @return boolean
-     *  
-     *
      */
 
     global define nm256hack (string modname) ``{
@@ -360,6 +359,7 @@
 
     /**
      * Looks up in the database for the module
+     * @param card map read from .probe.sound
      * @return map
      */
     global define get_module (map card) ``{
@@ -397,8 +397,8 @@
     /**
      * umnute channel 'devide' of the 'card_id'-th sound card. alsa only
      * @param devices list of channels to be unmuted
-     * @param id of the card
-     * return void
+     * @param card_id of the card
+     * @return void
      */
 
     global define unmute(list devices, integer card_id) ``{
@@ -419,6 +419,7 @@
     /**
      * stores the volume to file. stored volume will be 
      * restored after reboot
+     * @param card_id 
      *
      */
 
@@ -436,6 +437,8 @@
     /**
      *  Checks whether the module has been successfully loaded
      *
+     * @param save_entry card config map
+     * @param card_id
      * @return empty string on success/ error message on failure
      */ 
 
@@ -479,12 +482,13 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	return res;
     }
 
-    /* 
+    /** 
      * tries to extract list of values from description
      * these values are generated from alsa modules
      * and can be in form
      * [list=value,value,..] or
      * [range=1-19] or something not recognized
+     * @param des string 
      * @return list
      */
     global define parse_values (string des) ``{
@@ -548,6 +552,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
   /**
    * "sformates" list from sound database, where are localized messages, with 
    * optional formating information
+   * @param msg message to be formated
    * @return string
    * @example mysformat(["Message %1 %2 %3", "A", "B", "C"])  ->  "Message A B C"
    */
@@ -572,9 +577,9 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
     /**
      * checks whether param #1 is if type of param #2
-     * @param 1st value
-     * @param 2nd expected type. one of {int, string}
-     * @param 3nd if poss is nonempty, checks if value is one of them
+     * @param value
+     * @param type expected type. one of {int, string}
+     * @param poss if poss is nonempty, checks if value is one of them
      * returns error message, empty string if ok
      * @return string
      */
@@ -648,8 +653,9 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
     /**
      * inserts values to already set options
-     * @param 1st save_info entry
-     *
+     * @param params list with available options for module
+     * @param values values that have been already set 
+     * @return map with refreshed options
      *
      */
 
@@ -664,6 +670,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
     }
  
     /** get_tmp_modules_conf returns path to the temporary modules.conf
+     * @return 
      */
     
     global define get_tmp_modules_conf() ``{
@@ -673,7 +680,8 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
     }
 
     /** 
-     *	@return true if the fonts have already been installed
+     *  checks whether sound fonts have already been installed
+     *	@return boolean
      *	
      */
 
@@ -682,6 +690,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
     }
 
     /** @return true if the sound card supports sound fonts
+     * @param save_entry
      */
 
     global define HasFonts(map save_entry) ``{
@@ -694,6 +703,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
     /** this small wizard will install sound fonts for soundblaster live/awe
      *  @param symlink is path to default.sf2 that is to be created
+     *  @param dontask if true, skip the first messagebox
      */
 
     global define InstallFonts(string symlink, boolean dontask) ``{
@@ -751,26 +761,8 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
     }
 
     /**
-     *  helping hand for order_cards_by_uniques
-     *  returns true, if unique_key1 is before unique_key2 in uniques list
-     */
-
-    global define uniq_order(string key1, string key2, list uniques) ``{
-
-
-	integer i = 0;
-	while (i < size(uniques))
-	{
-	    if (select(uniques, i) == key2) return false;
-	    if (select(uniques, i) == key1) return true;
-	    i = i + 1;
-	}
-	return true;
-    }
-
-    /**
      * shows warning message when both nm265 and opl3sa2 cards are present
-     * @param cards list of sound cards
+     * @param sound_cards list of sound cards
      */
     
     global define nm256_opl3sa2_warn(list sound_cards) ``{
@@ -793,8 +785,9 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
     /**
      *	when user wants to delete a card, all cards using given module must be removed.
      *  this function returns list of positions of cards using the module
-     *  @param	save_info 
-     *	@param	module_name
+     *  @param	save_info all cards' donfiguration
+     *	@param	mod_name module name
+     *  @param  card_id id of currently removed card
      *  @return list of integers
      */
 
@@ -827,7 +820,9 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
     /**
      * remove memebers listed in id_list list
-     *
+     * @param input 
+     * @param id_list 
+     * @return list modified list
      *
      */
 
@@ -839,8 +834,9 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
     /**
      * removes entries from save_info listed by indices in id_list 
-     *
-     *
+     * @param save_info list
+     * @param id_list list of id's to be removed
+     * @return new save_info
      */
 
     global define remove_save_entries(list save_info, list id_list)
@@ -895,7 +891,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      * creates hardware-summary-like list of configured cards
      *
      * @return richtext
-     * @param seva_info
+     * @param save_info
      */
 
     global define ConfCardsRT(list save_info) ``{

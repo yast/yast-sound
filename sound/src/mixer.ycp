@@ -22,6 +22,15 @@
 {
     textdomain "sound";    
 
+    /**
+     * returns intfield (if we are running in ncurses) or 
+     * slider (for qt)
+     * @param label label for slider
+     * @param value initial value
+     * @param spec true-slider false-intfield
+     *
+     */
+
     global define volElement(string label, integer value, boolean spec) ``{
 	if (spec)
 	{
@@ -32,6 +41,12 @@
 	    return `IntField(`id(label), `opt(`notify), label, 0, 100, value);
 	}
     }
+
+    /**
+     * creates a mixer widget with channels obtained from 1st param
+     * @param channels channels to be shown
+     * @return term widget
+     */
 
     global define mixerWidget(list channels) ``{
         term widget = `VBox();
@@ -118,6 +133,12 @@
 
 
     // show the dialog
+
+/**
+ * shows mixer dialog for respective card
+ * @param card_id
+ *
+ */
     
 global define mixerDialog(integer card_id) ``{
 

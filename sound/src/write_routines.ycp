@@ -22,10 +22,6 @@
 
     include "misc_defines.ycp";
     include "sound/routines.ycp";
-//    include "sound/texts.ycp";
-//    include "sound/alsa_routines.ycp";
-
-//    map STRINGS = STRINGS_();
 
     /**
      * create special comment for given model
@@ -40,6 +36,8 @@
 
     /**
      * Saves one '/etc/modules.conf' entry
+     * @param entry card config
+     * @param tmp save to temporary file, not to /etc/modules.conf
      * @return boolean
      */
     global define SaveOneModulesEntry (map entry, boolean tmp) ``{
@@ -66,6 +64,13 @@
         return ret;
     }
 
+    /**
+     * saves modules options. this function has to collect parameters that use
+     * different cards that use single module and create a coma separated list of values
+     * @param save_info
+     * @param tmp write to tmp modules.conf, not to /etc/modules.conf
+     *
+     */
 
     global define SaveModulesOptions(list save_info, boolean tmp)
     ``{
@@ -119,6 +124,7 @@
 
     /**
      * removeOldAliases
+     * @param als list with old aliases
      *
      */
 
@@ -137,7 +143,7 @@
 
     /**
      * Saves all '/etc/modules.conf' entries
-     * @param cards save info
+     * @param save_info cards save info
      * @param system sytem dependent part
      * @param tmp write to /tmp/modules.conf (not to /etc/modules.conf)
      * @return map return struct: $["return": boolean, "err_msg": string]
@@ -183,7 +189,7 @@
 	    }
 	    else
 	    {
-		if (is_sparc())
+		if (Arch::sparc)
 		{
 		    string modname = lookup(select(save_info, 0), "module", "off");
 		    SCR::Write(mod_alias, "sound-slot-0", "sound");
@@ -214,22 +220,6 @@
     }
 
     /**
-     * Sets volume for all channels
-     * @return map return struct: $["return": boolean, "err_msg": string]
-     */
-    global define SetAllChannels (list cards, string command) ``{
-	string err_msg = "";
-//        if (contains (maplist (`e, cards, ``(maplist(`ch, `v, lookup (e, "volume", $[]), ``(SetVolume (command, ch, v,
-//        tointeger(lookup(lookup(lookup (e, "modules", $[]), "options", $[]), "snd_index", 0))))))), false))
-            {
-                // Error message
-                err_msg = lookup(STRINGS, "SetAllChannels", "");
-                return $["return": false, "err_msg": err_msg];
-            }
-        return $["return": true, "err_msg": ""];
-    }
-
-    /**
      * Save volume (for alsa it's alsactl store
      * @return map return struct: $["return": integer, "err_msg": string]
      */
@@ -257,7 +247,8 @@
         EnableJoystick ();
     }
     /**
-     *
+     * saves rc values that are stored in map
+     * @param rc map "variable" : "value", ....
      * @return string error string
      */
 

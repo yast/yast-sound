@@ -34,9 +34,21 @@
 
 //    map STRINGS = STRINGS_();
 
+    /**
+     * default widget when there are no known values
+     * @return term widget
+     */
+
     global define defWidget() ``{
 	return `Label(_("Possible value:\nnot known"));
     }
+
+    /**
+     * widget for choosing one value from list
+     * @param tail string with values eg. "12,3,4,6"
+     * @param default string default value (preselected in combo)
+     * @return term combobox widget
+     */
 
     global define gen_list(string tail, string default) ``{
 	list vals = splitstring(tail, ",");
@@ -45,6 +57,13 @@
 	return `ComboBox(`id(`poss), `opt(`notify), _("&Possible value:"), vals);
     }
 
+    /**
+     * integer widget
+     * @param tail string range description "1-19"
+     * @param default string default value
+     * @return intfield widget
+     */
+    
     global define gen_intfield(string tail, string default) ``{
 	list rng = splitstring(tail, "-");
 	if (size(rng) < 2)
@@ -58,16 +77,34 @@
 	return `IntField(`id(`poss), `opt(`notify), _("&Possible value:"), lower, upper, tointeger(default));
     }
 
+    /**
+     * combo with values 0/1
+     * @param default boolean preselected value
+     * return combobox widget
+     */
+
     global define gen_bool(string default) ``{
 	return `ComboBox(`id(`poss), `opt(`notify), _("&Possible value:"), [`item(`id("0"), "0", default == "0"), 
 	    `item(`id("1"), "1", default == "1")]);
     }
-    
+   
+    /**
+     * irq selector widget
+     * @param default
+     * @return combo wodget
+     */
+ 
     global define gen_irq(string default) ``{
 	list irqs = ["3", "5", "7", "9", "10", "11", "12", "15"];
 	irqs = maplist(`e, irqs, ``(`item(`id(e), e, default == e)));
 	return `ComboBox(`id(`poss), `opt(`notify), _("&Possible value:"), irqs);
     }
+
+    /** 
+     * dma selector widget
+     * @param default string preselected value
+     * @return combo widget
+     */
 
     global define gen_dma(string default) ``{
 	list dmas = ["-1", "0", "1", "3", "5", "6", "7"];
@@ -75,12 +112,19 @@
         return `ComboBox(`id(`poss), `opt(`notify), _("&Possible value:"), dmas);
     }
 
+    /** 
+     * dma size value selector 
+     * @param default string
+     */
+
     global define gen_dma_size(string default) ``{
 	return gen_intfield("4-64", default);
     }
 
     /** replaces `reppoint replacePoint by widget due to value contents.
      *   for list it's combobox, for range it's ... widget
+     * @param values string
+     * @param default string
      */
 
     global define updatePossibleValues(string values, string default) ``{
@@ -131,8 +175,8 @@
     /**
      * displays dialog with card options
      *
-     * @param string cardlabel label for the card
-     * @param list options. list where each item is map
+     * @param cardlabel string label for the card
+     * @param options list. list where each item is map
      *        with keys: name, value, type, default, description. 
      *	      values in map are strings
      * @return map
@@ -288,6 +332,12 @@
     }
 
 // ===== MAIN =====
+
+    /**
+     * just calls options dialog
+     * @param save_entry map with card configuration
+     * @return symbol 
+     */
 
     global define sound_options(map save_entry) ``{ 
 

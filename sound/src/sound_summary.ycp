@@ -27,7 +27,7 @@
     include "sound/read_routines.ycp";
 
 boolean __sparc = nil;
-boolean use_alsa = !is_sparc();
+boolean use_alsa = !Arch::sparc;
 if (use_alsa) 
 {
 	include "sound/alsa_routines.ycp";
