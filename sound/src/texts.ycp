@@ -27,11 +27,12 @@
 
     global define STRINGS_() ``{
 	return $["DisplayName":
-	     UI(_("<p>If you want to configure this sound card press <b>Next</b></p>"))+
-	     UI (_("<p>If you want to set a special option, press the <b>Options</b> button.
+	     UI(_("<p>If you want to configure this sound card and adjust its volume check <b>Normal setup</b></p>"))+
+	     UI (_("<p>If you want to set a special option, check the <b>Advanced setup</b> radio button.
 Most users won't need this.</p>"))+
-	     UI (_("<p>If you have more than one sound card, you can press <b>Skip</b> to
-configure an other card than the one that is displayed on the right.</p>")),
+	     UI (_("<p>If you have more than one sound card, you can check <b>Skip</b> to
+configure an other card than the one that is displayed on the right.</p>"))+
+	    UI(_("For quick automatic setup check <b>Quick automatic setup")),
 
 	    
 	    "ManualDialog":
@@ -107,7 +108,7 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 
 	 
 	    "SuccessDialog":
-	    UI(_("Automatic configuration finished successfully.")),
+	    UI(_("<P>Automatic configuration finished successfully.</P>")),
  
 	    "nm256hackWarning":
 	    UI(_("Configuring this sound card on some Sony VAIO notebooks
