@@ -55,10 +55,10 @@
 
 	term con=VolumeCon(save_entry, vol);
 	    // dialog title
-	UI(`SetWizardContents (_("Sound card volume"), con, help_text, true, true));
+	UI::SetWizardContents (_("Sound card volume"), con, help_text, true, true);
 	if (finish)
 	{
-	    UI(`ChangeWidget (`id(`next), `Label, UI(`FinishButtonLabel())));
+	    UI::ChangeWidget (`id(`next), `Label, UI::FinishButtonLabel());
 	}
 
 /* Sound fonts installation */
@@ -75,11 +75,11 @@
 
 	repeat 
 	{
-	    ui =  UI (`UserInput ());
+	    ui =  UI::UserInput ();
 
 	    if (ui == `volume) 
 	    {
-		vol = UI(`QueryWidget(`id(`volume), `Value ));
+		vol = UI::QueryWidget(`id(`volume), `Value );
 		SetVolume("Master", card_id, vol);
 	    }
 	    else if (ui == `test) 
@@ -89,7 +89,7 @@
 		    string msg=PlayTest(user_settings, card_id);
 		    if(msg != "")
 		    {
-			UI (`MessagePopup (msg));
+			UI::MessagePopup (msg);
 		    }
 		}
 	    }
@@ -97,7 +97,7 @@
 	    {
 		if (finish)
 		{
-		    if (!UI (`YesNoPopup (_("The sound volume and the configuration\nfor the sound card will be saved now."))))
+		    if (!UI::YesNoPopup (_("The sound volume and the configuration\nfor the sound card will be saved now.")))
 		    {
 		      continue;
 		    }
@@ -141,15 +141,15 @@
 	  );
 	    
 	    // dialog title
-	UI(`SetWizardContents (ErrorMsg(), con, help_text, true, false));
+	UI::SetWizardContents (ErrorMsg(), con, help_text, true, false);
 	if (finish)
 	{
-	    UI(`ChangeWidget (`id(`next), `Label, UI(`FinishButtonLabel())));
+	    UI::ChangeWidget (`id(`next), `Label, UI::FinishButtonLabel());
 	}
 
 	repeat 
 	{
-	    ui =  UI (`UserInput ());
+	    ui =  UI::UserInput ();
             if(ui == `cancel || ui == `abort)
             {
                 if(ReallyAbort()) 
@@ -187,15 +187,15 @@
           );
 
             // dialog title
-        UI(`SetWizardContents (_("Success"), con, help_text, true, true));
+        UI::SetWizardContents (_("Success"), con, help_text, true, true);
         if (finish)
         {
-            UI(`ChangeWidget (`id(`next), `Label, UI(`FinishButtonLabel())));
+            UI::ChangeWidget (`id(`next), `Label, UI::FinishButtonLabel());
         }
 
         repeat
         {
-            ui =  UI (`UserInput ());
+            ui =  UI::UserInput ();
 	    if(ui == `cancel || ui == `abort)
 	    {
 		if(ReallyAbort()) 
@@ -226,7 +226,7 @@
 
     boolean quick = false;
 
-    UI(`DisableWizardAbortButton());
+    UI::DisableWizardAbortButton();
 
     if (size (Args ()) > 2)
     {
@@ -255,7 +255,7 @@
 
     if (!test_mode)
     {
-	SCR(`Execute(.target.bash, "/etc/init.d/alsasound stop", $[]));
+	SCR::Execute(.target.bash, "/etc/init.d/alsasound stop", $[]);
 	list new_save=add(save_info, save_entry);
 	SaveModulesEntry (new_save, [], true);
 	alsasound_start_tmp(true);
@@ -296,9 +296,9 @@
 //	storeVolume(-1);
     }	
 
-    SCR(`Execute(.audio.alsa.restore, 0 ,0));
+    SCR::Execute(.audio.alsa.restore, 0 ,0);
 
-    UI(`ChangeWidget (`id(`next), `Label, UI(`NextButtonLabel())));
+    UI::ChangeWidget (`id(`next), `Label, UI::NextButtonLabel());
 
     return $["ui" : ui, "return" : size (err_msg) == 0];
 

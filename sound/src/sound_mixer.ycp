@@ -37,7 +37,7 @@
         any widget=`VBox();
 
 
-        boolean spec=UI(`HasSpecialWidget(`Slider));
+        boolean spec=UI::HasSpecialWidget(`Slider);
 
 	integer nchan=size(channels)-2;	 // don't count in 'Master' and 'PCM'
 	integer ncols=4; //tointeger(tofloat(nchan) / 4.0 + 0.999);	 // how many columns will we have?
@@ -129,17 +129,17 @@
     // show the dialog
 
     path pth=topath(sformat(".audio.alsa.cards.%1.channels", card_id));
-    list channels=SCR(`Dir(pth));
+    list channels=SCR::Dir(pth);
 
     pth=topath(sformat(".audio.alsa.cards.%1.name", card_id));
-    string card_name=SCR(`Read(pth));
+    string card_name=SCR::Read(pth);
 
     // get list of muted channels
     list muted=[];
     foreach(`e, channels, 
     ``{
 	path pth2=topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, e));
-	if(SCR(`Read(pth2)))
+	if(SCR::Read(pth2))
 	{
 	    muted=add(muted, e);
 	}
@@ -168,7 +168,7 @@
 	}
 	else
 	{
-	   return [e, SCR(`Read(topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", card_id, e))))];
+	   return [e, SCR::Read(topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", card_id, e)))];
 	}
     });
 
@@ -176,14 +176,14 @@
 Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the original settings.</P>");
 
     term con=mixerWidget(channels);
-    UI(`SetWizardContents (sformat(_("Volume settings for card '%1'"), card_name),con, help, true, true));
-    UI(`ChangeWidget(`id(`next), `Label, UI(`NextButtonLabel())));
+    UI::SetWizardContents (sformat(_("Volume settings for card '%1'"), card_name),con, help, true, true);
+    UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
 
     path pth=nil;
     any ui=nil;
     repeat
     {
-	ui=UI(`UserInput());
+	ui=UI::UserInput();
 
 	if(is(ui, string))
 	{
@@ -191,12 +191,12 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
 	    if(contains(muted, ui))
 	    {
 		path pth3=topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, ui));
-		SCR(`Write(pth3, false));
+		SCR::Write(pth3, false);
 	    }
 	    // set volume
 	    pth=topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", card_id, ui));
-	    integer value=UI(`QueryWidget(`id(ui), `Value));
-	    SCR(`Write(pth, value));
+	    integer value=UI::QueryWidget(`id(ui), `Value);
+	    SCR::Write(pth, value);
 	}
 	else if(ui==`abort && ReallyAbort())
 	{
@@ -209,13 +209,13 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
     {
 	// store volume settings
 	path pth=topath(sformat(".audio.alsa.cards.%1.store", card_id));
-	SCR(`Execute(pth, 0, 0));
+	SCR::Execute(pth, 0, 0);
     }
     else
     {
 	// restore volume settings
         path pth=topath(sformat(".audio.alsa.cards.%1.restore", card_id));
-        SCR(`Execute(pth, 0, 0));
+        SCR::Execute(pth, 0, 0);
     }
 
 

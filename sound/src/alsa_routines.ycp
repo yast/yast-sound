@@ -20,7 +20,7 @@
 {
     /**
      * get_vol_settings
-     * creates a list with stored values of volume and mute for each channel
+     * creates a list of stored values of volume and mute for each channel
      * of each card.
      * example: [ 
 		    [ ["PCM", 32, false], ["Master", 100, true]],
@@ -30,18 +30,17 @@
      */
 
     global define get_vol_settings() ``{
-	integer bound=size(SCR(`Dir(.audio.alsa.cards)));
+	integer bound=size(SCR::Dir(.audio.alsa.cards));
 	integer i=0;
 	list retlist=[];
 	while(i<bound)
 	{
 	    list sublist=[];
-	    
-	    foreach(`e, SCR(`Dir(topath(sformat(".audio.alsa.cards.%1.channels", i)))),
+	    foreach(`e, SCR::Dir(topath(sformat(".audio.alsa.cards.%1.channels", i))),
 	    ``{
 		path pth1=topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", i, e));	
 		path pth2=topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", i, e));
-		sublist=add(sublist, [e, SCR(`Read(pth1)), SCR(`Read(pth2))]);
+		sublist=add(sublist, [e, SCR::Read(pth1), SCR::Read(pth2)]);
 	    });
 	    retlist=add(retlist, sublist);
 	    i=i+1;
@@ -59,12 +58,12 @@
 	    ``{
 		path pth1=topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", i, select(f, 0)));
 		path pth2=topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", i, select(f,0)));
-		SCR(`Write(pth1, select(f, 1)));
-		SCR(`Write(pth2, select(f, 2)));
+		SCR::Write(pth1, select(f, 1));
+		SCR::Write(pth2, select(f, 2));
 	    });
 	    i=i+1;
 	});
-	SCR(`Execute(.audio.alsa.store, nil));
+	SCR::Execute(.audio.alsa.store, nil);
     }
 
     /**

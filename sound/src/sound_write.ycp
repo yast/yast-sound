@@ -80,8 +80,8 @@
 				  // label message
     term con = `Label(_("Saving ..."));
 				  // dialog title
-    UI(`SetWizardContents (_("Sound configuration"), con, helptext, false, false));
-    UI(`DisableWizardAbortButton());
+    UI::SetWizardContents (_("Sound configuration"), con, helptext, false, false);
+    UI::DisableWizardAbortButton();
 
     SaveVolume();
 

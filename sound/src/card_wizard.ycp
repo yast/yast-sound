@@ -74,7 +74,7 @@ global define _optVolume()
 }
 
 global define AbortDialog() ``{
-    any ret = UI(`ReallyAbortPopup(true));
+    any ret = UI::ReallyAbortPopup(true);
     if(ret==true) return `yes;
     return `back;
 

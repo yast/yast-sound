@@ -36,16 +36,10 @@
     include "sound/ui.ycp";
     include "sound/write_routines.ycp";
 
-    integer www=0;
-
-    global define sh() ``{
-	www=www+1;
-	y2error("Step %1#", www);
-    }
-
     // text constants for sound module
     map STRINGS=STRINGS_();
-  
+    float oldf=0.0; 
+ 
     // Menuentry for the YaST2 menu
     if (Args() == [ "get_menuentry" ])
     {
@@ -68,9 +62,7 @@
     OpenMainDialog();
     InitializingDialog ();
 
-sh();
-    UI(`DisableWizardAbortButton());
-sh();
+    UI::DisableWizardAbortButton();
     boolean test_mode     = false;
     boolean config_mode   = false;
     boolean autoinst_mode = false;
@@ -98,9 +90,7 @@ sh();
 	}
 	arg_n = arg_n - 1;
     }
-sh();
     list sound_cards  = get_audio ();
-sh();
 
     list save_info    = read_save_info ();
  
@@ -119,22 +109,18 @@ sh();
 
     if(!fileexist("/usr/lib/YaST2/sndcards.ycp"))
     {
-	UI(`MessagePopup(_("Sound card database not found. Please check your installation.")));
-	UI(`CloseDialog());
+	UI::MessagePopup(_("Sound card database not found. Please check your installation."));
+	UI::CloseDialog();
 	return;			
     }
-sh();
     sound_cards=filter_configured(save_info, sound_cards);
-sh();
     if(size(sound_cards)>0)
     {
 	// get all the apropriate information from the database
 	sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
 
-sh();
     // filter out modules with unspecified module name (sound card not supported by alsa / no module found)
 	sound_cards = filter(`e, sound_cards, ``(lookup(e, "module", $[])!=$[]));
-sh();    
     // create save_info entries
 	sound_cards = convert_to_save_info(sound_cards);
     }
@@ -142,15 +128,11 @@ sh();
 
     if(exit)
     {	// no sound cards database present, shutting down
-	UI(`CloseDialog ());
+	UI::CloseDialog ();
 	return;
     }
-sh();
-    SCR(`Execute(.target.bash, "rm /tmp/modules.conf; touch /tmp/modules.conf", $[]));
-sh();
+    SCR::Execute(.target.bash, "rm /tmp/modules.conf; touch /tmp/modules.conf", $[]);
 //    SaveModulesEntry(save_info, [], true);
-      SCR(`Dir(.lilo));
-sh();
     boolean skipped = false;
     if(all_cards_num == 1)
     {
@@ -320,7 +302,7 @@ sh();
     } until(state==`abort || state==`exit || state==`save);
     if(state==`back || state==`abort)
     {
-	UI(`CloseDialog());
+	UI::CloseDialog();
 	return;
     }
     else if(state==`save)
@@ -351,5 +333,5 @@ sh();
 //	}
     }
 
-    UI(`CloseDialog ());
+    UI::CloseDialog ();
 }

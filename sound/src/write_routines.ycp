@@ -57,11 +57,11 @@
         boolean ret = true;
         if (haskey (entry, "alias")) 
             {
-                ret = ret && SCR(`Write(mod_alias, lookup(entry, "module", "off"), 
-		    lookup(entry, "alias", "off")));
+                ret = ret && SCR::Write(mod_alias, lookup(entry, "module", "off"), 
+		    lookup(entry, "alias", "off"));
 		string comment=createAliasComment(lookup(entry, "model", ""), lookup(entry, "unique_key", ""));
 		// comment="# "+lookup(entry, "unique_key", "")+":"+lookup(entry, "model", "")+"\n";
-		ret = ret && SCR(`Write(mod_alias_comment, comment, lookup(entry, "alias", "off")));
+		ret = ret && SCR::Write(mod_alias_comment, comment, lookup(entry, "alias", "off"));
             }
         return ret;
     }
@@ -113,10 +113,28 @@
 	    });
 	    // write result to modules.conf
 	    
-	    SCR(`Write(mod_options, res, modname));
+	    SCR::Write(mod_options, res, modname);
 	});
     }
-  
+
+    /**
+     * removeOldAliases
+     *
+     */
+
+    global define removeOldEntries(list save_info) ``{
+	maplist(`e, als, 
+	``{
+	    if(	is_snd_alias(e) ||
+		issubstring(e, "sound-service-") ||
+		issubstring(e, "sound-slot-"))
+		{
+		    SCR::Write(mod_alias, nil, e);
+		}
+	});
+
+    }
+
     /**
      * Saves all '/etc/modules.conf' entries
      * @param cards save info
@@ -136,34 +154,26 @@
 	    mod_options=.tmp.modules.options;
 	    mod_alias_comment=.tmp.modules.alias.comment;
 	}
-
 	SaveModulesOptions(save_info, tmp);
 
         string err_msg="";
-	list als=SCR(`Read(mod_alias));
+	list als=SCR::Read(mod_alias);
 	// remove old entries
-	maplist(`e, als, 
-	``{
-	    if(	is_snd_alias(e) ||
-		issubstring(e, "sound-service-") ||
-		issubstring(e, "sound-slot-"))
-		{
-		    SCR(`Write(mod_alias, nil, e));
-		}
-	});
+
+	removeOldEntries(save_info);
+	
 	if(size(save_info)>0)
 	{
-	    SCR(`Write(mod_alias, "snd", "char-major-116"));
-	    SCR(`Write(mod_alias_comment, "\n# Alsa sound support. \n# Warning: please don't modify comments over "+
-"aliases 'snd-card-#'", "char-major-116"));
-	    SCR(`Write(mod_options, $["snd_cards_limit": sformat ("%1", size(save_info)),
-					     "snd_major":"116"], "snd"));
+	    SCR::Write(mod_alias, "snd", "char-major-116");
+	    SCR::Write(mod_alias_comment, "\n# Alsa sound support. \n# Warning: please don't modify comments over "+
+"aliases 'snd-card-#'", "char-major-116");
+	    SCR::Write(mod_options, $["snd_cards_limit": sformat ("%1", size(save_info)),
+					     "snd_major":"116"], "snd");
 	}
 	else
 	{
-	    SCR(`Write(mod_alias, "off", "char-major-116"));
+	    SCR::Write(mod_alias, "off", "char-major-116");
 	}
-    
         if ((contains(maplist (`e, save_info, 
 		``(SaveOneModulesEntry (e, tmp))), false))) 
         {
@@ -171,19 +181,17 @@
             err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry"); 
             return $["return": false, "err_msg": err_msg];
         }
-
 	if(size(save_info)>0)
 	{
 	    
 	    list oss_aliases=alsa_oss(size(save_info));
 	    foreach(`e, oss_aliases, 
 	    ``{
-		SCR(`Write(mod_alias, lookup(e, "module", ""), lookup(e, "alias", "")));
+		SCR::Write(mod_alias, lookup(e, "module", ""), lookup(e, "alias", ""));
 	    });
-	    SCR(`Write(mod_alias_comment, "\n\n\n# YaST2: sound system dependent part\n#\n", "sound-slot-0"));
+	    SCR::Write(mod_alias_comment, "\n\n\n# YaST2: sound system dependent part\n#\n", "sound-slot-0");
 	}
-	SCR(`Write(mod, nil));
-
+	SCR::Write(mod, nil);
         return $["return": true, "err_msg": ""];
     }
 
@@ -208,8 +216,7 @@
      * @return map return struct: $["return": integer, "err_msg": string]
      */
     global define SaveVolume () ``{
-	SCR(`Execute(.audio.alsa.store, 0, 0));
-//	SCR(`Execute(.target.bash, "/usr/sbin/alsactl store", $[]));
+	SCR::Execute(.audio.alsa.store, 0, 0);
     }
 
     /**
@@ -217,11 +224,11 @@
      * @return boolean
      */
     global define EnableJoystick () ``{
-        string tmpdir = SCR(`Read(.target.tmpdir));
-        return SCR(`Execute(.target.bash, "/usr/sbin/alsactl -f "+tmpdir+"/asound.conf store;\
+        string tmpdir = SCR::Read(.target.tmpdir);
+        return SCR::Execute(.target.bash, "/usr/sbin/alsactl -f "+tmpdir+"/asound.conf store;\
                 /usr/bin/sed /\"Joystick\"/s/false/true/ "+tmpdir+"/asound.conf >/etc/asound.conf;\
                 /bin/rm -f "+tmpdir+"/asound.conf;\
-                /usr/sbin/alsactl restore", $[]));
+                /usr/sbin/alsactl restore", $[]);
     }
 
     /**
@@ -239,8 +246,8 @@
     global define SaveRCValues (map rc) ``{
 	y2error(rc);
         string err_msg="";
-	if (contains (maplist (`k, `v, rc, ``(SCR(`Write(topath(sformat(".rc.system.%1", k)), v)))), false) ||
-            !SCR(`Write(.rc.system, nil)))
+	if (contains (maplist (`k, `v, rc, ``(SCR::Write(topath(sformat(".rc.system.%1", k)), v))), false) ||
+            !SCR::Write(.rc.system, nil))
             {
                 // Error message
                 err_msg = sformat (lookup(STRINGS, "saveRCValues"), "/etc/rc.config");

@@ -65,44 +65,44 @@
 			    // To translators: text entry label
 
 	    // dialog title
-	UI(`SetWizardContents (_("Manual sound card selection"), con, helptext, true, true));
-	UI(`ChangeWidget(`id(`sel_drv), `CurrentItem, select(select (module_names, 0), 1, select (module_names, 0))));
-	UI(`ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0)));
+	UI::SetWizardContents (_("Manual sound card selection"), con, helptext, true, true);
+	UI::ChangeWidget(`id(`sel_drv), `CurrentItem, select(select (module_names, 0), 1, select (module_names, 0)));
+	UI::ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0));
 	    // Next - button label
-	UI(`ChangeWidget(`id(`next), `Label, UI(`NextButtonLabel())));
+	UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
 
 	any ui = nil;
 
 	repeat 
 	{
-	    ui = UI(`UserInput ());
+	    ui = UI::UserInput ();
 	        
 	    if (ui == `sel_drv) 
 	    {
-		any drv = UI (`QueryWidget (`id(`sel_drv), `CurrentItem));
+		any drv = UI::QueryWidget (`id(`sel_drv), `CurrentItem);
 		card_names = get_card_names (drv);
 
-		UI(`ReplaceWidget (`id(`rep_mod),
+		UI::ReplaceWidget (`id(`rep_mod),
 				// To translators: selection box title
-		    `SelectionBox (`id (`sel_mod), _("Sound card &model"), card_names)));		
+		    `SelectionBox (`id (`sel_mod), _("Sound card &model"), card_names));		
 
 		// TODO: this would be nice to have from libyui instead of replacing widget
-		UI(`ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0)));
+		UI::ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0));
 	    }
 	    else if (ui == `search) 
 	    {
-		string entry = UI(`QueryWidget (`id(`search), `Value));
+		string entry = UI::QueryWidget (`id(`search), `Value);
 		integer card_id = search_card_id (entry);
 		card_names = get_cards ("all");
 		// always "all" field
-		UI(`ChangeWidget(`id(`sel_drv), `CurrentItem, select (module_names, 0)));
+		UI::ChangeWidget(`id(`sel_drv), `CurrentItem, select (module_names, 0));
 		if (card_id >= 0) 
 		{
-		    UI(`ReplaceWidget (`id(`rep_mod),
+		    UI::ReplaceWidget (`id(`rep_mod),
 				// To translators: selection box title
-				       `SelectionBox (`id (`sel_mod), _("Sound card &model"), card_names)));
+				       `SelectionBox (`id (`sel_mod), _("Sound card &model"), card_names));
 		
-		    UI(`ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, card_id)));
+		    UI::ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, card_id));
 		}
 	    }
 	    else if (ui == `abort || ui == `cancel)
@@ -119,8 +119,8 @@
 
 	map ret = $["ui" : ui];
 
-	any model=UI(`QueryWidget (`id(`sel_mod), `CurrentItem));
-	any modname=UI(`QueryWidget (`id(`sel_drv), `CurrentItem));
+	any model=UI::QueryWidget (`id(`sel_mod), `CurrentItem);
+	any modname=UI::QueryWidget (`id(`sel_drv), `CurrentItem);
     
 	if (ui == `next) 
 	{
@@ -136,13 +136,5 @@
 
     // ==== main ====
 
-    
-//    list db = GetCardDatabase(); 
-    
-//    if (db==nil) 
-//    {
-//	UI(`MessagePopup(_("The Sound card database cannot be found!")));
-//	return $["ui" : `back];
-//    }
     return ManualDialog ();
 }
