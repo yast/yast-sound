@@ -77,7 +77,7 @@ YCPValue AudioAgent::Read(const YCPPath &path, const YCPValue& arg) {
 	    /* snd cards name */
 	    case 4:
 		if(args[1]=="cards" && args[3]=="name")
-		    return YCPString("cardname"); // alsaCardName(atoi(args[2].c_str())))
+		    return alsaGetCardName(atoi(args[2].c_str()));
 		break;
 	    /* volume reading */
 	    case 6:
@@ -219,6 +219,40 @@ YCPValue AudioAgent::Dir(const YCPPath& path) {
 
     y2error("Wrong path '%s' in Dir().", path->toString().c_str());
     return YCPVoid();
+}
+
+YCPValue AudioAgent::Execute(const YCPPath& path, const YCPValue& value = YCPNull(),
+                              const YCPValue& arg = YCPNull())
+{
+    svect args;
+    for(int i=0; i<path->length(); i++)
+        args.push_back(path->component_str(i));
+
+    if(args[0]=="alsa")
+    {
+	int card_id=-1;
+	// alsa part
+	if(path->length()==4 && args[1]=="cards")
+	{
+	    card_id=atoi(args[2].c_str());
+	}   
+	
+	if(args[path->length()-1]=="store")
+	{
+	    return alsaStore(card_id);
+        }
+        else if(args[path->length()-1]=="restore")	
+        {
+	    return alsaRestore(card_id);
+	}
+    }
+    else if(args[0]=="oss" || args[0]=="common")
+    {
+	// oss part
+    }
+
+    y2error("Wrong path '%s' in Dir().", path->toString().c_str());
+    return YCPVoid(); 
 }
 
 /**

@@ -239,3 +239,15 @@ YCPValue alsaRestore(int card=-1)
     }
     return YCPBoolean(false);
 }
+
+YCPValue alsaGetCardName(int card_id)
+{
+    if(card_id>=snd_cards())
+    {
+	return YCPVoid();
+    }
+
+    char* cname;
+    snd_card_get_name(card_id, &cname);
+    return YCPString(cname);
+}

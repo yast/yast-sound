@@ -67,6 +67,12 @@ YCPValue alsaGetChannels(int card);
 
 YCPValue alsaGetCards();
 
+/** alsaGetCardName
+ * returns (long) name of card
+ */
+
+YCPValue alsaGetCardName(int card_id);
+
 /**
  * stores setting for given card. if card==-1 store all.
  * param card card id
