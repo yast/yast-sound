@@ -38,7 +38,7 @@ $[
     ],
     "snd-cs46xx":
     $[
-	"GAMEPORT_MODULE": "cs461x"
+	"GAMEPORT_MODULE": "off"
     ],
     "snd-emu10k1":
     $[
@@ -78,7 +78,7 @@ $[
     ],
     "snd-trident":
     $[
-	"GAMEPORT_MODULE": "pcigame"
+	"GAMEPORT_MODULE": "off"
     ],
     "snd-via686":
     $[
