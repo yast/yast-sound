@@ -782,9 +782,9 @@ module parameters, including invalid IO or IRQ parameters."), modname);
 		    card["module"]:"" != modname)
 		{
 		    // popup question: different module has to be choosed
-		    if (!Popup::YesNo (_("Looks like you have a Thinkpad 600E notebook.
-On this notebook, CS4236 driver should be used
-although CS46xx chip is detected.
+		    if (!Popup::YesNo (_("It seems that you have a Thinkpad 600E laptop.
+On this laptop, the CS4236 driver should be used
+although the CS46xx chip is detected.
 Attempt to probe the configuration of CS4236 driver?
 
 Warning: The probe procedure can take some time and

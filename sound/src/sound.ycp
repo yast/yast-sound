@@ -525,7 +525,7 @@ map cmdline = $[
 	"volume": $[
 	    "handler"	: SetVolumeHandler,
 	    // translators: command line help text for volume action
-	    "help"	: _("Set the volume of specific channels of given card."),
+	    "help"	: _("Set the volume of specific channels of the given card."),
 	    "options"	: [ "non_strict" ],// - for unknown parameter names
 	    // help text;  do not translate 'channels' as command name
 	    "non_strict_help" : _("Value of the specific channel (0-100). Use the 'channels' command to see a list of available channels."),
