@@ -36,6 +36,11 @@
 define boolean joy_test_popup (integer card_id, integer joymodidx,
 				      string joymod) ``{
 
+    // popup text (yes/no)
+    string some_text	= _("For proper joystick initialization,
+restart of sound system is necessary.
+Proceed?");
+
     any ret = nil;
     UI::OpenDialog(`opt(`decorated), `HBox(`HSpacing(1.5),
 	`VBox(
