@@ -321,13 +321,16 @@
     /**
      * get_obsoletes
      * @return list with obsolete indices of unique keys
+     * @param  cards from .probe.sound
+     * @param  keys unique keys from /var/lib/YaST/unique.inf
+     *
      * e.g. if in /var/lib/YaST/unique.inf in sound section are keys ["a", "b", "c"]
      * and card with id "b" is not present in computer, then [1] is returned;
      */
 
-    global define get_obsoletes() ``{
-	list keys=read_unique_keys();
-        list cards=get_audio(false, false);
+    global define get_obsoletes(list cards, list keys) ``{
+//	list keys=read_unique_keys();
+//      list cards=get_audio(false, false);
 	
 	list audio_keys=[];
         integer i=0;
@@ -346,13 +349,15 @@
     /**
      * get_present_unique_keys
      * @return list with unique keys. keys of removed hardware are removed
+     * @param cards is passed to get_obsoletes
+     * @param keys  is passed to get_obsoletes
      *
      *
      */
 
-    global define get_present_unique_keys () ``{
-	list keys=read_unique_keys();
-	list obs=get_obsoletes();
+    global define get_present_unique_keys (list cards, list keys) ``{
+//	list keys=read_unique_keys();
+	list obs=get_obsoletes(cards, keys);
 	integer i=size(obs)-1;
 
 //	y2error(sformat("all keys: %1", keys));
@@ -848,7 +853,7 @@
 	
 	// create a dummy modules.conf file
 	string dumbconf=SCR (`Read (.target.tmpdir));
-	dumbconf=dumbconf+"/modules.dumb";
+	dumbconf="/tmp/modules.conf.tmp";
 	SCR(`Execute (.target.bash, sformat("/bin/touch %1", dumbconf), $[]));	
 
 	
@@ -1157,9 +1162,38 @@
 	return card;
     }
   
+    /** 
+     * creates temporary modules.conf.
+     * it will be used for starting sound modules
+     *
+     */
+
     global define CreateTmpModulesConf() ``{
+	string cmd="";
 	string tmpdir=SCR (`Read (.target.tmpdir));
-	string cmd=sformat("grep '^[^#].*snd-card-' /etc/modules.conf > %1/modules.conf.tmp", tmpdir);
+
+//	SCR(`Execute(.target.bash, "/bin/echo 'napisu' > /tmp/modules.conf.tmp", $[]));
+//	SCR(`Execute(.target.bash, "/bin/echo 'nic' 'nenapisu' > /tmp/modules.conf.tmp", $[]));
+
+	cmd="/bin/echo 'alias' 'char-major-116' 'snd' > /tmp/modules.conf.tmp";
+	SCR(`Execute(.target.bash, cmd, $[]));
+	cmd="/bin/echo 'options' 'snd' 'snd_cards_limit=3' 'snd_major=116' >> /tmp/modules.conf.tmp";
+	SCR(`Execute(.target.bash, cmd, $[]));
+	cmd=sformat("/bin/grep \"^[^#].*snd-card-\" /etc/modules.conf >> /tmp/modules.conf.tmp", tmpdir);
+//	cmd=sformat("/bin/grep '^[^#].*snd-card-' /etc/modules.conf >> %1/modules.conf.tmp", tmpdir);
+	SCR(`Execute(.target.bash, cmd, $[]));
+    }
+
+    
+    
+    global define add_tmp_module_record(map card, integer cid) ``{
+	// TODO: remove old records (especially aliases with 'off' name)
+	string module_name=lookup(lookup(card, "module", $[]), "name", "off");
+	string cmd=sformat("/bin/echo 'alias' 'snd-card-%1' '%2' >> /tmp/modules.conf.tmp", cid, module_name);
+	SCR(`Execute(.target.bash, cmd, $[]));
+
+	cmd=sformat("/bin/echo 'options' '%1' 'snd_id=card%2' 'snd_index=%3' >> /tmp/modules.conf.tmp", module_name, cid+1, cid);
+	y2error(sformat("executing %1", cmd));
 	SCR(`Execute(.target.bash, cmd, $[]));
     }
 }

@@ -31,6 +31,7 @@
     include "sound/ui.ycp";
     include "sound/texts.ycp";
 
+    include "browser.ycp";
 
     map STRINGS=STRINGS_();
 
@@ -227,7 +228,7 @@ boolean need_restart=true;
 	quick= Args (3);
     }
 
-    if (!haskey(card, "module"))
+    if (!haskey(card, "module")) // this should not happen
     {
 	list db=GetCardDatabase(); //SCR(`Read (.target.yast2, "sndcards.ycp"));
 	card = add(card, "module", get_module (card));
@@ -239,16 +240,17 @@ boolean need_restart=true;
 			  "play_cmd"    : "/usr/bin/aplay",
 			  "mixer"       : "/usr/bin/amixer -c $CARD_NUM set \"$CHANNEL\" $VOLUME% unmute"];
       
-
-
     string err_msg = "";
     boolean no_alsa = lookup (lookup (module_map, "module", $[]), "no_alsa", false);
+
+    
 
     if (!test_mode)
     {
 	SCR(`Execute(.target.bash, "/etc/init.d/rcalsasound stop", $[]));
+	add_tmp_module_record(module_map, card_id);
 	err_msg = probe_module (module_map, user_settings);
-        SCR(`Execute(.target.bash, "/etc/init.d/rcalsasound start", $[]));
+//        SCR(`Execute(.target.bash, "/etc/init.d/rcalsasound start", $[]));
     }
     any ui = nil;
 
@@ -258,7 +260,7 @@ boolean need_restart=true;
     }
     else
     {
-//	if(need_restart)
+// always	if(need_restart)
 //	{
 //	    y2error("alsa restarted");
 //	    SCR(`Execute(.target.bash, "/etc/init.d/rcalsasound restart", $[]));

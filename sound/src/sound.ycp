@@ -204,7 +204,7 @@
     list save_info    = read_save_info ();
    
     // filter out save_info of non-present hardware
-    list obs=get_obsoletes();
+    list obs=get_obsoletes(sound_cards, read_unique_keys());
     integer obs_pos=size(obs)-1;
     string pth="";
     while(obs_pos>=0)
@@ -247,7 +247,7 @@
     integer all_cards_num=size(sound_cards);
 
   //  list already=read_unique_keys();
-    list already=get_present_unique_keys();
+    list already=get_present_unique_keys(sound_cards, read_unique_keys());
     
 //    y2error(sformat("alredy configured: %1", already));
     configured_unique=already;
@@ -294,6 +294,7 @@
 	    if (ui == `skip) 
 	    {
 		card_id = card_id + 1;
+		call_complex_dialog=true;
 		skipped = true;
 	    }
 	    if (ui == `back) 

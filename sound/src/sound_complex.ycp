@@ -134,7 +134,7 @@
         string helptext=lookup(STRINGS, "ComplexDialog");
 
 	list conf_cards = get_running_cards ();
-	list uniq_keys = get_present_unique_keys ();
+	list uniq_keys = read_unique_keys ();
 
 	if(size(conf_cards) < size(uniq_keys))
 	{
