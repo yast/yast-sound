@@ -1,6 +1,8 @@
 #
-# Makefile.am for y2a_rcnf/src
+# Makefile.am for y2a_audio/src
 #
+
+CXXFLAGS += -Wall
 
 plugindir = $(YAST2DIR)/plugin
 

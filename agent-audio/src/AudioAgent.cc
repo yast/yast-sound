@@ -83,11 +83,13 @@ YCPValue AudioAgent::Read(const YCPPath &path, const YCPValue& arg) {
 	return YCPVoid();
 
     }
+    /*
     else if(s_system=="oss" || s_system=="common")
     {
-
     }
+    */
     
+    y2error("Wrong path '%s' in Read().", path->toString().c_str());
     return YCPVoid();
 }
 
@@ -151,7 +153,8 @@ YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCP
 
     }
 
-    return YCPBoolean(false);
+    y2error("Wrong path '%s' in Write().", path->toString().c_str());
+    return YCPVoid();
 }
 
 /** 
@@ -195,10 +198,12 @@ YCPValue AudioAgent::Dir(const YCPPath& path) {
 	    {
 		return alsaGetChannels(card_id);
 	    }
+	    /*
 	    else if(s_system=="oss" || s_system=="common")
 	    {
 		return list;
 	    }
+	    */
 	case 3:
 	    if(s_system=="alsa")
 	    {
@@ -206,12 +211,16 @@ YCPValue AudioAgent::Dir(const YCPPath& path) {
 		list->add(YCPString("volume"));
 		return list;
 	    }
+	    /*
 	    else if(s_system=="oss" || s_system=="common")
 	    {
 		return list;
 	    }
+	    */
 	    
     }
+
+    y2error("Wrong path '%s' in Dir().", path->toString().c_str());
     return YCPVoid();
 }
 
