@@ -270,7 +270,8 @@
 	list already = [];
 	if (SCR::Read(.target.size, "/var/lib/YaST/unique.inf") > 0)
 	{
-	    already = SCR::Read(.var.lib.yast.unique);
+        // FIXME: no such agent!!
+	    already = [];//SCR::Read(.var.lib.yast.unique);
 	}
 	else
 	{
