@@ -8,11 +8,11 @@
  *
  *
  * parameters: 1st: module, Map, map of complete info about module (i.e. name, options, etc ...)
- * 
+ *
  */
 
 {
-	
+
 
 				// here the test sound is played, by
 				// default ist alsa whistle sound, but
@@ -22,24 +22,24 @@
 				// the message is displayed
 
 	define PlayTest () ``{
-	    
+	
 	    if ((Shell ("/bin/ls $FILE", $["FILE" : lookup (user_settings, "audio_file")]) != 0)) {
 		string file = lookup (user_settings, "audio_file");
-		
+
 		    // To translators: just one file will be displayed
 		    // To translators: if the test audio file can not be found this message is displayed
 		    // To translators: This is just popup message, shouldn't be too long
 		string msg = sformat (UI (_("Cannot find file:\n %1\n\n(test audio file)")), file);
-		
+
 		UI (`DisplayMessage (msg));
 	    }
 	    else
 		Shell ("/bin/cat $AUDIO > /dev/audio &", $["AUDIO" : lookup (user_settings, "audio_file")]);
 	};
 
+
+
 	
-	
-	  
 				// sets the volume, with amixer check
 				// if an error occurs popup error is displayed
 	define set_volume (string device, integer v) ``{
@@ -60,14 +60,14 @@
 		foreach (`d, devices, ``{
 		    set_volume (lookup (d, "device", "Master"), vol);
 		});
-		
+
 		set_volume ("Master", vol);
 	    }
-	    
+	
 	};
 
 
-	
+
 				// tries to insert module with options (if any)
 				// return string with error message (empty string if ok)
 	define probe_module (map snd_info) ``{
@@ -80,17 +80,17 @@
 				"snd-card-es18xx",
 				"snd-card-interwave",
 				"snd-card-interwave-stb"];
-		
+
 	    if (size (cmd) == 0)
 		return _("Invalid module name.");
 
 		//  tried to load with just snd_isapnp=0
 		// if this fails the user has to provide the ISA legacy resources
 	    if (contains (module_exept, module_name) &&
-		(size (lookup (snd_info, "args", "")) == 0)) {	
+		(size (lookup (snd_info, "args", "")) == 0)) {
 		snd_info = add (snd_info, "snd_isapnp=0");
 	    }
-		
+
 	    cmd = cmd + condition ((size (lookup (snd_info, "args", "")) > 0), ``(" " + lookup (snd_info, "args", "")), "");
 
 	    Shell("/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`");
@@ -112,7 +112,7 @@
 		if (module_name == "snd-card-cs4210") {	// hack For the IBM Thinkpad 600E
 		    module_name = "snd-card-4236";
 		    string ibm_options = "snd_port=0x530 snd_cport=0x538 snd_irq=5 snd_dma1=1 snd_dma2=0 snd_isapnp=0";
-		    
+		
 		    cmd = module_name + " " + ibm_options;
 		    snd_info = add (snd_info, "args", ibm_options);
 		    snd_info = add (snd_info, "conf", ibm_options);
@@ -121,15 +121,15 @@
 		    if (!haskey (pm, module_name))
 			return sformat (UI(_("The kernel module %1 for sound support\ncannot be loaded.")), module_name);
 		}
-		
+
 		return sformat (UI(_("The kernel module %1 for sound support\ncannot be loaded.")), module_name);
 	    }
 
 	    return "";
-	    
+	
 	};
-	
-	
+
+
 
 	    // ===== main =====
 
@@ -142,18 +142,18 @@
 	help_text = help_text + UI(_("<p>After the configuration is
  done you can use <b>amixer</b> (or any program of your choice) for
  adjusting the volume.</p>"));
-	
+
 	    // Help text - adjusting volume 4/4
 	help_text = help_text + UI(_("<p><b>WARNING/SPECIAL
  NOTE:</b>Please start testing your sound card with <b>very</b> low
  volume settings to prevent an accident with too much loud
  noise.</p>"));
-	
-	
+
+
 	map snd_info = Args (0);
 
 	term con = `VBox ();
-	
+
 	integer vol = 10;		// let's start with 10% volume for Master
 	integer step = 3;
 
@@ -163,7 +163,7 @@
 	    //list sb_live_exception = ["SB Live!",
 	    //"Sound Blaster Live!"];
 	    //boolean use_emu10k1_package = false;
-	
+
 	    //if (contains(sb_live_exception, soundcard_name (snd_info)))
 	    //use_emu10k1_package = YesOrNo (_("Do you want to enable joystick support\n(and therefore use another than ALSA driver)?"), _("&Yes"), _("&No"));
 
@@ -172,15 +172,15 @@
 	    //UI(`DisplayMessage (_("This requires 'emu10k1' package.\nYou can find it in the <b>SuSE</b> distribution (series 'snd2').\nALSA driver will be used instead.")));
 	    //use_emu10k1_package = false;
 	    //}
-	
-		
+
+
 	if (!test_mode)
 	    err = probe_module (snd_info);
 
 	boolean back = true;
 	boolean next = false;
-	
-		
+
+
 	if (size (err) > 0) {
 		// error
 
@@ -190,18 +190,19 @@
 	    help_text = help_text + UI(_("<p>Check that you have
  installed the correct <b>ALSA</b> package (series 'snd') and that
  you are running this as a root.</p>"));
-	    
+	
 				// Help text - intenal YaST2 error 3/3
 	    help_text = help_text + UI (_("<p>If the the problem
- persist, you can try to pass <b>options</b> to the ALSA kernel
- module. If you still cannot get sound card to work, you can try
- <i>OSS/Free</i> or another modules(drivers). However <b>YaST2</b>
- sound configuration currently supports only ALSA modules.</p>"));
-	    
-	    
+ persists, you can try to pass some <b>options</b> to the ALSA module.
+ If you still cannot get the sound card working, try
+ <i>OSS/Free</i> or another module.</p>
+ <p>However <b>YaST2</b>
+ sound configuration currently only supports ALSA.</p>"));
+	
+	
 	    con = `VBox(`Top (`Label (soundcard_name (snd_info))),
 			`HVCenter(`Label (err)));
-		
+
 	}
 
 	else {
@@ -212,8 +213,8 @@
 		unmute_all (90);
 		set_volume ("Master", vol);
 	    }
-	    
-	    
+	
+	
 				// TODO: add some other device ajusting here (stereo, other devices like CD, etc ...)???
 	    con = `VBox (
 		`VBox (
@@ -235,20 +236,20 @@
 		`PushButton (`id (`test), _("&Test"))
 		);
 	}
-	
+
 	UI(`SetContents (_("Sound cards"), con, help_text, back, next));
 	UI(`ChangeWidget (`id(`next), `Label, _("&Finish")));
-	
+
 	any ui = nil;
 
 	boolean volume_continue = false;
 
 	while (!volume_continue) {
-	    
+	
 	    repeat {
-	    
+	
 		ui =  UI (`UserInput ());
-	    
+	
 		if (ui == `minus) {
 		    if (vol > step) {
 			vol = vol - step;
@@ -272,9 +273,9 @@
 		else if (ui == `test)
 		    if (!test_mode)
 			PlayTest ();
-	    
+	
 		UI (`ChangeWidget(`id(`pb), `Value, vol));
-	    
+	
 	    } until ((ui == `back) || (ui == `next) || ui == `cancel);
 
 	    if (ui == `next) {
@@ -282,7 +283,7 @@
 	    }
 	    else
 		volume_continue = true;
-	
+
 	}
 
 
@@ -290,9 +291,9 @@
 	    UI(`ChangeWidget (`id(`next), `Label, _("&Next")));
 	    Shell ("/etc/rc.d/alsasound stop");
 	}
-	
+
 	return ui;
-	
+
 }
 
 
