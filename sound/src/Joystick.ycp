@@ -222,7 +222,8 @@
 
     global define boolean StartAndEnable() ``{
 
-	SCR::Execute(.target.bash, "/etc/init.d/joystick start", $[]);
+    if (start == "enable")
+	    SCR::Execute(.target.bash, "/etc/init.d/joystick start", $[]);
     Runlevel::ServiceAdjust("joystick", start);
     return true;
     }
@@ -235,7 +236,6 @@
      * @return True on success
      */
     global define boolean Write (block abort) ``{
-
 	// do not write anything in the test mode and if nothing was changed
 	if (Mode::test == true || !modified)
 	{
