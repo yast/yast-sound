@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Jan  9 09:46:14 CET 2003 - jsuchome@suse.de
+
+- fix of helptext (#19729 - "start ALSA")
+- fix of #19602 - setting sound-slot-[01] and sound-service-[01]-0
+  to "off" if card not present
+
+-------------------------------------------------------------------
 Fri Dec 13 18:56:38 CET 2002 - jsuchome@suse.de
 
 - updated for new modules agent interface
