@@ -210,7 +210,6 @@ Try to restart sound system?")))
 	    else if (ui == `b_volume)
 	    {
 		integer card_id = UI::QueryWidget (`id(`configured_table), `CurrentItem);
-		y2error("# use_alsa = %1", use_alsa);
 		map res = mixerDialog(card_id);
 		if (lookup(res, "ui", nil) == `abort || lookup(res, "ui", nil) == `cancel)
                 {

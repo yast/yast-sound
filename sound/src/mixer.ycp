@@ -143,8 +143,6 @@
 
 global define map mixerDialog(integer card_id) ``{
 
-    y2error(" #2usa_alsa = %1", use_alsa);
-
     path pth		= topath(sformat(".audio.alsa.cards.%1.channels", card_id));
     list channels	= []; //use_alsa ? SCR::Dir(pth) : ["Master"];
 
@@ -153,10 +151,6 @@ global define map mixerDialog(integer card_id) ``{
     if (use_alsa)
     {
 	modname = lookup(select(Sound::modules_conf, card_id, $[]), "module", "snd-card-dummy");
-	if (modname != "snd-card-dummy")
-	{
-	    y2error("module found: %1", modname);
-	}
 	channels = lookup(lookup(Sound::db_modules, modname, $[]), "mixer_elements", SCR::Dir(pth));
     }
     else

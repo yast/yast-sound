@@ -295,14 +295,14 @@
 	map m1 = lookup(Sound::db_indices, vendor_id, $[]);
 	if (m1 == $[])
 	{
-	    y2error("vendor_id not found...");
+	    y2debug("vendor_id not found...");
 	    return $[];
 	}
 
 	integer m2 = lookup(m1, device_id, -1);
 	if (m2 == -1)
 	{
-	    y2error("device_id not found");
+	    y2debug("device_id not found");
 	    return $[];
 	}
 
@@ -778,11 +778,11 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	foreach(`card, conflist,
 	``{
 	    // to translators: '(sound card is) Configured as snd-card-1'
-	    retlist = add(retlist, summaryDevice(card, sformat(_("Configured as snd-card-%1."), i)));
+	    retlist = add(retlist, Summary::Device(card, sformat(_("Configured as snd-card-%1."), i)));
 	    i = i + 1;
 	});
 
-	return summaryDevicesList(retlist);
+	return Summary::DevicesList(retlist);
 
     }
 

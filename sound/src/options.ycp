@@ -112,13 +112,11 @@
 	    if (regexpmatch(select(e, 1, ""), "^-[0-9]*$") || regexpmatch(select(e, 1, ""), "^[0-9]*$"))
 	    {
 		hex = false;
-		y2error("Hex=false");
 	    }
 	    else if (regexpmatch(select(e, 1, ""), "^-0x[0-9a-fA-F]*")
 			|| regexpmatch(select(e, 1, ""), "^0x[0-9a-fA-F]*"))
 	    {
 		hex = true;
-		y2error("Hex=true");
 	    }
 	    else
 	    {
@@ -159,7 +157,7 @@
 
 	if (parse_error)
 	{
-	    y2error("parse error: %1", input);
+	    y2debug("parse error: %1", input);
 	}
 
 	return l;

@@ -21,66 +21,8 @@
 {
     textdomain "sound";
 
-    include "ui/summary.ycp";
-    include "misc_defines.ycp";
-    include "sound/routines.ycp";
-    include "sound/read_routines.ycp";
+    import "Sound";
 
-boolean __sparc = nil;
-boolean use_alsa = !Arch::sparc;
-if (use_alsa)
-{
-	include "sound/alsa_routines.ycp";
-}
-else
-{
-	include "sound/oss_routines.ycp";
-}
-
-
-    integer id = -1;
-    global define integer cid() ``{
-	id = id + 1;
-	return id;
-    }
-
-    list cards	    = Sound::detected_cards;
-    list keys	    = read_unique_keys();
-    list save_info  = read_save_info ();
-
-
-    list conflist   = [];	// configured
-    list notlist    = [];	// not configured
-    list retlist    = [];	// return value of the module
-    // copy cards: configured are added to the front of list, unconfigured to the end
-	
-    string key = "";
-    
-    foreach(`entry, save_info, 
-    ``{
-	conflist = add(conflist, lookup(entry, "model", ""));
-    });
-
-    foreach(`card, cards, 
-    ``{
-	key = lookup(card, "unique_key", "");
-	if (!contains(keys, key))
-        {
-            notlist = add(notlist, get_card_label(card));
-        }
-    });
-
-    retlist = maplist(`card, save_info,
-    ``(
-	// to translators: '(sound card is) Configured as snd-card-1'
-	summaryDevice(lookup(card, "model", "Sound card"), sformat(_("Configured as snd-card-%1."), cid()))
-    ));
-
-    foreach(`card, notlist,
-    ``{
-        retlist = add(retlist, summaryDevice(card, summaryNotConfigured()));
-    });
-
-    return summaryDevicesList(retlist);
-
+    Sound::Read(``{});
+    return Sound::Summary();
 }
