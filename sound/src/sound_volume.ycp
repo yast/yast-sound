@@ -82,6 +82,9 @@
 	    string cmd = module_name;
 	    boolean probe = lookup (lookup (lookup (snd_info, "module", $[]), "module", $[]), "modprobe", true);
 	    boolean mod_active = lookup (lookup (lookup (snd_info, "module", $[]), "module", $[]), "active", false);
+	    boolean is_dmasound = false;
+	    if (module_name == "dmasound")
+		is_dmasound = true;
 
 	    list module_exept = ["snd-card-sb16",
 				"snd-card-es18xx",
@@ -99,7 +102,8 @@
 		snd_info = add (snd_info, "snd_isapnp=0");
 	    }
 
-	    cmd = cmd + condition ((size (lookup (snd_info, "args", "")) > 0), ``(" " + lookup (snd_info, "args", "")), "");
+	    if (!is_dmasound)
+	        cmd = cmd + condition ((size (lookup (snd_info, "args", "")) > 0), ``(" " + lookup (snd_info, "args", "")), "");
 
 	    Shell("/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`");
 
@@ -111,7 +115,8 @@
 		    Shell("/sbin/modprobe " + cmd);
 	    }
 
-	    Shell("/sbin/modprobe snd-pcm-oss"); // backwards OSS compatibility
+	    if (!is_dmasound)
+	        Shell("/sbin/modprobe snd-pcm-oss"); // backwards OSS compatibility
 
 	    map pm = SCR(`Read(.proc.modules));
 

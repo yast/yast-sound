@@ -224,6 +224,17 @@
 
 	    list|void snd_database = ReadY2 (database_name);
 
+	    if (lookup (select (SCR(`Read(.probe.system)), 0), "system") == "MacRISC") {
+		user_settings = add (user_settings, "play_cmd", "/usr/bin/play");
+		return $[
+		  "name" : "dmasound",
+		  "module" : $[ "name" : "dmasound", "modprobe" : true ],
+		  "cards" : [ "MacRISC internal sound" ],
+		  "libhd" : [ $[ "vendor_id" :263169, "device_id" : 262161 ] ]
+		
+		];
+	    }
+
 	    if (isPPCexception ($["bus" : bus, "vendor_id" : vendor_id, "device_id" : device_id]))
 		return select(filter (`d, snd_database, ``(lookup(lookup (d, "module", $[]), "name", "") == "snd-card-cs4232")), 0);
 
@@ -705,67 +716,12 @@ Do you want to select the driver manually?"),
 
 
 	define isPPCexception (map snd_info) ``{
-	    if (tolower(lookup(snd_info, "bus", "")) == "pci"
-		&& lookup (snd_info, "device_id", 0) == 262164
+	    if (lookup (snd_info, "device_id", 0) == 262164
 		&& lookup (snd_info, "vendor_id", 0) == 263170)
 		return true;
 
 	    return false;
 	}
-
-
-  	define PowerMac (list found) ``{
-
-  	    string name = "";
-  	    if (size (found) > 0)
-  		name = hardware_name (select (found, 0));
-  	    if (size (name) == 0)
-  		name = "generic PPC";
-  	    string help_text = UI (_("<p>The sound card was 
-found. If you want to configure this sound card press <i>Next</i> 
-otherwise quit by pressing <i>Back</i><p/>"));
-
-  	    if (size (name) == 0)
-  		name = "on PPC";
-  	    term con = `VBox (
-  		`VStretch (),
-  				// To translators: label message 1/2 "The sound card XY will be configured" - split due the different widget
-  		`Label (_("The sound card\n")),
-  		`Label (`opt(`outputField), name),
-  				// To translators: label message 2/2 "The sound card XY will be configured" - split due the different widget
-  		`Label (_("\nwill be configured."))
-  		);
-
-  	    UI(`SetContents (_("Sound cards"), con, help_text, true, true));
-
-  	    any ui = nil;
-
-  	    repeat {
-  		ui = UI(`UserInput ());		
-  	    } until (((ui == `back) || (ui == `next) || ui == `cancel));
-
-  	    if (ui == `next) {
-
-  		Shell ("/sbin/modprobe dmasound");
-
-  		string modules_conf = ReadString("/etc/modules.conf");
-
-  		modules_conf = modules_conf + "
-alias char-major-14 dmasound
-alias sound dmasound
-alias midi dmasound
-alias sound-slot-0 dmasound
-alias sound-service-0-0 dmasound";
-
-  		if (WriteString ("/etc/modules.conf", modules_conf))
-  		    UI(`DisplayMessage (_("The sound card was succesfully configured.\nYou can now use it immediately.")));
-  		else
-  		    UI(`DisplayMessage (_("An error occurred during saving /etc/modules.conf.")));
-
-  		Shell("/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`");
-  	    }
-	    
-  	}
 
 
 	    // ===== main =====
@@ -802,51 +758,42 @@ alias sound-service-0-0 dmasound";
 	map options_entered = $[];
 
 
-				// hack for PPC
-	if ((SCR(`Read(.probe.architecture)) == "ppc") && !isPPCexception (select (found, 0)))
-	    PowerMac (found);
+	any already = CallFunction (`sound_already ());
+
+	if (IsAlsaInstalled ()) {
 	    
-	else {
+	    if (already == nil || already == `next) {   
 
-	    any already = CallFunction (`sound_already ());
-
-	    if (IsAlsaInstalled ()) {
-	    
-		if (already == nil || already == `next) {   
-
-		    while (cont) {
+		while (cont) {
 		    
-			snd_info = DisplayFound (found);
-			found = [snd_info];
+		    snd_info = DisplayFound (found);
+		    found = [snd_info];
 		    
-			if (size (snd_info) > 0) {
-			    while (cont) {
-				any vol_ui = CallFunction (`sound_volume (snd_info));
-				cont = (vol_ui != `next);
-				if (vol_ui == `next)
-				    cont = (CallFunction (`sound_save (snd_info, options_entered)) != `next);
-				else if (vol_ui == `back) {
-				    found = FindCard ();
-				    break;
-				}
+		    if (size (snd_info) > 0) {
+			while (cont) {
+			    any vol_ui = CallFunction (`sound_volume (snd_info));
+			    cont = (vol_ui != `next);
+			    if (vol_ui == `next)
+				cont = (CallFunction (`sound_save (snd_info, options_entered)) != `next);
+			    else if (vol_ui == `back) {
+				found = FindCard ();
+				break;
 			    }
 			}
-			else {
-			    cont = false;
-			}
-
-
 		    }
-	    
+		    else {
+			cont = false;
+		    }
+
+
 		}
+	    
 	    }
+	}
 
-	    else {			// ALSA not installed
-		NotInstalled ();
-	    }
-
+	else {			// ALSA not installed
+	    NotInstalled ();
 	}
 
 	UI(`CloseDialog());
 }
-
