@@ -220,9 +220,9 @@
 
 	    map mod_rec = select (snd_database, n_drv);
 	    
-	    scr = add (scr, "device", sformat ("%1\n(driver: %2)",
-					       select (models, UI (`QueryWidget (`id(`sel_mod), `CurrentItem))),
-					       current_driver));
+	    scr = add (scr, "device", sformat ("%1", // \n(driver: %2)",
+					       select (models, UI (`QueryWidget (`id(`sel_mod), `CurrentItem)))));
+		//current_driver));
 
 	    scr = add (scr, "module", mod_rec);
 	    

@@ -375,8 +375,15 @@
 		    }
 		    else {
  			    // To translators: parameter is sound card name
-			message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
-			con = add (con, `HVCenter(`Label(`opt(`outputField), message)));
+			    //message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
+			
+			term lab = `VBox (
+			    `VStretch (),
+			    `Label (_("The sound card\n")),
+			    `Label (`opt(`outputField), soundcard_name (ret)),
+			    `Label (_("\nwill be configured."))
+			    );
+			con = add (con, lab);
 			con = add (con, `Bottom(`PushButton(`id (`options), _("&Options"))));
 			
 			    // Help text 1/2 (one sound card found)
@@ -463,8 +470,15 @@
 				    // help text 2/2
 				help_text = help_text + UI (_("<p>You can change options that are passed to the module by pressing <i>Options</i> buton.</p>"));
 				
-				message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
-				con = add (con, `ReplacePoint (`id(`rp), `HVCenter(`Label(`opt (`outputField), message))));
+				//message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
+
+				term lab = `VBox (
+				    `VStretch (),
+				    `Label (_("The sound card\n")),
+				    `Label (`opt(`outputField), soundcard_name (ret)),
+				    `Label (_("\nwill be configured."))
+				    );
+				con = add (con, `ReplacePoint (`id(`rp), `HVCenter(lab)));
 				con = add (con, `Bottom(`PushButton(`id (`options), _("&Options"))));
 				next = true;
 				
@@ -549,8 +563,15 @@
 			    // help text 2/2
 			help_text = help_text + UI (_("<p>You can change options that are passed to the module by pressing <i>Options</i> buton.</p>"));
 			
-			message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
-			con = add (con, `ReplacePoint (`id(`rp), `HVCenter(`Label(`opt (`outputField), message))));
+			    //message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
+
+			term lab = `VBox (
+			    `VStretch (),
+			    `Label (_("The sound card\n")),
+			    `Label (`opt(`outputField), soundcard_name (ret)),
+			    `Label (_("\nwill be configured."))
+			    );
+			con = add (con, `ReplacePoint (`id(`rp), `HVCenter(lab)));
 			con = add (con, `Bottom(`PushButton(`id (`options), _("&Options"))));
 			next = true;
 			
