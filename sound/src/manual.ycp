@@ -34,7 +34,7 @@
      * @param cardname string card name
      * @return string module name
      */
-    global define string get_module_by_cardname(string cardname) ``{
+    define string get_module_by_cardname(string cardname) ``{
 
 	if (!Sound::use_alsa)
 	{
@@ -58,7 +58,7 @@
      * @param cardname string card name
      * @return string vendor name
      */
-    global define string get_vendor_by_cardname(string cardname) ``{
+    define string get_vendor_by_cardname(string cardname) ``{
 
 	if (!Sound::use_alsa)
 	    return "";
@@ -76,7 +76,7 @@
      * returns list of card vendors
      * @return list of items with vendors (into table)
      */
-    global define list get_vendor_names () ``{
+    define list get_vendor_names () ``{
 
 	if (!Sound::use_alsa)
 	    return [];
@@ -98,7 +98,7 @@
      * @param card_map the current card (map with at least "module" entry)
      * @return updated map of current card
      */
-    global define map update_manual_card (map card_map) ``{
+    define map update_manual_card (map card_map) ``{
 
 	string uniq_k	= isa_uniq();
 	string label	= card_map["model"]:"Sound card";
@@ -140,7 +140,7 @@
      * (shows the lists of Vendors/Drivers and Models)
      *  @return map result
      */
-    global define map ManualDialog () ``{
+    define map ManualDialog () ``{
 
 	string helptext		= Sound::STRINGS["ManualDialog"]:"";
 	string keys		= Sound::use_alsa ? "vendors": "modules";
@@ -333,7 +333,7 @@
      * just calls ManualDialog
      * @return map passed result from ManualDialog
      */
-    global define map sound_manual() ``{
+    define map sound_manual() ``{
 
 	return ManualDialog();
     }

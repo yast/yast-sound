@@ -33,7 +33,7 @@
      * @param value volume 0-100
      * @return boolean success/failure
      */
-    global define boolean setVolume (string group, integer cardid,
+    define boolean setVolume (string group, integer cardid,
 				     integer value) ``{
 	if (!Sound::use_alsa)
 	{
@@ -74,7 +74,7 @@
      * @param card_id card id
      * @return boolean success/failure
      */
-    global define boolean storeVolume(integer card_id) ``{
+    define boolean storeVolume(integer card_id) ``{
 	if (card_id == -1)
 	{
 	    SCR::Execute(.audio.alsa.store, 0, 0);
@@ -90,7 +90,7 @@
      * @param card_id card id
      * @return string with error message. empty on success
      */
-    global define string PlayTest (integer card_id) ``{
+    define string PlayTest (integer card_id) ``{
 
 	string fname = "/usr/share/sounds/alsa/test.wav";
 	if (!Sound::use_alsa)
@@ -128,7 +128,7 @@
      * @param restore true - call alsactl restore, false - don't
      * @return void
      */
-    global define void sound_start_tmp(boolean restore) ``{
+    define void sound_start_tmp(boolean restore) ``{
 
 	// get the list of commands needed for start
 	list cmds = Sound::CreateModprobeCommands();
@@ -160,7 +160,7 @@
      * removes all sound modules from kernel
      * @return void
      */
-    global define void sound_stop() ``{
+    define void sound_stop() ``{
 
 	if (Sound::use_alsa)
 	{
@@ -186,7 +186,7 @@
      * stops all programs using sound devices
      * @return boolean true if nothing's using sound, false otherwise
      */
-    global define boolean stop_programs() ``{
+    define boolean stop_programs() ``{
 	if (Mode::config)
 	{
 	    return true;

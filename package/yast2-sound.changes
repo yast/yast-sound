@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Feb  2 15:40:41 CET 2004 - jsuchome@suse.cz
+
+- fixed testsuite
+- removed hwinfo from needforbuild
+- 2.9.6
+
+-------------------------------------------------------------------
 Tue Dec  9 16:24:19 CET 2003 - jsuchome@suse.cz
 
 - SCR agents adapted for new interpreter

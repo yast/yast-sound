@@ -26,10 +26,10 @@
 
 
     // list of all card models (generated only once and cached)
-    global list<string> all_card_names = [];
+    list<string> all_card_names = [];
 
     // list of all sound modules (table items)
-    global list all_module_items = [];
+    list all_module_items = [];
 
     /**
      * returns cards manufactured by given vendor (ALSA only) or driver
@@ -37,7 +37,7 @@
      * @param keys in which set is the key: "vendors" or "modules"
      * @return list with sound card models
      */
-    global define list<string> get_card_names (string key, string keys) ``{
+    define list<string> get_card_names (string key, string keys) ``{
 
 	Sound::LoadDatabase(true);
 
@@ -81,7 +81,7 @@
      *	(oss is nasty hacked, because it's not trivial to check this)
      *  @return list
      */
-    global define list get_running_cards () ``{
+    define list get_running_cards () ``{
 
 	if (!Sound::use_alsa)
 	    return [1,2,3,4,5];
@@ -101,7 +101,7 @@
      * @param parname original name of parameter
      * @return correct name
      */
-    global define string check_parameter_name (string parname) ``{
+    define string check_parameter_name (string parname) ``{
 
 	boolean prefix_used = Sound::snd_prefix_used ();
 	if (substring (parname, 0, 4) == "snd_" && !prefix_used)
@@ -117,7 +117,7 @@
      * @param modname module name
      * @return map with params and their descriptions
      */
-    global define map get_module_params(string modname) ``{
+    define map get_module_params(string modname) ``{
 
 	if (!Sound::use_alsa)
 	{
@@ -151,7 +151,7 @@
      * @param card_id card id
      * @return map modified card entry with filled alias value
      */
-    global define map add_alias(map entry, integer card_id) ``{
+    define map add_alias(map entry, integer card_id) ``{
 
 	if (!Sound::use_alsa)
 	    return add(entry, "alias", sformat("sound-slot-%1", card_id));
@@ -165,7 +165,7 @@
      *  @param card_id card id
      *  @return map modified save_entry
      */
-    global define map add_common_options(map entry, integer card_id) ``{
+    define map add_common_options(map entry, integer card_id) ``{
 
 	map opts = entry["options"]:$[];
 
@@ -201,7 +201,7 @@
      * @param number number of sound cards
      * @return list of oss-alsa aliases
      */
-    global define list alsa_oss (integer number) ``{
+    define list alsa_oss (integer number) ``{
 
 	if (!Sound::use_alsa)
 	    return [];
@@ -239,7 +239,7 @@
      * returns list of all available sound modules (OSS only)
      * @return list as above
      */
-    global define list get_module_names() ``{
+    define list get_module_names() ``{
 
 	if (all_module_items == [] || all_module_items == nil)
 	{
@@ -289,7 +289,7 @@
 		]
      * @return list as above
      */
-    global define list get_vol_settings() ``{
+    define list get_vol_settings() ``{
 
 	if (!Sound::use_alsa)
 	    return [];
@@ -333,7 +333,7 @@
      * @param vol_settings volume settings
      * @return boolean success/failure
      */
-    global define boolean set_vol_settings(list vol_settings) ``{
+    define boolean set_vol_settings(list vol_settings) ``{
 
 	if (!Sound::use_alsa)
 	    return true;
@@ -361,7 +361,7 @@
      * @param hardware_entry map
      * @return string readable name of the card
      */
-    global define string hardware_name (map hardware_entry) ``{
+    define string hardware_name (map hardware_entry) ``{
 
 	y2debug("hardware_entry: %1", hardware_entry);
 
@@ -390,7 +390,7 @@
      * @param cards autodetected cards
      * @return list of entries of not configured cards
      */
-    global define list<map> filter_configured(list<map> save_info, list<map> cards) ``{
+    define list<map> filter_configured(list<map> save_info, list<map> cards) ``{
 
         return filter(map det_card, cards, ``{
             string uniq     = det_card["unique_key"]:"";
@@ -409,7 +409,7 @@
      * returns the result of /usr/bin/whoami. currently broken. no idea why...
      * @return string username
      */
-    global define string whoami() ``{
+    define string whoami() ``{
 	map ret	= (map)SCR::Execute(.target.bash_output,"/usr/bin/whoami", $[]);
 	string out = ret["stdout"]:"";
 	list l = splitstring(out, "\n");
@@ -425,7 +425,7 @@
      * @param card map entry from .probe.audio
      * @return string card label
      */
-    global define string get_card_label(map card) ``{
+    define string get_card_label(map card) ``{
 
         list lab = splitstring(hardware_name(card),"\n");
 
@@ -448,7 +448,7 @@
      * @param alias string
      * @return boolean is/is not
      */
-    global define boolean is_snd_alias(string alias) ``{
+    define boolean is_snd_alias(string alias) ``{
 	if (Sound::use_alsa)
 	{
 	    return regexpmatch(alias, "^snd-card-[0-9]*$");
@@ -463,7 +463,7 @@
      * unique key for non-pci/pnp cards or virtual cards
      * @return string key for legacy isa cards
      */
-    global define string isa_uniq() ``{
+    define string isa_uniq() ``{
 	return "uniq.virtual";
     }
 
@@ -471,7 +471,7 @@
      * reads variables listed in 'vars' from rc.config
      * @return map optname: value
      */
-    global define map read_rc_vars () ``{
+    define map read_rc_vars () ``{
 
 	return $["LOAD_ALSA_SEQ" : SCR::Read(.sysconfig.sound.LOAD_SEQUENCER)];
     }
@@ -482,7 +482,7 @@
      * @param unconfigured list of string of unconfigured cards uniq keys
      * @return boolean true
      */
-    global define boolean SaveUniqueKeys(list configured, list unconfigured) ``{
+    define boolean SaveUniqueKeys(list configured, list unconfigured) ``{
         maplist (string uk, configured, ``{
             SCR::Write(.probe.status.configured, uk, `yes);
         });
@@ -503,7 +503,7 @@
      * @param name card name (or its substring)
      * @return integer position of the card
      */
-    global define integer search_card_id (string name) ``{
+    define integer search_card_id (string name) ``{
         list all_cards = get_card_names ("all", "vendors");
         integer pos = 0;
         integer len = size (name);
@@ -526,7 +526,7 @@
      * @param default value to select as default
      * @return list items to be shown in list widget
      */
-    global define list itemize_list (list l, integer default) ``{
+    define list itemize_list (list l, integer default) ``{
         integer i = 0;
         list itemized_list = [];
         integer s = size (l);
@@ -546,7 +546,7 @@
      *  @return boolean continue/abort
      */
 
-    global define boolean nm256hack (string modname) ``{
+    define boolean nm256hack (string modname) ``{
         if (modname == "snd-nm256")
         {
             // special warning message for in a special case
@@ -561,7 +561,7 @@
      * @param card map read from .probe.sound
      * @return map relevant card info found in db
      */
-    global define map get_module (map card) ``{
+    define map get_module (map card) ``{
 
 	Sound::LoadDatabase (true);
 
@@ -603,7 +603,7 @@
      * @param card_id of the card
      * @return void
      */
-    global define void unmute(list devices, integer card_id) ``{
+    define void unmute(list devices, integer card_id) ``{
 	if (Mode::config)
 	{
 	    return;
@@ -631,7 +631,7 @@
      * @param card_id card id
      * @return string empty on success/ error message on failure
      */
-    global define string check_module(map save_entry, integer card_id) ``{
+    define string check_module(map save_entry, integer card_id) ``{
 	map pm		= (map) SCR::Read(.proc.modules);
 	string mod_name	= save_entry["module"]:"off";
         if (!haskey (pm, mod_name) || size(get_running_cards()) <= card_id)
@@ -653,7 +653,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      * @return map with refreshed options
      *
      */
-    global define map restore_mod_params(map params, map values) ``{
+    define map restore_mod_params(map params, map values) ``{
 	return mapmap(string parname, map parmap, params, ``{
 	    parmap = add (parmap, "value", values[parname]:"");
 	    return $[parname : parmap];
@@ -666,7 +666,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      *
      */
 
-    global define boolean FontsInstalled() ``{
+    define boolean FontsInstalled() ``{
 	return SCR::Read(.target.size, "/usr/share/sfbank/creative") >= 0;
     }
 
@@ -676,7 +676,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      * @return boolean	card supports fonts/it doesn't
      */
 
-    global define boolean HasFonts(map save_entry) ``{
+    define boolean HasFonts(map save_entry) ``{
 	if (Mode::config)
 	{
 	    // don't install sound fonts during autoinstallation config
@@ -697,7 +697,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      *  @return void
      */
 
-    global define void InstallFonts(string symlink, boolean dontask) ``{
+    define void InstallFonts(string symlink, boolean dontask) ``{
 	boolean answer = false;
 
 	// step 1: want install?
@@ -760,7 +760,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      * @param sound_cards sound cards
      * @return boolean see as above
      */
-    global define boolean need_nm256_opl3sa2_warn(list sound_cards) ``{
+    define boolean need_nm256_opl3sa2_warn(list sound_cards) ``{
 	list mods = maplist (map card, sound_cards, ``(card["module"]:""));
 	if (contains(mods, "snd-nm256") && contains(mods, "snd-opl3sa2"))
 	{
@@ -774,7 +774,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      * @param sound_cards list of sound cards
      * @return void
      */
-    global define void nm256_opl3sa2_warn(list sound_cards) ``{
+    define void nm256_opl3sa2_warn(list sound_cards) ``{
 	list s1 = filter(map e, sound_cards, ``(e["module"]:"" == "snd-nm256"));
 	list s2 = filter(map e, sound_cards, ``(e["module"]:""=="snd-opl3sa2"));
 
@@ -796,7 +796,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      * @param save_info list
      * @return list new save_info
      */
-    global define list<map> recalc_save_entries(list<map> save_info) ``{
+    define list<map> recalc_save_entries(list<map> save_info) ``{
 	integer pos = 0;
 	save_info = maplist(map card, save_info, ``{
 	    map opts	= card["options"]:$[];

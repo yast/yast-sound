@@ -18,10 +18,19 @@
 
 {
     include "testsuite.ycp";
+
+    map READ_I = $[
+	"target" : $[
+	    "size": -1,
+	    "tmpdir" : "/tmp"
+	]
+    ];
+
+    TESTSUITE_INIT ([READ_I], nil);
     include "sound/routines.ycp";
 
-    list save_info = [];
-    list cards = [];
+    list<map> save_info = [];
+    list<map> cards = [];
     
     /*
      * in card entries we care about nothing but unique_key
