@@ -218,7 +218,7 @@
 	string help_text = UI(_("Here you can modify the options for the sound modules. "));
 				// Help text for options 2/4
 	help_text = help_text + UI(_("If you are not <b>absolutely
- sure</b> what are you doing, please leave this dialog untouched."));
+ sure</b> what you are doing, please leave this dialog untouched."));
 	
 
 				// Help text for options 3/4
