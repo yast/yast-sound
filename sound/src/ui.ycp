@@ -343,7 +343,7 @@
 	}
 	else
 	{
-	    clab="\n"+sformat(select(lookup(STRINGS, "soundCard", ""), 3), cname, cpos+1);
+	    clab="\n"+sformat(select(lookup(STRINGS, "soundCount", ""), 3), cname, cpos+1);
     	}
 
 	term con=

@@ -47,7 +47,7 @@
 	if (use_alsa)
 	{
 	    maplist (`dev, ["PCM", "PCM,1", "Wave", "Master Digital", "Synth"], 
-			   ``(SetVolume (lookup (user_settings, "mixer"), dev, sformat ("%1", 70), card_id)));
+			   ``(SetVolume (lookup (user_settings, "mixer", "amixer"), dev, sformat ("%1", 70), card_id)));
 	}
 	
 	/* help text: adjusting volume */
@@ -63,7 +63,14 @@
 	{
 	    UI(`ChangeWidget (`id(`next), `Label, _("&Finish")));
 	}
-	SetVolume (lookup (user_settings, "mixer"), "Master", sformat ("%1", vol), card_id);
+
+/* Sound fonts installation */
+
+//	InstallFonts("AS");
+
+/* end of sound fonts installation */
+
+	SetVolume (lookup (user_settings, "mixer", "amixer"), "Master", sformat ("%1", vol), card_id);
 
 	repeat 
 	{
@@ -73,7 +80,7 @@
 	    {
 		vol = UI(`QueryWidget(`id(`volume), `Value ));
 
-		SetVolume (lookup (user_settings, "mixer"), "Master", sformat ("%1", vol), card_id);
+		SetVolume (lookup (user_settings, "mixer", "amixer"), "Master", sformat ("%1", vol), card_id);
 	    }
 	    else if (ui == `test) 
 	    {
@@ -238,6 +245,7 @@ boolean need_restart=true;
       
     map user_settings = $["audio_file"  : "/usr/share/sounds/alsa/test.wav",
 			  "play_cmd"    : "/usr/bin/aplay",
+//			  "mixer"       : "/usr/bin/amixer -c %1 set \"%2\" %3%% unmute"];
 			  "mixer"       : "/usr/bin/amixer -c $CARD_NUM set \"$CHANNEL\" $VOLUME% unmute"];
       
     string err_msg = "";
@@ -271,7 +279,7 @@ boolean need_restart=true;
 	}
 	else
 	{
-	    SetVolume (lookup (user_settings, "mixer"), "Master", sformat ("%1", 75), card_id);
+	    SetVolume (lookup (user_settings, "mixer", "amixer"), "Master", sformat ("%1", 75), card_id);
 	    ui = SuccessDialog(card);
 	}
     }

@@ -662,6 +662,7 @@
      * @return any
      */
     global define SetVolume (string command, string channel, string value, integer card_num) ``{
+	y2error(sformat("command: %1, channel: %2, volume: %3, card_num: %4", command, channel, value, card_num));
 	return SCR(`Execute (.target.bash, command, $["CHANNEL" : channel, "VOLUME" : value, "CARD_NUM" : card_num]));
     }
 
@@ -1177,7 +1178,7 @@
 
 	cmd="/bin/echo 'alias' 'char-major-116' 'snd' > /tmp/modules.conf.tmp";
 	SCR(`Execute(.target.bash, cmd, $[]));
-	cmd="/bin/echo 'options' 'snd' 'snd_cards_limit=3' 'snd_major=116' >> /tmp/modules.conf.tmp";
+	cmd="/bin/echo 'options' 'snd' 'snd_cards_limit=16' 'snd_major=116' >> /tmp/modules.conf.tmp";
 	SCR(`Execute(.target.bash, cmd, $[]));
 	cmd=sformat("/bin/grep \"^[^#].*snd-card-\" /etc/modules.conf >> /tmp/modules.conf.tmp", tmpdir);
 //	cmd=sformat("/bin/grep '^[^#].*snd-card-' /etc/modules.conf >> %1/modules.conf.tmp", tmpdir);
@@ -1196,4 +1197,55 @@
 	y2error(sformat("executing %1", cmd));
 	SCR(`Execute(.target.bash, cmd, $[]));
     }
+
+    /** this small wizard will install sound fonts for soundblaster live/awe
+     *  @param symlink is path to default.sf2 that is to be created
+     */
+
+    global define InstallFonts(string symlink)
+    ``{
+	boolean answer=false;
+
+	// step 1: want install?
+
+	answer=UI(`YesNoHeadlinePopup(	lookup(STRINGS, "soundFontTitle", ""), 
+					lookup(STRINGS, "soundFontQuestion", "")));
+	if(!answer) 
+	{
+	    return;
+	}
+
+	boolean succes=false;
+
+	while(true)
+	{
+    		// step 2: insert CD
+	    answer=UI(`ContinueCancelHeadlinePopup (lookup(STRINGS, "soundFontTitle", ""), 
+						    lookup(STRINGS, "soundFontAppeal", "")));
+	    if(!answer)
+	    {
+		return;
+	    }
+
+	    // step3: do something 
+
+	    // step4: 
+	    if(succes)
+	    {
+		UI(`MessagePopup("soundFontFinal"));
+		return;
+	    }
+	    else
+	    {
+		answer=UI(`YesNoHeadlinePopup(  lookup(STRINGS, "soundFontNotFound", ""),
+						lookup(STRINGS, "soundFontRetry", "")));
+		if(!answer)
+		{
+		    return;
+		}
+	    }
+    
+	}
+    }
+
 }
