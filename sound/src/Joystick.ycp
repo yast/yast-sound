@@ -14,6 +14,7 @@
 
     import "Mode";
     import "Progress";
+    import "Runlevel";
 
     /**
      * joystick config datastructure (list of maps)

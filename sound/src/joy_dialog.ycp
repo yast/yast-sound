@@ -16,6 +16,8 @@
     import  "Joystick";
     import  "Sound";
     import  "Require";
+    import "Label";
+    import "Popup";
 
     include "sound/joysticks.ycp";
     include "sound/ui.ycp";
@@ -132,20 +134,20 @@ before pressing <B>Test</B> or <B>Next</B>.</P>");
 
 	if (button == `finish)
 	{
-	    Wizard::ReplaceNextButton(`PushButton(`id(`next), `opt(`default), FinishButtonLabel()));
+	    Wizard::ReplaceNextButton(`PushButton(`id(`next), `opt(`default), Label::FinishButton()));
 	}
 	else if (button == `ok)
 	{
-	    Wizard::ReplaceNextButton(`PushButton(`id(`next), `opt(`default), OKButtonLabel()));
+	    Wizard::ReplaceNextButton(`PushButton(`id(`next), `opt(`default), Label::OKButton()));
 	}
 	else if (button == `next)
 	{
-	    Wizard::ReplaceNextButton(`PushButton(`id(`next), `opt(`default), NextButtonLabel()));
+	    Wizard::ReplaceNextButton(`PushButton(`id(`next), `opt(`default), Label::NextButton()));
 	}
 	else
 	{
 	    y2warning("Unknown button label %1, using `next as default", button);
-	    Wizard::ReplaceNextButton(`PushButton(`id(`next), `opt(`default), NextButtonLabel()));
+	    Wizard::ReplaceNextButton(`PushButton(`id(`next), `opt(`default), Label::NextButton()));
 	}
 
 	Wizard::SetContents (caption, contents, helptext, true, true);
@@ -163,7 +165,7 @@ before pressing <B>Test</B> or <B>Next</B>.</P>");
 	    if (s == `next && UI::QueryWidget(`id(`os), `CurrentItem) == nil)
 	    {
 		// warning message - user did not select any joystick type
-		UI::WarningPopup(_("Select the joystick type from the list
+		Popup::Warning(_("Select the joystick type from the list
 before pressing Next.
 
 "));
@@ -175,10 +177,10 @@ before pressing Next.
 	    integer idx = UI::QueryWidget(`id(`os), `CurrentItem);
 	    string joymod = select(select(joylist, idx, ["", _("No joystick")]), 0, "");
 	    if (joymod == "")
-		    UI::MessagePopup(_("Select the joystick to test."));
+		    Popup::Message(_("Select the joystick to test."));
         // popup: %1 is required application
-	    else if (Require::RequireAndConflict(["joystick"],[], _("To test your joystick, the <b>%1</b> package is required.
-It is currently not installed. Install it now?")))
+	    else if (Require::RequireAndConflict(["joystick"],[], _("<p>To test your joystick, the <b>%1</b> package is required.
+It is currently not installed. Install it now?</p>")))
             joy_test_popup(card_id, idx, joymod);
         }
 
@@ -243,7 +245,7 @@ It is currently not installed. Install it now?")))
         // Wait text label
         `Label(_("Initializing joystick -- please wait...")),
         `VSpacing(1),
-        `PushButton(`id(`done), `opt(`default), AbortButtonLabel()),
+        `PushButton(`id(`done), `opt(`default), Label::AbortButton()),
         `VSpacing(1)),
     `HSpacing(1.5)
     ));
@@ -297,7 +299,7 @@ It is currently not installed. Install it now?")))
 
     if (size (joysticks) == 0)
     {
-        UI::MessagePopup(_("No joystick is connected."));
+        Popup::Message(_("No joystick is connected."));
         if (testing_new)
         {
             Joystick::joystick = current_conf;
@@ -322,7 +324,7 @@ Select the one to test
 and press some of its buttons several times.
 ")),
             `VSpacing(1),
-            `PushButton(`id(`abort), `opt(`default), AbortButtonLabel()),
+            `PushButton(`id(`abort), `opt(`default), Label::AbortButton()),
             `VSpacing(1)),
         `HSpacing(1.5)
         ));
@@ -450,7 +452,7 @@ and press some of its buttons several times.
         `VSpacing(1),
         joy_attrib,
         `VSpacing(1),
-        `PushButton(`id(`done), `opt(`default), OKButtonLabel()),
+        `PushButton(`id(`done), `opt(`default), Label::OKButton()),
         `VSpacing(1)),
     `HSpacing(1.5)
     ));

@@ -18,6 +18,9 @@
 {
     import "Directory";
 
+    import "Popup";
+    import "Sound";
+    import "Summary";
     textdomain "sound";
 
     /**
@@ -249,7 +252,7 @@
         {
             // special warning message for in a special case
             string warn_text = lookup(STRINGS, "nm256hackWarning", "");
-	    return UI::YesNoPopup(warn_text);
+	    return Popup::YesNo(warn_text);
         }
         return true;
     }
@@ -598,7 +601,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	}
 	else
 	{
-	    answer = UI::YesNoHeadlinePopup(	lookup(STRINGS, "soundFontTitle", ""),
+	    answer = Popup::YesNoHeadline(	lookup(STRINGS, "soundFontTitle", ""),
 					lookup(STRINGS, "soundFontQuestion", ""));
 	}
 
@@ -612,7 +615,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	while (true)
 	{
 		// step 2: insert CD
-	    answer = UI::ContinueCancelHeadlinePopup (lookup(STRINGS, "soundFontTitle", ""),
+	    answer = Popup::ContinueCancelHeadline (lookup(STRINGS, "soundFontTitle", ""),
 						    lookup(STRINGS, "soundFontAppeal", ""));
 	    if (!answer)
 	    {
@@ -629,12 +632,12 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	    // step4:
 	    if (cnt > 0)
 	    {
-		UI::MessagePopup(sformat(lookup(STRINGS, "soundFontFinal", ""), cnt, "/usr/share/sfbank/creative"));
+		Popup::Message(sformat(lookup(STRINGS, "soundFontFinal", ""), cnt, "/usr/share/sfbank/creative"));
 		return;
 	    }
 	    else
 	    {
-		answer = UI::YesNoHeadlinePopup(  lookup(STRINGS, "soundFontNotFound", ""),
+		answer = Popup::YesNoHeadline(  lookup(STRINGS, "soundFontNotFound", ""),
 						lookup(STRINGS, "soundFontRetry", ""));
 		if ( !answer )
 		{
@@ -676,7 +679,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	{
 	    string name1 = lookup(select(s1, 0, $[]), "model", "");
 	    string name2 = lookup(select(s2, 0, $[]), "model", "");
-	    UI::LongTextPopup("",
+	    Popup::LongText("",
 		`RichText("<p>"+sformat(lookup(STRINGS, "opl3sa_nm256_warn", ""), name1, name2)+"</p>"),
 		50, 12);
 	}
@@ -722,7 +725,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
                   // To translators: label message
 	    string msg = lookup(STRINGS, "WhichDialogMsg", "");
                   // Yes, No - button labels
-            boolean terminate = UI::YesNoPopup (msg);
+            boolean terminate = Popup::YesNo (msg);
             if (terminate)
             {
 		SCR::Execute (.target.bash, "/bin/fuser -k /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]);

@@ -20,7 +20,12 @@
 
 {
     textdomain "sound";
+    import "Sound";
+    import "Joystick";
     import "Wizard";
+    import "Wizard_hw";
+    import "Popup";
+    import "Label";
 
     /**
      *	InitializingDialog
@@ -80,7 +85,7 @@
 	    flagc = flagc * 2;
 	}
 		// Next button label
-	UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
+	UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
 
 	symbol input = `quick;
 
@@ -134,7 +139,7 @@
         Wizard::SetContents (_("Sound card configuration"), con, helptext, true, true);
                 // dialog title
                 // Next button label
-        UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
+        UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
 
 	symbol input = `quick;
 
@@ -516,7 +521,7 @@
     ``{
 	if (Sound::Changed() || Joystick::Changed())
 	{
-	    return UI::ReallyAbortPopup(true);
+	    return Popup::ReallyAbort(true);
 	}
 	return true;
     }
@@ -576,7 +581,7 @@
 	        // dialog title
         Wizard::SetContents (_("Configure a sound card"), con, helptext, true, true);
         // Next - button label
-        UI::ChangeWidget(`id(`next), `Label, UI(`NextButtonLabel()));
+        UI::ChangeWidget(`id(`next), `Label, UI(Label::NextButton()));
 
         if (size (nc) == 0)
         {
