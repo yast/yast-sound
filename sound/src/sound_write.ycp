@@ -135,7 +135,7 @@
     if (!autoinstall)
     {
 	Progress::New (_("Saving sound card settings."), " ", size(stones) - 1,
-		stones, stones2, "TODO: help");
+		stones, stones2, _("Saving sound card settings."));
         Wizard::DisableAbortButton();
     }
 

@@ -26,8 +26,8 @@
  * Read/Sets the values defined in <tt>/etc/sysconfig/alsa</tt>
  * in an easy manner.
  */
-.sound
+.sysconfig.sound
 
-`ag_rcconfig(
-  RcFile("/etc/sysconfig/sound")
+`ag_ini(
+  SysConfigFile("/etc/sysconfig/sound")
 )

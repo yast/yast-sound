@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Jan 21 14:30:46 CET 2002 - dmeszar@suse.cz
+
+- added proposal_sound.ycp file
+
+-------------------------------------------------------------------
 Thu Jan 17 15:33:51 CET 2002 - dmeszar@suse.cz
 
 - added joystick type selector dialog

@@ -157,7 +157,7 @@
 	    load_alsa = "yes";
 	}
 
-	return $["LOAD_ALSA" : load_alsa , "LOAD_ALSA_SEQ" : SCR::Read(.sound.LOAD_ALSA_SEQ)];
+	return $["LOAD_ALSA" : load_alsa , "LOAD_ALSA_SEQ" : SCR::Read(.sysconfig.sound.LOAD_ALSA_SEQ)];
 
 //        return listmap (`k, vars, ``([k, SCR::Read(topath(sformat (".rc.system.%1", k)))]));
     }
