@@ -22,6 +22,11 @@
     include "misc_defines.ycp";
     include "lan/lan_routines.ycp";
 
+// !!!!!!!!!!!!!!!Hack!!!!!!!!!!!!!!!!!!!!
+
+define isnil(any a)
+``{ return false; }
+
   /**
    * reads variables listed in 'vars' from rc.config
    * @return list
@@ -497,7 +502,7 @@
      * @return map
      */
     global define create_save_info (map card, integer card_id) ``{
-	list except_list = [$["try" : ``(MacRisc ()), "handle" : ``(mac_risc ())]];
+	list except_list = []; //[$["try" : ``(MacRisc ()), "handle" : ``(mac_risc ())]];
 	integer exp_id = 0;
 	
 	while (exp_id < size (except_list))

@@ -101,7 +101,7 @@
     }
 
     /**
-    * pops up error dialog
+    * shows error message in wizard
     * @return symbol `back | `cancel
     */
 
@@ -138,6 +138,46 @@
 	return ui;
     }
 
+    /**
+    * shows success message in wizard
+    * @return symbol `back | `cancel
+    */
+
+    define SuccessDialog (map card) ``{
+                                    // Help text - intenal YaST2 error 
+
+        string help_text=lookup(STRINGS, "SuccessDialog");
+
+        term con = `HVCenter
+          (
+            `VBox
+            (
+                    // error message
+              `Label (_("Sound card has been successfully installed.")),
+              `VSpacing (),
+              `Label (`opt(`outputField), hardware_name (card)),
+              `VSpacing (),
+              `Label ("")
+            )
+          );
+
+            // dialog title
+        UI(`SetWizardContents (_("Sound cards"), con, help_text, true, true));
+        if (finish)
+        {
+            UI(`ChangeWidget (`id(`next), `Label, _("&Finish")));
+        }
+
+        repeat
+        {
+            ui =  UI (`UserInput ());
+        } until ((ui == `back) || ui == `next);
+
+        return ui;
+    }
+
+
+
 
   // ===== main =====
       /*
@@ -151,9 +191,16 @@
     integer card_id = Args (1);
     boolean finish = false;
 
+    boolean quick = false;
+
     if (size (Args ()) > 2)
     {
 	finish = Args (2);
+    }
+    
+    if (size (Args ()) >3)
+    {
+	quick= Args (3);
     }
 
     if (!haskey(card, "module"))
@@ -184,7 +231,15 @@
     }
     else
     {
-	ui = VolumeDialog ();
+	if(!quick)
+	{
+	    ui = VolumeDialog ();
+	}
+	else
+	{
+	    SetVolume (lookup (user_settings, "mixer"), "Master", sformat ("%1", 75), card_id);
+	    ui = SuccessDialog(card);
+	}
     }
 
     if (ui == `back)

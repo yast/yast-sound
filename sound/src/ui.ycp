@@ -54,49 +54,39 @@
 	  
     global define DisplayName (string name, string cname) ``{
 	string helptext=lookup(STRINGS, "DisplayName");
-
-	term con = `VBox 
-	(
-	  `VStretch (),
-	  `HBox
-	  (
-	    `HSpacing (3),
-	    `HVCenter
-	    (
-	      `VBox
-	      (
-			// To translators: label message 1/2 The sound card XY will be configured
-		`Left(`Label (_("The sound card\n"))),
-		`Label (`opt(`outputField), name),
-		`VSpacing (),
-			// To translators: label message 2/2 The sound card XY will be configured
-		`Left(`Label (_("\nwill be configured as"))),
-		`Label (`opt(`outputField), cname)
-	      )
-	    )
-	  ),
-	  `VStretch (),
-	  `VBox
-	  (
-	    `HSquash
-	    (
-	      `HBox 
-	      (
-			// Options - button label
-		`HWeight(1, `PushButton (`id(`options), _("Options"))),
-			// Skip button label
-		`HWeight(1, `PushButton (`id(`skip), _("Skip")))
-	      )
-	    ),
-	    `VSpacing ()
-	  )
-	);
-
+	term con=AutoconfDlg(name, cname);
 		// dialog title
 	UI(`SetWizardContents (_("Sound card configuration"), con, helptext, true, true));
 		// Next button label    
 	UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
-	return $["ui" : UI(`UserInput ())];
+	symbol input=UI(`UserInput());
+	y2error(sformat("input: %1", input));
+	symbol output=`next;
+	if(input==`back) output=`back;
+	if(input==`next)
+	{
+	    y2error("next");
+	    integer tmp=UI(`QueryWidget(`id(`action), `CurrentButton));
+	    y2error("radio: %1", tmp);
+	    if(tmp==2)
+	    {
+		output=`options;
+	    }
+	    if(tmp==1)
+	    {
+		ouput=`next;
+	    }
+	    if(tmp==3)
+	    {
+		output=`skip;
+	    }
+	    if(tmp==0)
+	    {
+		output=`quick;
+	    }
+	}
+	y2error(sformat("Return: %1", output));
+	return $["ui" : output];
     }
 
     /**
@@ -359,5 +349,30 @@
             );
 	return con;
     }
-
+    
+    global define AutoconfDlg(string name, string cname) ``{
+	term con=
+            `VBox (
+                `VSpacing (1),
+                `Label (`opt (`hstretch), _("The sound card\n")),
+                `HBox (`HSpacing (5), `Label (`opt (`hstretch), name)),
+                `Label (`opt (`hstretch), _("\nwill be configured as")),
+                `HBox (`HSpacing (5), `Label (`opt (`hstretch), cname)),
+                `VSpacing (1),
+                `HBox (`HSpacing (5), `RadioButtonGroup (
+                    `id (`action),
+                    `VBox (
+                        `RadioButton (`id (0), `opt (`hstretch), _("Quick automatic setup"), true),
+                        `VSpacing (0.3),
+                        `RadioButton (`id (1), `opt (`hstretch), _("Normal setup")),
+                        `VSpacing (0.3),
+                        `RadioButton (`id (2), `opt (`hstretch), _("Advanced setup with possibility to change options")),
+                        `VSpacing (0.3),
+                        `RadioButton (`id (3), `opt (`hstretch), _("Skip sound card"))
+                        )
+                    )),
+                `VStretch ()
+                );
+	return con;
+    }
 }

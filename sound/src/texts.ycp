@@ -105,7 +105,10 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
  <p>However, <b>YaST2</b>\
  sound configuration currently only supports ALSA.</p>")),
 
-	  
+	 
+	    "SuccessDialog":
+	    UI(_("Automatic configuration finished successfully.")),
+ 
 	    "nm256hackWarning":
 	    UI(_("Configuring this sound card on some Sony VAIO notebooks
  may be unsuccessful with running X. You may avoid these problems by specifying snd_vaio_hack

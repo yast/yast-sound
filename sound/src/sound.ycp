@@ -53,8 +53,9 @@
      * @return  list with save info, as required by sound_write for one cards
      */
     global define OneCardWizard (map card, integer card_id, any ui) ``{
+	    // 3rd param for "sound_module" will be defined later
 	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id))),
-		    ``(CallModule ("sound_volume", [card, card_id, (size (sound_cards) == 1)] ))];
+		    ``(CallModule ("sound_volume", [card, card_id, (size (sound_cards) == 1), quick] ))];
 
 	integer id = 0;
 	if (ui == `back)
@@ -66,6 +67,8 @@
 
 	boolean success = false;
 	any act_dialog = nil;
+
+	boolean quick=false;
 
 	while ((id >= 0) && (id < size (dialog))) 
 	{
@@ -89,8 +92,10 @@
 	    }
 	    
 	      // case: next
-	    else if (ui == `next) 
+	    else if (ui == `next || ui == `quick) 
 	    {
+		if(ui == `quick) quick=true;
+		else quick=false;
 		id = id + 1;
 
 		if (id == size (dialog)) 
