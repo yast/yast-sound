@@ -1092,7 +1092,7 @@ could make your system unstable.
 	    map entry		= modules_conf[c_id]:$[];
 	    string modname	= entry["module"]:"";
 
-	    return ( db_modules[modname, "joystick"]:$[] == $[] );
+	    return ( db_modules[modname, "joystick"]:$[] != $[] );
 	}
 	else
 	{

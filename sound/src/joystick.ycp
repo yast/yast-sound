@@ -48,7 +48,7 @@
      * sound configuration module.
      * @return symbol Symbol of pressed button
      */
-    global define symbol joystick_configuration() ``{
+    define symbol joystick_configuration() ``{
 
 	// helptext
 	string helptext = _("<P>Two or more sound cards in your system support joysticks.<P>
@@ -176,7 +176,7 @@
      * Save joystick configuration
      * @return symbol Return `next (for wizard sequencer)
      */
-    global define symbol saveconfig() ``{
+    define symbol saveconfig() ``{
 	Joystick::Write (abort_block);
 	return `next;
     }
