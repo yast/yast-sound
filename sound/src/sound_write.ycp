@@ -107,7 +107,7 @@
 
     if (autoinstall)
     {
-	UI::CreateWizardDialog();
+	UI::Wizard::CreateDialog();
     }	
 
     list stones = [
@@ -124,38 +124,30 @@
 	    _("Starting sound card..."),
 	    _("Storing volume settings")];
 
-				  // label message
-//    term con = `Label(_("Saving ..."));
     Progress::New (_("Saving sound card settings."), " ", size(stones) - 1, 
 		stones, stones2, "TODO: help");
 
 
-				  // dialog title
-//    UI::SetWizardContents (_("Sound configuration"), con, helptext, false, false);
-    UI::DisableWizardAbortButton();
+    UI::Wizard::DisableAbortButton();
 
     
     integer step = 0;
 
-//    ProgressMilestone(step, _("Saving modules configuration..."), step);
     Progress::NextStage();
     step = step + 1;
     SaveModulesEntry(save_info, [], false);
     sleep(100);
 
-//    ProgressMilestone(step, _("Saving card information..."), step);
     Progress::NextStage();
     step = step + 1;
     save_unique_keys (maplist(`e, save_info, ``(lookup(e, "unique_key", ""))));
     sleep(100);
 
-//    ProgressMilestone(step, _("Saving RC values..."), step);
     Progress::NextStage();
     step = step + 1;
     SaveRCValues(rc_vars);
     sleep(100);
 
-//    ProgressMilestone(step, _("Starting sound card..."), step);
     Progress::NextStage();
     step = step + 1;
 
@@ -164,7 +156,6 @@
 	map out = SCR::Execute(.target.bash_output, "/usr/sbin/rcalsasound start", nil);
     }
 
-//    ProgressMilestone(step, _("Storing volume settings"), step);
     Progress::NextStage();
     if (size(Args()) >= 4)
     {

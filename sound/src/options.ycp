@@ -24,15 +24,7 @@
 {
 
     textdomain "sound";
-
-//    include "misc_defines.ycp";
-//    include "sound/routines.ycp";
-//    include "sound/ui.ycp";
-//    include "sound/texts.ycp";
-
-//  include "browser.ycp";
-
-//    map STRINGS = STRINGS_();
+    import "Wizard";
 
     /**
      * default widget when there are no known values
@@ -221,7 +213,7 @@
 
 
 		// dialog title
-	UI::SetWizardContents (_("Sound card advanced options"), con, help_text, true, true);
+	UI::Wizard::SetContents (_("Sound card advanced options"), con, help_text, true, true);
 	if (size (itemized_descriptions) > 0) 
 	{
 	    UI::ChangeWidget(`id(`table), `CurrentItem, 0);

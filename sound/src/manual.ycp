@@ -21,13 +21,8 @@
 {
 
     textdomain "sound";
+    import "Wizard";
 
-//    include "sound/routines.ycp";
-//    include "sound/ui.ycp";
-//    include "sound/texts.ycp";
-    
-//    map STRINGS = STRINGS_();
- 
     /**
      *	dialog for manual settings
      *  @return list
@@ -65,7 +60,7 @@
 			    // To translators: text entry label
 
 	    // dialog title
-	UI::SetWizardContents (_("Manual sound card selection"), con, helptext, true, true);
+	UI::Wizard::SetContents (_("Manual sound card selection"), con, helptext, true, true);
 	UI::ChangeWidget(`id(`sel_drv), `CurrentItem, select(select (module_names, 0), 1, select (module_names, 0)));
 	UI::ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0));
 	    // Next - button label

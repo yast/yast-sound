@@ -19,6 +19,7 @@
 
 {
     textdomain "sound";
+    import "Wizard";
 //    include "sound/texts.ycp";
 
 //    map STRINGS = STRINGS_();
@@ -35,7 +36,7 @@
 	term con = `Label (sformat(_("Initializing ...")));
 	string helptext = "";
 	 // dialog title message
-	UI::SetWizardContents (_("YaST2\nInitializing ..."), con, helptext, false, false);
+	UI::Wizard::SetContents (_("YaST2\nInitializing ..."), con, helptext, false, false);
 
 	return `next;
     };
@@ -55,7 +56,7 @@
     global define DisplayName (string name, string cname, integer cpos, integer flags) ``{
 	string helptext = lookup(STRINGS, "DisplayName", "");
 	term con = AutoconfDlg(name, cname, cpos);
-	UI::SetWizardContents (_("Sound card configuration"), con, helptext, true, true);
+	UI::Wizard::SetContents (_("Sound card configuration"), con, helptext, true, true);
 		// dialog title
 	integer flagc = 1;
 	integer flagp = 0;
@@ -118,7 +119,7 @@
     global define quickConfig(string name, string cname, integer cpos, integer flags) ``{
         string helptext = lookup(STRINGS, "quickConfig", "");
         term con = QuickconfDlg(name, cname, cpos);
-        UI::SetWizardContents (_("Sound card configuration"), con, helptext, true, true);
+        UI::Wizard::SetContents (_("Sound card configuration"), con, helptext, true, true);
                 // dialog title
         integer flagc = 1;
         integer flagp = 0;
@@ -174,7 +175,7 @@
      */
 
     global define OpenMainDialog() ``{
-	UI::CreateWizardDialog();
+	UI::Wizard::CreateDialog();
     }
 
 
@@ -526,7 +527,7 @@
 	string helptext = lookup(STRINGS, "selectHardware", "");
 
 
-	UI::SetWizardContents (_("Sound card configuration"), widget, helptext, true, true);
+	UI::Wizard::SetContents (_("Sound card configuration"), widget, helptext, true, true);
 
     }
 
@@ -553,7 +554,7 @@
         term con = WhichDlgCon(nc);
 
 	        // dialog title
-        UI::SetWizardContents (_("Configure a sound card"), con, helptext, true, true);
+        UI::Wizard::SetContents (_("Configure a sound card"), con, helptext, true, true);
         // Next - button label
         UI::ChangeWidget(`id(`next), `Label, UI(`NextButtonLabel()));
 
