@@ -127,7 +127,7 @@
      */
 
     global define boolean is_snd_alias(string alias) ``{
-	if (use_alsa)
+	if (Sound::use_alsa)
 	{
 	    return regexpmatch(alias, "^snd-card-[0-9]*$");
 	}

@@ -147,7 +147,7 @@
 
 	if (size(save_info) >0)
 	{
-	    if (use_alsa)
+	    if (Sound::use_alsa)
 	    {
 		SCR::Write(mod_alias, "snd", "char-major-116");
 		SCR::Write(mod_alias_comment, "\n# Alsa sound support. \n# Warning: please don't modify comments over "+
@@ -174,7 +174,7 @@
             err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry", "");
             return $["return": false, "err_msg": err_msg];
         }
-	if (size(save_info) > 0 && use_alsa)
+	if (size(save_info) > 0 && Sound::use_alsa)
 	{
 
 	    list oss_aliases = alsa_oss(size(save_info));

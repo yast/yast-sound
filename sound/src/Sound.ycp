@@ -22,13 +22,18 @@
     // Set the name of the module
     module "Sound";
     import "Runlevel";
-
-    include "sound/read_routines.ycp";
-    include "sound/alsa_routines.ycp";
-    include "sound/routines.ycp";
-
     import "Summary";
     import "Mode";
+
+    include "sound/read_routines.ycp";
+    include "sound/routines.ycp";
+
+    /**
+     * what sound system we're using (true=alsa, false=oss)
+     */
+
+    global boolean use_alsa = true;
+
 
 
     /**
@@ -62,10 +67,6 @@
      */
     global list modules_conf = [];
 
-    /**
-     * what sound system we're using (true=alsa, false=oss)
-     */
-    global boolean use_alsa = true;
 
     /**
      * settings to save using .audio.alsa ... mixer
@@ -102,6 +103,34 @@
      * flag for showing/not showing ui stuff (eg when loading alsa database)
      */
     global boolean use_ui = false;
+
+    /**
+     * ctor
+     */
+
+    global define void Sound() ``{
+	if (Arch::sparc)
+	{
+	    use_alsa = false;
+	}
+
+	maplist(`e, Args(), ``{
+	    if (is(e, path) && (e == .oss))
+	    {
+		use_alsa = false;
+	    }
+	});
+
+	if (use_alsa)
+	{
+	    include "sound/alsa_routines.ycp";
+	}
+	else
+	{
+	    include "sound/oss_routines.ycp";
+	}
+
+    }
 
     /**
      * do hardware detection

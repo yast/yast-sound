@@ -335,7 +335,7 @@
     global define term ComplexDlgCon(list cc, boolean start_alsa, boolean start_alsa_seq, boolean show_font_but) ``{
 	term butts = nil;
 	term alsabuts = `Empty();
-	if  (use_alsa)
+	if  (Sound::use_alsa)
 	{
 	    alsabuts = `VBox
                          (
@@ -489,7 +489,7 @@
 
     global define boolean ReallyAbort()
     ``{
-	if (Sound::ConfigChanged() || Joystick::Changed())
+	if (Sound::Changed() || Joystick::Changed())
 	{
 	    return UI::ReallyAbortPopup(true);
 	}

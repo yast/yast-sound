@@ -40,7 +40,7 @@
 	list ret    = maplist(`e, Sound::modules_conf,
 	``{
 	    string state = "";
-	    if (use_alsa)
+	    if (Sound::use_alsa)
 	    {
 		if (size(filter(`f, runn, ``(lookup(f, "number", -1) == pos))) !=0 )
 		{
@@ -114,7 +114,7 @@
 
 	y2debug(" save_info %1, agent %2", size(Sound::modules_conf), size(SCR::Dir(.audio.alsa.cards)));
 
-	if (!Sound::autoinstallation && use_alsa && (size(Sound::modules_conf) != size(get_running_cards())))
+	if (!Sound::autoinstallation && Sound::use_alsa && (size(Sound::modules_conf) != size(get_running_cards())))
 	{
 	    if (UI::YesNoPopup(_("The number of currently running cards doesn't match 
 the number of configured cards in your configuration files. 
