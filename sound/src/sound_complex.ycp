@@ -339,7 +339,7 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 		else if (ui == `cancel)
 		    break;
 
-	    } until ((((ui == `back) || (ui == `next) || ui == `cancel)));
+	    } until ((ui == `back) || (ui == `next) || (ui == `cancel) || (ui == `skip));
 	    
 	    ui = nil;
 

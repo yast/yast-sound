@@ -196,13 +196,14 @@
  sound configuration currently only supports ALSA.</p>"));
 
 	
-	term con = `VBox(`Label (`opt(`outputField), hardware_name (card)),
-			 `HVCenter(`VBox(
-			     `Label (_("An error occured:")),
-			     `Label (err)
-			     ))
-			 );
-
+	term con = `HVCenter(
+	    `VBox(
+		`Label (_("An error occured during installing")),
+		`VSpacing (),
+		`Label (`opt(`outputField), hardware_name (card)),
+		`VSpacing (),
+		`Label (err)));
+	
 	UI(`SetWizardContents (_("Sound cards"), con, help_text, true, false));
 
 	repeat {
