@@ -371,7 +371,7 @@
 
 				    if (id == 0)
 				    {
-					dialog = add (dialog, ``(OneCardWizard (lookup (result, "return"), size (save_info), ui, 6)));
+					dialog = add (dialog, ``(OneCardWizard (lookup (result, "return"), size (save_info), ui, 6, false)));
 				    }
 				    if (id == 1) 
 				    {

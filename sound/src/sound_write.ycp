@@ -121,11 +121,13 @@
     else 
     {	
 				  // final success message
-	final_msg = lookup(STRINGS, "saveFinal2");
+//	final_msg = lookup(STRINGS, "saveFinal2");
+	final_msg="";
 	if (size(filter (`e, lookup (sound_info, "cards", []), ``((size (e) > 0) && (lookup (e, "name") != "off")))) == 0)
 	{
 					    // final success message	    
-	    final_msg = lookup(STRINGS, "saveFinal3");
+//	    final_msg = lookup(STRINGS, "saveFinal3");
+	    final_msg="";
 	}
 
     }
@@ -135,8 +137,10 @@
 	  // message displayed just in the test mode
 	  final_msg = final_msg + " " + UI(_("(TEST MODE)"));
     }
-      
-    UI(`MessagePopup (final_msg));
+    if(final_msg!="")      
+    {
+        UI(`MessagePopup (final_msg));
+    }
 
     return (size (err_msg) == 0);
 }

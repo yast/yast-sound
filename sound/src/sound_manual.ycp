@@ -36,7 +36,7 @@
 	    // label if no module name found
 	list module_names = sort (maplist (`e, db, ``(lookup (e, "name", _("Unknown module name")))));
 	    // in the modules/cards list - to see all available cards
-	module_names = prepend (module_names, _("All"));
+	module_names = prepend (module_names,  _("All"));
 	list card_names = get_cards ("All");
 
 	term con = `VBox ();
@@ -79,7 +79,9 @@
 	    if (ui == `sel_drv) 
 	    {
 		string drv = UI (`QueryWidget (`id(`sel_drv), `CurrentItem));
+//		symbol itemid= UI (`QueryWidget (`id(`sel_drv), `CurrentItem));
 		if (drv == UI(_("All")))
+//		if ( itemid==`all)
 		{
 		    card_names = get_cards ("all");
 		}

@@ -19,6 +19,7 @@
 
 {
     include "ui/summary.ycp";
+    include "misc_defines.ycp";
     include "sound/routines.ycp";
     
     list cards=get_audio(false, false);
@@ -29,36 +30,34 @@
     list retlist=[];	// return value of the module
     // copy cards: configured are added to the front of list, unconfigured to the end
 	
-    integer i=0;
     string key="";
-    while(i<size(cards))
-    {
-	key=lookup(select(cards, i), "unique_key", "");
+    foreach(`card, cards, 
+    ``{
+	key=lookup(card, "unique_key", "");
 	if(contains(keys, key))
-	{
-	    conflist=add(conflist, lookup(select(cards, i), "sub_device", ""));
-	}
-	else 
-	{
-	    notlist=add(notlist, lookup(select(cards, i), "sub_device", ""));
-	}
-	i=i+1;
-    }
-    i=0;
-    while(i<size(conflist))
-    {
-	// to translators: '(sound card is) Configured as snd-card-1'
-	retlist=add(retlist, summaryDevice(select(conflist, i), sformat("Configured as snd-card-%1.", i)));
-	i=i+1;
-    }
-    
-    i=0;
-    while(i<size(notlist))
-    {
-        retlist=add(retlist, summaryDevice(select(notlist, i), summaryNotConfigured()));
-	i=i+1;
-    }
+        {
+            conflist=add(conflist, hardware_name(card));
+        }
+        else 
+        {
+            notlist=add(notlist, hardware_name(card));
+        }
+    });
 
-    return summaryDevicesList(retlist);
+    integer i=0;
+
+    foreach(`card, conflist, 
+    ``{
+	// to translators: '(sound card is) Configured as snd-card-1'
+	retlist=add(retlist, summaryDevice(card, sformat("Configured as snd-card-%1.", i)));
+	i=i+1;
+    });
+    
+    foreach(`card, notlist,
+    ``{
+        retlist=add(retlist, summaryDevice(card, summaryNotConfigured()));
+    });
+
+    y2error(summaryDevicesList(retlist));
 
 }
