@@ -28,6 +28,8 @@
 	return $["DisplayName":
 	     _("<p>If you want to configure this sound card and adjust its volume check <b>Normal setup</b>.</p><p>If you want to set a special option, check the <b>Advanced setup</b> radio button. Most users won't need this.</p><p>If you don't wish to adjust volume or set options now, check <b>Quick automatic setup</b>. You can set volume and change options later.</p>"),
 
+	    "quickConfig":
+	     _("<p>If you want to configure this sound card and adjust its volume check <b>Normal setup</b>.</p><p>If you don't wish to adjust volume now, check <b>Quick automatic setup</b>. You can set volume and change options later.</p><P>If you want to configure another card that was not detected, check the <B>More detailed installation of sound cards</B>.</P>"),
 	    
 	    "ManualDialog":
 	    _("<p>Please <b>manually</b> choose the sound card, you want to configure. You can search for a particular sound card by entering the name in the search box.</p><p>Select <b>All</b> if you want to see the whole list of supported sound card models.</p>"),

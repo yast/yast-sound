@@ -94,7 +94,7 @@
 	map entry=$["unique_key": isa_uniq(), "options": $[]];
 	while(true)
 	{
-            res=CallFunction(`sound_manual());
+            map res=CallFunction(`sound_manual());
 
             if(lookup(res, "ui", nil)==`next)
             {
