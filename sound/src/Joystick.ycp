@@ -46,7 +46,7 @@
      *	      was pressed.
      * @return True on success
      */
-    global define boolean Read (block abort) ``{
+    global define boolean Read (block<boolean> abort) ``{
 
 	// values for test mode
 	if (Mode::test == true)
@@ -69,13 +69,13 @@
 
 	    // go thru 'vars' list and read all variable values
 	    foreach(string v, vars, ``{
-		tmp = SCR::Read (
+		tmp = (string) SCR::Read (
 		    topath(sformat(".sysconfig.joystick.%1_%2", v, pos)));
 		j = add(j, v, tmp);
 	    });
 
 	    // read model comment
-	    string model = SCR::Read(topath(
+	    string model = (string) SCR::Read(topath(
 		sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment",pos)));
 
 	    y2debug("Read model comment: %1", model);
@@ -169,7 +169,7 @@
 	SCR::Write(topath(
 	    sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment", pos)),"");
 
-	map j = select(joystick, pos, $[]);
+	map j = joystick[pos]:$[];
 
 	foreach (string v, vars, ``{
 
@@ -221,7 +221,8 @@
      * Stop joystick service
      */
     global define boolean Stop() ``{
-	return SCR::Execute(.target.bash, "/etc/init.d/joystick stop", $[]);
+	return
+	    (SCR::Execute(.target.bash, "/etc/init.d/joystick stop", $[]) == 0);
     }
 
     /**
@@ -249,7 +250,7 @@
      *	      was pressed.
      * @return True on success
      */
-    global define boolean Write (block abort) ``{
+    global define boolean Write (block<boolean> abort) ``{
 	// do not write anything in the test mode and if nothing was changed
 	if (Mode::test == true || !modified)
 	{
@@ -288,7 +289,7 @@
      * @param settings The YCP structure to be imported.
      * @return True on success
      */
-    global define boolean Import (map settings) ``{
+    global define boolean Import (list settings) ``{
 	joystick = settings;
 	return true;
     }
@@ -298,7 +299,7 @@
      * (For use by autoinstallation.)
      * @return Dumped settings (later acceptable by Import ())
      */
-    global define map Export () ``{
+    global define list Export () ``{
 	return joystick;
     }
 

@@ -25,9 +25,110 @@
 {
 
     textdomain "sound";
+
+    import "Sound";
     import "Wizard";
     import "Label";
     import "Popup";
+
+    include "sound/ui.ycp"; // ReallyAbort
+    include "sound/routines.ycp"; // get_module_params, restore_mod_params
+
+    /**
+     * checks whether param #1 is if type of param #2
+     * @param value value
+     * @param type expected type. one of {int, string}
+     * @param poss if poss is nonempty, checks if value is one of them
+     * returns error message, empty string if ok
+     * @return string error message
+     */
+    global define string check_value (string value, string type, list poss) ``{
+        if (type == "int")
+        {
+            if (tolower(substring (value, 0, 2)) == "0x")	// hex number
+            {
+                string rest = tolower(substring (value, 2));
+                if (filterchars(rest, "0123456789abcdef") != rest)
+                {
+                      // To translators: popup message, wrong value
+                      return sformat (_("The value: %1 must be a number"), value);
+                }
+            }
+            else                // decimal number
+            {
+                string rest = value;
+                if (substring (value, 0, 1) == "-")      // negative number
+                {
+                    rest = substring (value, 1);
+                }
+                if (filterchars(rest, "0123456789") != rest)
+                {
+                    // To translators: popup message, wrong value
+                    return sformat (_("The value: %1 must be a number"), value);
+                }
+            }
+        }
+        else if (type == "string")
+        {
+            if (filterchars (tolower (value), "abcdefghijklmnopqrstuvwxyz_0123456789") != value)
+            {
+
+                integer wrong_pos = findfirstnotof (tolower (value), "abcdefghijklmnopqrstuvwxyz_0123456789");
+                string wrong_char = substring (value, wrong_pos, 1);
+                if (wrong_char == " ")
+                {
+                    // To translators: "space" means blank character
+                    wrong_char = wrong_char + " " + _("(space)");
+                }
+                // To translators: popup message, wrong value
+                return  sformat (_("String cannot contain: %1"), wrong_char);
+            }
+        }
+
+        // now check for poss list
+        if (size (poss) > 0)
+        {
+            list poss_list = [];
+
+            if (type == "int")
+            {
+                poss_list = maplist (`v, poss, ``(tointeger (value) == v));
+            }
+            else
+            {
+                poss_list = maplist (`v, poss, ``(value == v));
+            }
+
+            if (!contains (poss_list, true))
+            {
+                // popup message: wrong value; %1 is list of right values
+                return sformat (_("The value must be one of
+%1"), mergestring (poss,","));
+            }
+        }
+
+        return "";  // ok :-)
+    }
+
+    /**
+     *  creates itemized table entries,
+     *  @param lm list of maps to take keys from
+     *  @param lk list of keys to look for in 1st param
+     *  @return list of items
+     */
+    global define list create_table (list lm, list lk) ``{
+	list res = [];
+	integer pos = 0;
+	foreach (map m, lm, ``{
+	    res = add(res, `item(`id(pos),
+		lookup(m, lk[0]:"", ""),
+		lookup(m, lk[1]:"", ""),
+		lookup(m, lk[2]:"", "")
+	    ));
+	    pos = pos + 1;
+	});
+	return res;
+    }
 
     /**
      * parses string (eg. '{{0,2},{0,100,20}}') to a list
@@ -89,7 +190,7 @@
      */
     global define list string2vallist(string input) ``{
 	boolean parse_error	= false;
-	list l			= flatten (parse_bracket(input));
+	list l			= flatten ((list<list>)parse_bracket(input));
 
 	l = maplist(list e, l, ``{
 	    if (size(e) == 0)
@@ -158,7 +259,7 @@
 	    return outlist;
 	});
 
-	l = flatten(l);
+	l = flatten((list<list>) l);
 
 	if (parse_error)
 	{
@@ -216,13 +317,61 @@
     global define string getDescr(any arg) ``{
 	if (is(arg, string))
 	{
-	    return arg;
+	    return (string) arg;
 	}
 	if (is(arg, list))
 	{
-	    return sformat(arg[0]:"%1", arg[1]:"");
+	    list larg = (list) arg;
+	    return sformat(larg[0]:"%1", larg[1]:"");
 	}
 	return "";
+    }
+
+    /**
+     *	UI controls for options setting dialog
+     *
+     *  @param cardlabel card model string
+     *  @param itemized_descriptions option list (preformated using
+     *		'create_table' with tripples: description, name, value)
+     *  @param current_option_name initially selected item name
+     *  @param current_option_value value of current option
+     *  @return term options dialog contents
+     *  @see options#OptionsDialog
+     */
+    global define term OptionsCon (string cardlabel, list itemized_descriptions,
+		    string current_option_name, string current_option_value) ``{
+
+	return `HBox (
+	    `HSpacing (3),
+	    `VBox (
+		`VSquash(`Top(`Label (`opt(`outputField), cardlabel))),
+                `VSpacing (),
+		`Table (`id(`table), `opt (`notify, `immediate), `header(
+		    // Table header -- option description
+		    _("Description"),
+		    // Table header -- option name
+		    _("Option"),
+		    // Table header -- value of an option
+		    `Right(_("Value"))), itemized_descriptions),
+                `VSpacing (0.5),
+		`HBox (
+		    `TextEntry (`id (`des), `opt(`notify), current_option_name,
+			current_option_value),
+		    `VBox(
+			`Label(""),
+			`HBox(
+			    // push button label - set option value
+			    `PushButton (`id (`set), _("&Set")),
+			    // restore original option values
+			    `PushButton (`id (`reset), _("R&eset all"))
+			)
+		    )
+		),
+		`Left(`ReplacePoint(`id(`reppoint), `Label(""))),
+                `VSpacing (0.5)
+            ),
+	    `HSpacing (3)
+        );
     }
 
     /**
@@ -236,7 +385,7 @@
      */
     global define map OptionsDialog (string cardlabel, map opts) ``{
 
-	string help_text = STRINGS["OptionsDialog"]:"";
+	string help_text = Sound::STRINGS["OptionsDialog"]:"";
 
 	map origOptions = opts;
 	list options = maplist (string name, map o, opts, ``($[
@@ -281,15 +430,16 @@
 	{
 	    if (ui == `table)
 	    {
-		current_option = UI::QueryWidget (`id(`table), `CurrentItem);
-		current_option_name = select (
+		current_option =
+		    (integer) UI::QueryWidget (`id(`table), `CurrentItem);
+		current_option_name = (string) select ((list)
 		    UI::QueryWidget(`id(`table), `Item(current_option)), 2, "");
 
 		UI::ChangeWidget(`id(`des), `Label,
 		    // name of currently selected option: eg. 'Option: snd_asdf'
 		    sformat ("%1 %2", _("&Option: "),current_option_name));
 
-		UI::ChangeWidget(`id(`des), `Value, select (
+		UI::ChangeWidget(`id(`des), `Value, select ((list)
 		    UI::QueryWidget(`id(`table),`Item(current_option)), 3, ""));
 
 		// update possible values
@@ -304,13 +454,14 @@
 		    vals = optmap["allows"]:"";
 		}
 
-		updatePossibleValues (vals, select(
+		updatePossibleValues (vals, (string) select((list)
 		    UI::QueryWidget(`id(`table),`Item(current_option)), 3, ""));
 	    }
 	    if (ui == `poss)
 	    {
-		current_option = UI::QueryWidget (`id(`table), `CurrentItem);
-                current_option_name = select (
+		current_option =
+		    (integer) UI::QueryWidget (`id(`table), `CurrentItem);
+                current_option_name = (string) select ((list)
 		    UI::QueryWidget(`id(`table), `Item(current_option)), 2, "");
 
 		string value = sformat("%1",UI::QueryWidget(`id(`poss),`Value));
@@ -319,7 +470,7 @@
 	    }
 	    if (ui == `set)	// set button pressed
 	    {
-		string value = UI::QueryWidget(`id(`des), `Value);
+		string value = (string) UI::QueryWidget(`id(`des), `Value);
 
 		if (size (value) == 0)  // we don't care  about empty values
 		{
@@ -346,9 +497,12 @@
 
 		    list tmp = [];
 		    maplist (term e, itemized_descriptions, ``{
-			if (current_option == select(select (e, 0, ""), 0, ""))
+			if (current_option ==
+			    (integer) select((list) select (e, 0, []), 0, 0))
+			{
 			    tmp = add (tmp, `item(select (e, 0, ""),
 				select (e, 1, ""), select (e, 2, ""), value));
+			}
 			else
 			    tmp = add (tmp, e);
 		    });
@@ -382,7 +536,7 @@
 		    break;
 		}
 	    }
-	    ui = UI::UserInput();
+	    ui = (symbol) UI::UserInput();
 	} until (ui == `back || ui == `next || ui == `cancel);
 
 	return $["ui" : ui, "return" : itemized_descriptions];
@@ -399,8 +553,8 @@
 	string label	= save_entry["model"]:"";
 	map params	= get_module_params (modname);
 
-	map p2		= restore_mod_params (params, save_entry["options"]:[]);
-	params		= restore_mod_params (params, save_entry["options"]:[]);
+	map p2		= restore_mod_params (params,save_entry["options"]:$[]);
+	params		= restore_mod_params (params,save_entry["options"]:$[]);
 
 	UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
 

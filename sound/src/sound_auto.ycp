@@ -42,10 +42,10 @@
 	map param = $[];
 
 	/* Check arguments */
-	if(size(Args()) > 0 && is(Args(0), string)) {
-		func = WFM::Args(0);
-		if(size(Args()) > 1 && is(Args(1), map))
-			param = WFM::Args(1);
+	if (size(WFM::Args()) > 0 && is(WFM::Args(0), string)) {
+		func = (string) WFM::Args(0);
+		if(size(WFM::Args()) > 1 && is(WFM::Args(1), map))
+		    param = (map) WFM::Args(1);
 	}
 	y2debug("func=%1", func);
 	y2debug("param=%1", param);
@@ -65,7 +65,7 @@
 	}
 	/* Change configuration (run AutoSequence) TODO */
 	else if (func == "Change") {
-		ret =  WFM::CallFunction(`sound());
+		ret = WFM::CallFunction("sound", [] );
 	}
 	/* Return required package list */
 	else if (func == "Packages") {
@@ -76,7 +76,7 @@
 		ret = Sound::Export();
 	}
 	else if (func == "Read") {
-		ret = Sound::Read(``{});
+		ret = Sound::Read (false);
 	}
 	/* Write givven settings */
 	else if (func == "Write") {
@@ -84,7 +84,7 @@
 		Progress::off();
 		map settings = Sound::Export();
 		Sound::write_only = true;
-		WFM::CallFunction (`sound_write(settings));
+		WFM::CallFunction ("sound_write", [ settings ]);
 		Progress::on();
 		return ret;
 	}

@@ -19,16 +19,14 @@
 
     Sound::installation = true;
 
-    string func  = WFM::Args(0);
-    map    param = WFM::Args(1);
+    string func  = (string) WFM::Args(0);
+    map    param = (map) WFM::Args(1);
     map    ret   = $[];
 
     // Make proposal for installation/configuration...
     if ( func == "MakeProposal" )
     {
 	boolean force_reset = param["force_reset"]:false;
-	// TODO: check installation: ForceReset was called each time in Propose
-	// before 9.1
 
 	if (force_reset)
 	{
@@ -59,7 +57,7 @@
 
 	Sound::installation = true;
 
-	any sequence = WFM::CallFunction ( `sound () );
+	any sequence = WFM::CallFunction ( "sound", [] );
 
 	// Fill return map
 	ret =
@@ -80,7 +78,7 @@
     }
     else if ( func == "Write" )
     {
-	Sound::Write (``{}, ``{});
+	Sound::Write ();
     }
 
     return ret;

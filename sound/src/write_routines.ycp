@@ -65,16 +65,16 @@
      * @return void
      */
 
-    global define void SaveModulesOptions(list save_info)
-    ``{
+    global define void SaveModulesOptions(list save_info) ``{
+
 	path mod_options = .modules.options;
 
 	// create distinct list of all modules
-	list mods = toset(maplist(`e, save_info, ``(lookup(e, "module", "off"))));
-	foreach(`modname, mods,
-	``{
-	    map res = Sound::CollectOptions(modname);
+	list mods = toset(maplist(map card, save_info,
+	    ``(card["module"]:"off")));
 
+	foreach(string modname, mods, ``{
+	    map res = Sound::CollectOptions(modname);
 	    SCR::Write( add (mod_options, modname ), res);
 	});
     }
@@ -86,24 +86,24 @@
      */
 
     global define void removeOldEntries(list als) ``{
-	maplist(`e, als,
-	``{
+	maplist(string e, als, ``{
 	    if (is_snd_alias(e) ||
 		issubstring(e, "sound-service-") ||
 		issubstring(e, "sound-slot-"))
 		{
-		    SCR::Write( add (mod_alias, e), nil);
+		    SCR::Write( add (.modules.alias, e), nil);
 		}
 	});
-    // seting off-values due to kdm log (bug #19602)
-    integer i=0;
-    while (i<4)
-    {
-        SCR::Write(add (.modules.alias, sformat ("sound-slot-%1", i)), "off");
-        SCR::Write(add (.modules.alias, sformat ("sound-service-%1-0", i)),
-            "off");
-        i = i + 1;
-    }
+	// seting off-values due to kdm log (bug #19602)
+	integer i=0;
+	while (i<4)
+	{
+	    SCR::Write(add (.modules.alias, sformat ("sound-slot-%1", i)),
+		"off");
+	    SCR::Write(add (.modules.alias, sformat ("sound-service-%1-0", i)),
+		"off");
+	    i = i + 1;
+	}
     }
 
     /**
@@ -123,7 +123,7 @@
         string err_msg = "";
 	if (contains(SCR::Dir(mod), "alias"))
 	{
-	    als = SCR::Read(mod_alias);
+	    als = (list)SCR::Read(mod_alias);
 	}
 	// remove old entries
 
@@ -150,7 +150,7 @@
 	    {
 		if (Arch::sparc)
 		{
-		    string modname = lookup(select(save_info, 0, $[]), "module", "off");
+		    string modname = save_info[0, "module"]:"off";
 		    SCR::Write(add (mod_alias, "sound"), "sound-slot-0");
 		}
 		SCR::Write( add (mod_alias, "char-major-14"), "sound");
@@ -161,7 +161,7 @@
 		``(SaveOneModulesEntry (entry))), false)))
         {
             // Error message
-            err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry", "");
+            err_msg = err_msg + Sound::STRINGS["SaveModuleEntry"]:"";
             return $["return": false, "err_msg": err_msg];
         }
 	if (size(save_info) > 0 && Sound::use_alsa)
@@ -183,7 +183,7 @@
      * @return boolean success/failure
      */
     global define boolean SaveVolume () ``{
-	return SCR::Execute(.audio.alsa.store, 0, 0);
+	return (boolean) SCR::Execute(.audio.alsa.store, 0, 0);
     }
 
     /**
@@ -191,7 +191,6 @@
      * @param rc map "variable" : "value", ....
      * @return string error string
      */
-
     global define string SaveRCValues (map rc) ``{
 	SCR::Write (.sysconfig.sound.LOAD_SEQUENCER, rc["LOAD_ALSA_SEQ"]:"no");
 	return "";

@@ -37,7 +37,6 @@ import "RichText";
 include "commandline/commandline.ycp";
 include "wizard/sequencer.ycp";
 
-include "sound/texts.ycp";
 include "sound/wizards.ycp";
 
 integer arg_n = size (WFM::Args ()) - 1;
@@ -60,25 +59,6 @@ if (Sound::use_alsa &&
     return;
 }
 
-// some global variables:
-
-/**
- * text constants for sound module
- */
-map STRINGS		= STRINGS_();
-
-/**
- * map of current sound card
- */
-map save_entry	= $[];
-
-/**
- * id of current card
- */
-integer card_id	= 0;
-boolean was_complex = false;
-
-
 // --------------------------------------------------------------------------
 // --------------------------------- cmd-line handlers
 
@@ -99,7 +79,8 @@ global define boolean SoundSummaryHandler (map options ) ``{
 global define boolean SoundRead () ``{
 
     Sound::use_ui = false;
-    boolean ret = Sound::Read (false) && Joystick::Read(``{return false;});
+    block<boolean> abort_block = ``{return false;};
+    boolean ret = Sound::Read (false) && Joystick::Read(abort_block);
     return ret;
 }
 
@@ -109,7 +90,7 @@ global define boolean SoundRead () ``{
  */
 global define boolean SoundWrite () ``{
 
-    return Sound::Write (``{}, ``{});
+    return Sound::Write ();
 }
 
 /**
@@ -129,13 +110,13 @@ global define boolean AddCardHandler (map options) ``{
     {
 	card_no = 0;
     }
-    card_id = card_no; // now card_id is index to Sound::unconfigured_cards
+    Sound::card_id = card_no; // now Sound::card_id is index to Sound::unconfigured_cards
 
     // 1. choose the card to add
     map save_entry = $[];
-    if (card_id >= 0)  // -1 is for manual...
+    if (Sound::card_id >= 0)  // -1 is for manual...
     {
-	save_entry = Sound::unconfigured_cards[card_id]:$[];
+	save_entry = Sound::unconfigured_cards[Sound::card_id]:$[];
 	if (save_entry == $[])
 	{
 	    // error message
@@ -163,12 +144,12 @@ global define boolean AddCardHandler (map options) ``{
     do
     {
 	list save_info	= Sound::modules_conf;
-	card_id		= size (Sound::modules_conf); // id of new card
+	Sound::card_id		= size (Sound::modules_conf); // id of new card
 
-	save_entry  = add_common_options (save_entry, card_id);
-	save_entry  = add_alias (save_entry, card_id);
+	save_entry  = add_common_options (save_entry, Sound::card_id);
+	save_entry  = add_alias (save_entry, Sound::card_id);
 
-	map res = sound_volume (save_entry, card_id, true, true, save_info);
+	map res = sound_volume (save_entry, Sound::card_id, true, true, save_info);
 	ret = (res["ui"]:`back == `next);
 
 	if (ret)
@@ -183,7 +164,7 @@ global define boolean AddCardHandler (map options) ``{
 	    CommandLine::Print (sformat (_("Successfully added card '%1'"),
 		save_entry["model"]:""));
 	    if (haskey (options, "play"))
-		PlayTest (card_id);
+		PlayTest (Sound::card_id);
 	}
 	save_entry	= Sound::unconfigured_cards [0]:$[];
 
@@ -219,12 +200,12 @@ global define boolean RemoveCardHandler (map options) ``{
 	return false;
     }
 
-    card_id = card_no;
+    Sound::card_id = card_no;
     do
     {
 	ret = (_snd_delete() == `next);
     }
-    while (all && ret && Sound::modules_conf[card_id]:nil != nil);
+    while (all && ret && Sound::modules_conf[Sound::card_id]:nil != nil);
 
     return ret;
 }
@@ -273,7 +254,7 @@ global define boolean ShowCardHandler (map options) ``{
     }
     string modname	= save_entry["module"]:"";
     map params          = get_module_params (modname);
-    params		= restore_mod_params (params, save_entry["options"]:[]);
+    params		= restore_mod_params (params,save_entry["options"]:$[]);
 
     // label: list of card parameters will follow; %1 is card name, %2 driver
     string out = sformat (_("Parameters of card '%1' (using module %2):\n"),

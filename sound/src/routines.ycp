@@ -21,9 +21,304 @@
     import "Mode";
     import "Popup";
     import "Sound";
-    import "Summary";
 
     textdomain "sound";
+
+
+    // list of all card models (generated only once and cached)
+    global list all_card_names = [];
+
+    /**
+     * returns cards manufactured by given vendor
+     * @param vendor if "all" returns all models
+     * @return list with sound card models
+     */
+    global define list get_card_names (string vendor) ``{
+
+	// when called from ManualDialogModules, parameter is name of module,
+	// otherwise (from ManualDialogModules) it is vendor
+
+	if (!Sound::use_alsa)
+	    return [sformat("Sound card (%1)", vendor)];
+
+	Sound::LoadDatabase(true);
+        if (vendor == "all" || vendor == "")
+        {
+	    if (all_card_names == [] || all_card_names == nil)
+	    {
+		// use card names from db_cards (they contain the vendor name)
+		all_card_names = maplist (integer k, list v, Sound::db_cards,
+		    ``(v));
+		all_card_names = sort ((list)flatten (all_card_names));
+	    }
+	    return all_card_names;
+        }
+	else
+	{
+	    // names from db_vendors (vendor name not included - not necessary)
+	    return sort (Sound::db_vendors[vendor]:[]);
+	}
+    }
+
+    /**
+     *  Returns list of already running cards
+     *	(oss is nasty hacked, because it's not trivial to check this)
+     *  @return list
+     */
+    global define list get_running_cards () ``{
+
+	if (!Sound::use_alsa)
+	    return [1,2,3,4,5];
+
+	path proot = .audio.alsa.cards;
+	list cards = SCR::Dir (proot);
+
+	return maplist(string c, cards, ``($[
+	    "number"	: tointeger (c),
+	    "name"	: SCR::Read (add(add(proot, c), "name"))
+	]));
+    }
+
+    /** ALSA only
+     * Checks if name of parameter is in correct form (has 'snd_' prefix)
+     * and updates it if necessary
+     * @param parname original name of parameter
+     * @return correct name
+     */
+    global define string check_parameter_name (string parname) ``{
+
+	boolean prefix_used = Sound::snd_prefix_used ();
+	if (substring (parname, 0, 4) == "snd_" && !prefix_used)
+	    parname = substring (parname, 4);
+	else if (prefix_used && substring (parname, 0, 4) != "snd_")
+	    parname = sformat ("snd_%1", parname);
+
+	return parname;
+    }
+
+    /**
+     * returns the 'params' section from sndcards.ycp of the given module
+     * @param modname module name
+     * @return map with params and their descriptions
+     */
+    global define map get_module_params(string modname) ``{
+
+	if (!Sound::use_alsa)
+	{
+	    map params = (map) SCR::Read (
+		topath(sformat(".modinfo.kernel.drivers.sound.%1", modname)));
+	    params = filter(string k, string v, params, ``(
+		!contains(["module_author","module_description","module_filename"],k)
+	    ));
+	    return mapmap (string name, string desc, params, ``(
+		$[ name: $[
+			"name"	: name,
+			"descr"	: [desc],
+			"type"	: "string" ]
+		]
+	    ));
+	}
+
+	Sound::LoadDatabase(true);
+	map params = Sound::db_modules[modname, "params"]:$[];
+
+	// change the names of parameters if necessary
+	return mapmap (string parname, map parsettings, params, ``{
+	    parname = check_parameter_name (parname);
+	    return $[ parname : parsettings ];
+	});
+    }
+
+    /**
+     * adds alias to save_info entry
+     * @param entry card config
+     * @param card_id card id
+     * @return map modified card entry with filled alias value
+     */
+    global define map add_alias(map entry, integer card_id) ``{
+
+	if (!Sound::use_alsa)
+	    return add(entry, "alias", sformat("sound-slot-%1", card_id));
+	else
+	    return add(entry, "alias", sformat("snd-card-%1", card_id));
+    }
+
+    /**
+     *  adds common options for module. for alsa it is 'snd_index=${card_id}'
+     *  @param entry card config
+     *  @param card_id card id
+     *  @return map modified save_entry
+     */
+    global define map add_common_options(map entry, integer card_id) ``{
+
+	map opts = entry["options"]:$[];
+
+	if (!Sound::use_alsa)
+	{
+
+	    map parms = get_module_params(entry["module"]:"");
+	    if (size(parms) != 0)
+	    {
+		map enab = filter (string name, map e, parms,
+		    ``(name == "snd_enable"));
+		if (size(enab) != 0)
+		    opts = add(opts, "snd_enable", "1");
+	    }
+	    entry = add(entry, "options", opts);
+	    return entry;
+	}
+
+	opts = add (opts, Sound::snd_prefix() + "index",sformat ("%1",card_id));
+	opts = add (opts, Sound::snd_prefix() + "enable", "1");
+
+	entry = add(entry, "options", opts);
+	return entry;
+    }
+
+    /**
+     * Simply returns list with ALSA OSS/Free emulation modules
+     * @param number number of sound cards
+     * @return list of oss-alsa aliases
+     */
+    global define list alsa_oss (integer number) ``{
+
+	if (!Sound::use_alsa)
+	    return [];
+
+        list modules = [];
+        integer i = 0;
+        // map with minor as a key and module as value
+        map oss_list = $[
+            0  : "snd-mixer-oss",
+            11 : "snd-mixer-oss",
+            3  : "snd-pcm-oss",
+            12 : "snd-pcm-oss",
+            1  : "snd-seq-oss",
+            8  : "snd-seq-oss"
+            ];
+
+        while (i < number)
+        {
+            modules = add (modules, $[
+		    "alias"	: sformat ("sound-slot-%1", i),
+		    "module"	: sformat ("snd-card-%1", i) ]
+	    );
+            foreach(integer key, string mod, oss_list, ``{
+                modules = add (modules, $[
+		    "alias"	: sformat("sound-service-%1-%2", i, key),
+		    "module"	: mod]
+		);
+            });
+            i = i + 1;
+        }
+        return modules;
+    }
+
+    /**
+     * returns list of all available sound modules (OSS only)
+     * @return list as above
+     */
+    global define list get_module_names() ``{
+
+	if (Sound::use_alsa)
+	    return [];
+
+	if (all_card_names == [] || all_card_names == nil)
+	{
+	    list ret = SCR::Dir(.modinfo.kernel.drivers.sound);
+	    ret = filter(string mod, ret, ``(mod != "sound"));
+	    ret = add(ret, "emu10k1");
+	    ret = add(ret, "cs4281");
+	    ret = maplist(string e, ret,``{
+		string descr = lookup(
+		    (map)SCR::Read(add(.modinfo.kernel.drivers.sound, e)),
+		    "module_description", "");
+		return
+		    `item(`id(e), (descr != "" && descr != "<none>")? descr: e);
+	    });
+	    ret = sort(term a, term b, ret,
+		``(select(a, 1, "") < select(b, 1, "")));
+	    all_card_names = ret;
+	}
+	return all_card_names;
+    }
+
+    /**
+     * get_vol_settings
+     * creates a list of stored values of volume and mute for each channel
+     * of each card.
+     * example: [
+		    [ ["PCM", 32, false], ["Master", 100, true]],
+		    [ [....], .....                            ]
+		]
+     * @return list as above
+     */
+    global define list get_vol_settings() ``{
+
+	if (!Sound::use_alsa)
+	    return [];
+
+	Sound::LoadDatabase(true);
+	integer bound	= size(SCR::Dir(.audio.alsa.cards));
+	integer i	= 0;
+	list retlist	= [];
+	while (i < bound)
+	{
+	    list sublist = [];
+	    string modname = Sound::modules_conf[i,"module"]:"snd-dummy";
+	    list chans = Sound::db_modules[modname, "mixer_elements"]:[];
+
+	    if (chans == [])
+	    {
+		if (contains(SCR::Dir(.audio.alsa.cards), sformat("%1", i)))
+		{
+		    chans = SCR::Dir(topath(
+			sformat(".audio.alsa.cards.%1.channels", i)));
+		}
+		else
+		{
+		    chans = [];
+		}
+	    }
+
+	    foreach (string e, chans, ``{
+		path pth1 = topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", i, e));
+		path pth2 = topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", i, e));
+		sublist = add(sublist, [e, SCR::Read(pth1), SCR::Read(pth2)]);
+	    });
+	    retlist = add (retlist, sublist);
+	    i = i + 1;
+	}
+	return retlist;
+    }
+
+    /**
+     * stores values generated by get_vol_settings
+     * @param vol_settings volume settings
+     * @return boolean success/failure
+     */
+    global define boolean set_vol_settings(list vol_settings) ``{
+
+	if (!Sound::use_alsa)
+	    return true;
+
+	integer i = 0;
+	foreach(list channels, vol_settings, ``{
+	    foreach(list channel, channels, ``{
+		string name = channel[0]:"Master";
+		path pth1 = topath (
+		    sformat(".audio.alsa.cards.%1.channels.%2.volume", i,name));
+		path pth2 = topath (
+		    sformat(".audio.alsa.cards.%1.channels.%2.mute", i, name));
+		SCR::Write (pth1, channel[1]:0);
+		SCR::Write (pth2, channel[2]:false);
+	    });
+	    i = i + 1;
+	});
+	SCR::Execute(.audio.alsa.store, nil);
+	return true;
+    }
+
 
     /**
      * common function to extract 'name' of hardware
@@ -79,7 +374,7 @@
      * @return string username
      */
     global define string whoami() ``{
-	map ret	= SCR::Execute (.target.bash_output,"/usr/bin/whoami", $[]);
+	map ret	= (map)SCR::Execute(.target.bash_output,"/usr/bin/whoami", $[]);
 	string out = ret["stdout"]:"";
 	list l = splitstring(out, "\n");
 	if (size(l) > 0)
@@ -219,7 +514,7 @@
         if (modname == "snd-nm256")
         {
             // special warning message for in a special case
-            string warn_text = STRINGS["nm256hackWarning"]:"";
+            string warn_text = Sound::STRINGS["nm256hackWarning"]:"";
 	    return Popup::YesNo(warn_text);
         }
         return true;
@@ -275,7 +570,6 @@
     global define void unmute(list devices, integer card_id) ``{
 	if (Mode::config)
 	{
-	    // TODO: store this info some elsewhere...
 	    return;
 	}
 
@@ -293,33 +587,16 @@
 	});
     }
 
-    /**
-     * stores the volume to file. stored volume will be
-     * restored after reboot
-     * @param card_id card id
-     * @return boolean success/failure
-     */
-    global define boolean storeVolume(integer card_id) ``{
-	if (card_id == -1)
-	{
-	    SCR::Execute(.audio.alsa.store, 0, 0);
-	}
-	string p = sformat(".audio.alsa.cards.%1.store", card_id);
-
-	return SCR::Execute(topath(p), 0, 0);
-    }
-
 
     /**
-     *  Checks whether the module has been successfully loaded
+     * Checks whether the module has been successfully loaded
      *
      * @param save_entry card config map
      * @param card_id card id
      * @return string empty on success/ error message on failure
      */
-
     global define string check_module(map save_entry, integer card_id) ``{
-	map pm		= SCR::Read(.proc.modules);
+	map pm		= (map) SCR::Read(.proc.modules);
 	string mod_name	= save_entry["module"]:"off";
         if (!haskey (pm, mod_name) || size(get_running_cards()) <= card_id)
         {
@@ -333,106 +610,6 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
     }
 
-
-    /**
-     *  creates itemized table entries,
-     *  @param lm list of maps to take keys from
-     *  @param lk list of keys to look for in 1st param
-     *
-     *  @return list of items
-     */
-
-    global define list create_table (list lm, list lk)
-    ``{
-	list res = [];
-	integer pos = 0;
-	foreach (map m, lm, ``{
-	    res = add(res, `item(`id(pos),
-		lookup(m, lk[0]:"", ""),
-		lookup(m, lk[1]:"", ""),
-		lookup(m, lk[2]:"", "")
-	    ));
-	    pos = pos + 1;
-	});
-	return res;
-    }
-
-    /**
-     * checks whether param #1 is if type of param #2
-     * @param value value
-     * @param type expected type. one of {int, string}
-     * @param poss if poss is nonempty, checks if value is one of them
-     * returns error message, empty string if ok
-     * @return string error message
-     */
-    global define string check_value (string value, string type, list poss) ``{
-        if (type == "int")
-        {
-            if (tolower(substring (value, 0, 2)) == "0x")	// hex number
-            {
-                string rest = tolower(substring (value, 2));
-                if (filterchars(rest, "0123456789abcdef") != rest)
-                {
-                      // To translators: popup message, wrong value
-                      return sformat (_("The value: %1 must be a number"), value);
-                }
-            }
-            else                // decimal number
-            {
-                string rest = value;
-                if (substring (value, 0, 1) == "-")      // negative number
-                {
-                    rest = substring (value, 1);
-                }
-                if (filterchars(rest, "0123456789") != rest)
-                {
-                    // To translators: popup message, wrong value
-                    return sformat (_("The value: %1 must be a number"), value);
-                }
-            }
-        }
-        else if (type == "string")
-        {
-            if (filterchars (tolower (value), "abcdefghijklmnopqrstuvwxyz_0123456789") != value)
-            {
-
-                integer wrong_pos = findfirstnotof (tolower (value), "abcdefghijklmnopqrstuvwxyz_0123456789");
-                string wrong_char = substring (value, wrong_pos, 1);
-                if (wrong_char == " ")
-                {
-                    // To translators: "space" means blank character
-                    wrong_char = wrong_char + " " + _("(space)");
-                }
-                // To translators: popup message, wrong value
-                return  sformat (_("String cannot contain: %1"), wrong_char);
-            }
-        }
-
-        // now check for poss list
-        if (size (poss) > 0)
-        {
-            list poss_list = [];
-
-            if (type == "int")
-            {
-                poss_list = maplist (`v, poss, ``(tointeger (value) == v));
-            }
-            else
-            {
-                poss_list = maplist (`v, poss, ``(value == v));
-            }
-
-            if (!contains (poss_list, true))
-            {
-                // popup message: wrong value; %1 is list of right values
-                return sformat (_("The value must be one of
-%1"), mergestring (poss,","));
-            }
-        }
-
-        return "";  // ok :-)
-    }
-
     /**
      * inserts values to already set options
      * @param params list with available options for module
@@ -443,7 +620,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
     global define map restore_mod_params(map params, map values) ``{
 	return mapmap(string parname, map parmap, params, ``{
 	    parmap = add (parmap, "value", values[parname]:"");
-	    return [parname, parmap];
+	    return $[parname : parmap];
 	});
     }
 
@@ -494,8 +671,8 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	}
 	else
 	{
-	    answer = Popup::YesNoHeadline(
-		STRINGS["soundFontTitle"]:"", STRINGS["soundFontQuestion"]:"");
+	    answer = Popup::YesNoHeadline(Sound::STRINGS["soundFontTitle"]:"",
+		Sound::STRINGS["soundFontQuestion"]:"");
 	}
 
 	if (!answer)
@@ -507,13 +684,14 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	{
 	    // step 2: insert CD
 	    if (!Popup::ContinueCancelHeadline (
-		STRINGS["soundFontTitle"]:"", STRINGS["soundFontAppeal"]:""))
+		    Sound::STRINGS["soundFontTitle"]:"",
+		    Sound::STRINGS["soundFontAppeal"]:""))
 	    {
 		return;
 	    }
 
 	    // step3: do something
-	    map res = SCR::Execute (.target.bash_output,
+	    map res = (map) SCR::Execute (.target.bash_output,
 		Directory::ybindir + "/copyfonts 2>/dev/null", $[] );
 
 	    integer cnt = tointeger(lookup(res, "stdout", 0));
@@ -525,14 +703,15 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	    // step4:
 	    if (cnt > 0)
 	    {
-		Popup::Message (sformat(STRINGS["soundFontFinal"]:"", cnt,
-		    "/usr/share/sfbank/creative"));
+		Popup::Message (sformat(Sound::STRINGS["soundFontFinal"]:"",
+		    cnt, "/usr/share/sfbank/creative"));
 		return;
 	    }
 	    else
 	    {
-		if (!Popup::YesNoHeadline (STRINGS["soundFontNotFound"]:"",
-			STRINGS["soundFontRetry"]:""))
+		if (!Popup::YesNoHeadline (
+			Sound::STRINGS["soundFontNotFound"]:"",
+			Sound::STRINGS["soundFontRetry"]:""))
 		{
 		    return;
 		}
@@ -546,7 +725,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      * @return boolean see as above
      */
     global define boolean need_nm256_opl3sa2_warn(list sound_cards) ``{
-	list mods = maplist (map card, sound_cards, card["module"]:"");
+	list mods = maplist (map card, sound_cards, ``(card["module"]:""));
 	if (contains(mods, "snd-nm256") && contains(mods, "snd-opl3sa2"))
 	{
 	    return true;
@@ -565,10 +744,12 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
 	if (size(s1) > 0 && size(s2) > 0)
 	{
-	    string name1 = lookup(select(s1, 0, $[]), "model", "");
-	    string name2 = lookup(select(s2, 0, $[]), "model", "");
-	    Popup::LongText("",	`RichText("<p>" +
-		sformat(STRINGS["opl3sa_nm256_warn"]:"", name1, name2)+"</p>"),
+	    string name1 = s1[0, "model"]:"";
+	    string name2 = s2[0, "model"]:"";
+	    Popup::LongText("",
+		`RichText ("<p>" +
+		    sformat(Sound::STRINGS["opl3sa_nm256_warn"]:"", name1,name2)
+		    +"</p>"),
 		50, 12);
 	}
     }
@@ -589,54 +770,6 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	    return card;
 	});
 	return save_info;
-    }
-
-    /**
-     * stops all programs using sound devices
-     * @return boolean true if nothing's using sound, false otherwise
-     */
-    global define boolean stop_programs() ``{
-	if (Mode::config)
-	{
-	    return true;
-	}
-	integer fuser = SCR::Execute (.target.bash, "/bin/fuser /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]);
-
-	if (fuser == 0)
-        {
-	    string msg		= STRINGS["WhichDialogMsg"]:"";
-            boolean terminate	= Sound::use_ui ? Popup::YesNo (msg) : true;
-            if (terminate)
-            {
-		SCR::Execute (.target.bash, "/bin/fuser -k /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]);
-            }
-            else
-            {
-		return false;
-            }
-        }
-	return true;
-    }
-
-    /**
-     * creates hardware-summary-like list of configured cards
-     * @return string richtext
-     * @param save_info save info
-     */
-    global define string ConfCardsRT(list save_info) ``{
-	list retlist = [];
-	list conflist = [];
-	foreach(map card, save_info, ``{
-	    conflist = add (conflist, card["model"]:"");
-	});
-	integer i = 0;
-	foreach(string cardname, conflist, ``{
-	    retlist = add (retlist, Summary::Device (cardname,
-		// to translators: '(sound card is) Configured as snd-card-1'
-		sformat(_("Configured as snd-card-%1."), i)));
-	    i = i + 1;
-	});
-	return Summary::DevicesList(retlist);
     }
 
 }//EOF

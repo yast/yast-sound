@@ -22,7 +22,7 @@
     include "sound/card_wizard.ycp";
     include "sound/read_routines.ycp";
     include "sound/routines.ycp";
-    include "sound/ui.ycp";
+    include "sound/volume_routines.ycp";
     include "sound/write_routines.ycp";
     include "sound/volume.ycp";
     include "sound/options.ycp";
@@ -30,14 +30,8 @@
     include "sound/select.ycp";
     include "sound/manual.ycp";
 
-    if (Sound::use_alsa)
-    {
-	include "sound/alsa_routines.ycp";
-    }
-    else
-    {
-        include "sound/oss_routines.ycp";
-    }
+
+    global boolean was_complex = false;
 
     /**
      * card selection dialog
@@ -57,8 +51,8 @@
 	map res		= sound_select (nh, Sound::modules_conf);
 	symbol ui	= res["ui"]:`abort;
 
-	card_id		= res["id"]:0;
-	if (card_id == -1)
+	Sound::card_id	= res["id"]:0;
+	if (Sound::card_id == -1)
 	{
 	    return `manual;
 	}
@@ -70,17 +64,17 @@
      * @return symbol next dialog
      */
     global define symbol _snd_quick() ``{
-	save_entry	= Sound::unconfigured_cards[0]:$[];
-	card_id		= 0;
+	Sound::save_entry	= Sound::unconfigured_cards[0]:$[];
+	Sound::card_id	= 0;
 	boolean has_joy = false;
-	string modname	= save_entry["module"]:"";
+	string modname	= Sound::save_entry["module"]:"";
 	if (Sound::db_modules [modname, "joystick"]:$[] != $[])
 	{
 	    has_joy = true;
 	}
 
-	string model	= save_entry["model"]:"";
-	map res		= quickConfig (model, "snd-card-0", card_id, has_joy);
+	string model	= Sound::save_entry["model"]:"";
+	map res	= quickConfig (model, "snd-card-0", Sound::card_id, has_joy);
 
 	return res["ui"]:nil;
     }
@@ -91,13 +85,13 @@
      * @return symbol next dialog
      */
     global define symbol _snd_quick2(boolean type) ``{
-	save_entry  = add_common_options(save_entry, 0);
-	save_entry  = add_alias(save_entry, 0);
-	map res	    = sound_volume(save_entry, 0, true, type, []);
+	Sound::save_entry  = add_common_options(Sound::save_entry, 0);
+	Sound::save_entry  = add_alias(Sound::save_entry, 0);
+	map res	    = sound_volume(Sound::save_entry, 0, true, type, []);
 	symbol ui   = res["ui"]:nil;
 	if (ui == `next)
 	{
-	    Sound::modules_conf = [save_entry];
+	    Sound::modules_conf = [Sound::save_entry];
 	}
 	return ui;
     }
@@ -114,12 +108,12 @@
 
 	if (ui == `next)
 	{
-	    save_entry	= update_manual_card (res);
-	    card_id	= -1;
+	    Sound::save_entry		= update_manual_card (res);
+	    Sound::card_id	= -1;
 	}
 	if (ui == `back)
 	{
-	    save_entry	= $[];
+	    Sound::save_entry	= $[];
 	}
 	return ui;
     }
@@ -134,9 +128,9 @@
 
 	map res		= WhichDialog(nh);
 	symbol ui	= res["ui"]:`back;
-        card_id		= res["card_id"]:-1;
+        Sound::card_id	= res["card_id"]:-1;
 
-        if (card_id == -1 && ui == `next)
+        if (Sound::card_id == -1 && ui == `next)
         {
             return `manual;
         }
@@ -158,9 +152,9 @@
             }
 
 	    // remove joystick settings
-	    if (card_id < 4)
+	    if (Sound::card_id < 4)
 	    {
-		Joystick::joystick = remove (Joystick::joystick, card_id);
+		Joystick::joystick = remove (Joystick::joystick,Sound::card_id);
 		Joystick::joystick[3] = $[];
 	    }
 
@@ -168,15 +162,15 @@
 	    // card removal everything is muted and set to 0.
             list vol_settings = get_vol_settings();
 
-            Sound::modules_conf	    = remove (Sound::modules_conf, card_id);
+            Sound::modules_conf	= remove (Sound::modules_conf, Sound::card_id);
 	    Sound::modules_conf	    = recalc_save_entries(Sound::modules_conf);
 
-	    if (vol_settings[card_id]:nil != nil)
+	    if (vol_settings[Sound::card_id]:nil != nil)
 	    {
-		vol_settings    = remove (vol_settings, card_id);
+		vol_settings    = remove (vol_settings, Sound::card_id);
 		// we have to move old entry in global list:
 		Sound::volume_settings = add (vol_settings,
-		    Sound::volume_settings[card_id]:[]);
+		    Sound::volume_settings[Sound::card_id]:[]);
 	    }
 
 	    if (!Mode::config)
@@ -196,11 +190,11 @@
      * @return symbol next dialog
      */
     global define symbol _snd_config() ``{
-	if (card_id >= 0)
+	if (Sound::card_id >= 0)
 	{
-	    save_entry = Sound::unconfigured_cards [card_id]:$[];
+	    Sound::save_entry = Sound::unconfigured_cards [Sound::card_id]:$[];
 	}
-	map res = OneCardWizard (save_entry, size(Sound::modules_conf),
+	map res = OneCardWizard (Sound::save_entry, size(Sound::modules_conf),
 	    15, false, Sound::modules_conf);
 
         symbol ui = res["ui"]:nil;
@@ -208,12 +202,12 @@
         {
 	    // copy card_entry from unconfigured to configured list
             Sound::modules_conf = add(Sound::modules_conf, res["return"]:$[]);
-	    if (card_id >= 0)
+	    if (Sound::card_id >= 0)
 	    {
 		// if this this card was autodetedted, remove
 		// card we've just configured from unconfigured card list.
 		Sound::unconfigured_cards = remove (Sound::unconfigured_cards,
-		    card_id);
+		    Sound::card_id);
 	    }
 	    if (size(Sound::unconfigured_cards) == 0)
 	    {
@@ -258,8 +252,6 @@ global define symbol MainSequence(string initial) ``{
 	    "quick"	: ``(_snd_quick()),
 	    "quick2"	: ``(_snd_quick2(true)),
 	    "quick3"	: ``(_snd_quick2(false)),
-
-	    "joystick"	: ``(joystick())
 	];
 
     map m_sequence = $[
@@ -333,10 +325,6 @@ global define symbol MainSequence(string initial) ``{
 		$[
 		    `next	    :	"complex"
 		],
-        "joystick"   :
-        $[
-            `next       :   `finish
-        ]
     ];
 
     return WizardSequencer(m_aliases, m_sequence);
@@ -359,7 +347,8 @@ global define symbol SoundSequence () ``{
     {
 	if (!Sound::Read(true))
 	    return `abort;
-	Joystick::Read(``{});
+	block<boolean> abort = ``{ return false;};
+	Joystick::Read(abort);
 	Sound::StoreSettings();
     }
 
@@ -401,7 +390,7 @@ global define symbol SoundSequence () ``{
     // when running this module as non-root, go to complex-dialog
     if (size(Sound::unconfigured_cards) == 1 && size(Sound::modules_conf) == 0)
     {
-	card_id = 0;
+	Sound::card_id = 0;
 	initial = "quick";
     }
     else if (size(Sound::unconfigured_cards) == 0)
@@ -439,7 +428,7 @@ global define symbol SoundSequence () ``{
     {
 	if (!Sound::installation && ( Sound::Changed() || Joystick::Changed()))
 	{
-	    Sound::Write (``{}, ``{});
+	    Sound::Write ();
 	}
     }
 
