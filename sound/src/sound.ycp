@@ -342,7 +342,7 @@
 	UI::CloseDialog ();
 	return;
     }
-    SCR::Execute(.target.bash, "rm /tmp/modules.conf > /dev/null 2>&1; touch /tmp/modules.conf > /dev/null 2>&1", $[]);
+    SCR::Execute(.target.bash, "/bin/rm /tmp/modules.conf > /dev/null 2>&1; /bin/touch /tmp/modules.conf > /dev/null 2>&1", $[]);
     
     nm256_opl3sa2_warn(sound_cards);
 

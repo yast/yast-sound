@@ -1,4 +1,22 @@
 -------------------------------------------------------------------
+Tue Sep  4 17:55:16 CEST 2001 - dmeszar@suse.cz
+
+- use alias sound-slot-0 -> sound
+  and	    sound -> char-major-14 for sparcs
+
+-------------------------------------------------------------------
+Tue Sep  4 13:06:27 CEST 2001 - dmeszar@suse.cz
+
+- unmute device "Wave Playback Volume" for ymf sound cards
+- default value for lookup(3) added
+
+-------------------------------------------------------------------
+Fri Aug 31 14:23:51 CEST 2001 - dmeszar@suse.cz
+
+- bug #9993 fixed
+- logs removed
+
+-------------------------------------------------------------------
 Wed Aug 29 10:10:05 CEST 2001 - dmeszar@suse.cz
 
 - fixed typos

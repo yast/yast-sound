@@ -151,7 +151,7 @@
     define OptionsDialog (string cardlabel, list options) ``{
 
 
-	string help_text = lookup(STRINGS, "OptionsDialog");
+	string help_text = lookup(STRINGS, "OptionsDialog", "");
 	    
 	term con = `VBox ();
 
@@ -160,7 +160,7 @@
 				    // always omit these options -- they are assigned dynamically
 	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_id"));
 	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_index"));
-	options = maplist (`e, options, ``($["description" : mysformat (lookup (e, "description")),
+	options = maplist (`e, options, ``($["description" : mysformat (lookup (e, "description", [])),
 						// if no option name is available
 						"name"         : lookup (e, "name", _("No name available")),
 						"value"        : lookup (e, "default", lookup (e, "value", "")),
@@ -170,7 +170,7 @@
 	list itemized_descriptions = create_table (options, ["description", "name", "value"]);
 
 	integer current_option = 0;
-	string current_option_name = lookup (select (options, 0), "name");
+	string current_option_name = lookup (select (options, 0), "name", "");
 
 	if (size (itemized_descriptions) > 0) 
 	{

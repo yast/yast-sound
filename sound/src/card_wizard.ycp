@@ -73,12 +73,15 @@ global define _optVolume()
     return _volume();
 }
 
-global define AbortDialog() ``{
+
+/* REMOVEME
+ global define AbortDialog() ``{
     any ret = UI::ReallyAbortPopup(true);
     if (ret == true) return `yes;
-    return `back;
+   return `back;
 
 }
+*/
 
     /**
      * Wizard steps: 1. displayname 

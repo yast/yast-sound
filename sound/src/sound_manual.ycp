@@ -35,7 +35,7 @@
 
 
     define ManualDialog () ``{
-	string helptext	    = lookup(STRINGS, "ManualDialog");
+	string helptext	    = lookup(STRINGS, "ManualDialog", "");
 	list module_names   = get_module_names();
 
 	string initial = use_alsa ? "all" : select(select(module_names, 0), 1);

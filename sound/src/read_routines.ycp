@@ -150,8 +150,8 @@ nil
 		y2debug("%1", res);
 		if (res != nil)
 		{
-		    uniq = lookup(res, "unique_key"); //substring(comment, 0, pos);
-		    model = lookup(res, "name"); //substring(comment, pos+1, size(comment)-pos-1);
+		    uniq = lookup(res, "unique_key", ""); //substring(comment, 0, pos);
+		    model = lookup(res, "name", ""); //substring(comment, pos+1, size(comment)-pos-1);
 		}   
 		
 		else 
