@@ -939,8 +939,7 @@ could make your system unstable.
      */
     global define boolean Changed() ``{
 	if (modules_conf != modules_conf_b ||
-	    rc_vars != rc_vars_b ||
-	    used_modprobe_conf)
+	    rc_vars != rc_vars_b)
 	{
 	    return true;
 	}
