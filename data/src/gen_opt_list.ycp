@@ -33,6 +33,9 @@
     // collect param descriptions of all snd-card-* modules
 
     map mod_idx = SCR::Read(.target.ycp, "./src/module_index.ycp");
+    map mixer   = SCR::Read(.target.ycp, "./addons/mixer.ycp");
+
+    map joy_mods = SCR::Read(.target.ycp, "./addons/joy_mods.ycp");
 
 
     list mods = maplist(`k, `v, mod_idx, ``(v)); // SCR::Dir(.modinfo.misc);
@@ -54,6 +57,7 @@
 
     map database = $[];
 
+    map mod_data = $[];
 
     foreach (`e, mods,
     ``{
@@ -61,12 +65,17 @@
 	mod_descr = lookup(lookup(modopts, mod_name, $[]), "module_description", "");
 	mod_params = $[];
 
+	mod_data = $["description" : mod_descr,
+                     "params" : mod_params
+                     ];
 
-	database = add(database, mod_name, 
-			$[
-			    "description" : mod_descr,
-			    "params" : mod_params
-			]);
+	maplist(`k, `v, lookup(mixer, mod_name, $[]), ``{mod_data[k]=v;});
+
+	database = add(database, mod_name, mod_data);
+//			$[
+//			    "description" : mod_descr,
+//			    "params" : mod_params
+//			]);
     });
 
     string kernel_ver = lookup(SCR::Execute(.target.bash_output, "uname -r", $[]), "stdout", "");
@@ -103,6 +112,14 @@
 
 	    // these two declaration must be here
 	    any anydescr = translate_descr(descr);
+
+	    if (is(anydescr, list) && size(anydescr) > 1)
+	    {
+		if (select(anydescr, 1) == "specified")
+		{
+		    anydescr[1] = lookup(lookup(database, modname, $[]), "description", "");
+		}
+	    }
 //	    locale locdescr = anydescr;
 
 //	    y2error("%1 %2 %3", modname, parmname, tmpmap);
@@ -114,6 +131,11 @@
 
 	    oldopts = add(oldopts, parmname, tmpmap);
 	    oldmap = add(oldmap, "params", oldopts);
+
+//	    if (haskey(joy_mods, modname))
+//	    {
+//		oldmap = add(oldmap, "joystick", lookup(joy_mods, modname, $[]));
+//	    }
 	    database = add(database, modname, oldmap);
 	}
     });
@@ -127,5 +149,18 @@
 	database = add(database, k, v);
     });
 
-    SCR::Write(.target.ycp, "./modlist.ycp.in", database);
+    // now add joystick data
+
+    map outdb= $[];
+
+    foreach(`k, `v, database,
+    ``{
+	if (haskey(joy_mods, k))
+	{
+	    v = add(v, "joystick", lookup(joy_mods, k, $[]));
+	}
+	outdb = add(outdb, k, v);
+    });
+
+    SCR::Write(.target.ycp, "./modlist.ycp.in", outdb);
 }
