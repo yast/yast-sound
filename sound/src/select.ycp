@@ -37,7 +37,7 @@
 
     UI::ChangeWidget(`id(`next), `Label, UI::FinishButtonLabel());
 
-    any ui = nil;
+    symbol ui = nil;
     do
     {
 	ui = UI::UserInput();

@@ -22,12 +22,12 @@
 
     /**
      * volume in percents (0..100)
-     * @return any
+     * @return boolean
      */
     global define SetVolume (string group, integer cardid, integer value) ``{
         string p = sformat(".audio.alsa.cards.%1.channels.%2.volume", cardid, group);
 
-        SCR::Write(topath(p), value);
+        return SCR::Write(topath(p), value);
     }
 
 

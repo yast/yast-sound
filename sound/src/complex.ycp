@@ -94,7 +94,7 @@
 		}
 	    }
 
-	    any r = `item(`id(pos), sformat("[%1]", pos), lookup(e, "model", ""), state);
+	    term r = `item(`id(pos), sformat("[%1]", pos), lookup(e, "model", ""), state);
 	    pos = pos + 1;
 	    return r;
 
@@ -118,7 +118,7 @@
 
     global define ComplexDialog () ``{
 	// help text 
-	any ui = nil;
+	symbol ui = nil;
         string helptext = lookup(STRINGS, "ComplexDialog", "");
 
 	y2debug(" save_info %1, agent %2", size(save_info), size(SCR::Dir(.audio.alsa.cards)));

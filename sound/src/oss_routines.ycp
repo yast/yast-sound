@@ -21,7 +21,7 @@
     textdomain "sound";
         /**
      * volume in percents (0..100)
-     * @return any
+     * @return boolean
      */
     global define SetVolume (string group, integer cardid, integer value) ``{
 	if (is_sparc())
@@ -35,6 +35,7 @@
 
             SCR::Write(topath(p), value);
 	}
+	return true;
     }
 
     global define PlayTest (integer card_id) ``{

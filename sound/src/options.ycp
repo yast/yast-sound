@@ -90,7 +90,7 @@
 	    return;
 	}
 	values = substring(values, 1, size(values) - 2);
-	any widg = defWidget();
+	term widg = defWidget();
 
 	list slist = splitstring(values, "=");
 	if (values == "BOOL")
@@ -183,7 +183,7 @@
 	    UI::ChangeWidget(`id(`table), `CurrentItem, 0);
 	}
 
-	any ui = nil;
+	symbol ui = nil;
 	    
 	repeat 
 	{
@@ -218,8 +218,7 @@
 		current_option = UI::QueryWidget (`id(`table), `CurrentItem);
                 current_option_name = select(UI::QueryWidget(`id(`table), `Item(current_option)), 2);
 
-		any value = sformat("%1", (UI::QueryWidget(`id(`poss), `Value)));
-		y2debug(sformat("%1", value));
+		string value = sformat("%1", (UI::QueryWidget(`id(`poss), `Value)));
 
 		UI::ChangeWidget(`id(`des), `Value, value);
 	    }

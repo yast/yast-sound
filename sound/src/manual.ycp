@@ -71,7 +71,7 @@
 	    // Next - button label
 	UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
 
-	any ui = nil;
+	symbol ui = nil;
 
 	do 
 	{
@@ -79,7 +79,7 @@
 	        
 	    if (ui == `sel_drv) 
 	    {
-		any drv = UI::QueryWidget (`id(`sel_drv), `CurrentItem);
+		string drv = UI::QueryWidget (`id(`sel_drv), `CurrentItem);
 		card_names = get_card_names (drv);
 
 		UI::ReplaceWidget (`id(`rep_mod),
@@ -119,8 +119,8 @@
 
 	map ret = $["ui" : ui];
 
-	any model   = UI::QueryWidget (`id(`sel_mod), `CurrentItem);
-	any modname = UI::QueryWidget (`id(`sel_drv), `CurrentItem);
+	string model   = UI::QueryWidget (`id(`sel_mod), `CurrentItem);
+	string modname = UI::QueryWidget (`id(`sel_drv), `CurrentItem);
     
 	if (ui == `next) 
 	{
