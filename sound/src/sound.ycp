@@ -200,7 +200,7 @@
             // everything is muted and set to 0.
             list vol_settings = get_vol_settings();
 
-            list rem	    = get_indices_for_removal(save_info, modname);
+            list rem	    = get_indices_for_removal(save_info, modname, card_id);
             save_info	    = remove_save_entries(save_info, rem);
             vol_settings    = multi_remove(vol_settings, rem);
 
