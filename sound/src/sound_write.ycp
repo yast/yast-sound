@@ -128,12 +128,27 @@
 
     Progress::NextStage();
 
-    // ensure that all required kernel modules are installed
+    // get required sound and joystick kernel modules
     list<string> reqmodules = Sound::RequiredKernelModules();
+    list<string> reqjoymodules = Joystick::RequiredKernelModules();
 
-    if (reqmodules != nil && size(reqmodules) > 0)
+    if (reqmodules == nil)
     {
-	Package::InstallKernel(Sound::RequiredKernelModules());
+	reqmodules = [];
+    }
+
+    if (reqjoymodules == nil)
+    {
+	reqjoymodules = [];
+    }
+
+    // merge lists, remove duplicates
+    reqmodules = (list<string>) union(reqmodules, reqjoymodules);
+
+    if (size(reqmodules) > 0)
+    {
+	// ensure that all required kernel modules are installed
+	Package::InstallKernel(reqmodules);
     }
 
     // save config to /etc/modprobe.d/sound
