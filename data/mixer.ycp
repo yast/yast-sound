@@ -1,0 +1,28 @@
+$[
+    "snd-emu10k1":
+    $[
+	"mixer":		// channels to be initialized (unmuted and volume adjusted)
+	$[
+	    "PCM" :	80,
+	    "CD":	80,
+	    "Synth":	80,
+	    "Master":	80
+	],
+	"main_volume": "Master", // main volume element
+	"mixer_elements":	// channels to be shown in yast2 mixer dialog
+	[
+	    "Master",
+	    "PCM",
+	    "Line",
+	    "CD",
+	    "Synth",
+	    "FM",
+	    "Mic",
+	    "Video",
+	    "Phone"
+	]
+    ],
+    "second_module...":
+    $[
+    ]
+]
