@@ -130,7 +130,6 @@ the number of configured cards in your configuration files.
 Try to restart sound system?")))
  
 	    {
-		BrowseTree(save_info);
 		sound_stop();
 		sound_start_tmp(true);
 		// TODO revise

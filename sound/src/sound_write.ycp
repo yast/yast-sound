@@ -14,33 +14,45 @@
  * $Id$
  *
  * Params:
- *         1st ... map with information to store with these keys:
- *                 "cards"  : <list> // list with all card-dependent information
- *                 "system" : <map> // list with all system dependent information
- *                 "other"  : <term> // function to call to provide some additional work
+ *         1st ... save info- list of configured cards:
+ *	   [
+ *		$[
+ *		    "model"	: "sb live!",
+ *		    "alias"	: "snd-card-0",
+ *		    "options"	: $["snd_id":"0" ...],
+ *		    "module"	: "snd-card-emu10k1",
+ *		    "unique_key": "abcd.efghijklmn"
+ *		],
+ *              $[
+ *                  "model"     : "avi onboard!",
+ *                  "alias"     : "snd-card-1",
+ *                  "options"   : $["snd_id":"1" ...],
+ *                  "module"    : "snd-card-asf",
+ *                  "unique_key": "abcd.abcdefghij"
+ *              ]
+ *         ]
  *
- *                  each element of cards list will be a map with these keys:
+ *	   2nd ... rc_values
+ *	   $[
+ *		"START_ALSA" : "yes",
+ *		"START_SEQUENCER" : "yes"
+ *         ]
+ *	    
+ *	   3rd ... use_alsa - boolean
  *
- *                                   "name"    : <string> // card name
- *                                   "modules" : <map>    // map for 'modules.conf' with "alias" and
- *                                                        // "options" keys
- *                                   "volume"  : <map>    // map for storing volume, map keys should be
- *                                                        // channels
+ *	   4th ... autoinstall mode boolean
  *
- *                  system will be a map with (possibly many more) these keys:
+ *	   5th ... volume setting (usefull only for autoconfig)
+ *	   [
+ *		[  // card #1
+ *		    ["PCM", 32, false], ["Master", 100, true] ...
+ *	        ],
+ *		[  // card #2
+ *		    
+ *		],
+ *		...
  *
- *                                   "modules" : <list> // list of maps for 'modules.conf' - "alias",
- *                                                      // "options"; it's list because more than one entry
- *                                                      // to 'modules.conf' will be needed
- *
- *                                   "volume"  : <map>  // "mixer" ... mixer command to set-up the volume 
- *                                                                     (must include $CHANNEL and $VOLUME substrings, i.e:
- *                                                                      "/usr/bin/amixer set \"$CHANNEL\" $VOLUME% unmute")
- *                                                      // "store" ... function to call to store the info.
- *                                   "rc"      : <map>  // map with rc.config entries (i.e. START_ALSA, START_ALSA_SEQ entry etc ...)
- *                 
- *
- *        2nd ... boolean - testmode
+ *	   ]
  *
  * Steps:
  *        1. save '/etc/modules.conf'
@@ -61,32 +73,96 @@
  //   map STRINGS = STRINGS_();
 
     include "sound/write_routines.ycp";
+    include "sound/alsa_routines.ycp";
+    include "ui/progress.ycp";
+    include "ui/wizard_dialog.ycp";
 
       // ==== MAIN ====
 
     boolean test_mode	= false;
-    list save_info	= Args (0);
     map rc_vars		= $[];
 
     string helptext	= "";
     string err_msg	= "";
 
+    list save_info	= Args (0);
+    boolean use_alsa	= true;
+    boolean autoinstall = false;
       
     if (size (Args ()) > 1)
     {
 	rc_vars = Args (1);
     }
+    
+    if (size(Args ()) > 2)
+    {
+	use_alsa = Args(2);
+    }
 
+    if (size(Args ()) > 3)
+    {
+	autoinstall = Args(3);
+    }
+
+    integer steps = 3;
+
+    list stones = [
+	    _("Save modules configuration"),
+            _("Save RC values")];
+
+    if (autoinstall)
+    {
+	stones = add(stones, _("Start sound cards"));
+	steps = steps + 1;
+
+	UI::CreateWizardDialog();
+    }
+
+    stones = add(stones, _("Store volume settings"));
 				  // label message
-    term con = `Label(_("Saving ..."));
+//    term con = `Label(_("Saving ..."));
+    ProgressSetup (_("Saving sound card settings."), " ", steps, 
+		stones,
+		"");
+
+
 				  // dialog title
-    UI::SetWizardContents (_("Sound configuration"), con, helptext, false, false);
+//    UI::SetWizardContents (_("Sound configuration"), con, helptext, false, false);
     UI::DisableWizardAbortButton();
 
-    SaveVolume();
+    
+    integer step = 0;
 
+    ProgressMilestone(step, " ", step);
+    step = step + 1;
     SaveModulesEntry(save_info, [], false);
+    sleep(100);
+
+    ProgressMilestone(step, " ", step);
+    step = step + 1;
+    save_unique_keys (maplist(`e, save_info, ``(lookup(e, "unique_key", ""))));
+    sleep(100);
+
+    ProgressMilestone(step, " ", step);
+    step = step + 1;
     SaveRCValues(rc_vars);
+    sleep(100);
+
+    ProgressMilestone(step, " ", step);
+    step = step + 1;
+
+    if (autoinstall)
+    {
+	map out = SCR::Execute(.target.bash_output, "/usr/sbin/rcalsasound restart", nil);
+    }
+
+    ProgressMilestone(step, " ", step);
+    if (size(Args()) >= 4)
+    {
+	set_vol_settings(Args(4));
+    }
+    SaveVolume();
+    sleep(100);
     
     return (size (err_msg) == 0);
 }
