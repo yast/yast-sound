@@ -26,7 +26,6 @@
     include "sound/ui.ycp";
     include "sound/texts.ycp";
 
-
     // text constants for sound module
     map STRINGS=STRINGS_();
   
@@ -240,7 +239,6 @@
 
     // get all the apropriate information from the database
     sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
-
     // filter out modules with unspecified module name (sound card not supported by alsa)
     sound_cards = filter(`e, sound_cards, ``(lookup(e, "module", $[])!=$[]));
 
@@ -395,7 +393,6 @@
 	    cont = false;
 	}
     }
-    //BrowseTree(["save_info in sound #1", save_info]);
 			    // filter out empty enries
     save_info = filter (`e, save_info, ``(size (e) > 0));
     n_cards = size (save_info);
@@ -436,7 +433,6 @@
 
     //UI(`DebugDialog (save_info));
 
-	//BrowseTree(save_map);
 
 	CallModule ("sound_write", [save_map, test_mode]);
 

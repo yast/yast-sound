@@ -1,0 +1,48 @@
+#!/bin/bash
+# 
+# script for copying sound banks from sound blaster cd to localhost
+# $id$
+# dan meszaros <dmeszar@suse.cz>
+
+# first get the path to cdrom
+CDROMDEVICE=`grep cdrom /etc/fstab | cut -f2 | head -n1`
+
+# mount cdrom
+mount $CDROMDEVICE
+SOUNDFONTDIR="/usr/share/sfbank/creative"
+
+# create target directory
+mkdir -p $SOUNDFONTDIR 
+
+# create list of unique sound font found on the whole cd
+for F in `find $CDROMDEVICE -name '*.[sS][fF]2' -type f `
+do 
+    echo -e "${F##*/}\t$F"
+done | \
+sort | \
+while read NAM FILE
+do
+    if [ "$NAM" != "$OLD" ]
+    then
+        cp $FILE $SOUNDFONTDIR
+        OLD=$NAM
+	echo "line"
+	
+    fi
+done | wc -l 
+
+cd $SOUNDFONTDIR
+
+# find the largest file in $SOUNDFONTDIR
+HIGHEST=`ls -S1 *.[sS][fF]2 | head -n1`
+
+# remove old link
+rm -f default.sf2
+
+#create link to the largest font file
+ln -s $HIGHEST default.sf2
+
+umount $CDROMDEVICE
+
+#echo $CNT
+

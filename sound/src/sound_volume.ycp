@@ -44,11 +44,11 @@
     define VolumeDialog () ``{
 
 	    //unmute these devices
-	if (use_alsa)
-	{
-	    maplist (`dev, ["PCM", "PCM,1", "Wave", "Master Digital", "Synth"], 
-			   ``(SetVolume (lookup (user_settings, "mixer", "amixer"), dev, sformat ("%1", 70), card_id)));
-	}
+//	if (use_alsa)
+//	{
+//	    maplist (`dev, ["PCM", "PCM,1", "Wave", "Master Digital", "Synth"], 
+//			   ``(SetVolume (lookup (user_settings, "mixer", "amixer"), dev, sformat ("%1", 70), card_id)));
+//	}
 	
 	/* help text: adjusting volume */
 
@@ -65,8 +65,10 @@
 	}
 
 /* Sound fonts installation */
-
-//	InstallFonts("AS");
+	if(HasFonts(card))
+	{
+	    InstallFonts("AS");
+	}
 
 /* end of sound fonts installation */
 
@@ -79,7 +81,6 @@
 	    if (ui == `volume) 
 	    {
 		vol = UI(`QueryWidget(`id(`volume), `Value ));
-
 		SetVolume (lookup (user_settings, "mixer", "amixer"), "Master", sformat ("%1", vol), card_id);
 	    }
 	    else if (ui == `test) 
@@ -255,9 +256,11 @@ boolean need_restart=true;
 
     if (!test_mode)
     {
-	SCR(`Execute(.target.bash, "/etc/init.d/rcalsasound stop", $[]));
+	SCR(`Execute(.target.bash, "/etc/init.d/alsasound stop", $[]));
 	add_tmp_module_record(module_map, card_id);
-	err_msg = probe_module (module_map, user_settings);
+	alsasound_start_tmp();
+	err_msg = check_module(module_map);
+//	err_msg = probe_module (module_map, user_settings);
 //        SCR(`Execute(.target.bash, "/etc/init.d/rcalsasound start", $[]));
     }
     any ui = nil;
@@ -273,6 +276,12 @@ boolean need_restart=true;
 //	    y2error("alsa restarted");
 //	    SCR(`Execute(.target.bash, "/etc/init.d/rcalsasound restart", $[]));
 //	}
+
+	if (use_alsa)
+        {
+            maplist (`dev, ["PCM", "PCM,1", "Wave", "Master Digital", "Synth"],
+                           ``(SetVolume (lookup (user_settings, "mixer", "amixer"), dev, sformat ("%1", 70), card_id)));
+        }
 	if(!quick)
 	{
 	    ui = VolumeDialog ();
@@ -286,7 +295,9 @@ boolean need_restart=true;
 
     if (ui == `back || ui == `cancel || ui == `abort)
     {
-	SCR(`Execute (.target.modprobe, sformat ("-r %1", lookup (lookup (module_map, "module", $[]), "name", "")), ""));
+	remove_tmp_module_record(card_id);
+	SCR(`Execute (.target.modprobe, 
+	    sformat ("-r %1", lookup (lookup (module_map, "module", $[]), "name", "")), ""));
     }
 
 
