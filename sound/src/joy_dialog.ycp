@@ -96,6 +96,7 @@ define boolean joy_test_popup (integer card_id, integer joymodidx,
         }
         i = i + 1;
     }
+    i = 0;
 
     if (size (joysticks) == 0)
     {
@@ -128,7 +129,6 @@ and press some of its buttons several times.
             `VSpacing(1)),
         `HSpacing(1.5)
         ));
-	i = 0;
 
 	// more joysticks are connected: run jstest alternately for all ones,
 	// until user pushs some button of joystick he want to test
@@ -156,11 +156,14 @@ and press some of its buttons several times.
 		    ret = `found;
 		}
 	    }
-	    SCR::Execute(.background.kill, nil);
-	    if (i == size (joysticks))
-		i = 0;
-	    else
-		i = i + 1;
+	    SCR::Execute(.background.kill);
+	    if (ret != `found)
+	    {
+		if (i == size (joysticks))
+		    i = 0;
+		else
+		    i = i + 1;
+	    }
         }
     }
     if (ret == `abort)
@@ -178,6 +181,8 @@ and press some of its buttons several times.
         return false;
     }
 
+    // number of device could be different from card number...
+    js_id	= joysticks [i]:0;
     SCR::Execute(.background.run_output,
         sformat("/usr/bin/jstest --event /dev/input/js%1",js_id));
 
@@ -188,7 +193,7 @@ and press some of its buttons several times.
         ret = UI::PollInput();
         if (ret != nil)
         {
-            SCR::Execute(.background.kill, nil);
+            SCR::Execute(.background.kill);
             if (testing_new)
             {
                 Joystick::joystick = current_conf;
@@ -313,7 +318,7 @@ and press some of its buttons several times.
     }
     while (ret == nil);
 
-    SCR::Execute(.background.kill, nil);
+    SCR::Execute(.background.kill);
 
     // back to the old values
     Joystick::joystick = current_conf;
@@ -492,6 +497,7 @@ It is currently not installed. Install it now?</p>")))
 	if (s == `next)
 	{
 	    string modname	= Sound::modules_conf[card_id, "module"]:"";
+	    map sound_options	= Sound::modules_conf[card_id, "options"]:$[];
 	    map joy_entry	= Sound::GetJoystickSettings (modname);
 	    integer joymodidx = (integer)UI::QueryWidget(`id(`os),`CurrentItem);
 	    string joymod	= joylist[joymodidx,0]:"";
