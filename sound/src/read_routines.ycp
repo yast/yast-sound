@@ -1,0 +1,237 @@
+/**
+ * File:
+ *   read_routines.ycp
+ * 
+ * Module:
+ *   Sound
+ * 
+ * Summary:
+ *   Routines for reading sound card configuration
+ * 
+ * Authors:
+ *   Dan Meszaros <dmeszar@suse.cz>
+ *
+ * $Id$
+ *
+ */
+
+{
+
+    /**
+     * reads already saved info from modules.conf
+     * example:
+     * [
+     *	    $[
+     *		"alias":    "snd-card-0",
+     *		"module":   "snd-card-emu10k1",
+     *		"options":  ["snd_id":"0", "snd_index":"card1"],
+     *		"unique_key":"asdf.asdfasdfasdf",
+     *		"model":    "Sound Blaster Live!"
+     *	    ],
+     *	    $[...]
+     *	]
+     * @return list 
+     */
+    global define read_save_info () ``{
+        string prefix = "";
+        list aliases  = SCR(`Read(topath (sformat ("%1.modules.alias", prefix))));
+        list options  = SCR(`Read(topath (sformat ("%1.modules.options", prefix))));
+        list save     = [];             // structure to save
+        integer i     = 0;
+
+	// since parameters in modules options are separated by comas (eg. options mod snd_id=1,2,3, snd_index=1,2,3)
+	// we have to count occurences for each module
+
+
+        if (contains (aliases, "char-major-116"))
+        {
+              // alsa modules
+	    map mod_occur=$[];
+
+	    list aliases=SCR(`Read(.modules.alias));
+	    aliases=filter(`e, aliases, ``(find(e, "snd-card-")==0));
+    
+	    integer position=-1;
+
+	    foreach(`e, aliases, 
+	    ``{
+		position=position+1;
+		map entry=$[];
+		string modname=SCR(`Read(.modules.alias, e));
+
+		integer opt_pos=lookup(mod_occur, modname, 0);
+
+		mod_occur=add(mod_occur, modname, lookup(mod_occur, modname, 0)+1);		    
+
+		map options=SCR(`Read(.modules.options, modname));
+		options=mapmap(`k, `v, options, 
+		``{
+		    list vals=splitstring(v, ",");
+		    if(size(v)>opt_pos)
+		    {
+			return [k, select(vals, opt_pos)];
+		    }
+		    return [nil, nil];
+		}
+		);
+
+		string comment=SCR(`Read(.modules.alias.comment, e));
+		// first remove trash from the end and beginning of the comment string
+		comment=afterLast(beforeLast(comment, "\n"), "\n");
+		comment=removeBlanks(afterLast(comment, "#"));
+		integer pos=find(comment, ":");
+		string uniq="";
+		string model="";
+		if(pos>=0)
+		{
+		    uniq=substring(comment, 0, pos);
+		    model=substring(comment, pos+1, size(comment)-pos-1);
+		}   
+		
+		else 
+		{
+		    // probably system upgrade
+		    list cards=get_audio();
+		    list keys=read_unique_keys();
+		    if(size(keys)<=position)
+		    {
+			uniq=isa_uniq();
+			model="ISA / virtual sound card";
+		    }
+		    else
+		    {
+			string key=select(keys, position);
+			list card=filter(`cc, cards, ``(lookup(cc, "unique_key", "")==key));
+			if(size(card)>=0)
+			{
+			    uniq=key;
+			    model=get_card_label(select(card, 0));
+			}
+			else
+			{
+			    uniq=isa_uniq();
+			    model="ISA / virtual sound card";
+			}
+		    }
+		}
+	
+		entry=$[    "alias"	: e,
+			    "module"	: modname,
+			    "options"	: options,
+			    "unique_key": uniq,
+			    "model"	: model
+		];
+		
+		save=add(save, entry);
+	    });	
+
+/*            if (SCR(`Read(topath(sformat ("%1.modules.alias", prefix)), "char-major-116")) == "snd")
+            {
+                integer cards   = tointeger (lookup (SCR(`Read(topath (sformat ("%1.modules.options", prefix)), "snd")), "snd_cards_limit", 1));
+                map entry       = $[];
+                map mod_entry   = $[];
+
+                string alias    = "";
+                string module_name   = "";
+                string comment  = "";
+
+                    // read the cards
+                while (i < cards)
+                {
+
+                          // == snd-card-X ==
+                    entry = $[];
+                    alias = sformat ("snd-card-%1", i);
+
+                    if (!contains(aliases, alias))
+                    {
+                        i = i + 1; continue; // not found
+                    }
+
+                    module_name  = SCR(`Read(topath (sformat ("%1.modules.alias", prefix)), alias));
+                    if ((module_name == "off") || (module_name == "null"))
+                    {
+                        i = i + 1; continue;
+                    }
+                    comment = SCR(`Read(topath (sformat ("%1.modules.alias.comment", prefix)), alias));
+
+		                        entry = add (entry, "name", module_name);
+                    mod_entry = add (mod_entry, "alias", alias);
+                    if (contains (options, module_name))
+                    {
+                        mod_entry = add (mod_entry, "options", SCR(`Read(topath (sformat ("%1.modules.options", prefix)), module_name)));
+                    }
+                    if (size (comment) > 0)
+                    {
+                        entry = add (entry, "comment", comment);
+                    }
+
+                    entry = add (entry, "modules", mod_entry);
+                    save = add (save, entry);
+
+                    i = i + 1;
+                }
+            }
+*/
+
+        }
+        else if (contains (aliases, "char-major-14"))
+        {
+              // oss (poor support, should be enhanced ... )
+
+              // list of aliases to be read
+            list local_aliases = ["char-major-14",
+                                  "sound",
+                                  "midi",
+                                  "sound-slot-0",
+                                  "sound-service-0-0"];
+
+            map entry      = $[];
+            map option     = $[];
+            string module_name  = "";
+            string comment = "";
+
+            maplist (`alias, local_aliases,
+              ``{
+                if (contains (aliases, alias))
+                {
+                    entry   = $[];
+                    module_name  = SCR (`Read(topath (sformat ("%1.modules.alias", prefix)), alias));
+                    comment = SCR (`Read(topath (sformat ("%1.modules.alias.comment", prefix)), alias));
+                    if (contains (options, module_name))
+                    {
+                        option = SCR (`Read(topath (sformat ("%1.modules.options", prefix)), module_name));
+                    }
+                    else
+                    {
+                        option = $[];
+                    }
+
+                    if ((module_name != "off") && (module_name != "null"))
+                    {
+                        if (size (module_name) > 0)
+                        {
+                            entry = add (entry, "alias", alias);
+                            entry = add (entry, "name", module_name);
+                            if (size (option) > 0)
+                            {
+                                entry = add (entry, "options", option);
+                            }
+                            if (size (comment) > 0)
+                            {
+                                entry = add (entry, "comment", comment);
+                            }
+                        }
+                    }
+                    if (size (entry) > 0)
+                    {
+                        save = add (save, entry);
+                    }
+                }
+              });
+        }
+        return save;
+    }
+
+
+}

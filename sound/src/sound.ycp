@@ -8,7 +8,7 @@
  *   Sound 	 
  *
  * Authors:
- *   Dan Veselý	<dan@suse.cz>
+ *   Dan Meszaros <dmeszar@suse.cz>
  *
  * $Id$
  *
@@ -25,7 +25,10 @@
     include "sound/routines.ycp";
     include "sound/ui.ycp";
     include "sound/texts.ycp";
+    include "sound/read_routines.ycp";
+    include "sound/alsa_routines.ycp";
 
+    include "browser.ycp";
 
     // text constants for sound module
     map STRINGS=STRINGS_();
@@ -57,120 +60,94 @@
      * @param	finish true if no complex dialog is to be called (then the popup "Config will be saved.." will appear)
      * @return  list with save info, as required by sound_write for one cards
      */
-    global define OneCardWizard (map card, integer card_id, any ui, integer flags, boolean finish) ``{
+    global define OneCardWizard (map save_entry, integer card_id, any ui, integer flags, boolean finish, list save_info) ``{
 	    // 3rd param for "sound_module" will be defined later
+	    // TODO: add nm256hack
+	integer state=1;
 
-	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id), card_id, flags)),
-		    ``(CallModule ("sound_volume", [card, card_id, finish, quick] ))]; 
-	integer id = 0;
-	if (ui == `back)
+	if(ui == `back)
 	{
-	    id = size (dialog) - 1;
-	}
-	any result = $[];
-	any ui = nil;
+	    state=3;
+	}	
 
-	boolean success = false;
-	any act_dialog = nil;
+	map opts=lookup(save_entry, "options", $[]);
+	save_entry=add_common_options(save_entry, card_id);
+	save_entry=add_alias(save_entry, card_id);
+	
+	integer state=1;
+	map res=$[];
 
-	boolean quick=false;
-
-	while ((id >= 0) && (id < size (dialog))) 
-	{
-
-	    act_dialog = select (dialog, id);
-
-	    if (id+1 == size (dialog))
-	    {
-		if (!nm256hack(card)) 
-		{
-		    id = 0;
-		    continue;
-		}
-	    }
-
+	string modelname=lookup(save_entry, "model", "");
+   
+	boolean show_opts=false;
  
-	    result=eval(act_dialog);
-
-	    ui = lookup(result, "ui", `cancel);
-
-	    if (ui == `skip)
-	    {	
-		break;
-	    }
-	      // case: next
-	    else if (ui == `next || ui == `quick) 
-	    {
-		if(ui == `quick) quick=true;
-		else quick=false;
-		id = id + 1;
-
-		if (id == size (dialog)) 
-		{
-		    success = lookup (result, "return", false);
-		}
-		else 
-		{
-		    if (act_dialog == ``(CallModule ("sound_options", [card]))) 
-		    {
-			card = lookup (result, "return", $[]);
-		    }
-		}
-	    }
-		// case: back
-	    else if (ui == `back) 
-	    {
-		id = id - 1;
-		if (id == 0) 
-		{
-		    dialog = filter (`e, dialog, ``(e != ``(CallModule ("sound_options", [card]))));
-		}
-	    }
-		// case: options
-	    else if (ui == `options) 
-	    {
-		list nd   = [];
-		integer i = 0;
-		// insert into the pre-last position
-		foreach (`e, dialog, ``{
-		    if ((size (dialog) - 1) == i) 
-		    {
-			nd = add (nd, ``(CallModule ("sound_options", [card])));
-		    }
-		    nd = add (nd, select(dialog, i));
-		    i = i + 1;
-		});
-		dialog = nd;
-		id = id + 1;
-	    }
-	    else if (ui == `abort || ui == `cancel)
-	    {
-		{
-		    return $["ui": `abort];
-		}
-	    }
-	}
-	map ret = $[];
-
-	if (((ui == `next) && success) || (ui == `back)) 
+	while(state>0)
 	{
-	    result = create_save_info (card, card_id);
-	    if (size (result) > 0)
+	    if(state==1)
+	    // display_name dialog
 	    {
-		ret = add (ret, "return", result);
+		res=DisplayName(modelname, lookup(save_entry, "alias"), card_id, flags);
+		symbol ui=lookup(res, "ui", nil);
+		
+		show_opts=(ui==`options);
+
+		map nextstate=$[`back: -1, `next: 3, `options: 2, `quick: 4, `skip: -2, `abort: -3];
+		state=lookup(nextstate, ui, 0);
+	    }
+	    else if(state==2)
+	    // options dialog
+	    {
+		res=CallModule ("sound_options", [save_entry]);
+		symbol ui=lookup(res, "ui", nil);
+		if(ui == `next)
+		{
+		    save_entry=lookup(res, "return", $[]);
+		    save_entry=add_common_options(save_entry, card_id);
+		}
+		
+		map nextstate=$[`next: 3, `back: 1, `abort: -3];
+		state=lookup(nextstate, ui, 0);
+	    }
+	    else if(state==3)
+	    // volume dialog
+	    {
+		res=CallModule ("sound_volume", [save_entry, card_id, finish, false, save_info] );
+		map nextstate=$[`next: -13, `abort: -3, `back: 1];
+		symbol ui=lookup(res, "ui", nil);
+		if(ui==`back && show_opts)
+		{
+		    state=2;
+		}
+		else
+		{
+		    state=lookup(nextstate, ui, 0);
+		}
+	    }
+	    else if(state==4)
+	    // quick config
+	    {
+		res=CallModule ("sound_volume", [save_entry, card_id, finish, true, save_info]);
+		map nextstate=$[`next: -13, `abort: -3, `back: 1];
+		symbol ui=lookup(res, "ui", nil);
+		if(ui==`back && show_opts)
+                {
+                    state=2;
+                }
+                else
+                {
+                    state=lookup(nextstate, ui, 0);
+                }
 	    }
 	}
 
-	if (no_alsa_exception (card, config_mode))
-	{
-	    ret = add (ret, "use_alsa", false);
-	}
-	return add (ret, "ui", ui);
+	map nextstate=$[-13: `next, -3: `abort, -2: `skip, -1: `back];
+	return $["ui": lookup(nextstate, state, -2), "return": save_entry];
     }
 
     // ========== MAIN ==========
     OpenMainDialog();
     InitializingDialog ();
+
 
     UI(`DisableWizardAbortButton());
 
@@ -201,26 +178,10 @@
 	}
 	arg_n = arg_n - 1;
     }
-    list sound_cards  = get_audio (test_mode, config_mode);
+    list sound_cards  = get_audio ();
 
     list save_info    = read_save_info ();
-   
-    // filter out save_info of non-present hardware
-/*    list obs=get_obsoletes(sound_cards, read_unique_keys());
-    integer obs_pos=size(obs)-1;
-    string pth="";
-    while(obs_pos>=0)
-    {
-	// first remove alias
-	pth=sformat("snd-card-%1", obs_pos);
-	SCR(`Write(.modules.alias, nil, pth));	
-    
-	save_info=remove(save_info, select(obs, obs_pos));
-	obs_pos=obs_pos-1;
-    }   
-*/
-    // TODO: save modules.conf now if changed
-
+ 
     CreateTmpModulesConf();
  
     map rc_vars       = $[];
@@ -234,30 +195,24 @@
     list configured_unique = []; // list of unique keys, that was configured
 
     boolean exit = false;
-    list db = GetCardDatabase(); 
-    if (db==nil) 
-    {
-	UI(`MessagePopup (_("The Sound card database cannot be found.\nPlease check your installation")));
-	exit = true;
-    }
+    list db = nil;
 
-    // get all the apropriate information from the database
-    sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
-
-
-    // filter out modules with unspecified module name (sound card not supported by alsa / not autodetected)
-    sound_cards = filter(`e, sound_cards, ``(lookup(e, "module", $[])!=$[]));
-
-    integer all_cards_num=size(sound_cards);
-
-  //  list already=read_unique_keys();
-    list already=get_present_unique_keys(sound_cards, read_unique_keys());
+    sound_cards=filter_configured(save_info, sound_cards);
     
-//    y2error(sformat("alredy configured: %1", already));
-    configured_unique=already;
-	// filter out cards that had been already configured
-    sound_cards = filter (`e, sound_cards, ``(!contains (already, lookup (e, "unique_key", ""))));
-    integer new_cards_num=size(sound_cards);
+    if(size(sound_cards)>0)
+    {
+	db=GetCardDatabase();
+	// get all the apropriate information from the database
+	sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
+
+
+    // filter out modules with unspecified module name (sound card not supported by alsa / no module found)
+	sound_cards = filter(`e, sound_cards, ``(lookup(e, "module", $[])!=$[]));
+    
+    // create save_info entries
+	sound_cards = convert_to_save_info(sound_cards);
+    }
+    integer all_cards_num=size(sound_cards);
 
     if(exit)
     {	// no sound cards database present, shutting down
@@ -267,7 +222,6 @@
 
 
     boolean skipped = false;
-//    call_complex_dialog = ( size (sound_cards) != 1 );	
     if(all_cards_num == new_cards_num && all_cards_num == 1)
     {
 	call_complex_dialog=false;
@@ -279,180 +233,176 @@
     
     nm256_opl3sa2_warn(sound_cards);
 
-    while (cont) 
+    symbol state=`card_select;
+    map res=$[];
+
+    boolean can_go_back=false;
+
+    repeat
     {
-		    // wizards ...
-	while ((card_id >= 0) && (card_id < size (sound_cards))) 
+	if(state==`card_select)
+	// let's select the hardware we want to configure
 	{
-
-	    result = OneCardWizard (select (sound_cards, card_id), size (save_info), 
-				    condition (skipped, `next, ui), 15, !call_complex_dialog);
-
-
-	    ui       = lookup (result, "ui", `cancel);
-	    use_alsa = lookup (result, "use_alsa", true);
-
-	    if (ui == `cancel || ui == `abort)
-	    {	
-		UI(`CloseDialog());
-		return;
-		//break;
-	    }
-	    if (ui == `skip) 
+	    if(size(sound_cards)==0)
 	    {
-		card_id = card_id + 1;
-		call_complex_dialog=true;
-		skipped = true;
+		state=`detail;
+		can_go_back=false;
+		continue;
 	    }
-	    if (ui == `back) 
+	    list nh=maplist(`e, sound_cards, ``(lookup(e, "model", "")));
+	    list ch=maplist(`e, save_info, ``(lookup(e, "model", "")));
+	    res=CallModule("sound_select", [nh, ch]);
+	    symbol ui=lookup(res, "ui", nil);
+	    if(ui==`next)
 	    {
-		map rem = lookup (result, "return", $[]);
-		save_info = filter (`e, save_info, ``(e != rem));
-		configured_unique = filter (`e, configured_unique, ``(lookup (select (sound_cards, card_id), "unique_key", "") != e));
-		card_id = card_id - 1;
+		if(lookup(res, "type", nil)==`new)
+		{
+		    card_id=lookup(res, "id", 0);
+		    state=`card_wizard;
+		}
+		else if(lookup(res, "type", nil)==`configured)
+		{
+		    card_id=lookup(res, "id", 0);
+	            state=`edit_options;
+		}
+		else if(lookup(res, "type", nil)==`manual)
+		{
+		    state=`add_manual;
+		}   
+	    } 
+	    else if(ui==`detail)
+	    {
+		state=`detail;
+		can_go_back=true;
 	    }
-	    if (ui == `next) 
+	    else if(ui==`back || ui==`abort)
 	    {
-		map new = lookup (result, "return", $[]);
-		save_info = add (save_info, new);
-		configured_unique = add (configured_unique, lookup (select (sound_cards, card_id), "unique_key", ""));
-		card_id = card_id + 1;
-		skipped = false;
+		state=`abort;
 	    }
-    
 	}
-
-	if (ui == `abort || ui == `cancel) 
+	else if(state==`card_wizard)
+	// run the card wizard for new card
 	{
-	    UI(`CloseDialog());
-	    return;
-	}
-
-	if (ui == `back) 
-	{   // exit module
-	    break;
-	}
-    
-	if (call_complex_dialog) 
-	{
-	    result = CallModule ("sound_complex", [get_audio(false, false)/*sound_cards*/, save_info, configured_unique]);
-	}
-	else
-	{
-	    result = $["ui" : `next, "save_info" : save_info];
-	}
-
-	ui = lookup (result, "ui", `cancel);
-	if(ui == `abort)
-	{
-	    UI(`CloseDialog());
-	    return;
-	}
-
-	if ((ui == `next) && (size (sound_cards) != 1)) 
-	{
-	
-      // confirmation popup message
-	    string warn_msg = lookup(STRINGS, "ConfigSaveWarn", "");
-
-	    if (size(filter (`e, lookup (result, "save_info", $[]), ``((size (e) > 0) && (lookup (e, "name", "off") != "off")))) == 0)
+	    map save_entry=select(sound_cards, card_id);
+	    res=OneCardWizard(save_entry, size(save_info), false, 15, false, save_info);
+	    symbol ui=lookup(res, "ui", nil);
+	    if(ui==`back)
 	    {
-	// confirmation popup message		
-		warn_msg = lookup(STRINGS, "ConfigSaveWarn2", "");
+		state=`card_select;
 	    }
-
-	// Yes, No - button label
-	    cont = !(UI (`YesNoPopup (warn_msg)));
-	
-	    if (call_complex_dialog) 
+	    else if(ui==`next)
 	    {
-		save_info = lookup (result, "save_info", $[]);
-		rc_vars   = lookup (result, "rc", $[]);
-		configured_unique = lookup (result, "configured_unique", []);
+		save_info=add(save_info, lookup(res, "return", $[]));
+		sound_cards=remove(sound_cards, card_id);
+		// TODO: another dialog should be called
+		state=`card_select;
+	    }
+	    else if(ui==`abort)
+	    {
+		state=`abort;
+	    }
+	}
+	else if(state==`edit_options)
+	// edit options
+	{
+	    map entry=select(save_info, card_id);
+	    map res=CallModule("sound_options", [entry]);
+	    symbol ui=lookup(res, "ui", nil);
+	    if(ui==`next)
+	    {
+	        entry=lookup(res, "return", $[]);
+	        entry=add_common_options(entry, card_id);
+	        integer pos=0;
+	        save_info=maplist(`e, save_info,
+	        ``{
+	            if(pos!=card_id)
+	            {
+	                pos=pos+1;
+	                return e;
+	            }
+	            else
+	            {
+	                pos=pos+1;
+	                return entry;
+	            }
+	        });
+		state=`card_select;
+	    }
+	    else if(ui==`abort)
+	    {
+		state=`abort;
 	    }
 	    else
 	    {
-		skipped = true;
+		state=`card_select;
 	    }
 	}
-	else 
+	else if(state==`detail)
+	// edit card options
 	{
-	    if ((size (sound_cards) != 1))
+	    map res=CallModule("sound_complex", [save_info, []]);
+	    symbol ui=lookup(res, "ui", nil);
+	    if(ui==`next)
 	    {
-		cont = false;
+		save_info=lookup(res, "save_info", []);
+		state=`save;
 	    }
-	    else 
+	    else if(ui==`abort)
 	    {
-		if (ui == `back) 
+		state=`abort;
+	    }
+	    else if(ui==`back)
+	    {
+		if(can_go_back)
 		{
-		    card_id = card_id - 1;
+		    state=`card_select;
+		}
+		else
+		{
+		    state=`abort;
 		}
 	    }
-
 	}
-	if ((size (sound_cards) == 1)) 
+	else if(state==`add_manual)
 	{
-// !!!!!!!!
-	    if (call_complex_dialog)
-            {
-                save_info = lookup (result, "save_info", $[]);
-                rc_vars   = lookup (result, "rc", $[]);
-                configured_unique = lookup (result, "configured_unique", []);
-            }
-// !!!!!!!
-	    cont = false;
+	    map res=add_card_manually(save_info);
+	    symbol ui=lookup(res, "ui", nil);
+	    if(ui==`next)
+	    {
+		save_info=add(save_info, lookup(res, "return", $[]));
+		state=`card_select;
+	    }
+	    else if(ui==`abort)
+	    {
+		state=`abort;
+	    }
+	    else
+	    {
+		state=`card_select;
+	    }
 	}
+    } until(state==`abort || state==`exit || state==`save);
+    if(state==`back || state==`abort)
+    {
+	UI(`CloseDialog());
+	return;
     }
+    else if(state==`save)
+    {
+	ui=`save;
+    }   
 			    // filter out empty enries
     save_info = filter (`e, save_info, ``(size (e) > 0));
     n_cards = size (save_info);
 
     map save_map = $[];
 
-    if (/*(n_cards > 0) &&*/ (ui == `next)) 
+    if (ui == `save) 
     {
-	if (use_alsa) 
-	{
-	    string snd_name = "off";
+	CallModule ("sound_write", [save_info]);
 
-	    if (size (filter (`e, save_info, ``(lookup (e, "name", "off") != "off"))) > 0)
-	    {
-		snd_name = "snd";
-	    }
-
-	    save_info = prepend (save_info, $["name"   : snd_name,
-				      "modules" : $["alias"  : "char-major-116",
-						    "options" : $["snd_cards_limit" : sformat ("%1", n_cards),
-						     "snd_major"        : "116"]]]);
-
-	    save_map = add (save_map, "cards",  save_info);
-	    save_map = add (save_map, "system", $["modules" : alsa_oss (n_cards),
-					     "rc"       : rc_vars]);
-	    save_map = add (save_map, "other",  ``(AlsaFinish ()));
-
-	}
-	else 
-	{
-	// no alsa
-	    string mod_name = lookup (select (sound_cards, 0), "module", "");
-	    if (size (mod_name) > 0)
-	    {
-		save_map = add (save_map, "system", no_alsa (mod_name));
-	    }
-	}
-
-    //UI(`DebugDialog (save_info));
-
-
-	CallModule ("sound_write", [save_map, test_mode]);
-
-    
-    }    
-
-    if (ui == `next) 
-    {
     // always save unique keys 
-	save_unique_keys (get_audio (test_mode, config_mode), configured_unique);
+	save_unique_keys (maplist(`e, save_info, ``(lookup(e, "unique_key", ""))));
 
 	if (lookup (rc_vars, "START_ALSA", "yes") == "no")
 	{

@@ -1,0 +1,68 @@
+/**
+ * File:
+ *   sound_select
+ *
+ * Module:
+ *   Sound
+ *
+ * Summary:
+ *   sound card selection dialog
+ *
+ * Authors: 
+ * Dan Meszaros <dmeszar@suse.cz>
+ * 
+ * 
+ * $Id$
+ * 
+ * Params: 1st ... list of strings of new hardware
+ *         2nd ... list of strings of configured hardware
+ */
+
+{
+    include "sound/ui.ycp";
+
+    // show the dialog
+    selectHardware( maplist(`e, sound_cards, ``(lookup(e, "model", ""))),
+                    maplist(`e, save_info, ``(lookup(e, "model", ""))));
+
+    UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
+
+    any ui=nil;
+    repeat
+    {
+	ui=UI(`UserInput());
+	if(ui==`nh)
+	{
+	    UI(`ChangeWidget(`id(`action), `CurrentButton, `new));
+	}
+	else if(ui==`ch)
+	{
+	    UI(`ChangeWidget(`id(`action), `CurrentButton, `configured));
+	}
+	else if(ui==`abort && ReallyAbort())
+	{
+	    return $["ui": `abort];
+	}
+
+    } until(ui==`back || ui==`next ||  ui==`detail);
+
+    symbol type=nil;
+    integer index=0;
+    type=UI(`QueryWidget(`id(`action), `CurrentButton));
+
+    if(type==`new)
+    {
+	index=UI(`QueryWidget(`id(`nh), `CurrentItem));
+    }
+    else if(type==`configured)
+    {
+	index=UI(`QueryWidget(`id(`ch), `CurrentItem));
+    }
+    else 
+    {
+	index=-1;
+    }
+
+    return $["ui": ui, "type":type, "id":index];
+
+}

@@ -1,0 +1,142 @@
+/**
+ *
+ *
+ * File:
+ *   alsa_routines.ycp
+ *
+ * Module:
+ *   Sound       
+ *
+ * Authors:
+ *   Dan Meszaros <dmeszar@suse.cz>
+ *
+ * $Id$
+ *
+ * routines for alsa sound system
+ *                   
+ *
+ */
+
+{
+    /**
+     * fliters out already configured cards
+     * @param save_info info from modules.conf
+     * @cards autodetected cards
+     * @return list of entries of not configured cards
+     */
+    
+    global define filter_configured(list save_info, list cards) ``{
+	cards=filter(`e, cards,
+	``{
+	    string uniq=lookup(e, "unique_key", "");
+	    boolean retval=true;
+	    foreach(`s, save_info,
+	    ``{
+		if(lookup(s, "unique_key", "")==uniq)
+		{
+		    retval=false;
+		}
+	    });
+	    return retval;
+	});
+	return cards;
+    }
+
+    /**
+     *
+     *
+     *
+     *
+     */
+    global define get_card_label(map card)
+    ``{
+	list lab=splitstring(hardware_name(card),"\n");
+	if(select(lab, 1)=="")
+	{
+	    return select(lab, 0);
+	}
+	return select(lab, 1);
+    }
+
+    /**
+     * creates a save-info-like list of cards
+     * @param detected cards
+     */
+
+    global define convert_to_save_info(list cards) ``{
+	cards = maplist(`e, cards,
+	``{
+	    list options=lookup(e, "options", []);
+	    map opts=$[];
+	    maplist(`op, options,
+	    ``{
+		if(lookup(op, "default", "")!="")
+		{
+		    opts=add(opts, lookup(op, "name", ""), lookup(op, "default", ""));
+		}
+	    });
+	    map entry=$[
+		"model"     : get_card_label(e),
+		"module"    : lookup(lookup(lookup(e, "module", $[]),"module", $[]),"name", ""),
+		"unique_key": lookup(e, "unique_key", ""),
+		"options"   : opts];
+	    return entry;
+	});
+	return cards;
+    }
+
+    /**
+     * adds alias to save_info entry
+     */
+
+    global define add_alias(map entry, integer card_id) ``{
+	return add(entry, "alias", sformat("snd-card-%1", card_id));
+    }
+
+    /**
+     *	adds common options for module. for alsa it is 'snd_id=card(#+1) snd_index=#'
+     *
+     */
+
+    global define add_common_options(map entry, integer card_id) ``{
+	map opts=lookup(entry, "options", $[]);
+	opts=add(opts, "snd_index", card_id);
+        opts=add(opts, "snd_id", sformat("card%1", card_id+1));
+	entry=add(entry, "options", opts);
+	return entry;
+    }
+
+    /**
+     * Simply returns list with ALSA OSS/Free emulation modules
+     * Params: "number" ... number of sound cards
+     * @return list
+     */
+    global define alsa_oss (integer number) ``{
+        list modules = [];
+        integer i = 0;
+        // map with minor as a key and module as value
+        map oss_list = $[
+            0  : "snd-mixer-oss",
+            11 : "snd-mixer-oss",
+            3  : "snd-pcm-oss",
+            12 : "snd-pcm-oss",
+            1  : "snd-seq-oss",
+            8  : "snd-seq-oss"
+            ];
+
+        while (i < number)
+        {
+            modules=add(modules, $[ "alias": sformat ("sound-slot-%1", i),
+                                    "module": sformat ("snd-card-%1", i)]);
+            foreach(`k, `v, oss_list,
+            ``{
+                modules=add(modules, $[ "alias": sformat("sound-service-%1-%2",i, k),
+                                        "module": v]);
+            });
+            i = i + 1;
+        }
+        return modules;
+    }
+
+
+}

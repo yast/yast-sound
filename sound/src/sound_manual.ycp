@@ -34,14 +34,12 @@
     define ManualDialog () ``{
 	string helptext=lookup(STRINGS, "ManualDialog");
 	    // label if no module name found
-	list module_names = sort (maplist (`e, db, ``(lookup (e, "name", _("Unknown module name")))));
-	    // in the modules/cards list - to see all available cards
-	module_names = prepend (module_names,  `item(`id(`all), _("All")));
-	list card_names = get_cards ("All");
+	list module_names=get_module_names();
+	module_names=prepend(module_names, `item(`id("all"), _("All")));
+	
+	list card_names = get_card_names("all");//get_cards ("All");
 
 	term con = `VBox ();
-
-//	TERM Con = `VBox (`VSquash(`Tree(`id(`tree), `opt(`hstretch), "Select", tree)));
 
 	con = add (con, `VBox
 	    (
@@ -79,23 +77,13 @@
 	    if (ui == `sel_drv) 
 	    {
 		any drv = UI (`QueryWidget (`id(`sel_drv), `CurrentItem));
-//		symbol itemid= UI (`QueryWidget (`id(`sel_drv), `CurrentItem));
-		if (is(drv, symbol) && drv == `all ) //UI(_("All")))
-//		if ( itemid==`all)
-		{
-		    card_names = get_cards ("all");
-		}
-		else
-		{
-		    card_names = get_cards (drv);
-		}
+		card_names = get_card_names (drv);
 
 		UI(`ReplaceWidget (`id(`rep_mod),
 				// To translators: selection box title
 		    `SelectionBox (`id (`sel_mod), _("Sound card model"), card_names)));		
 
 		// TODO: this would be nice to have from libyui instead of replacing widget
-		// UI(`ChangeWidget(`id(`sel_mod), `Items, card_names));
 		UI(`ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0)));
 	    }
 	    else if (ui == `search) 
@@ -128,21 +116,16 @@
 
 	map ret = $["ui" : ui];
 
-	string drv_selection="";
-	any it=UI (`QueryWidget (`id(`sel_drv), `CurrentItem));
-	if(is(it, symbol))
-	{
-	    drv_selection="All";
-	}
-	else
-	{
-	    drv_selection=it;
-	}
+	any model=UI(`QueryWidget (`id(`sel_mod), `CurrentItem));
+	any modname=UI(`QueryWidget (`id(`sel_drv), `CurrentItem));
     
 	if (ui == `next) 
 	{
-	    ret = add (ret, "return", get_card (drv_selection, // UI(`QueryWidget (`id(`sel_drv), `CurrentItem)),
-					  UI (`QueryWidget (`id(`sel_mod), `CurrentItem))));
+	    if(modname=="all")
+	    {
+		modname=get_module_by_cardname(model);
+	    }
+	    ret=$["ui": `next, "module": modname, "model": model];
 	}
 	return ret;
     }
@@ -150,7 +133,7 @@
 
     // ==== main ====
 
-
+    
     list db = GetCardDatabase(); 
     
     if (db==nil) 

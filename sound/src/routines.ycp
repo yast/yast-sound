@@ -15,12 +15,214 @@
  *
  */
 
-
 {
     textdomain "sound";
     include "misc_defines.ycp";
     include "lan/lan_routines.ycp";
 
+    global define add_card_manually(list save_info) ``{
+	symbol ui=nil;
+	map entry=$["unique_key": isa_uniq(), "options": $[]];
+	while(true)
+	{
+            res=CallModule("sound_manual", []);
+
+            if(lookup(res, "ui", nil)==`next)
+            {
+                entry=add(entry, "model", lookup(res, "model", ""));
+                entry=add(entry, "module", lookup(res, "module", ""));
+            }
+            else
+            {
+                ui=lookup(res, "ui");
+                if(ui==`abort || ui==`cancel)
+                {
+                    return $["ui": `abort];
+                }
+                break;
+            }
+	    res=OneCardWizard(entry,  size(save_info), `next, 6, false, save_info);
+	    if(lookup(res, "ui", `cancel)==`next)
+	    {
+	        entry=lookup(res, "return", $[]);
+	        ui=`next;
+	        break;
+	    }
+	    else
+	    {
+	        if(lookup(res, "ui", `cancel)!=`back)
+	        {
+	            ui=`abort;
+	            break;
+	        }
+	    }
+	}
+	return $["ui": ui, "return": entry];
+    }
+
+    /** returns list of items: [`item(`id(module_name), "module label")]
+     */
+    global define get_module_names() ``{
+	list ret=[];
+	if(db==nil) return [];
+	foreach(`e, db, 
+	``{
+	    ret=add(ret, `item(`id(lookup(lookup(e, "module", $[]), "name", "")), lookup(e, "name", _("Unknown module name"))));
+	});
+	ret=sort(`a, `b, ret, ``(select(a, 1)<select(b, 1)));
+
+	return ret;
+    }
+
+    /** returns card models list 
+     *
+     * @param modname if "all" returns all models
+     *
+     *
+     */
+
+    global define get_card_names(string modname) ``{
+	if(modname=="all")
+	{
+	    list cards=[];
+	    foreach(`e, db,
+	    ``{
+		cards=add(cards, lookup(e, "cards", []));
+	    });
+
+	    cards=flatten(cards);
+	    return sort(cards);
+	}
+
+	list mods=filter(`e, db, 
+	``(lookup(lookup(e, "module", $[]), "name", "")==modname));
+	if(size(mods)==0)
+	{
+	    return [];
+	}
+	return sort(lookup(select(mods, 0), "cards", []));
+    }
+
+    /**  
+     *	returns module name for a given card model
+     *
+     */
+
+    global define get_module_by_cardname(string cardname) ``{
+	list mod=filter(`e, db,
+	``(contains(lookup(e, "cards"), cardname))
+	);
+	return lookup(lookup(select(mod, 0), "module", $[]), "name", "unknown");
+    }
+
+    /**
+     * returns the 'params' section from sndcards.ycp of the given module
+     * @param modname module name
+     * @return list with params and their descriptions
+     */
+
+    global define get_module_params(string modname) ``{
+	// database must be read some elsewhere
+	list mod=filter(`e, db, ``(lookup(lookup(e, "module", $[]), "name", "")==modname));
+	if(size(mod)>0)
+	{
+	    return lookup(select(mod, 0), "params", []);
+	}
+	return [];
+    }
+
+    /**
+     * unique key for non-pci/pnp cards or virtual cards	
+     *
+     */
+
+    global define isa_uniq() ``{
+	return "uniq.virtual";
+    }
+
+    /**
+     * returns true if char is blank
+     */
+    global define isBlank(string s) ``{
+        if(s=="\n" || s=="\t" || s==" ")
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     *  removes trailing and leading blank chars from string
+     *
+     *
+     */
+    global define removeBlanks(string str)``{
+        //emtpy  string
+        if(size(str)==0) return "";
+
+        integer bound=size(str);
+        integer first=0;
+        integer last=size(str)-1;
+        // find first non-blank char
+        while(first<bound && isBlank(substring(str, first, 1)))
+        {
+            first=first+1;
+        }
+
+        while(last>=0 && isBlank(substring(str, last, 1)))
+        {
+            last=last-1;
+        }
+        if(last>first)
+        {
+            return substring(str, first, last-first+1);
+        }
+        return "";
+    }
+
+
+  /** 
+   * returns the substring that is after the last occurence of the given character(string)
+   * @param str input string
+   * @param delim deliminator string (usually 1 character)
+   * @return string that is after last occurence of delim string in str string
+   */
+    global define afterLast(string str, string delim) ``{
+	integer cut=0;
+	while(true)
+	{
+	    cut=find(str, delim);
+	    if(cut==-1)
+	    {
+		return str;
+	    }
+	    str=substring(str, cut+size(delim), size(str)-cut-size(delim));
+	}
+	// unreachable code
+	return "";
+    }
+
+  /**
+   * returns substring that is before the last occurence of the given character(string)
+   * @see afterLast
+   */
+
+    global define beforeLast(string str, string delim) ``{
+	if(!issubstring(str, delim))
+	{
+	    return str;
+	}
+	integer pos=size(str)-size(delim);
+	while(pos>=0)
+	{
+	    if(find(substring(str, pos, size(str)-pos), delim)==0)
+	    {
+		return substring(str, 0, pos);
+	    }
+	    pos=pos-1;
+	}
+	return str;
+    }
 
   /**
    * reads variables listed in 'vars' from rc.config
@@ -44,21 +246,21 @@
 
     /**
      *  writes unique keys of the configured cards to /var/lib/YaST/unique.inf
-     *  @param list of maps
+     *  @param list of keys
      *  @return void
      *  
      *
      */
 
-    global define save_unique_keys (list cards, list configured_unique) ``{
+    global define save_unique_keys (list keys) ``{
         list orig = SCR(`Read(.var.lib.yast.unique));
         if (orig==nil)
         {
             orig = [];
         }
-        list sound_unique = maplist (`e, configured_unique, ``($["unique" : e, "state" : "configured"]));
+        list keys = maplist (`e, keys, ``($["unique" : e, "state" : "configured"]));
         orig = filter (`e, orig, ``(lookup(e, "section", "") != "sound"));
-	list final=add (orig, $["contents" : sound_unique, "section" : "sound"]);
+	list final=add (orig, $["contents" : keys, "section" : "sound"]);
         SCR(`Write(.var.lib.yast.unique, final));
     }
 
@@ -93,6 +295,7 @@
 
     global define GetCardDatabase() ``{
 	any database=SCR(`Read (.target.yast2, "sndcards.ycp"));
+	y2error("### Reading sndcards.ycp");
 	textdomain "sound_db";
 	database = UI (database);
 	textdomain "sound";
@@ -182,6 +385,7 @@
             ret = add (ret, "bus", "ISA");
         }
         return ret;
+
     }
 
     /**
@@ -251,13 +455,86 @@
         return [];
     }
 
-/*    define get_configured_cards () ``{
-	list keys = read_unique_keys ();
-	list res  = maplist(`l, keys, ``$);
+        /**
+     *
+     *
+     * @return list with configred cards. eg:
+     *  [
+     *      $["unique" : "asdas.asdasd", "state" : "configured", "model" : "SoundBlaster16"],
+     *      $[...]
+     *  ]
+     */
 
-	return res;
+    global define read_configured_cards() ``{
+        if (SCR(`Read(.target.size, "/var/lib/YaST/unique.inf")) == 0)
+        {
+            return [];
+        }
+        list uniq_inf=SCR (`Read(.var.lib.yast.unique));
+        list snd_uniq=[];
+        foreach(`e, uniq_inf,
+        ``{
+            if(lookup(e, "section", "")=="sound")
+            {
+                snd_uniq=lookup(e, "contents", []);
+            }
+        });
+        // now the "configured" values look like 'configured:SoundBlaster16'
+        // we must deivide this and create new key
+
+        string state="";
+        list strings=[];
+
+        list probedcards=[];
+
+        snd_uniq=maplist(`e, snd_uniq,
+        ``{
+            state=lookup(e, "state", ":");
+            strings=splitstring(state, ":");
+            e=add(e, "state", select(strings, 0));
+            if(size(strings)>1)
+            {
+		string modname=select(strings, 1);
+		// substitute underscores by spaces
+		modname=mergestring(splitstring(modname, "_"), " ");
+                e=add(e, "model", modname);
+            }
+            else
+            {
+                string modelname=UI(_("Unknown model"));
+
+                // this probably means, that the system has been upgraded
+                if(probedcards==[])
+                {
+                    probedcards=SCR(`Read(.probe.sound));
+                }
+                foreach(`g, probedcards,
+                ``{
+                    if(lookup(g, "unique_key", "")==lookup(e, "unique", ""))
+                    {
+			if(lookup(g, "sub_device", "")!="")
+			{
+			    modelname=lookup(g, "sub_device", modelname);
+			}
+			else 
+			{
+			    modelname=lookup(g, "device", modelname);
+	    		}    
+                    }
+                });
+
+                e=add(e, "model", modelname);
+
+
+            }
+            return e;
+        });
+
+        return snd_uniq;
     }
-*/
+
+
+
 
     /**
      * Returns list of keys read from /var/lib/YaST/unique.inf
@@ -368,17 +645,8 @@
      *
      */
 
-    global define nm256hack (map card) ``{
-        string module_name = "";
-        if (!haskey(card, "module"))
-        {
-            module_name = lookup(get_module (card), "name", "");
-        }
-        else
-        {
-            module_name = lookup (lookup(lookup (card, "module", $[]), "module", ""), "name", "");
-        }
-        if (module_name == "snd-card-nm256")
+    global define nm256hack (string modname) ``{
+        if (modname == "snd-card-nm256")
         {
             // special warning message for in a special case
             string warn_text=lookup(STRINGS, "nm256hackWarning", "");
@@ -407,39 +675,6 @@
 
 
     /**
-     * Simply returns list with ALSA OSS/Free emulation modules
-     * Params: "number" ... number of sound cards
-     * @return list
-     */
-    global define alsa_oss (integer number) ``{
-	list modules = [];
-	integer i = 0;
-	// map with minor as a key and module as value
-	map oss_list = $[		
-	    0  : "snd-mixer-oss",
-	    11 : "snd-mixer-oss",
-	    3  : "snd-pcm-oss",
-	    12 : "snd-pcm-oss",
-	    1  : "snd-seq-oss",
-	    8  : "snd-seq-oss"
-	    ];
-	
-	while (i < number) 
-	{
-	    modules = add (modules, $["name"   : sformat ("snd-card-%1", i),
-				      "modules" : $["alias" : sformat ("sound-slot-%1", i)]]);
-
-	    modules = union (modules, maplist (`minor, `mod, oss_list, ``(
-		$["name"   : sformat ("%1", mod),
-		  "modules" : $["alias" : sformat ("sound-service-%1-%2", i, minor)]])));
-
-	    i = i + 1;
-	}   
-	return modules;
-    }
-
-
-    /**
      * This is no alsa hack function
      * @return map
      */
@@ -463,56 +698,41 @@
 	    ];
     }
 
-    /**
-     * simply gets detected audio. 
-     * @return map
+    /** 
+     * returns list of detected soundcards
+     *
+     * return example:
+     *          [       
+     *          "bus"           : "PCI",
+     *          "device"        : "ES1371 [AudioPCI-97]",
+     *          "device_id"     : 70513,
+     *          "resource"      : $["io":[$["active":true, "length":0, "mode":"rw", "start":28672]],
+     *                             "irq":[$["count":0, "enabled":true, "irq":10]]],
+     *          "rev"           : "6",
+     *          "sub_device"    : "Creative Sound Blaster AudioPCI64V, AudioPCI128",
+     *          "sub_device_id" : 70513,
+     *          "sub_vendor"    : "Ensoniq",
+     *          "sub_vendor_id" : 70260,
+     *          "vendor"        : "Ensoniq",
+     *          "vendor_id"     : 70260,
+     *          "unique_key"    : "test.test",
+     *          "module"        : $["name":"eps23"]]
+     *          ]
      */
-    global define get_audio (boolean test_mode, boolean config_mode) ``{
-	if (!test_mode && !config_mode) 
-	{
-	    string tmpdir=SCR (`Read (.target.tmpdir));
-	    if(fileexist(tmpdir+"/audio.ycp"))
-	    {
-		return SCR(`Read(.target.ycp, tmpdir+"/audio.ycp"));
-	    }
 
-	    list ret = SCR(`Read(.probe.sound));
-	    if (ret==nil) ret = [];
-	    SCR(`Write(.target.ycp, tmpdir+"/audio.ycp", ret));
-	    return ret;
-	}
-	return [$[//"baseclass"  : "Multimedia controller", 
-		 "bus"           : "PCI", 
-		 "device"        : "ES1371 [AudioPCI-97]", 
-		 "device_id"     : 70513, 
-		 "resource"      : $["io":[$["active":true, "length":0, "mode":"rw", "start":28672]], 
-				    "irq":[$["count":0, "enabled":true, "irq":10]]], 
-		 "rev"           : "6", 
-		 "sub_device"    : "Creative Sound Blaster AudioPCI64V, AudioPCI128", 
-		 "sub_device_id" : 70513, 
-		 "sub_vendor"    : "Ensoniq", 
-		 "sub_vendor_id" : 70260, 
-		 //"subclass"    : "Multimedia audio controller", 
-		 "vendor"        : "Ensoniq", 
-		 "vendor_id"     : 70260,
-		 "unique_key"    : "test.test"],
-	  $[//"baseclass"  : "Multimedia controller", 
-	   "bus"           : "PCI", 
-	   "device"        : "ES1371 [AudioPCI-97]", 
-	   "device_id"     : 98309, 
-	   "resource"      : $["io":[$["active":true, "length":0, "mode":"rw", "start":28672]], 
-			    "irq":[$["count":0, "enabled":true, "irq":10]]], 
-	   "rev"           : "6", 
-	   "sub_device"    : "Creative Sound Blaster AudioPCI64V, AudioPCI128", 
-	   "sub_device_id" : 70513, 
-	   "sub_vendor"    : "Ensoniq", 
-	   "sub_vendor_id" : 70260, 
-	   //"subclass"    : "Multimedia audio controller", 
-	   "vendor"        : "Ensoniq", 
-	   "vendor_id"     : 69832,
-	   "unique_key"    : "test2.test2"]];
+    global define get_audio() ``{
+        string tmpdir=SCR (`Read (.target.tmpdir));
+        if(fileexist(tmpdir+"/audio.ycp"))
+        {
+            return SCR(`Read(.target.ycp, tmpdir+"/audio.ycp"));
+        }
 
-  }
+        list ret = SCR(`Read(.probe.sound));
+        if (ret==nil) ret = [];
+        SCR(`Write(.target.ycp, tmpdir+"/audio.ycp", ret));
+        return ret;
+    }
+
 
     /**
      * runs a perl script 'fetchmodule' and returns a sndcards-like module record    
@@ -665,129 +885,6 @@
     }
 
     /**
-     * reads already saved info from modules.conf
-     * @return list 
-     */
-    global define read_save_info () ``{
-	string prefix = "";
-	list aliases  = SCR(`Read(topath (sformat ("%1.modules.alias", prefix))));
-	list options  = SCR(`Read(topath (sformat ("%1.modules.options", prefix))));
-	list save     = [];		// structure to save
-	integer i     = 0;
-
-	if (contains (aliases, "char-major-116")) 
-	{
-	      // alsa modules
-	      
-	      
-	    if (SCR(`Read(topath(sformat ("%1.modules.alias", prefix)), "char-major-116")) == "snd") 
-	    {
-		list minor_list = [0, 1, 3, 8, 11, 12];		
-		integer cards   = tointeger (lookup (SCR(`Read(topath (sformat ("%1.modules.options", prefix)), "snd")), "snd_cards_limit", 1));
-		map entry       = $[];
-		map mod_entry   = $[];
-
-		string alias    = "";
-		string module_name   = "";
-		string comment  = "";
-
-		    // read the cards
-		while (i < cards) 
-		{
-
-			  // == snd-card-X ==
-		    entry = $[];
-		    alias = sformat ("snd-card-%1", i);
-
-		    if (!contains(aliases, alias)) 
-		    {
-			i = i + 1; continue; // not found
-		    }
-			  
-		    module_name  = SCR(`Read(topath (sformat ("%1.modules.alias", prefix)), alias));
-		    if ((module_name == "off") || (module_name == "null")) 
-		    { 
-			i = i + 1; continue; 
-		    }
-		    comment = SCR(`Read(topath (sformat ("%1.modules.alias.comment", prefix)), alias));
-
-		    entry = add (entry, "name", module_name);
-		    mod_entry = add (mod_entry, "alias", alias);
-		    if (contains (options, module_name)) 
-		    {
-			mod_entry = add (mod_entry, "options", SCR(`Read(topath (sformat ("%1.modules.options", prefix)), module_name)));
-		    }
-		    if (size (comment) > 0) 
-		    {
-			entry = add (entry, "comment", comment);
-		    }
-			  
-		    entry = add (entry, "modules", mod_entry);
-		    save = add (save, entry);
-
-		    i = i + 1;
-		}
-	    }
-	}
-	else if (contains (aliases, "char-major-14")) 
-	{
-	      // oss (poor support, should be enhanced ... )
-	      
-	      // list of aliases to be read
-	    list local_aliases = ["char-major-14",
-				  "sound",
-				  "midi",
-				  "sound-slot-0",
-				  "sound-service-0-0"];
-
-	    map entry      = $[];
-	    map option     = $[];
-	    string module_name  = "";
-	    string comment = "";
-	      
-	    maplist (`alias, local_aliases, 
-	      ``{
-		if (contains (aliases, alias)) 
-		{
-		    entry   = $[];
-		    module_name  = SCR (`Read(topath (sformat ("%1.modules.alias", prefix)), alias));
-		    comment = SCR (`Read(topath (sformat ("%1.modules.alias.comment", prefix)), alias));
-		    if (contains (options, module_name)) 
-		    {
-			option = SCR (`Read(topath (sformat ("%1.modules.options", prefix)), module_name));
-		    }
-		    else 
-		    {
-			option = $[];
-		    }
-
-		    if ((module_name != "off") && (module_name != "null")) 
-		    {
-			if (size (module_name) > 0) 
-			{
-			    entry = add (entry, "alias", alias);
-			    entry = add (entry, "name", module_name);
-			    if (size (option) > 0) 
-			    {
-				entry = add (entry, "options", option);
-			    }
-			    if (size (comment) > 0) 
-			    {
-				entry = add (entry, "comment", comment);
-			    }
-			}
-		    }
-		    if (size (entry) > 0) 
-		    {
-			save = add (save, entry);
-		    }
-		}
-	      });
-	}
-	return save;
-    }
-    
-    /**
      * here the test sound is played, by
      * default ist alsa whistle sound, but
      * if snd_au package is installed,
@@ -898,10 +995,10 @@
      * @return empty string on success/ error message on failure
      */ 
 
-    global define check_module(map card) ``{
-
+    global define check_module(map save_entry) ``{
+	// TODO: check by /proc/asound/cards
 	map pm = SCR(`Read(.proc.modules));
-	string mod_name=lookup(lookup(card, "module", $[]), "name", "off");
+	string mod_name=lookup(save_entry, "module", "off");
         if (!haskey (pm, mod_name))
         {
 
@@ -922,7 +1019,7 @@
 
     global define create_table (list lm, list lk)
     ``{
-        integer i = 0;
+/*	integer i = 0;
         list itemized_list = [];
         integer s = size (lm);
         term val = `item ();
@@ -931,16 +1028,28 @@
         {
             val = `item (`id(i));
             foreach (`k, lk,
-                ``{
+            ``{
                 val = add (val, lookup (select (lm, i), k, ""));
-                });
+            });
 
             itemized_list = add (itemized_list, val);
             i = i + 1;
         }
-
         return itemized_list;
-    };
+*/
+	list res=[];
+	integer pos=0;
+	foreach(`m, lm, 
+	``{
+	    res=add(res, `item(`id(pos), 
+		lookup(m, select(lk, 0), ""),
+		lookup(m, select(lk, 1), ""),
+		lookup(m, select(lk, 2), "")
+		));
+	    pos=pos+1;
+	});
+	return res;
+    }
 
     /* 
      * tries to extract list of values from description
@@ -1117,17 +1226,7 @@
     global define get_not_yet (list uniques) ``{
 
 
-        list all = get_audio (test_mode, config_mode);
-/*        list not_yet = get_unique_not (all, ["configured"], "sound", false, config_mode);
-
-	if(size(not_yet)>0)
-	{
-	    list db=GetCardDatabase(); // needed for get_module function
-	    not_yet=maplist(`e, not_yet, ``(add (e, "module", get_module (e))));
-	}
-
-	not_yet=filter(e, not_yet, ``(lookup(`e, "module", $[])!=$[]));	
-*/
+        list all = get_audio ();
 	all=filter(`e, all,
 	``(!contains(uniques, lookup(e, "unique_key", "##")))
 	);
@@ -1164,33 +1263,19 @@
 
     /**
      * inserts values to already set options
-     * @param 1st card that is going to be modified
-     * @param 2st save_info with card options
+     * @param 1st save_info entry
      *
      *
      */
 
-    global define RestoreCardInfo(map card, list save_info) ``{
-	card =  add (card, "module", get_module (card));
+    global define restore_mod_params(list params, map values) ``{
+	return maplist(`e, params,
+	``{
+	    string pname=lookup(e, "name", "");
+	    e=add(e, "value", lookup(values, pname, ""));
+	    return e;
+	});
 
-	string calias=lookup(lookup(lookup(card, "module", "") , "module", ""), "name", "");
-	
-	list save=filter(`s, save_info, ``(calias==lookup(s, "name", "")));
-
-	if(size(save)==0)
-	{
-	    return card;
-	}
-	map save_opts=lookup(lookup(select(save, 0), "modules", []), "options", []);
-	list options=lookup(lookup(card, "module", $[]), "params", []);   
-
-	options=InsertOptions(options, save_opts);
-
-	map newModule=lookup(card, "module", "");
-	newModule=add(newModule, "params", options);
-	card=add(card, "module", newModule);
-
-	return card;
     }
  
     /** get_tmp_modules_conf returns path to the temporary modules.conf
@@ -1267,23 +1352,20 @@
      *
      */
  
-    global define add_tmp_module_record(map card, integer cid) ``{
-	string module_name=lookup(lookup(card, "module", $[]), "name", "off");
+    global define add_tmp_module_record(map save_entry, integer cid) ``{
+	string module_name=lookup(save_entry, "module", "off");
 	string cmd=sformat("/bin/echo alias snd-card-%1 %2 >> ", cid, module_name)+get_tmp_modules_conf();
 	SCR(`Execute(.target.bash, cmd, $[]));
 
 	string options="";	
 
-	maplist(`e, lookup(card, "params", []),
+	mapmap(`e, `f, lookup(save_entry, "options", $[]),
 	``{
-	    if(lookup(e, "value", "")!="")
-	    {
-		options=options+" "+lookup(e, "name", "")+"="+lookup(e, "value", "");
-	    }
+	    options=options+" "+e+"="+f;
 	}
     	);
 
-	cmd=sformat("/bin/echo options %1 snd_id=card%2 snd_index=%3 %4 >> ", module_name, cid+1, cid, options) +
+	cmd=sformat("/bin/echo options %1 %4 >> ", module_name, cid+1, cid, options) +
 	    get_tmp_modules_conf();
 	SCR(`Execute(.target.bash, cmd, $[]));
 
@@ -1335,20 +1417,15 @@
     /** @return true if the sound card supports sound fonts
      */
 
-    global define HasFonts(map card) ``{
-	if(lookup(card, "sub_vendor_id", "0")==69890)
+    global define HasFonts(map save_entry) ``{
+	if(lookup(save_entry, "module", "")=="snd-card-emu10k1")
 	{
 	    return true;
 	}
-	if(lookup(lookup(card, "module", $[]), "name", "")=="snd-card-sbawe")
-	{
-	    return true;
-	}
-	map pm = SCR(`Read(.proc.modules));
-        if (haskey (pm, "snd-card-sbawe"))
-	{
-	    return true;
-	}
+	if(lookup(save_entry, "module", "")=="snd-card-sbawe")
+        {
+            return true;
+        }   
 	return false;
     }
 
@@ -1458,41 +1535,6 @@
 	}
     }
 
-    /**
-     * saves module entry to temporary modules conf.
-     *
-     */
-
-    global define save_single_tmp_modules_conf(string entry_name, map entry) ``{
-	 if (haskey (entry, "alias"))
-            {
-                SCR(`Write(.tmp.modules.alias, entry_name, lookup(entry, "alias")));
-                if (haskey (entry, "options"))
-                    {
-                        SCR(`Write(.tmp.modules.options, lookup(entry, "options"), entry_name));
-                    }
-            }
-    }
-
-    /**
-     * saves module entries to temporary modules conf.
-     *
-     */
-
-    global define save_tmp_modules_conf(list save_info) ``{
-	integer i=0;
-	list als=SCR(`Read(.tmp.modules.alias));
-	while(i<16)
-	{
-	    if(contains(als, sformat("snd-card-%1", i)))
-	    {
-		SCR(`Write(.tmp.modules.alias, nil, sformat("snd-card-%1", i)));
-	    }
-	    i=i+1;
-	}
-	maplist (`e, save_info, ``(save_single_tmp_modules_conf(lookup (e, "name", ""), lookup (e, "modules", $[]))));  
-	SCR(`Write(.tmp.modules, nil));
-    }
     
     /**
      *	when user wants to delete a card, all cards using given module must be removed.
@@ -1508,7 +1550,7 @@
 	integer pos=0;
 	maplist(`e, save_info, 
 	``{  
-	    if(lookup(e, "name", "")==mod_name)
+	    if(lookup(e, "module", "")==mod_name)
 	    {
 		ret=add(ret, pos);
 	    }
@@ -1533,10 +1575,11 @@
 	integer pos=0;
 	save_info=maplist(`e, save_info, 
 	``{
-	    map opts=lookup(lookup(e, "modules", $[]), "options", []);
+	    map opts=lookup(lookup(e, "modules", $[]), "options", $[]);
 	    opts=add(opts, "snd_index", sformat("%1", pos));
 	    opts=add(opts, "snd_id", sformat("card%1", pos+1));
-	    e=add(e, "modules", $["alias": sformat("snd-card-%1", pos), "options": opts]);
+	    e=add(e, "alias", sformat("snd-card-%1", pos));
+	    e=add(e, "options", opts);
 	    pos=pos+1;
 	    return e;
 	});
