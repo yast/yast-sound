@@ -283,10 +283,11 @@
 				// not istalled
 	    define NotInstalled () ``{
 				// Help text when Alsa-drivers are not installed 1/1
-		string help_text = UI(_("Sound support requires the
- <b>ALSA</b> package. You can find it in the <b>SuSE</b> distribution
- (series 'snd1') or you can download it from
- <i>http://www.alsa-project.org</i> and than install it."));
+
+		string help_text = UI(_("\
+Sound support requires the <b>ALSA</b> package.\
+ You can find it in the <b>SuSE</b> distribution (series 'snd')\
+ or you can download it from <i>http://www.alsa-project.org</i>"));
 		
 		UI(`SetContents (_("Sound cards"),
 				 `HVCenter (
@@ -308,9 +309,10 @@
 
 	    define DBNotFound () ``{
 				// Help text when sndcards database not found 1/1
-		string help_text = UI(_("An internal <b>YaST2</b> file
- is missing or corrupted. Please try to reinstall <b>YaST2</b>. You
- will find it in <b>SuSE</b> distribution, series 'a1'."));
+		string help_text = UI(_("\
+An internal <b>YaST2</b> file is missing or corrupted.\
+ Please try to reinstall <b>YaST2</b>.\
+ You can find it in the <b>SuSE</b> distribution, series 'a'."));
 		
 		UI(`SetContents (_("Sound cards"),
 				 `HVCenter (
