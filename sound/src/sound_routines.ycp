@@ -209,8 +209,8 @@ define create_save_info (map card, integer card_id) ``{
 /*
  * command must be string with $CHANNEL and $VALUE included
  */
-define SetVolume (string command, string channel, string value) ``{
-    return SCR(`Execute (.target.bash, command, $["CHANNEL" : channel, "VOLUME" : value]));
+define SetVolume (string command, string channel, string value, integer card_num) ``{
+    return SCR(`Execute (.target.bash, command, $["CHANNEL" : channel, "VOLUME" : value, "CARD_NUM" : card_num]));
 }
 
 /*

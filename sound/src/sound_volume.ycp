@@ -112,7 +112,7 @@
 	//unmute these devices
 	if (use_alsa)
 	    maplist (`dev, ["PCM", "PCM,1", "Wave", "Master Digital", "Synth"], 
-		     ``(SetVolume (lookup (user_settings, "mixer"), dev, sformat ("%1", 70))));
+		     ``(SetVolume (lookup (user_settings, "mixer"), dev, sformat ("%1", 70), card_id)));
 	    
 	// Help text - adjusting volume 1/4
 	string help_text = UI(_("<p>Please adjust the volume.</p>"));
@@ -158,7 +158,7 @@
 	    `HSpacing (3));
 
 	UI(`SetWizardContents (_("Sound cards"), con, help_text, true, true));
-	SetVolume (lookup (user_settings, "mixer"), "Master", sformat ("%1", vol));
+	SetVolume (lookup (user_settings, "mixer"), "Master", sformat ("%1", vol), card_id);
 
 	repeat {
 
@@ -167,7 +167,7 @@
 	    if (ui == `volume) {
 		vol = UI(`QueryWidget(`id(`volume), `Value ));
 
-		SetVolume (lookup (user_settings, "mixer"), "Master", sformat ("%1", vol));
+		SetVolume (lookup (user_settings, "mixer"), "Master", sformat ("%1", vol), card_id);
 	    }
 	    else if (ui == `test)
 		if (!test_mode)
@@ -196,8 +196,12 @@
  sound configuration currently only supports ALSA.</p>"));
 
 	
-	term con = `VBox(`Top (`Label (hardware_name (card))),
-			 `HVCenter(`Label (err)));
+	term con = `VBox(`Label (`opt(`outputField), hardware_name (card)),
+			 `HVCenter(`VBox(
+			     `Label (_("An error occured:")),
+			     `Label (err)
+			     ))
+			 );
 
 	UI(`SetWizardContents (_("Sound cards"), con, help_text, true, false));
 
@@ -223,11 +227,14 @@
     map card = Args (0);
     integer card_id = Args (1);
 
-    map module_map = lookup (card, "module", $[]);
+    if (!haskey(card, "module"))
+	card = add(card, "module", get_module (card));
 
+    map module_map = lookup (card, "module", $[]);
+    
     map user_settings = $["audio_file" : "/usr/share/sounds/alsa/test.wav",
 			 "play_cmd"    : "/usr/bin/aplay",
-			 "mixer"       : "/usr/bin/amixer set \"$CHANNEL\" $VOLUME% unmute"];
+			 "mixer"       : "/usr/bin/amixer -c $CARD_NUM set \"$CHANNEL\" $VOLUME% unmute"];
     
 
 

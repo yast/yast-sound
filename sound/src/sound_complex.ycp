@@ -1,3 +1,13 @@
+/*
+ * $Id$
+ * 
+ * sound complex dialog
+ *
+ * Params: 1st ... list of sound_cards
+ *         2nd ... list with save_info
+ *         3rd ... list with configured_unique
+ */
+
 {
 
 textdomain "sound";
@@ -19,8 +29,11 @@ define get_not_yet () ``{
 
 
 define get_running_cards () ``{
-    // TODO: no alsa drivers ...
-    if (fileexist("/proc/asound/cards")) return SCR(`Read(.proc.asound.cards));
+    
+    if (fileexist("/proc/asound/cards")) {
+	list asound = SCR(`Read(.proc.asound.cards));
+	if (is(select (asound, 0), map)) return asound;
+    }
     return [];
 }
 
@@ -28,7 +41,7 @@ define get_running_cards () ``{
  * reads variables from rc.config
  */
 define read_rc_vars (list vars) ``{
-    
+
     return listmap (`k, vars, ``([k, SCR(`Read(topath(sformat (".rc.system.%1", k))))]));
 }
 
@@ -153,18 +166,22 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
     list conf_cards = get_running_cards ();
     list cc = maplist (`e, conf_cards, ``(`item(`id(lookup (e, "number", 0)), sformat ("   [%1]", lookup (e, "number", 0)), lookup (e, "line1")))); 
     
-    term con = `VBox (
-	`Table (`id(`configured_table), `opt (`notify, `immediate), 
-		`header(_("Number"), _("Card name")), cc),
-	`PushButton(`id(`b_delete), _("Delete"))
-	);
-
-    term config_buttons = `VBox (`PushButton(`id(`b_conf2), _("Configure")));
-
-    term alsa_buttons   = `VBox (`Left(`CheckBox(`id(`b_alsa), `opt(`notify), _("Start ALSA"), (lookup (rc_vars, "START_ALSA", "no") == "yes"))),
-				 `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("Start sequencer"), (lookup (rc_vars, "START_ALSA_SEQ", "no") == "yes"))));
-
-    con = add (con, `HBox(`HStretch (), config_buttons, alsa_buttons));
+    term con = `HBox(
+	`HSpacing (3),
+	`VBox (
+	    `Table (`id(`configured_table), `opt (`notify, `immediate), 
+		    `header(_("Number"), _("Card name")), cc),
+	    `VSpacing (0.5),
+	    `HBox(`PushButton (`id(`b_delete), _("Delete")),
+		  `HStretch (),
+		  `PushButton (`id(`b_conf2), _("Add soundcard ..."))),
+	    `VSpacing (0.5),
+	    `HBox(`HStretch (),
+		  `VBox (`Left(`CheckBox(`id(`b_alsa), `opt(`notify), _("Start ALSA"), (lookup (rc_vars, "START_ALSA", "no") == "yes"))),
+			 `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("Start sequencer"), (lookup (rc_vars, "START_ALSA_SEQ", "no") == "yes"))))),
+	    `VSpacing (0.5)
+	    ),
+	`HSpacing (3));
 
 
     UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
@@ -277,8 +294,12 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 			if (size (card) > 0) {
 			    map result = OneCardWizard (card, size (save_info), ui);
 			    any ui     = lookup (result, "ui", `cancel); 
-			    if (ui == `next)
+			    if (ui == `next) {
 				save_info = add (save_info, lookup (result, "return"));
+				configured_unique = add (configured_unique, lookup (card, "unique_key", ""));
+			    }
+			    else if (ui == `back)
+				configured_unique = filter (`e, configured_unique, ``(lookup (card, "unique_key", "") != e));
 			}
 			
 			if (ui == `back) ui = nil;
@@ -347,6 +368,7 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 
     return $["ui"       : ui,
 	    "save_info" : save_info,
+	    "configured_unique" : configured_unique,
 	    "rc"        : rc_vars];
 }
 
@@ -354,6 +376,8 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 
 list cards     = Args(0);
 list save_info = Args(1);
+list configured_unique = Args(2);
+
 list to_delete = [];
 boolean config_mode = false;
 

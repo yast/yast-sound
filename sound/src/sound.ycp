@@ -105,13 +105,15 @@
 
 
     define save_unique_keys (list cards) ``{
+
 	list|void orig = SCR(`Read(.var.lib.yast.unique));
 	if (is (orig, void)) orig = [];
 	list skipped = filter (`e, cards, ``(!contains (configured_unique, lookup (e, "unique_key", ""))));
-
 	list sound_unique = maplist (`e, configured_unique, ``($["unique" : e, "state" : "configured"]));
-	sound_unique = union (sound_unique, maplist (`e, skipped, ``($["unique" : e, "state" : "skipped"])));
+	sound_unique = union (sound_unique, maplist (`e, skipped, ``($["unique" : lookup(e, "unique_key", ""), "state" : "skipped"])));
+	orig = filter (`e, orig, ``(lookup(e, "section", "") != "sound"));
 	SCR(`Write(.var.lib.yast.unique, add (orig, $["contents" : sound_unique, "section" : "sound"])));
+
     }
 
 
@@ -210,9 +212,9 @@
 		    success = lookup (result, "return", false);
 		else {
 
-		    //UI(`DebugDialog(maplist (`e, lookup (lookup (card, "module"), "params"), ``(lookup (e, "value", "none")))));
-		    card = lookup (result, "return");
-		    //UI(`DebugDialog(maplist (`e, lookup (lookup (card, "module"), "params"), ``(lookup (e, "value", "none")))));
+		    // UI(`DebugDialog(maplist (`e, lookup (lookup (card, "module"), "params"), ``(lookup (e, "value", "none")))));
+		    // card = lookup (result, "return");
+		    // UI(`DebugDialog(maplist (`e, lookup (lookup (card, "module"), "params"), ``(lookup (e, "value", "none")))));
 		}
 	    }
 	    else if (ui == `back) {
@@ -328,7 +330,7 @@
 	
 
 
-	result = CallModule ("sound_complex", [sound_cards, save_info]);
+	result = CallModule ("sound_complex", [sound_cards, save_info, configured_unique]);
 	ui = lookup (result, "ui", `cancel);
 
 	if (ui == `next) {
@@ -337,6 +339,7 @@
 	    
 	    save_info = lookup (result, "save_info");
 	    rc_vars   = lookup (result, "rc", $[]);
+	    configured_unique = lookup (result, "configured_unique", []);
 	}
 	else if (ui == `back) card_id = card_id - 1;
     
@@ -384,7 +387,7 @@
     
     if (ui == `next) {
 	// always save unique keys 
-	save_unique_keys (sound_cards);
+	save_unique_keys (get_audio (test_mode, config_mode));
 
 	if (lookup (rc_vars, "START_ALSA") == "no")
 	    SCR(`Execute (.bin.bash, "/sbin/init.d/alsasound stop", $[]));
