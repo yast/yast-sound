@@ -9,12 +9,12 @@
  *   Module where an attemp of inserting module is provided,
  *   if everything goes well adjusting volume is done here
  *   otherwise error message is displayed
- * 
+ *
  * Authors:
- *   Dan Veselý <dan@suse.cz>
+ *   Dan Vesely <dan@suse.cz>, Dan Meszaros <dmeszar@suse.cz>
  *
  * String corrections by Christian Steinruecken <cstein@suse.de>, 2001/08/01
- * 
+ *
  *
  * $Id$
  *
@@ -29,7 +29,7 @@
 
     textdomain "sound";
     import "Wizard";
-	
+
 
     /**
      * This dialog sipmply reads user input and calls apropriate set funtion

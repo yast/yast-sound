@@ -119,11 +119,10 @@
      */
 
     global define get_card_names(string modname) ``{
-        read_db();
         if (modname == "all")
         {
             list cards = [];
-            foreach(`e, sound_db,
+            foreach(`e, Sound::sound_db,
             ``{
                 cards = add(cards, lookup(e, "cards", []));
             });
@@ -132,7 +131,7 @@
             return sort(cards);
         }
 
-        list mods = filter(`e, sound_db,
+        list mods = filter(`e, Sound::sound_db,
         ``(lookup(lookup(e, "module", $[]), "name", "") == modname));
         if (size(mods) == 0)
         {
@@ -149,8 +148,7 @@
      */
 
     global define get_module_by_cardname(string cardname) ``{
-        read_db();
-        list mod = filter(`e, sound_db,
+        list mod = filter(`e, Sound::sound_db,
         ``(contains(lookup(e, "cards", []), cardname))
         );
         return lookup(lookup(select(mod, 0), "module", $[]), "name", "unknown");
@@ -164,8 +162,7 @@
 
     global define get_module_params(string modname) ``{
         // database must be read some elsewhere
-        read_db();
-        list mod = filter(`e, sound_db, ``(lookup(lookup(e, "module", $[]), "name", "") == modname));
+        list mod = filter(`e, Sound::sound_db, ``(lookup(lookup(e, "module", $[]), "name", "") == modname));
         if (size(mod) > 0)
         {
             return lookup(select(mod, 0), "params", []);
@@ -180,8 +177,7 @@
      */
     global define get_module_names() ``{
         list ret = [];
-        read_db();
-        foreach(`e, sound_db,
+        foreach(`e, Sound::sound_db,
         ``{
             ret = add(ret, `item(`id(lookup(lookup(e, "module", $[]), "name", "")),
                     lookup(e, "name", _("Unknown module name"))));
@@ -408,6 +404,5 @@
         }
         return snd;
     }
- 
 
 }

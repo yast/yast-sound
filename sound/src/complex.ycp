@@ -9,7 +9,7 @@
  *   sound complex dialog
  *
  * Authors: 
- * Dan Vesely <dan@suse.cz>
+ * Dan Vesely <dan@suse.cz>, Dan Meszaros <dmeszar@suse.cz>
  *
  * String corrections by Christian Steinruecken <cstein@suse.de>, 2001/08/01
  * 
@@ -153,7 +153,7 @@ Try to restart sound system?")))
         // dialog title
 	Wizard::SetContents (_("Sound configuration"), con, helptext, true, true);
 	// Finish - button label
-	ChangeWidget(`id(`next), `Label, UI::FinishButtonLabel());
+	UI::ChangeWidget(`id(`next), `Label, UI::FinishButtonLabel());
     
 	if (size (cc) == 0) 
 	{
@@ -303,16 +303,17 @@ Try to restart sound system?")))
 //    list save_info	= Args(0);
     list to_delete	= [];
     boolean config_mode = false;
+    map rc_vars = Sound::rc_vars;
 
 //    map rc_vars		= read_rc_vars (["START_ALSA", "START_ALSA_SEQ"]);
 
 
-    if (size(lookup (rc_vars, "START_ALSA", "")) == 0)
+    if (size(lookup (Sound::rc_vars, "START_ALSA", "")) == 0)
     {
-	rc_vars = add (rc_vars, "START_ALSA", "yes");
+	Sound::rc_vars = add (Sound::rc_vars, "START_ALSA", "yes");
     }
 
-    if (size (lookup (rc_vars, "START_ALSA_SEQ", "")) == 0)
+    if (size (lookup (Sound::rc_vars, "START_ALSA_SEQ", "")) == 0)
     {
 	rc_vars = add (rc_vars, "START_ALSA_SEQ", "yes");
     }

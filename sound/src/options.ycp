@@ -13,7 +13,7 @@
  * 
  *
  * Authors:
- *   Dan Vesely <dan@suse.cz>, 2000
+ *   Dan Vesely <dan@suse.cz>, Dan Meszaros <dmeszar@suse.cz>
  *
  * $Id$
  *
@@ -333,7 +333,6 @@
 
     global define sound_options(map save_entry) ``{ 
 
-    read_db();
 
 //    map save_entry	= Args(0);
     string modname	= lookup(save_entry, "module", "");

@@ -8,7 +8,7 @@
  *   Routines for sound card configuration
  * 
  * Authors:
- *   Dan Veselý <dan@suse.cz>
+ *   Dan Veselý <dan@suse.cz>, Dan Meszaros <dmeszar@suse.cz>
  *
  * $Id$
  *
@@ -167,32 +167,6 @@
 
 
     /**
-     * loads sound card database to global variable sound_db
-     * @return list
-     */
-
-    global define GetCardDatabase() ``{
-	textdomain "sound_db";
-	y2debug("Reading card database");
-	sound_db = eval(SCR::Read (.target.yast2, "sndcards.ycp"));
-	textdomain "sound";
-    }
-
-    /** 
-     * function for reading sound_db on demand
-     * checks if sound_db is empty. if true, loads the database
-     * to it. otherwise does nothing
-     * @return void
-     */
-
-    global define read_db() ``{
-	if (sound_db == nil || size(sound_db) == 0)
-	{
-	    GetCardDatabase();
-	}
-    }
-
-    /**
      * Used for searching. returns index of the card in the database identified by name
      * @param name card name
      * @return integer
@@ -224,10 +198,9 @@
     global define get_cards (string module_name) ``{
         list ret = [];
 
-	read_db();
         if (tolower(module_name) == "all")
         {	// copy the whole database
-        maplist (`e, sound_db,
+        maplist (`e, Sound::sound_db,
             ``{
                 if (size (lookup (e, "cards", [])) > 0) ret = add (ret, lookup (e, "cards", []));
                 else ret = add (ret, [lookup (e, "name", "")]);
@@ -235,7 +208,7 @@
         }
         else
         {	// filter by name 
-            ret = maplist (`c, filter (`e, sound_db, ``(lookup (e, "name", "") == module_name)), ``(lookup (c, "cards", [])));
+            ret = maplist (`c, filter (`e, Sound::sound_db, ``(lookup (e, "name", "") == module_name)), ``(lookup (c, "cards", [])));
             ret = filter (`e, ret, ``(size(e) > 0));
 
             if (size (ret) == 0)
@@ -363,7 +336,6 @@
      * @return map
      */
     global define get_module (map card) ``{
-	read_db();
 
 	string bus        = lookup (card, "bus", "");
 	integer offset    = (tolower (bus) == "isa") ? 0x20000 : 0x10000;
@@ -373,14 +345,14 @@
 	list fc = [];
 	if (tolower (bus) == "pci") 
 	{
-	    fc = filter (`d, sound_db, 
+	    fc = filter (`d, Sound::sound_db, 
 		 ``(filter(`c, lookup (d, "libhd", []), 
 		    ``((lookup (c, "vendor_id", 0) == vendor_id - offset) && 
 		       (contains(lookup(c, "device_id", 0), device_id - offset)))) != []));
 	}
 	else 
 	{
-	    fc = filter (`d, sound_db, 
+	    fc = filter (`d, Sound::sound_db, 
 		   ``(filter(`c, lookup (d, "libhd", []), 
 			``((lookup (c, "vendor_id", 0) == vendor_id - offset) &&
 			   (lookup (c, "device_id", 0) == device_id - offset))) != []));

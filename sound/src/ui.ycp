@@ -2,8 +2,8 @@
  *
  * $Id$
  *
- * File:              
- *   ui.ycp        
+ * File:
+ *   ui.ycp
  *
  * Module:
  *   Sound
@@ -14,7 +14,7 @@
  * Authors:
  *   Dan Veselý <dan@suse.cz> , Dan Meszaros <dmeszar@suse.cz>
  *
- *                   
+ * 
  */
 
 {
