@@ -29,15 +29,6 @@
 
     textdomain "sound";
 	
-//    files needed to be included: (commented because they're included some elsewhere)
-//    include "misc_defines.ycp";
-//    include "sound/routines.ycp";
-//    include "sound/ui.ycp";
-//    include "sound/texts.ycp";
-//    include "sound/write_routines.ycp";
-
-
-//    map STRINGS = STRINGS_();
 
     /**
      * This dialog sipmply reads user input and calls apropriate set funtion
@@ -114,6 +105,8 @@
 
     /**
     * shows error message in wizard
+    * @param save_entry card config
+    * @param err error string to be shown
     * @return symbol `back | `cancel
     */
 
@@ -171,6 +164,7 @@ its parameters using the 'Advanced setup'.");
 
     /**
     * shows success message in wizard
+    * @param save_entry info about card config
     * @return symbol `back | `cancel
     */
 
@@ -224,9 +218,19 @@ its parameters using the 'Advanced setup'.");
        *        2. on succes unmute and volume dialog
        *        3. on fail display error message
        */
-    
-    global define sound_volume(map save_entry, integer card_id, boolean finish, 
-				boolean quick, list save_info) ``{
+   
+    /**
+     * shows volume dialog for normal setup or success dialog for quick setup
+     * in case of failure show error dialog with 'next' button disabled 
+     * @param save_entry card config
+     * @param card_id id of currently donfigured card
+     * @param finish show 'finish' button instead of 'next'
+     * @param quick quick/normal config
+     * @param save_info config of previuosly configured cards
+     * @return symbol
+     */
+ 
+    global define sound_volume(map save_entry, integer card_id, boolean finish,	boolean quick, list save_info) ``{
 
     boolean need_restart    = true;
 //    map save_entry	    = Args (0);

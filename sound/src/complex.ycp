@@ -102,6 +102,10 @@
 	return ret;
     }
 
+    /**
+     * function for enabling relevant controls in complex dialog
+     * @param val boolean enable/disable
+     */
 
     global define enableButtons(boolean val) ``{
 	UI::ChangeWidget(`id(`b_delete),    `Enabled, val);
@@ -287,6 +291,12 @@ Try to restart sound system?")))
     }
 
 // ===== MAIN =====
+
+    /**
+     * just calls ComplexDialog
+     * @param save_info list 
+     */
+    
     global define sound_complex(list save_info) ``{
 
 //    list save_info	= Args(0);

@@ -133,6 +133,11 @@
 	return ret;
     }
 
+    /**
+     * just calls ManualDialog
+     *
+     */
+
     global define sound_manual() ``{
     // ==== main ====
 

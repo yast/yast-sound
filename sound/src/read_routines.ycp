@@ -18,8 +18,9 @@
 {
 
     /**
-     * 
-     *
+     * tries to determine card model name from audio.alsa agent
+     * @param card_id
+     * @return card name, "Sound card" on failure
      */
 
     global define read_card_name_from_alsa(integer card_id) ``{
@@ -32,20 +33,13 @@
 	return name;	
     }
 
-    /**
-     * parses special alias comment
-     * @param comment
-     * @return pair [model, uniq_key] or [] on parse error
-     *
-     */
 
     /**
- * Extacts the unique key and the name of the card from comment in the
- * modules.conf placed before char-major-81-x
- * @param Comment before the char-major-81-x
- * @return map Returns map: $[ "unique_key" : string, "name" : string ] or
-nil
- */
+     * Extacts the unique key and the name of the card from comment in the
+     * modules.conf placed before char-major-81-x
+     * @param comment before the char-major-81-x
+     * @return map Returns map: $[ "unique_key" : string, "name" : string ] or nil
+     */
     global define extractUniqueKey(string comment) ``{
 	map result = nil;
 
@@ -192,61 +186,6 @@ nil
 	    });	
 
         }
-        else // don't use alsa // if (contains (aliases, "char-major-14"))
-        {
-              // oss (poor support, should be enhanced ... )
-
-              // list of aliases to be read
-/*            list local_aliases = ["char-major-14",
-                                  "sound",
-                                  "midi",
-                                  "sound-slot-0",
-                                  "sound-service-0-0"];
-
-            map entry      = $[];
-            map option     = $[];
-            string module_name  = "";
-            string comment = "";
-
-            maplist (`alias, local_aliases,
-              ``{
-                if (contains (aliases, alias))
-                {
-                    entry   = $[];
-                    module_name  = SCR::Read(topath (sformat ("%1.modules.alias", prefix)), alias);
-                    comment = SCR::Read(topath (sformat ("%1.modules.alias.comment", prefix)), alias);
-                    if (contains (options, module_name))
-                    {
-                        option = SCR::Read(topath (sformat ("%1.modules.options", prefix)), module_name);
-                    }
-                    else
-                    {
-                        option = $[];
-                    }
-
-                    if ((module_name != "off") && (module_name != "null"))
-                    {
-                        if (size (module_name) > 0)
-                        {
-                            entry = add (entry, "alias", alias);
-                            entry = add (entry, "name", module_name);
-                            if (size (option) > 0)
-                            {
-                                entry = add (entry, "options", option);
-                            }
-                            if (size (comment) > 0)
-                            {
-                                entry = add (entry, "comment", comment);
-                            }
-                        }
-                    }
-                    if (size (entry) > 0)
-                    {
-                        save = add (save, entry);
-                    }
-                }
-              });
-*/        }
 	
         return save;
     }

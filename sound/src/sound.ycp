@@ -21,6 +21,7 @@
 
     textdomain "sound";
 
+    import "Arch";
     include "misc_defines.ycp";
 
     include "wizard/sequencer.ycp";
@@ -39,9 +40,8 @@
     include "sound/select.ycp";
     include "sound/manual.ycp";
 
-    boolean __sparc=nil;
 
-    boolean use_alsa = !is_sparc();
+    boolean use_alsa = !Arch::sparc;
     if (size(Args()) > 0 && Args(0)==.oss)
     {
 	use_alsa=false;
@@ -71,8 +71,8 @@
     map save_entry = $[];
     boolean was_complex = false;
 
-    /*
-     * card selection
+    /**
+     * card selection dialog
      *
      */
 
@@ -97,7 +97,7 @@
     }
 
     /**
-     *
+     * quick configuration step #1 dialog
      *
      */
 
@@ -109,6 +109,11 @@
 	symbol ui	    = lookup(res, "ui", nil);
 	return ui;	
     }
+
+    /**
+     * quick config step #2 dialog
+     * @param type boolean quick/normal config
+     */
 
     global define _snd_quick2(boolean type) ``{
 	save_entry  = add_common_options(save_entry, 0);
@@ -122,8 +127,8 @@
 	return ui;
     }
 
-    /*
-     * card selection
+    /**
+     * dialog for manual card selection
      *
      */
 
@@ -168,8 +173,8 @@
 	return ui;
     }
 
-    /*
-     * card selection
+    /**
+     * add card from complex dialog
      *
      */
 
@@ -224,12 +229,12 @@
 	return `next;
     }
 
-    /*
-     * card selection
+    /**
+     * configure selected card
      *
      */
 
-    global define _snd_config( /* symbol finish_sym */) ``{
+    global define _snd_config() ``{
 	if (card_id >= 0)
 	{
 	    save_entry = select(sound_cards, card_id);
@@ -256,8 +261,8 @@
 	return ui;
     }
 
-    /*
-     * card selection
+    /**
+     * complex dialog
      *
      */
 
