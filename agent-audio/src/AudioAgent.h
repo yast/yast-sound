@@ -22,6 +22,10 @@
 #ifndef __AUDIOAGENT
 #define __AUDIOAGENT
 
+#ifdef y2log_component
+#undef y2log_component
+#endif 
+
 #define y2log_component "ag_audio"
 
 #include <Y2.h>
@@ -39,6 +43,8 @@ public:
     virtual YCPValue Read(const YCPPath &path, const YCPValue& arg = YCPNull());
     virtual YCPValue Write(const YCPPath &path, const YCPValue& value, const YCPValue& arg = YCPNull());
     virtual YCPValue Dir(const YCPPath& path);
+    virtual YCPValue Execute(const YCPPath& path, const YCPValue& value = YCPNull(),
+                             const YCPValue& arg = YCPNull());
     
     virtual YCPValue otherCommand(const YCPTerm& term);
 };
