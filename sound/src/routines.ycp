@@ -638,6 +638,11 @@
 	});
     }
 
+    global define storeVolume(integer card_id) ``{
+	string p=sformat(".audio.alsa.cards.%1.store", cardid);
+	SCR(`Execute(topath(p)));
+    }
+
     /**
      * here the test sound is played, by
      * default ist alsa whistle sound, but
@@ -942,7 +947,7 @@ module parameters, including invalid IO or IRQ parameters.")), mod_name);
 
 	if(restore)
 	{
-	    SCR(`Execute(.target.bash, "/usr/sbin/alsactl restore", $[]));
+	    SCR(`Execute(.audio.alsa.restore));
 	}
     }
 

@@ -285,6 +285,11 @@
 	SaveModulesEntry(save_info, [], true);
 	alsasound_start_tmp(true);	
     }
+    
+    if(ui==`next)
+    {
+	storeVolume(card_id);
+    }	
 
 
     UI(`ChangeWidget (`id(`next), `Label, UI(`NextButtonLabel())));

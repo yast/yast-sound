@@ -53,22 +53,28 @@
 	    return $["ui": `abort];
 	}
 */
-    } until(ui==`back || ui==`next ||  ui==`detail || ui==`configure);
+    } until(ui==`back || ui==`next ||  ui==`edit_button || ui==`configure_button);
 
     symbol type=nil;
     integer index=0;
 //    type=UI(`QueryWidget(`id(`action), `CurrentButton));
 
-    if(ui==`configure)
+    if(ui==`configure_button)
     {
 	type=`new;
-	index=UI(`QueryWidget(`id(`nh), `CurrentItem));
+	index=UI(`QueryWidget(`id(`detected_selbox), `CurrentItem));
+	ui=`configure;
     }
 
     if(ui==`configure && index<0)
     {
 	type=`manual;
 	index=-1;
+    }
+
+    if(ui==`edit_button)
+    {
+	ui=`detail;
     }
 
     return $["ui": ui, "type":type, "id":index];
