@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Feb 27 13:25:55 CET 2004 - jsuchome@suse.cz
+
+- sound card database: fixed module parameters descriptions (tiwai)
+
+-------------------------------------------------------------------
 Thu Feb 26 20:24:43 CET 2004 - jsuchome@suse.cz
 
 - hack for CS4236 on IBM Thinkpad 600E (#34462)
