@@ -462,9 +462,8 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 		    con = add (con, `PushButton(`id (`options), `opt(`disabled), _("&Options")));
 
 		    			    // Help text 1/1 (more sound cards detected)
-			help_text = UI(_("<p>There were found more
- sound cards. Please select <b>the one</b> you want to
- configure.</p>"));
+			help_text = UI(_("<p>More sound cards were found.\
+ Please select <b>the one</b> you want to configure.</p>"));
 
 
 		    next = false;
