@@ -16,6 +16,10 @@
  *
  */
 
+{
+    textdomain "sound";
+
+    global map JoystickDB =
 $[
     "a3d":
     [
@@ -94,4 +98,5 @@ $[
     [
 	"Logitech WingMan Warrior"
     ]
-]
+];
+}

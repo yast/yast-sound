@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Aug  7 16:58:08 CEST 2002 - lslezak@suse.de
+
+- added 3rd parameter to select() in sound DB generator
+- fixed loading of joystick DB (changed to include file)
+- version 2.6.14
+
+-------------------------------------------------------------------
 Mon Aug  5 13:16:27 CEST 2002 - lslezak@suse.cz
 
 - added alsa to Requires
