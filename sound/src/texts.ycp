@@ -50,7 +50,7 @@
 
 
 	    "OptionsDialog":
-	    _("<p>Here, you can modify the options for the sound modules.\n If you are not <b>absolutely sure</b> what you are doing, please leave this dialog untouched. </p><p>Choose the option you want to set, use the <b>Set</b> button to enable new value. If there are known possible values for selected option, you can choose it in <B>Possible value</B> combo box. You can reset all values by pressing <b>Reset</b>. Numeric values can be entered as decimal or hexadecimal (hexadecimal with a <b>0x</b> prefix).</p>"),
+	    _("<p>Here, you can modify the options for the sound modules.\n If you are not <b>absolutely sure</b> what you are doing, please leave this dialog untouched. </p><p>Choose the option you want to set, use the <b>Set</b> button to enable new value. If there are known possible values for the selected option, you can choose it in <B>Possible value</B> combo box. You can reset all values by pressing <b>Reset</b>. Numeric values can be entered as decimal or hexadecimal (hexadecimal with a <b>0x</b> prefix).</p>"),
 
 	    "VolumeDialog":
 	    _("<p>Please adjust the volume.</p><p>You can test your sound card by pressing the <b>Test</b> button.</p><p>After the configuration is done you can use <b>amixer</b> (or any program of your choice) for adjusting the volume.</p><p><b>WARNING/SPECIAL NOTE:</b>Please start testing your sound card with <b>very</b> low volume settings to prevent an accident with too much loud noise.</p>"),
