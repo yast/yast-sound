@@ -35,9 +35,13 @@ config_DATA = \
 	sound.y2cc \
 	joystick.y2cc
 
+desktop_DATA = \
+	sound.desktop
+	joystick.desktop
+
 module_DATA = Sound.ycp	\
 	Joystick.ycp
 
 ybin_SCRIPTS = copyfonts
 
-EXTRA_DIST = $(module_DATA) $(config_DATA) $(ynclude_DATA) $(ybin_SCRIPTS) $(client_DATA) 
+EXTRA_DIST = $(module_DATA) $(config_DATA) $(ynclude_DATA) $(ybin_SCRIPTS) $(client_DATA) $(desktop_DATA)
