@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Sep 14 16:45:10 CEST 2004 - lslezak@suse.cz
+
+- autoyast fixes - sound card status is always "not running",
+  Get/SetModified functions, fixed initialization
+- version 2.10.5
+
+-------------------------------------------------------------------
 Fri Sep 10 14:37:40 CEST 2004 - lslezak@suse.cz
 
 - check also kernel joystick modules (#44394)

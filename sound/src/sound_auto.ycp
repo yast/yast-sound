@@ -111,6 +111,13 @@
 	else if(func == "Summary") {
 		ret = Sound::Summary();
 	}
+	else if (func == "GetModified") {
+		ret = Sound::GetModified();
+	}
+	else if (func == "SetModified") {
+		Sound::SetModified();
+		ret = true;
+	}
 	/* Reset configuration */
 	else if (func == "Reset") {
 		Sound::Import($[]);
@@ -118,6 +125,10 @@
 	}
 	/* Change configuration (run AutoSequence) TODO */
 	else if (func == "Change") {
+		// initialize to empty lists
+		Sound::detected_cards = [];
+		Sound::unconfigured_cards = [];
+
 		ret = WFM::CallFunction("sound", [] );
 	}
 	/* Return required package list */
