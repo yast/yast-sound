@@ -423,6 +423,9 @@
 
 	symbol ui = `table;
 
+	if (size (itemized_descriptions) == 0)
+	    ui = `no;
+
 	repeat
 	{
 	    if (ui == `table)
@@ -431,7 +434,6 @@
 		    (integer) UI::QueryWidget (`id(`table), `CurrentItem);
 		current_option_name = (string) select ((term)
 		    UI::QueryWidget(`id(`table), `Item(current_option)), 2, "");
-
 		UI::ChangeWidget(`id(`des), `Label,
 		    // name of currently selected option: eg. 'Option: snd_asdf'
 		    sformat ("%1 %2", _("&Option: "),current_option_name));
