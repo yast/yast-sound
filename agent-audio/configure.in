@@ -6,7 +6,7 @@ AC_ARG_PROGRAM
 VERSION=`cat ${srcdir}/VERSION`
 RPMNAME=`cat ${srcdir}/RPMNAME`
 MAINTAINER=`cat ${srcdir}/MAINTAINER`
-YAST2DOC=/usr/share/doc/packages/$RPMNAME
+DOCDIR=/usr/share/doc/packages/$RPMNAME
 YAST2DIR=/usr/lib/YaST2
 YAST2INC=/usr/include/YaST2
 
@@ -57,9 +57,9 @@ AC_C_CONST
 AC_C_INLINE
 
 AC_OUTPUT(Makefile
-	package/yast2-agent-alsamixer.spec:yast2-agent-alsamixer.spec.in
+	package/$RPMNAME.spec:$RPMNAME.spec.in
 	src/Makefile
 	doc/Makefile
 	doc/autodocs/Makefile
 	conf/Makefile
-	testsuite/Makefile)
+	)
