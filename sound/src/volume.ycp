@@ -324,14 +324,7 @@ its parameters using the 'Advanced setup'.");
     {
 
 	string modname = lookup(save_entry, "module", "snd-dummy");
-//	map devs = lookup(lookup(Sound::db_modules, modname, $[]), "mixer",
-//	    $["Master":70, "PCM":70, "CD":70, "Synth": 70]);
-//
-//	list devs2 = maplist(`k, `v, devs, ``(k));
-//
-//        foreach (`dev, `vol, devs, ``(SetVolume (dev, card_id, vol)));
 
-//	unmute(devs2, card_id);
 	if (!Sound::autoinstallation)
 	{
 	    Sound::InitMixer(card_id, lookup(save_entry, "module", "snd-dummy"));
