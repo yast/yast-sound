@@ -258,7 +258,7 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 	    UI(`ChangeWidget (`id(`configured_table), `Items, cc));
 	    if (size (cc) == 0) {
 		
-		SCR(`Execute (.target.bash, "/sbin/init.d/alsasound stop", $[]));
+		SCR(`Execute (.target.bash, "/etc/init.d/alsasound stop", $[]));
 
 		UI(`ChangeWidget(`id(`configured_table), `Enabled, false));
 		UI(`ChangeWidget(`id(`b_delete), `Enabled, false));

@@ -407,7 +407,7 @@
 	save_unique_keys (get_audio (test_mode, config_mode));
 
 	if (lookup (rc_vars, "START_ALSA") == "no")
-	    SCR(`Execute (.bin.bash, "/sbin/init.d/alsasound stop", $[]));
+	    SCR(`Execute (.bin.bash, "/etc/init.d/alsasound stop", $[]));
     }
 
 
