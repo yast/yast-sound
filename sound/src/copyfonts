@@ -5,7 +5,7 @@
 # dan meszaros <dmeszar@suse.cz>
 
 # first get the path to cdrom
-CDROMDEVICE=`grep ^/dev/cdrom /etc/fstab | cut -f2 | head -n1`
+CDROMDEVICE=`grep ^/dev/cdrom /etc/fstab | awk '{print $2}' | head -n1`
 
 # mount cdrom
 mount $CDROMDEVICE

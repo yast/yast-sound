@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Sep  4 17:15:40 CEST 2002 - lslezak@suse.cz
+
+- fixed copyfonts script (#18866) - allow spaces and tabs
+  as separators in /etc/fstab
+- version 2.6.19
+
+-------------------------------------------------------------------
 Mon Sep  2 16:57:28 CEST 2002 - lslezak@suse.cz
 
 - use module Directory
