@@ -1,0 +1,26 @@
+{
+    include "testsuite.ycp";
+    include "sound/routines.ycp";
+//    include "misc_defines.ycp";
+
+    boolean use_alsa = false;
+
+    foreach(`snd, [true, false],  // check for both alsa and oss behaviour
+    ``{
+	use_alsa = snd;
+	TEST(``(is_snd_alias("")), [], nil);
+	TEST(``(is_snd_alias("snd-card-0")), [], nil);
+	TEST(``(is_snd_alias("snd-card-16")), [], nil);
+	TEST(``(is_snd_alias("snd-card-emu10k1")), [], nil);
+	TEST(``(is_snd_alias("snd-card-0a")), [], nil);
+	TEST(``(is_snd_alias("snd-card-a0")), [], nil);
+	TEST(``(is_snd_alias("sound-slot-1")), [], nil);
+	TEST(``(is_snd_alias("sound-slot-117")), [], nil);
+	TEST(``(is_snd_alias("sound-slot-0a")), [], nil);
+	TEST(``(is_snd_alias("sound-slot-asdf")), [], nil);
+	TEST(``(is_snd_alias("  sound-slot-0")), [], nil);
+
+    });
+
+
+}

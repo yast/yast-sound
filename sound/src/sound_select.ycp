@@ -38,7 +38,6 @@
     any ui = nil;
     do
     {
-	y2error("###1");
 	ui = UI::UserInput();
 	if ((ui == `abort || ui == `cancel) && ReallyAbort())
         {

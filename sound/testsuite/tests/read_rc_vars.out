@@ -1,0 +1,10 @@
+Read	.rc.system.ASD nil
+Return	$["ASD":nil]
+Read	.rc.system.var1 "val1"
+Return	$["var1":"val1"]
+Read	.rc.system.var1 "val1"
+Read	.rc.system.var2 "val2"
+Return	$["var1":"val1", "var2":"val2"]
+Return	$[]
+Read	.rc.system.var3 nil
+Return	$["var3":nil]

@@ -254,14 +254,31 @@ its parameters using the 'Advanced setup'.");
 
     stop_programs();    
 
+// #################################
+
     if (!test_mode)
     {
+	list new_save = [];
+	if (card_id >= size(save_info))
+	{
+	    new_save = add(save_info, save_entry);
+	}
+	else
+	{
+	    integer pos = -1;
+	    new_save = maplist(`e, save_info,
+	    ``{
+		pos = pos + 1;
+		return (pos == card_id) ? save_entry :  e;
+	    });
+	}
+
 	sound_stop();
-	list new_save = add(save_info, save_entry);
 	SaveModulesEntry (new_save, [], true);
 	sound_start_tmp(true);
 	err_msg = check_module(save_entry, card_id);
     }
+// #################################
     any ui = nil;
 
     if (size (err_msg) > 0)

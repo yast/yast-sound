@@ -129,21 +129,12 @@
     }
 
     /**
-     * just tests, if the item exists
-     * otherwise returns default
-     * @return any
-     */
-    define myselect (list l, integer i, any default) ``{
-	if (i < size (l)) 
-	{
-	    return select (l, i);
-	}
-	return default;
-    }
-
-    /**
      * displays dialog with card options
      *
+     * @param string cardlabel label for the card
+     * @param list options. list where each item is map
+     *        with keys: name, value, type, default, description. 
+     *	      values in map are strings
      * @return map
      *
      */

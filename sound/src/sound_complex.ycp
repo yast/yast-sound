@@ -197,6 +197,7 @@ Try to restart sound system?")))
 			    return entry;
 			}
 		    });
+//		    CallFunction(`sound_volume(entry, card_id, false, false, save_info));
 		}
 		else if (lookup(res, "ui", nil) == `abort || lookup(res, "ui", nil) == `cancel)
 		{
