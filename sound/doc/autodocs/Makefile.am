@@ -22,7 +22,7 @@ ycp_files = \
 	../../src/write_routines.ycp
 
 all: $(ycp_files)
-	@YAST2DIR@/bin/ycpdoc -d. $(ycp_files)
+	ycpdoc -d. $(ycp_files)
 
 clean:
 	rm -f *~ *.html

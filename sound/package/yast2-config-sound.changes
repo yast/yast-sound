@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Apr 17 08:58:28 CEST 2001 - dmeszar@suse.cz
+
+- sound summary module added, fixed 'requires'
+
+-------------------------------------------------------------------
 Fri Mar 30 11:35:16 CEST 2001 - dmeszar@suse.cz
 
 - options editing, quick config
