@@ -246,7 +246,7 @@ select the appropriate item in list and press
 </P>
 ") +
 _("<P>
-Press <B>Edit</B> to configure cards already installed.
+Press <B>Change</B> to configure cards already installed.
 </P>
 ") +
 _("<P>

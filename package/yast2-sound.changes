@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Nov 18 13:55:40 CET 2003 - jsuchome@suse.cz
+
+- fixed button label in helptext (#33076)
+- migrated to doxygen
+- 2.9.4 
+
+-------------------------------------------------------------------
 Fri Nov  7 16:22:08 CET 2003 - jsuchome@suse.cz
 
 - basic command-line interface
