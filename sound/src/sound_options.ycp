@@ -229,7 +229,7 @@
 
 		UI(`ChangeWidget(`id(`des), `Value, value));
 	    }
-	    if (ui == `des) 	// ui ==`set) set button pressed
+	    if (ui == `set) 	// ui ==`set) set button pressed
 	    {
 		string value = UI(`QueryWidget(`id(`des), `Value));
 

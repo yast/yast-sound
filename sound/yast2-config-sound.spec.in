@@ -14,7 +14,7 @@ Name:         @RPMNAME@
 Release:      1
 Copyright:    (c) 2000 SuSE GmbH
 Group:        System Environment/YaST
-Requires:	yast2-trans-sound yast2-db-sound yast2
+Requires:	yast2-trans-sound yast2-db-sound yast2 yast2-agent-any yast2-agent-audio yast2-agent-modules yast2-agent-system yast2-agent-rcconfig
 BuildArchitectures: noarch
 
 Packager:     @MAINTAINER@
