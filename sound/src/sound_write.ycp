@@ -74,7 +74,8 @@
 
     include "sound/write_routines.ycp";
     include "sound/alsa_routines.ycp";
-    include "ui/progress.ycp";
+//    include "ui/progress.ycp";
+    import  "Progress";
     include "ui/wizard_dialog.ycp";
 
       // ==== MAIN ====
@@ -116,11 +117,17 @@
 	    _("Start sound card"),
 	    _("Store volume")];
 
+    list stones2 = [
+	    _("Saving sound card settings."),
+	    _("Saving card information..."),
+	    _("Saving RC values..."),
+	    _("Starting sound card..."),
+	    _("Storing volume settings")];
+
 				  // label message
 //    term con = `Label(_("Saving ..."));
-    ProgressSetup (_("Saving sound card settings."), " ", size(stones) - 1, 
-		stones,
-		"");
+    Progress::New (_("Saving sound card settings."), " ", size(stones) - 1, 
+		stones, stones2, "TODO: help");
 
 
 				  // dialog title
@@ -130,22 +137,26 @@
     
     integer step = 0;
 
-    ProgressMilestone(step, _("Saving modules configuration..."), step);
+//    ProgressMilestone(step, _("Saving modules configuration..."), step);
+    Progress::NextStage();
     step = step + 1;
     SaveModulesEntry(save_info, [], false);
     sleep(100);
 
-    ProgressMilestone(step, _("Saving card information..."), step);
+//    ProgressMilestone(step, _("Saving card information..."), step);
+    Progress::NextStage();
     step = step + 1;
     save_unique_keys (maplist(`e, save_info, ``(lookup(e, "unique_key", ""))));
     sleep(100);
 
-    ProgressMilestone(step, _("Saving RC values..."), step);
+//    ProgressMilestone(step, _("Saving RC values..."), step);
+    Progress::NextStage();
     step = step + 1;
     SaveRCValues(rc_vars);
     sleep(100);
 
-    ProgressMilestone(step, _("Starting sound card..."), step);
+//    ProgressMilestone(step, _("Starting sound card..."), step);
+    Progress::NextStage();
     step = step + 1;
 
     if (autoinstall)
@@ -153,7 +164,8 @@
 	map out = SCR::Execute(.target.bash_output, "/usr/sbin/rcalsasound start", nil);
     }
 
-    ProgressMilestone(step, _("Storing volume settings"), step);
+//    ProgressMilestone(step, _("Storing volume settings"), step);
+    Progress::NextStage();
     if (size(Args()) >= 4)
     {
 	set_vol_settings(Args(4));

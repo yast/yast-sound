@@ -41,6 +41,8 @@
     include "sound/manual.ycp";
 
 
+    boolean autoinstall = true;
+
     boolean use_alsa = !Arch::sparc;
     if (size(Args()) > 0 && Args(0)==.oss)
     {
