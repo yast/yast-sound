@@ -130,7 +130,7 @@
         map ret = $[];
         map db_entry = $[];
 
-        if (module_name == UI(_("All")))
+        if (module_name == "All") //UI(_("All")))
         {
             list tmp = filter (`e, db, ``(contains(lookup (e, "cards"), card_name)));
             if (size (tmp) > 0)
@@ -197,7 +197,7 @@
         {	// copy the whole database
         maplist (`e, db,
             ``{
-                if (size (lookup (e, cards)) > 0) ret = add (ret, lookup (e, cards));
+                if (size (lookup (e, "cards")) > 0) ret = add (ret, lookup (e, "cards"));
                 else ret = add (ret, [lookup (e, "name")]);
             });
         }
