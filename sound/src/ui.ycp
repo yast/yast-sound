@@ -272,7 +272,7 @@
 		    )
 
 		  ),
-		  `Left(`ReplacePoint(`id(`reppoint), `Label("Possible values:"))),
+		  `Left(`ReplacePoint(`id(`reppoint), `Label(""))),
                   `VSpacing (0.5)
                 ),
                 `HSpacing (3)
