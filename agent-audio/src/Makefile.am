@@ -10,9 +10,9 @@ plugin_LTLIBRARIES = libpy2ag_audio.la
 noinst_LTLIBRARIES = liby2ag_audio.la
 
 liby2ag_audio_la_SOURCES =		\
+	OSSAudio.cc	OSSAudio.h	\
 	AudioAgent.cc	AudioAgent.h	\
-	AlsaAudio.cc	AlsaAudio.h	\
-	OSSAudio.cc	OSSAudio.h	
+	AlsaAudio.cc	AlsaAudio.h
 liby2ag_audio_la_LDFLAGS = $(LDFLAGS) -version-info 2:0 -lasound
 
 libpy2ag_audio_la_SOURCES =				\
