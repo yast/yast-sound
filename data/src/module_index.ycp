@@ -31,7 +31,7 @@ $[
     10	: "snd-cs4236",
     11	: "snd-cs4281",
     12	: "snd-cs46xx",
-    13	: "snd-dt0197h",
+    13	: "snd-dt019x",
     14	: "snd-dummy",
     15	: "snd-emu10k1",
     16	: "snd-ens1370",

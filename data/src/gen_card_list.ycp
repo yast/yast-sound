@@ -1,6 +1,5 @@
 {
 
-    include "browser.ycp";
     include "gen_routines.ycp";
 
     map mod_idx = SCR::Read(.target.ycp, "./src/module_index.ycp");
