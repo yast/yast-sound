@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Feb 19 13:50:40 CET 2004 - mvidner@suse.cz
+
+- changed sort to use "<" instead of "<=" because of the switch to std::sort
+
+-------------------------------------------------------------------
 Sat Feb 07 23:23:13 CET 2004 - arvin@suse.de
 
 - removed config files (*.y2cc)

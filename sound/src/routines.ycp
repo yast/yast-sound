@@ -251,7 +251,7 @@
 		});
 
 		mods = sort(term a, term b, mods, ``{
-		    return select(a, 1, "") <= select(b, 1, "");
+		    return select(a, 1, "") < select(b, 1, "");
 		});
 
 		// item for all sound card models in sound card driver list
