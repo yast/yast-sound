@@ -32,6 +32,7 @@
     import "Wizard";
     import "Popup";
     import "Label";
+    import "Mode";
 
     import "Sound";
 
@@ -63,7 +64,7 @@
 	    // dialog title
 	Wizard::SetContents (_("Sound card volume"), con, help_text, true, true);
 
-	if (Sound::autoinstallation)
+	if (Mode::config)
 	{
 	    UI::ChangeWidget(`id(`test), `Enabled, false);
 	}
@@ -230,7 +231,7 @@ its parameters using the 'Advanced setup'.");
 
     string err_msg = "";
 
-    if (Sound::autoinstallation)
+    if (Mode::config)
     {
         stop_programs();
     }
@@ -256,7 +257,7 @@ its parameters using the 'Advanced setup'.");
 
 	Sound::modules_conf = new_save;
 
-	if (!Sound::autoinstallation)
+	if (!Mode::config)
 	{
 	    sound_stop();
 	    sound_start_tmp(true/*, size(new_save)*/);
@@ -275,9 +276,9 @@ its parameters using the 'Advanced setup'.");
 
 	string modname = lookup(save_entry, "module", "snd-dummy");
 
-	if (!Sound::autoinstallation)
+	if (!Mode::config)
 	{
-	    Sound::InitMixer(card_id, lookup(save_entry, "module", "snd-dummy"));
+	    Sound::InitMixer(card_id, lookup(save_entry, "module","snd-dummy"));
 	}
 
 	if (!quick)
@@ -317,7 +318,7 @@ its parameters using the 'Advanced setup'.");
 
     if (ui == `back || ui == `cancel || ui == `abort)
     {
-	if (!Sound::autoinstallation)
+	if (!Mode::config)
 	{
 //	    SaveModulesEntry(save_info, [], true);
 
@@ -332,14 +333,17 @@ its parameters using the 'Advanced setup'.");
 	Sound::curr_model = "";
     }
 
-    if (!Sound::autoinstallation)
+    if (!Mode::config)
     {
 	SCR::Execute(.audio.alsa.restore, 0 ,0);
     }
 
     UI::ChangeWidget (`id(`next), `Label, Label::NextButton());
 
-    SCR::Execute(.target.bash, "/usr/bin/killall aplay 2> /dev/null", $[]);
+    if (!Mode::config)
+    {
+	SCR::Execute(.target.bash, "/usr/bin/killall aplay 2> /dev/null", $[]);
+    }
 
     return $["ui" : ui, "return" : size (err_msg) == 0];
 

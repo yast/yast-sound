@@ -30,6 +30,7 @@
     import "Wizard";
     import "Label";
     import "Popup";
+    import "Mode";
 
     import "Sound";
     include "sound/mixer.ycp";
@@ -120,7 +121,8 @@
 
 	y2debug(" save_info %1, agent %2", size(Sound::modules_conf), size(SCR::Dir(.audio.alsa.cards)));
 
-	if (!Sound::autoinstallation && Sound::use_alsa && (size(Sound::modules_conf) != size(get_running_cards())))
+	if (!Mode::config && Sound::use_alsa &&
+	    (size(Sound::modules_conf) != size(get_running_cards())))
 	{
 	    // marning popup message text
 	    if (Popup::YesNo(_("The number of currently running cards doesn't match 
@@ -157,7 +159,7 @@ Try to restart sound system?")))
 
 	do
 	{
-	    if (!Sound::autoinstallation)
+	    if (!Mode::config)
 	    {
 		SCR::Execute(.audio.alsa.restore, 0, 0);
 	    }

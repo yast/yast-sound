@@ -36,7 +36,6 @@
 	import "Summary";
 	import "Wizard";
 	Mode::config = true;
-	Sound::autoinstallation = true;
 
 	any ret = nil;
 	string func = "";
@@ -83,9 +82,9 @@
 	else if (func == "Write") {
 		import "Progress";
 		Progress::off();
-	    map settings = Sound::Export();
-	    settings = add (settings, "autoinstall", true);
-	    WFM::CallFunction (`sound_write(settings));
+		map settings = Sound::Export();
+		Sound::write_only = true;
+		WFM::CallFunction (`sound_write(settings));
 		Progress::on();
 		return ret;
 	}
