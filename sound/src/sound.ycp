@@ -39,6 +39,7 @@
     include "sound/complex.ycp";
     include "sound/select.ycp";
     include "sound/manual.ycp";
+    include "sound/joystick.ycp";
 
 
     boolean autoinstall = false;
@@ -432,7 +433,9 @@ in order to configure sound cards."));
 	    // quick configuration
 	    "quick"	: ``(_snd_quick()),
 	    "quick2"	: ``(_snd_quick2(true)),
-	    "quick3"	: ``(_snd_quick2(false))
+	    "quick3"	: ``(_snd_quick2(false)),
+
+	    "joystick"	: ``(joystick())
 	];
 
     map m_sequence = $[
@@ -443,7 +446,6 @@ in order to configure sound cards."));
 		    `normal	    :	"quick3",
 		    `abort	    :	`abort,
 		    `intro	    :	"intro"
-		    
 		],
 	    "quick2"	:
 		$[

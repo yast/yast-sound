@@ -227,7 +227,8 @@
 		      `HSpacing ()
 		    )
 		  ),
-		  `VStretch ()
+		  `VStretch (),
+		  `PushButton(`id(`joystick), _("&Configure joystick"))
 	      ),
 	      `HSpacing (3));
 

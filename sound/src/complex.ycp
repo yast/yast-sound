@@ -255,16 +255,16 @@ Restart sound system now?")))
 	    else if (ui == `b_conf2)
 	    // add soundcard
 	    {
-		list cards = Sound::detected_cards;
-		if (size(cards) != 0)
-		{
-		    cards = maplist(`e, cards, ``(add (e, "module", get_module (e))));
-		    cards = filter(`e, cards, ``(lookup(e, "module", $[]) != $[]));
-		    cards = filter_configured(save_info, cards);
-		}
+		Sound::UpdateUnconfiguredCards();
+//		if (size(cards) != 0)
+//		{
+//		    cards = maplist(`e, cards, ``(add (e, "module", get_module (e))));
+//		    cards = filter(`e, cards, ``(lookup(e, "module", $[]) != $[]));
+//		    cards = filter_configured(save_info, cards);
+//		}
 
 
-		if (size(cards) == 0)
+		if (size(Sound::unconfigured_cards) == 0)
 		{
 		    ui = `add_manual;
 		}

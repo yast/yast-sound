@@ -22,7 +22,9 @@ include_DATA = \
 	options.ycp \
 	complex.ycp \
 	select.ycp \
-	manual.ycp
+	manual.ycp \
+	joystick.ycp \
+	joysticks.ycp
 
 
 clients_DATA = 	\
