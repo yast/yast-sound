@@ -113,6 +113,7 @@
 	};
 
 	define DebugDialog(any str) ``{
+	    // OK button user confirmation
 	    OpenDialog(`VBox(`RichText(sformat("%1",str)),`PushButton(_("&OK"))));
 	    any r = UserInput();
 	    CloseDialog();
@@ -127,8 +128,10 @@
 			       `VSpacing(0.2),
 			       `Heading(message),
 			       `HBox(
+				   // Yes button - user confirmation
 				   `PushButton(`id(`yes),  _("&Yes")),
 				   `HStretch(),
+				   // Yes button - user confirmation
 				   `PushButton(`opt(`default), _("&No"))
 				   ),
 			       `VSpacing(0.2)
@@ -172,6 +175,7 @@
 	    module_name = lookup (lookup(lookup (card, "module", $[]), "module", ""), "name", "");
 
 	if (module_name == "snd-card-nm256"){
+	    // special warning message for in a special case
 	    string warn_text = UI(_("Configuring this sound card on some Sony notebooks
 may be unsuccessful with running X. You may avoid these problems by specifying snd_buffer-top
 option value or configuring this card outside X. Proceed?"));
@@ -185,8 +189,10 @@ option value or configuring this card outside X. Proceed?"));
 
     define InitializingDialog () ``{
     
+	// label message
 	term con = `Label (sformat(UI(_("Initializing ..."))));
 	string helptext = "";
+	// dialog title message
 	UI(`SetWizardContents (_("YaST2\nInitializing ..."), con, helptext, false, false));
 	
 	return `next;
@@ -221,13 +227,17 @@ configure an other card than the one that is displayed on the right.</p>"));
 	    `VStretch (),
 	    `VBox(
 		`HSquash(`HBox (
+		    // Options - button label
 		    `HWeight(1, `PushButton (`id(`options), _("Options"))),
+		    // Skip button label
 		    `HWeight(1, `PushButton (`id(`skip), _("Skip")))
 		    )),
 		`VSpacing ())
 	    );
 	
+	// dialog title
 	UI(`SetWizardContents (_("Sound card configuration"), con, helptext, true, true));
+	// Next button label	
 	UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
 	return $["ui" : UI(`UserInput ())];
     }
@@ -414,10 +424,13 @@ configure an other card than the one that is displayed on the right.</p>"));
 
 	if (ui == `next) {
 	    
+	    // confirmation popup message
 	    string warn_msg = UI (_("Sound volume and the configuration\nfor the sound card will be saved now."));
 	    if (size(filter (`e, lookup (result, "save_info"), ``((size (e) > 0) && (lookup (e, "name") != "off")))) == 0)
+		// confirmation popup message		
 		warn_msg = UI (_("The sound configuration will be saved now."));
 
+	    // Yes, No - button label
 	    cont = !(UI (`YesOrNo (warn_msg, _("&Yes"), _("&No"))));
 	    
 	    save_info = lookup (result, "save_info");

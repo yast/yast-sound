@@ -67,6 +67,7 @@
     define SaveModulesEntry (list cards, list system) ``{
 
 	if ((contains(maplist (`e, cards, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) {
+				// Error message
 	    err_msg = err_msg + UI(_("Error while saving '/etc/modules.conf'.\n"));
 	    return false;
 	}
@@ -75,6 +76,7 @@
 	    SCR(`Write(.modules.alias.comment, "\n#\n# YaST2: sound cards support\n#\n", lookup (lookup (select (cards, 0), "modules", $[]), "alias")));
 
 	if ((contains(maplist (`e, system, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) {
+				// Error message	    
 	    err_msg = err_msg + UI(_("Error while saving '/etc/modules.conf'.\n"));
 	    return false;
 	}
@@ -84,6 +86,7 @@
 		       lookup (lookup (select (system, 0), "modules", $[]), "alias")));
 
 	if (!SCR(`Write(.modules, nil))) {
+				// Error message
 	    err_msg = err_msg + UI(_("Error while saving '/etc/modules.conf'.\n"));
 	    return false;
 	}
@@ -98,6 +101,7 @@
     define SetAllChannels (list cards, string command) ``{
 	if (contains (maplist (`e, cards, ``(maplist(`ch, `v, lookup (e, "volume", $[]), ``(SetVolume (command, ch, v, 
 		       tointeger(lookup(lookup(lookup (e, "modules", $[]), "options", $[]), "snd_index", 0))))))), false)) {
+				// Error message
 	    err_msg = err_msg + UI(_("Error while setting volume.\n"));
 	    return false;
 	}
@@ -139,6 +143,7 @@
 	
 	if (contains (maplist (`k, `v, rc, ``(SCR(`Write(topath(sformat(".rc.system.%1", k)), v)))), false) ||
 	    !SCR(`Write(.rc.system, nil)))
+				// Error message
 	    err_msg = err_msg + UI (sformat (_("Error while saving file: %1 \n"), "/etc/rc.config"));
 
     }
@@ -155,8 +160,9 @@
     if (size (Args ()) > 1)
 	test_mode = Args (1);
 
-
+				// label message
     term con = `Label(_("Saving ..."));
+    				// dialog title
     UI(`SetWizardContents (_("Sound configuration"), con, helptext, false, false));
 
     // Step ONE: save '/etc/modules.conf'
@@ -183,15 +189,19 @@
 
     string final_msg = "";
     if (size (err_msg) > 0)
+				// Error popup message	
 	final_msg = sformat (UI(_("These errors occurred during saving configuration:\n%1")), err_msg);
     else {	
+					// final success message
 	final_msg = UI(_("The sound card was successfully configured.\nYou can now use it immediately."));
 	if (size(filter (`e, lookup (sound_info, "cards", []), ``((size (e) > 0) && (lookup (e, "name") != "off")))) == 0)
+					// final success message	    
 	    final_msg = UI (_("The sound configuration was saved."));
 
     }
 
     if (test_mode)
+	// message displayed just in the test mode
 	final_msg = final_msg + " " + UI(_("(TEST MODE)"));
     
     UI(`DisplayMessage (final_msg));

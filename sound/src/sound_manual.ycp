@@ -123,8 +123,9 @@
 	helptext = helptext + UI(_("<p>Select <b>All</b> if you want\
  to see the whole list of supported sound card models.</p>"));
 
-
+	// label if no module name found
 	list module_names = sort (maplist (`e, db, ``(lookup (e, "name", _("Unknown module name")))));
+	// in the modules/cards list - to see all available cards
 	module_names = prepend (module_names, _("All"));
 	list card_names = get_cards ("All");
 
@@ -145,15 +146,18 @@
 			      `SelectionBox (`id (`sel_mod), `opt(`notify), _("Sound card model"), card_names)
 		    )),
 	    `VSpacing (),
+	    // textetry label
 	    `TextEntry (`id(`search), `opt(`notify), _("Search")),
 	    `VSpacing ()
 	    ));
 		   // To translators: text entry label
 		   //con = add (con, `TextEntry (`id(`search), `opt(`notify), _("Search")));
 
+	// dialog title
 	UI(`SetWizardContents (_("Sound manual configuration"), con, helptext, true, true));
 	UI(`ChangeWidget(`id(`sel_drv), `CurrentItem, select (module_names, 0)));
 	UI(`ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0)));
+	// Next - button label
 	UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
 
 	any ui = nil;

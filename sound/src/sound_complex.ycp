@@ -93,15 +93,19 @@ define WhichDialog () ``{
 
     term con = `HBox(
 	`HSpacing (3),
+	// frame label
 	`Frame(`id(`frame), _("Select"), 
 	       `HBox (`HSpacing (1), `VBox (
 		   `RadioButtonGroup (`id(`rg), `VBox (
 		       `VSpacing (1),
 		       `Left(`VBox(
+			   // label of radiobutton
 			   `Left(`RadioButton(`id(`auto), `opt (`notify), _("&Autodetected"), (size (nc) > 0))),
+			   // label of list with autodetected cards
 			   `VSquash(`SelectionBox(`id(`sel), _("List of autodetected"), nc))
 			   )),
 		       `VSpacing (1),
+		       // label of radio button
 		       `Left(`RadioButton (`id(`manual), `opt(`notify), _("&Manual selection"), (size (nc) == 0))),
 		       `VSpacing (1)
 		       ))),
@@ -110,8 +114,9 @@ define WhichDialog () ``{
 
 
 
-
+    // dialog title
     UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
+    // Next - button label
     UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
 
     if (size (nc) == 0) {
@@ -170,21 +175,28 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 	`HSpacing (3),
 	`VBox (
 	    `Table (`id(`configured_table), `opt (`notify, `immediate), 
+		    // table header labels
 		    `header(_("Number"), _("Card name")), cc),
 	    `VSpacing (0.5),
+	    // Delete - button label
 	    `HBox(`PushButton (`id(`b_delete), _("Delete")),
 		  `HStretch (),
+		  // Add soundcard ... - button label
 		  `PushButton (`id(`b_conf2), _("Add soundcard ..."))),
 	    `VSpacing (0.5),
 	    `HBox(`HStretch (),
+		  // check button label
 		  `VBox (`Left(`CheckBox(`id(`b_alsa), `opt(`notify), _("Start ALSA"), (lookup (rc_vars, "START_ALSA", "no") == "yes"))),
+			 // check button label
 			 `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("Start sequencer"), (lookup (rc_vars, "START_ALSA_SEQ", "no") == "yes"))))),
 	    `VSpacing (0.5)
 	    ),
 	`HSpacing (3));
 
 
+    // dialog title
     UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
+    // Finish - button label
     UI(`ChangeWidget(`id(`next), `Label, _("&Finish")));
     
     if (size (cc) == 0) {
@@ -214,6 +226,7 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 				// To translators: label message
 		msg = msg + UI (_("To reset the configuration these programs must be terminated. Proceed?"));
 		
+		// Yes, No - button labels
 		boolean terminate = UI(`YesOrNo (msg, _("&Yes"), _("&No")));
 		if (terminate)
 		    SCR(`Execute (.target.bash, "/bin/fuser -k /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]));
@@ -250,6 +263,7 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 		
 	    }
 	    else {
+		// error popup message
 		UI (`DisplayMessage (_("Cannot delete this entry!")));
 	    }
 
@@ -350,8 +364,10 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 
 	    conf_cards = get_running_cards ();
 	    cc = maplist (`e, conf_cards, ``(`item(`id(lookup (e, "number", 0)), sformat ("   [%1]", lookup (e, "number", 0)), lookup (e, "line1")))); 
+	    // dialog title
 	    UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
 	    UI(`ChangeWidget(`id(`configured_table), `Items, cc));
+	    // Finish - button label
 	    UI(`ChangeWidget(`id(`next), `Label, _("&Finish")));
 	    
 	    if (size (cc) == 0) {

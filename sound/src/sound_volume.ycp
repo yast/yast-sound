@@ -133,11 +133,12 @@
 
 
 	integer vol = 10;
-				// TODO: add some other device ajusting here (stereo, other devices like CD, etc ...)???
 
+	// slider label
 	term slider = `IntField(`id(`volume), `opt(`notify), _("Volume"), 0, 100, vol);
 
 	if (UI(`HasSpecialWidget(`Slider)))
+	    	// slider label
 	    slider = `Slider (`id(`volume), `opt(`notify), _("Volume"), 0, 100, vol);
 
 
@@ -146,6 +147,7 @@
 	    `VBox (
 		`VSpacing (),
 		`Top (`VBox(
+		    // dialog title
 		    `Left(`Label(_("Settings for sound card"))),
 		    `Label (`opt(`outputField), hardware_name (card))
 		    )),
@@ -156,8 +158,10 @@
 			`VSpacing (0.5),
 			slider,
 			`VSpacing (),
+			// Test - button label
 			`PushButton (`id (`test), _("&Test")),
 			`VSpacing (0.5),
+			// message label
 			`Label (_("Press 'Test' to start playing sound sample")),
 			`VSpacing (0.5)
 			),
@@ -166,6 +170,7 @@
 		),
 	    `HSpacing (3));
 
+	// dialog title
 	UI(`SetWizardContents (_("Sound cards"), con, help_text, true, true));
 	SetVolume (lookup (user_settings, "mixer"), "Master", sformat ("%1", vol), card_id);
 
@@ -208,12 +213,14 @@
 	
 	term con = `HVCenter(
 	    `VBox(
+		// error message
 		`Label (_("An error occured during installing")),
 		`VSpacing (),
 		`Label (`opt(`outputField), hardware_name (card)),
 		`VSpacing (),
 		`Label (err)));
 	
+	// dialog title
 	UI(`SetWizardContents (_("Sound cards"), con, help_text, true, false));
 
 	repeat {
