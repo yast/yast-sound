@@ -67,14 +67,16 @@
     
     list cards=get_audio(false, false);
     list keys=read_unique_keys();
-    
+
+    list runcards = SCR(`Read(.proc.asound.cards));
+
     list conflist=[];	// configured
     list notlist=[];	// not configured
     list retlist=[];	// return value of the module
     // copy cards: configured are added to the front of list, unconfigured to the end
 	
     string key="";
-    foreach(`card, cards, 
+/*    foreach(`card, cards, 
     ``{
 	key=lookup(card, "unique_key", "");
 	if(contains(keys, key))
@@ -82,6 +84,32 @@
             conflist=add(conflist, removeBlanks(hardware_name(card)));
         }
         else 
+        {
+            notlist=add(notlist, removeBlanks(hardware_name(card)));
+        }
+    });
+
+    integer i=0;
+
+    if(size(runcards) > size(conflist)) 
+    {
+	i=size(conflist); 
+	while(i<size(runcards))
+	{
+	    conflist=add(conflist, removeBlanks(lookup(select(runcards, i), "line1", "")));
+	    i=i+1;
+	}
+    }
+*/
+    foreach(`card, runcards, 
+    ``{
+	conflist=add(conflist, removeBlanks(lookup(card, "line1", "")));
+    });
+
+    foreach(`card, cards, 
+    ``{
+	key=lookup(card, "unique_key", "");
+	if(!contains(keys, key))
         {
             notlist=add(notlist, removeBlanks(hardware_name(card)));
         }
