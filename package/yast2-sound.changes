@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Sep  9 11:23:54 CEST 2004 - lslezak@suse.cz
+
+- install all required kernel modules/packages (#44394)
+- version 2.10.3 
+
+-------------------------------------------------------------------
 Tue Aug 10 09:20:14 CEST 2004 - jsuchome@suse.cz
 
 - merged proofread texts

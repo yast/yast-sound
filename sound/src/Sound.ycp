@@ -743,6 +743,35 @@ could make your system unstable.
     }
 
     /**
+     * Get list of all kernel modules which are requied by the configured cards
+     * @return list Unique list of modules
+     */
+    global define list<string> RequiredKernelModules()
+    {
+	// list of all unique modules
+	list<string> mods = [];
+
+	if (modules_conf != nil && size(modules_conf) > 0)
+	{
+	    foreach(map m, modules_conf, {
+		    string modname = m["module"]:"";
+
+		    if (m != nil && size(m) > 0)
+		    {
+			mods = add(mods, modname);
+		    }
+		}
+	    );
+	}
+
+	// remove duplicates
+	mods = toset(mods);
+
+	y2milestone("Required kernel modules: %1", mods);
+
+	return mods;
+    }
+    /**
      * Update the SCR according to sound settings
      * @return boolean True on success
      */
