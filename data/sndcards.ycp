@@ -1198,7 +1198,7 @@
           "allows" : "{{0,Disabled},{1,Latency},{2,Bridge},{3,Both},{255,Auto}}",
           "default" : "4",
           "descr" : [
-            _("Enable VIA-workaround for %1 soundcard."),
+            _("Enable VIA work-around for %1 sound card."),
             "Aureal Vortex 2 3D Sound Processor"
           ],
           "dialog" : "check"
@@ -1295,7 +1295,7 @@
       "description" : "Brooktree Bt87x audio driver",
       "params" : $[
         "digital_rate" : $[
-          "descr" : _("Digital input rate for Bt87x soundcard")
+          "descr" : _("Digital input rate for Bt87x sound card")
         ]
       ]
     ],
@@ -2349,7 +2349,7 @@
         "buggy_irq" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _("Enable workaround for buggy interrupts on some motherboards."),
+          "descr" : _("Enable work-around for buggy interrupts on some motherboards."),
           "dialog" : "check"
         ]
       ]
