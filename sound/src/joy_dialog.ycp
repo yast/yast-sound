@@ -122,7 +122,7 @@ define boolean joy_test_popup (integer card_id, integer joymodidx,
     {
 	// popup text (yes/no)
 	if (Popup::YesNo (_("For proper joystick initialization,
-restart of sound system is necessary.
+a restart of the sound system is necessary.
 Proceed?")))
 	{
 	    sound_stop ();

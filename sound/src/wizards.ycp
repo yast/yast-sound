@@ -166,6 +166,8 @@
             // we have to remember volume/mute settings because after a
 	    // card removal everything is muted and set to 0.
             list vol_settings = get_vol_settings();
+	    if (Mode::config)
+		vol_settings	= Sound::volume_settings;
 
             Sound::modules_conf	= remove (Sound::modules_conf, Sound::card_id);
 	    Sound::modules_conf	    = recalc_save_entries(Sound::modules_conf);
@@ -174,8 +176,11 @@
 	    {
 		vol_settings    = remove (vol_settings, Sound::card_id);
 		// we have to move old entry in global list:
-		Sound::volume_settings = add (vol_settings,
-		    Sound::volume_settings[Sound::card_id]:[]);
+		if (!Mode::config)
+		    Sound::volume_settings = add (vol_settings,
+			Sound::volume_settings[Sound::card_id]:[]);
+		else
+		    Sound::volume_settings = eval (vol_settings);
 	    }
 
 	    if (!Mode::config)

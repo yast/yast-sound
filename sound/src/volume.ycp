@@ -265,7 +265,7 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
 
     if (Sound::use_ui) Wizard::DisableAbortButton();
 
-    if (Mode::config)
+    if (Sound::use_ui)
     {
         stop_programs();
     }
@@ -288,7 +288,7 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
     Sound::modules_conf = new_save;
 
     // now restart sound system with new (current) card
-    if (!Mode::config)
+    if (!Mode::config && !Mode::autoinst)
     {
 	sound_stop();
 	sound_start_tmp(true);
@@ -305,7 +305,7 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
     {
 	string modname = save_entry["module"]:"snd-dummy";
 
-	if (!Mode::config)
+	if (!Mode::config && !Mode::autoinst)
 	{
 	    Sound::InitMixer(card_id, modname);
 	}
@@ -334,20 +334,27 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
 	    setVolume (master_elem, card_id, Sound::default_volume);
 	    setVolume ("Headphone", card_id, Sound::default_volume);
 
+	    map devs = lookup (Sound::db_modules[modname]:$[], "mixer", $[]);
+	    if (haskey (devs, "PCM"))
+	    {
+		setVolume ("PCM", card_id, Sound::default_volume);
+	    }
+
 	    if (Sound::conf_joystick == true && Sound::use_ui)
 	    {
 		joy_dialog(card_id, `next);
 	    }
 	    ui = `next;
 	}
-	storeVolume(card_id);
+	if (!Mode::config && !Mode::autoinst)
+	    storeVolume(card_id);
     }
 
     Sound::modules_conf = modules_conf_backup;
 
     if (ui == `back || ui == `cancel || ui == `abort)
     {
-	if (!Mode::config)
+	if (!Mode::config && !Mode::autoinst)
 	{
 	    sound_stop();
 	    sound_start_tmp(true);
@@ -361,7 +368,7 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
 	Sound::curr_model = "";
     }
 
-    if (!Mode::config)
+    if (!Mode::config && !Mode::autoinst)
     {
 	SCR::Execute(.audio.alsa.restore, 0 ,0);
 	SCR::Execute(.target.bash, "/usr/bin/killall aplay 2> /dev/null", $[]);

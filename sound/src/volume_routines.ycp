@@ -33,8 +33,8 @@
      * @param value volume 0-100
      * @return boolean success/failure
      */
-    define boolean setVolume (string group, integer cardid,
-				     integer value) ``{
+    define boolean setVolume (string group, integer cardid, integer value) ``{
+
 	if (!Sound::use_alsa)
 	{
 	    if (Arch::sparc)
@@ -53,7 +53,10 @@
 	}
 
 	// rest is for ALSA
-	if (!Mode::config)
+	// In Mode::autoinst, we need to update volume_settings from
+	// UpdateCardsToTargetSystem functions; volume will be saved later
+	// in set_vol_settings ().
+	if (!Mode::config && !Mode::autoinst)
 	{
 	    string p = sformat(".audio.alsa.cards.%1.channels.%2.volume",
 		cardid, group);
@@ -63,7 +66,8 @@
 	{
 	    // store volume to Sound::volume_settings for autoinstallation use
 	    map oldmap = Sound::volume_settings[cardid]:$[];
-	    Sound::volume_settings[cardid] = add(oldmap, group, value);
+	    // if current size of volume_settings < cardid, there will be nil!
+	    Sound::volume_settings[cardid] = add (oldmap, group, value);
 	    return true;
 	}
     }
@@ -185,7 +189,7 @@
      * @return boolean true if nothing's using sound, false otherwise
      */
     define boolean stop_programs() ``{
-	if (Mode::config)
+	if (Mode::config || Mode::autoinst)
 	{
 	    return true;
 	}

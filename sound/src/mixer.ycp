@@ -218,13 +218,14 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
     term con = mixerWidget (channels);
 
     // dialog header
-    Wizard::SetContents (sformat(_("Volume settings for card '%1'"), card_name),
-//    Wizard::SetContents (sformat(_("Volume settings for card '%1'"), card_id),
+    Wizard::SetContents (sformat(_("Volume settings for card '%1'"), card_id),
 	con, help, true, true);
     Wizard::RestoreNextButton();
 
     any	ui = nil; // value can be `next `abort... or string (channel name)
     integer value = 0;
+
+    UI::ChangeWidget (`id(`test), `Enabled, !Mode::config);
 
     repeat
     {
@@ -243,10 +244,8 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
 	    // set volume
 	    if (Sound::use_alsa)
 	    {
-		pth = topath(sformat(".audio.alsa.cards.%1.channels.%2.volume",
-		    card_id, ui));
+		setVolume ((string)ui, card_id, value);
 		value = (integer)UI::QueryWidget(`id(ui), `Value);
-		SCR::Write(pth, value);
 	    }
 	    else
 	    {
