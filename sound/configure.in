@@ -3,9 +3,9 @@ AC_INIT(src/Makefile.am) dnl a source file from your sub dir, but acinclude.m4 d
 AC_CANONICAL_SYSTEM
 AC_ARG_PROGRAM
 
-VERSION=`cat VERSION`
-RPMNAME=`cat RPMNAME`
-MAINTAINER=`cat MAINTAINER`
+VERSION=`cat ${srcdir}/VERSION`
+RPMNAME=`cat ${srcdir}/RPMNAME`
+MAINTAINER=`cat ${srcdir}/MAINTAINER`
 DOCDIR=/usr/share/doc/packages/yast2
 YAST2DIR=/usr/lib/YaST2
 
@@ -31,9 +31,7 @@ AM_CONDITIONAL(ISSPARC, test `uname -m` = sparc)
 AM_CONDITIONAL(ISPPC, test `uname -m` = ppc)
 
 AC_OUTPUT(Makefile
-	y2c_snd.spec
+	package/y2c_snd.spec:y2c_snd.spec.in
 	src/Makefile
 	doc/Makefile
 	doc/implementation/Makefile)
-
-mv $RPMNAME.spec package
