@@ -1571,7 +1571,7 @@
         ],
         "mmap_valid" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
-          "default" : "0",
+          "default" : "1",
           "descr" : _("Support OSS mmap."),
           "dialog" : "check"
         ],
