@@ -8,7 +8,6 @@ all:
 	y2tool y2automake
 	aclocal
 	autoconf
-	autoheader
 	automake -a
 
 install: configure
