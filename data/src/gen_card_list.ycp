@@ -49,8 +49,7 @@
     // let's open input file...
     string kernel_ver = lookup(SCR::Execute(.target.bash_output, "uname -r", $[]), "stdout", "");
     kernel_ver = select(splitstring(kernel_ver, "\n"), 0, "");
-    // string s = SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.generic_string");
-    string s = SCR::Read(.target.string, "/export/alsa/alsa-driver/utils/alsa-module-syntax");
+    string s = SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.generic_string");
 
     list l = splitstring(s, "\n");
 
