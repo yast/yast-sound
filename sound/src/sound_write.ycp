@@ -65,7 +65,7 @@
       // ==== MAIN ====
 
     boolean test_mode = false;
-    map save_info = Args (0);
+    list save_info = Args (0);
 
     string helptext = "";
     string err_msg = "";

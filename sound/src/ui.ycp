@@ -61,7 +61,7 @@
 	integer flagc=1;
 	integer flagp=0;
 	boolean selected=false;
-	while(flagp<4)
+	while(flagp<3)
 	{
 	    if((flagc & flags) ==0)
 	    {
@@ -383,9 +383,10 @@
                         `VSpacing (0.3),
                         `RadioButton (`id (1), `opt (`hstretch), _("Normal setup")),
                         `VSpacing (0.3),
-                        `RadioButton (`id (2), `opt (`hstretch), _("Advanced setup with possibility to change options")),
-                        `VSpacing (0.3),
-                        `RadioButton (`id (3), `opt (`hstretch), _("Skip sound card"))
+                        `RadioButton (`id (2), `opt (`hstretch), _("Advanced setup with possibility to change options"))
+//,
+//                        `VSpacing (0.3),
+//                        `RadioButton (`id (3), `opt (`hstretch), _("Skip sound card"))
                         )
                     )),
                 `VStretch ()
