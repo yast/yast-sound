@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Mar 16 16:36:09 CET 2005 - lslezak@suse.cz
+
+- adjust also volume of "Front" channel (#72971)
+- 2.11.9
+
+-------------------------------------------------------------------
 Thu Mar 10 17:42:02 CET 2005 - lslezak@suse.cz
 
 - use 'default' PCM device for playing test sound
