@@ -6,7 +6,7 @@
 # please send bugfixes or comments to @MAINTAINER@
 #
 
-# neededforbuild  autoconf automake ydoc
+# neededforbuild  autoconf automake ydoc ycpdoc
 
 Vendor:       SuSE GmbH, Nuernberg, Germany
 Distribution: SuSE Linux 6.4 (i386)
@@ -14,7 +14,7 @@ Name:         @RPMNAME@
 Release:      1
 Copyright:    (c) 2000 SuSE GmbH
 Group:        System Environment/YaST
-Requires:	y2t_snd y2d_snd yast2
+Requires:	y2t_snd y2d_snd yast2 ycpdoc
 BuildArchitectures: noarch
 
 Packager:     @MAINTAINER@
@@ -22,6 +22,8 @@ Packager:     @MAINTAINER@
 Summary:      YaST2 Modules for installation
 Version:      @VERSION@
 Source0:      @RPMNAME@-@VERSION@.tar.bz2
+Provides:     y2c_snd
+Obsoletes:    y2c_snd
 
 %description
 -
