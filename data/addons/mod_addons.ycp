@@ -7,7 +7,7 @@ $[
 	    "snd_enable_beep":
 	    $[
 		"descr": _("Enable beep using PCM."),
-		"allows": "{{0}, {1}}"
+		"allows": "{{0},{1}}"
 	    ]
 	]
     ]
