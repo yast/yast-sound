@@ -25,7 +25,7 @@
      *  @return map
      */
 
-    define STRINGS() ``{
+    define STRINGS_() ``{
 	return $["DisplayName":
 	     UI(_("<p>If you want to configure this sound card press <b>Next<b></p>"))+
 	     UI (_("<p>If you want to set a special option, press the <b>Options</b> button.
@@ -120,6 +120,9 @@
 	    "saveFinal2":
 	    UI(_("The sound card was successfully configured.\nYou can now use it immediately.")),
 
+	    "saveFinal3":
+	    UI(_("The sound configuration was saved.")),
+
 	    "saveRCValues":
 	    UI(_("Error while saving file: %1 \n")),
 
@@ -135,7 +138,7 @@
 	    ];
     }
 
-    return STRINGS();
+    return STRINGS_();
     
 }
 

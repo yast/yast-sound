@@ -27,7 +27,7 @@
  *                                   "volume"  : <map>    // map for storing volume, map keys should be
  *                                                        // channels
  *
- *                  system will be a map with (possible many more) these keys:
+ *                  system will be a map with (possibly many more) these keys:
  *
  *                                   "modules" : <list> // list of maps for 'modules.conf' - "alias",
  *                                                      // "options"; it's list because more than one entry
@@ -53,14 +53,16 @@
 
 {
 
+
     textdomain "sound";
+
+    map STRINGS=CallModule("sound_texts", []);
 
       /**
        * Saves one '/etc/modules.conf' entry
        * @return boolean
        */
     define SaveOneModulesEntry (string entry_name, map entry) ``{
-	y2error(sformat("%1", entry));
 	boolean ret = true;
 	if (haskey (entry, "alias")) 
 	{
@@ -182,6 +184,7 @@
 
     boolean test_mode = false;
     map sound_info = Args (0);
+
     string helptext = "";
     string err_msg = "";
 

@@ -8,7 +8,7 @@ includedir = $(YAST2DIR)/include/sound
 
 include_DATA = \
 	sound_routines.ycp \
-	sound_ui.ycp
+	sound_ui.ycp 
 
 modules_DATA = 	\
 	sound.ycp 		\

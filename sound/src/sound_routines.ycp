@@ -17,20 +17,32 @@
 
 
 {
+
+    textdomain "sound";
+
+    /**
+     * returns sound card database
+     * @return list
+     */
+
+    define GetCardDatabase() ``{
+	return SCR(`Read (.target.yast2, "sndcards.ycp"));
+    }
+
     /**
      * Used for searching. returns index of the card in the database identified by name
      * @return integer
      */
 
-    textdomain "sound";
-
     define search_card_id (string name) ``{
         list all_cards = get_cards ("all");
         integer pos = 0;
         integer len = size (name);
-        while (pos < size (all_cards))
+	name = tolower(name);
+	integer bound = size (all_cards);
+        while (pos < bound)
         {
-            if (substring (tolower(select (all_cards, pos)), 0, len) == tolower(name))
+            if (substring (tolower(select (all_cards, pos)), 0, len) == name)
             {
                 return pos;
             }
@@ -105,6 +117,8 @@
      * returns list of sound cards. get_cards("all") returns all cards
      * @return list
      */
+
+    /* !!! variable cards is inherited from module sound_manual.ycp*/
     define get_cards (string module_name) ``{
         list ret = [];
 
@@ -316,7 +330,7 @@
      * @return map
      */
     define get_module (map card) ``{
-	list|void db = SCR(`Read (.target.yast2, "sndcards.ycp"));
+//	list|void db = SCR(`Read (.target.yast2, "sndcards.ycp"));
 	
 	if (db == nil)
 	{

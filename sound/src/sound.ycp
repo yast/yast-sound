@@ -71,6 +71,7 @@
      * @return  list with save info, as required by sound_save for one cards
      */
     define OneCardWizard (map card, integer card_id, any ui) ``{
+	y2error("OneCard card_id=%1", card_id);
 	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id))),
 		    ``(CallModule ("sound_volume", [card, card_id, (size (sound_cards) == 1)] ))];
 
@@ -204,6 +205,9 @@
 
     list sound_cards  = get_audio (test_mode, config_mode);
     list save_info    = read_save_info ();
+    
+    y2error(sformat("SaveInfo:%1",save_info ));
+
     map rc_vars       = $[];
     integer card_id   = 0;
     integer n_cards   = 0;
@@ -214,9 +218,7 @@
     list configured_unique = []; // list of unique keys, that was configured
 
     boolean exit = false;
-y2error("Begin reading sound db");
-    list|void db = SCR(`Read (.target.yast2, "sndcards.ycp"));
-y2error("db reading inished");
+    list|void db = GetCardDatabase(); //SCR(`Read (.target.yast2, "sndcards.ycp"));
     if (is (db, void)) 
     {
 	UI(`DisplayMessage ("The Sound card database cannot be found!!!"));
@@ -224,8 +226,9 @@ y2error("db reading inished");
     }
 
     // get all the apropriate information from the database
-      sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
+    sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
 
+    // all configured cards
     list|void already = nil;
     if (SCR(`Read(.target.size, "/var/lib/YaST/unique.inf")) > 0)
     {
@@ -236,170 +239,178 @@ y2error("db reading inished");
     {
 	already = maplist (`k, lookup (select (filter (`e, already, ``(lookup (e, "section") == "sound")), 0, $[]), "contents", []),
 			   ``(lookup (k, "unique")));
+	// filter out cards that had been already configured
 	sound_cards = filter (`e, sound_cards, ``(!contains (already, lookup (e, "unique_key"))));
     }
 
-    if (!exit) 
+    
+
+    if(exit)
+    {	// no sound cards database present, shutting down
+	UI(`CloseDialog ());
+	return;
+    }
+
+
+    boolean skipped = false;
+    call_complex_dialog = ( size (sound_cards) != 1 );	
+    while (cont) 
     {
-
-	boolean skipped = false;
-	call_complex_dialog = size (sound_cards) != 1;	
-	while (cont) 
+		    // wizards ...
+	while ((card_id >= 0) && (card_id < size (sound_cards))) 
 	{
-				// wizards ...
-	    while ((card_id >= 0) && (card_id < size (sound_cards))) 
-	    {
-		result = OneCardWizard (select (sound_cards, card_id), size (save_info), condition (skipped, `next, ui));
+	    y2error(sformat("#1: card_id=%1", card_id));
 
-		ui       = lookup (result, "ui", `cancel);
-		use_alsa = lookup (result, "use_alsa", true);
+	    result = OneCardWizard (select (sound_cards, card_id), size (save_info), condition (skipped, `next, ui));
 
-		if (ui == `cancel)
-		{
-		    break;
-		}
-		if (ui == `skip) 
-		{
-		    card_id = card_id + 1;
-		    skipped = true;
-		}
-		if (ui == `back) 
-		{
-		    map rem = lookup (result, "return", $[]);
-		    save_info = filter (`e, save_info, ``(e != rem));
-		    configured_unique = filter (`e, configured_unique, ``(lookup (select (sound_cards, card_id), "unique_key", "") != e));
-		    card_id = card_id - 1;
-		}
-		if (ui == `next) 
-		{
-		    map new = lookup (result, "return", $[]);
-		    save_info = add (save_info, new);
-		    configured_unique = add (configured_unique, lookup (select (sound_cards, card_id), "unique_key", ""));
-		    card_id = card_id + 1;
-		    skipped = false;
-		}
-	
-	    }
+	    ui       = lookup (result, "ui", `cancel);
+	    use_alsa = lookup (result, "use_alsa", true);
 
-	    if (ui == `back) 
+	    if (ui == `cancel)
 	    {
 		break;
 	    }
+	    if (ui == `skip) 
+	    {
+		card_id = card_id + 1;
+		skipped = true;
+	    }
+	    if (ui == `back) 
+	    {
+		map rem = lookup (result, "return", $[]);
+		save_info = filter (`e, save_info, ``(e != rem));
+		configured_unique = filter (`e, configured_unique, ``(lookup (select (sound_cards, card_id), "unique_key", "") != e));
+		card_id = card_id - 1;
+	    }
+	    if (ui == `next) 
+	    {
+		map new = lookup (result, "return", $[]);
+		save_info = add (save_info, new);
+		configured_unique = add (configured_unique, lookup (select (sound_cards, card_id), "unique_key", ""));
+		card_id = card_id + 1;
+		skipped = false;
+	    }
+    
+	}
+
+	if (ui == `back) 
+	{   // exit module
+	    break;
+	}
+    
+	if (call_complex_dialog) 
+	{
+	    result = CallModule ("sound_complex", [sound_cards, save_info, configured_unique]);
+	}
+	else
+	{
+	    result = $["ui" : `next, "save_info" : save_info];
+	}
+
+	ui = lookup (result, "ui", `cancel);
+
+	if (ui == `next && (size (sound_cards) != 1)) 
+	{
+	
+      // confirmation popup message
+	    string warn_msg = lookup(STRINGS, "ConfigSaveWarn");
+
+	    if (size(filter (`e, lookup (result, "save_info"), ``((size (e) > 0) && (lookup (e, "name") != "off")))) == 0)
+	    {
+	// confirmation popup message		
+		warn_msg = lookup(STRINGS, "ConfigSaveWarn2");
+	    }
+
+	// Yes, No - button label
+	    cont = !(UI (`YesOrNo (warn_msg, _("&Yes"), _("&No"))));
 	
 	    if (call_complex_dialog) 
 	    {
-		result = CallModule ("sound_complex", [sound_cards, save_info, configured_unique]);
+		save_info = lookup (result, "save_info");
+		rc_vars   = lookup (result, "rc", $[]);
+		configured_unique = lookup (result, "configured_unique", []);
 	    }
 	    else
 	    {
-		result = $["ui" : `next, "save_info" : save_info];
+		skipped = true;
 	    }
-
-	    ui = lookup (result, "ui", `cancel);
-
-	    if (ui == `next && (size (sound_cards) != 1)) 
-	    {
-	    
-	  // confirmation popup message
-		string warn_msg = lookup(STRINGS, "ConfigSaveWarn");
-
-		if (size(filter (`e, lookup (result, "save_info"), ``((size (e) > 0) && (lookup (e, "name") != "off")))) == 0)
-		{
-	    // confirmation popup message		
-		    warn_msg = lookup(STRINGS, "ConfigSaveWarn2");
-		}
-
-	    // Yes, No - button label
-		cont = !(UI (`YesOrNo (warn_msg, _("&Yes"), _("&No"))));
-	    
-		if (call_complex_dialog) 
-		{
-		    save_info = lookup (result, "save_info");
-		    rc_vars   = lookup (result, "rc", $[]);
-		    configured_unique = lookup (result, "configured_unique", []);
-		}
-		else
-		{
-		    skipped = true;
-		}
-	    }
-	    else 
-	    {
-		if ((size (sound_cards) != 1))
-		{
-		    cont = false;
-		}
-		else 
-		{
-		    if (ui == `back) 
-		    {
-			card_id = card_id - 1;
-		    }
-		}
-  
-	    }
-	    if ((size (sound_cards) == 1)) 
+	}
+	else 
+	{
+	    if ((size (sound_cards) != 1))
 	    {
 		cont = false;
 	    }
-	}
-
-				// filter out empty enries
-	save_info = filter (`e, save_info, ``(size (e) > 0));
-	n_cards = size (save_info);
-
-	map save_map = $[];
-    
-	if ((n_cards > 0) && (ui == `next)) 
-	{
-	    if (use_alsa) 
-	    {
-		string snd_name = "off";
-
-		if (size (filter (`e, save_info, ``(lookup (e, "name") != "off"))) > 0)
-		{
-		    snd_name = "snd";
-		}
-
-		save_info = prepend (save_info, $["name"   : snd_name,
-					  "modules" : $["alias"  : "char-major-116",
-							"options" : $["snd_cards_limit" : sformat ("%1", n_cards),
-					 		"snd_major"        : "116"]]]);
-
-		save_map = add (save_map, "cards",  save_info);
-		save_map = add (save_map, "system", $["modules" : alsa_oss (n_cards),
-						 "rc"       : rc_vars]);
-		save_map = add (save_map, "other",  ``(AlsaFinish ()));
-
-	    }
 	    else 
 	    {
-	    // no alsa
-		string mod_name = lookup (select (sound_cards, 0), "module", "");
-		if (size (mod_name) > 0)
+		if (ui == `back) 
 		{
-		    save_map = add (save_map, "system", no_alsa (mod_name));
+		    card_id = card_id - 1;
 		}
 	    }
 
-	//UI(`DebugDialog (save_info));
-
-	    CallModule ("sound_save", [save_map, test_mode]);
-
-	
-	}    
-    
-	if (ui == `next) 
+	}
+	if ((size (sound_cards) == 1)) 
 	{
-	// always save unique keys 
-	    save_unique_keys (get_audio (test_mode, config_mode));
+	    cont = false;
+	}
+    }
 
-	    if (lookup (rc_vars, "START_ALSA") == "no")
+			    // filter out empty enries
+    save_info = filter (`e, save_info, ``(size (e) > 0));
+    n_cards = size (save_info);
+
+    map save_map = $[];
+
+    if ((n_cards > 0) && (ui == `next)) 
+    {
+	if (use_alsa) 
+	{
+	    string snd_name = "off";
+
+	    if (size (filter (`e, save_info, ``(lookup (e, "name") != "off"))) > 0)
 	    {
-		SCR(`Execute (.bin.bash, "/etc/init.d/alsasound stop", $[]));
+		snd_name = "snd";
+	    }
+
+	    save_info = prepend (save_info, $["name"   : snd_name,
+				      "modules" : $["alias"  : "char-major-116",
+						    "options" : $["snd_cards_limit" : sformat ("%1", n_cards),
+						     "snd_major"        : "116"]]]);
+
+	    save_map = add (save_map, "cards",  save_info);
+	    save_map = add (save_map, "system", $["modules" : alsa_oss (n_cards),
+					     "rc"       : rc_vars]);
+	    save_map = add (save_map, "other",  ``(AlsaFinish ()));
+
+	}
+	else 
+	{
+	// no alsa
+	    string mod_name = lookup (select (sound_cards, 0), "module", "");
+	    if (size (mod_name) > 0)
+	    {
+		save_map = add (save_map, "system", no_alsa (mod_name));
 	    }
 	}
 
+    //UI(`DebugDialog (save_info));
+
+	CallModule ("sound_save", [save_map, test_mode]);
+
+    
+    }    
+
+    if (ui == `next) 
+    {
+    // always save unique keys 
+	save_unique_keys (get_audio (test_mode, config_mode));
+
+	if (lookup (rc_vars, "START_ALSA") == "no")
+	{
+	    SCR(`Execute (.bin.bash, "/etc/init.d/alsasound stop", $[]));
+	}
     }
+
     UI(`CloseDialog ());
 }
