@@ -233,7 +233,7 @@
 
     /**
      * Read all sound settings from the SCR
-     * @param _unused
+     * @param _unused unused parameter
      * @return boolean True on success
      */
     global define boolean Read(block _unused) ``{
@@ -283,6 +283,7 @@
     
     /**
      * Just Set module data
+     * @param settings Sound configuration settings
      * @return: void
      */
     global define void Set(map settings)  ``{
@@ -293,8 +294,8 @@
 
     /**
      * Update the SCR according to sound settings
-     * @paran _unused
-     * @param _unused2
+     * @param _unused unused parameter
+     * @param _unused2 unused parameter
      * @return boolean True on success
      */
     global define boolean Write(block _unused, block _unused2) ``{
@@ -354,7 +355,7 @@
 
     /**
      * returns html formated configuration summary
-     * @return string
+     * @return string Summary string
      */
 
     global define string Summary() ``{
@@ -392,11 +393,11 @@
      * ]
      * CollectOptions("snd-emu10k1") returns $["opt1":"a,b", "opt2":",c"]
      * @param modname module name
-     * @return map
+     * @return map Map with collected options
      *
      */
 
-    global define string CollectOptions(string modname) ``{
+    global define map CollectOptions(string modname) ``{
 	// first filter out entries with other module
 	list mod_entries = filter(`e, modules_conf, ``(lookup(e, "module", "off") == modname));
 
@@ -482,7 +483,7 @@
      * @return boolean success/failure
      */
 
-    global define Propose() ``{
+    global define boolean Propose() ``{
 	if (proposal_created)
 	{
 	    return true;
@@ -537,8 +538,8 @@
     }
 
     /**
-     * returns true if the config has changed
-     * @return boolean
+     * Status of configuration
+     * @return boolean true if configuration was changed
      */
 
     global define boolean Changed() ``{
@@ -604,6 +605,12 @@
 	SaveUniqueKeys(conf, unconf);
     }
 
+    /**
+     * Get joystick settings from sound database
+     * @param modname name of sound module
+     * @return map map with options
+     */
+
     global define map GetJoystickSettings(string modname) ``{
 	map mod = lookup(db_modules, modname, $[]);
 	return lookup(mod, "joystick", $[]);
@@ -643,7 +650,7 @@
      * sets the channel volume to value [0..100]
      * @param card_id card #
      * @param channel channel name
-     * @value volume [0..100]
+     * @param value volume of channel [0..100]
      */
 
     global define void SetVolume(integer card_id, string channel, integer value) ``{
@@ -669,11 +676,10 @@
     /**
      * initialises volume after adding a new card. unmutes and sets volume for some channels
      * @param card_id card id.
-     * @param module_name
-     * @return boolean
+     * @param modname name of sound module
      */
 
-    global define boolean InitMixer(integer card_id, string modname) ``{
+    global define void  InitMixer(integer card_id, string modname) ``{
         map devs = lookup(lookup(Sound::db_modules, modname, $[]), "mixer",
             $["Master":70, "PCM":70, "CD":70, "Synth": 70]);
 
@@ -696,6 +702,12 @@
 
 	// in addidtion, some other channels can be specified or some volumes may be overriden
     }
+
+    /**
+     * Test whether sound card supports joystick
+     * @param card_id id of sound card
+     * @return boolean True if sound card card_id supports joystick
+     */
 
     global define boolean HasJoystick(integer card_id) ``{
 	if (card_id == nil)
@@ -723,6 +735,10 @@
 	}
     }
 
+    /**
+     * Return list of configured/proposed sound cards which support joystick
+     * @return list list of maps: [$["card_no":0, "name":"Sound Blaster Live!"]]
+     */
     global define list GetSoundCardListWithJoy() ``{
 
 	// get list of installed sound cards

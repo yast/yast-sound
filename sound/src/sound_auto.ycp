@@ -61,7 +61,11 @@
     Sound::Import ( settings );
     y2milestone("Imported: (%1)", settings);
 
-    define set_contents() ``{	
+    /**
+     * Set contents of wizard dialog
+     */
+
+    define void set_contents() ``{	
 	term contents =
 	    `VBox(
 		  `VSpacing(1),

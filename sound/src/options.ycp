@@ -215,6 +215,12 @@
 
     }
 
+    /**
+     * Returns description of card module option
+     * @param arg type of arg can be string or list
+     * @return string description
+     */
+
     global define string getDescr(any arg) ``{
 	if (is(arg, string))
 	{

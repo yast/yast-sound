@@ -38,21 +38,14 @@
     /**
      * Saves one '/etc/modules.conf' entry
      * @param entry card config
-     * @param tmp save to temporary file, not to /etc/modules.conf
      * @return boolean success/failure
      */
-    global define boolean SaveOneModulesEntry (map entry, boolean tmp) ``{
+    global define boolean SaveOneModulesEntry (map entry) ``{
 	path mod		= .modules;
         path mod_alias		= .modules.alias;
         path mod_options	= .modules.options;
         path mod_alias_comment	= .modules.alias.comment;
-        if (tmp)
-        {
-            mod			= .tmp.modules;
-            mod_alias		= .tmp.modules.alias;
-            mod_options		= .tmp.modules.options;
-            mod_alias_comment	= .tmp.modules.alias.comment;
-        }
+
         boolean ret = true;
         if (haskey (entry, "alias"))
             {
@@ -69,17 +62,12 @@
      * saves modules options. this function has to collect parameters that use
      * different cards that use single module and create a coma separated list of values
      * @param save_info save info
-     * @param tmp write to tmp modules.conf, not to /etc/modules.conf
      * @return void
      */
 
-    global define void SaveModulesOptions(list save_info, boolean tmp)
+    global define void SaveModulesOptions(list save_info)
     ``{
 	path mod_options = .modules.options;
-	if (tmp)
-	{
-	    mod_options = .tmp.modules.options;
-	}
 
 	// create distinct list of all modules
 	list mods = toset(maplist(`e, save_info, ``(lookup(e, "module", "off"))));
@@ -114,22 +102,14 @@
      * Saves all '/etc/modules.conf' entries
      * @param save_info cards save info
      * @param system sytem dependent part
-     * @param tmp write to /tmp/modules.conf (not to /etc/modules.conf)
      * @return map return struct: $["return": boolean, "err_msg": string]
      */
-    global define map SaveModulesEntry (list save_info, list system, boolean tmp) ``{
+    global define map SaveModulesEntry (list save_info, list system) ``{
 	path mod		= .modules;
 	path mod_alias		= .modules.alias;
 	path mod_options	= .modules.options;
 	path mod_alias_comment	= .modules.alias.comment;
-	if (tmp)
-	{
-	    mod=.tmp.modules;
-	    mod_alias=.tmp.modules.alias;
-	    mod_options=.tmp.modules.options;
-	    mod_alias_comment=.tmp.modules.alias.comment;
-	}
-	SaveModulesOptions(save_info, tmp);
+	SaveModulesOptions(save_info);
 
 	list als=[];
 
@@ -168,7 +148,7 @@
 	}
 
         if ((contains(maplist (`e, save_info,
-		``(SaveOneModulesEntry (e, tmp))), false)))
+		``(SaveOneModulesEntry (e))), false)))
         {
             // Error message
             err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry", "");
