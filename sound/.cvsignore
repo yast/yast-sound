@@ -12,3 +12,5 @@ config.h.in
 aclocal.m4
 Makefile.am
 autom4te.cache
+install-sh
+mkinstalldirs
