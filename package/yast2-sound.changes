@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Oct 25 15:14:46 CEST 2002 - jsuchome@suse.cz
+
+- dialog for joystick testing (works with the new version of jstest)
+- enables also test when more joysticks are connected
+- version 2.7.0
+
+-------------------------------------------------------------------
 Wed Oct  9 16:07:39 CEST 2002 - lslezak@suse.cz
 
 - enable/disable alsasound service depending on number of

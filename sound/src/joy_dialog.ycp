@@ -54,19 +54,22 @@
 	// dialog header
 	string caption = _("Joystick configuration") + sformat (" - %1 (snd-card-%2)", cardname, card_id);
 	string helptext =
-	// help text for joystick configuration 1/3
+	// help text for joystick configuration 1/4
 _("<P>In this dialog, specify your joystick type. If your
 joystick type is not in the list, select <B>Generic analog joystick</B>.</P>
 ") +
 
-	// help text for joystick configuration 2/3
+	// help text for joystick configuration 2/4
 _("<P>To remove the configured joystick from the system
-or if you do not have a joystick, select <B>No joystick</B>.</P>
+or if you do not have any joystick, select <B>No joystick</B>.</P>
 ") +
 
-	// help text for joystick configuration 3/3
+	// help text for joystick configuration 3/4
+_("<P>Press <B>Test</B> to test functionality of selected joystick type.") +
+
+	// help text for joystick configuration 4/4
 _("<P><B>Note:</B> Connect your joystick to your computer
-before pressing <B>Next</B>.</P>");
+before pressing <B>Test</B> or <B>Next</B>.</P>");
 
 
 	map joy = select(Joystick::joystick, card_id, $[]);
@@ -125,10 +128,12 @@ before pressing <B>Next</B>.</P>");
 	    `VBox(
 		`VSpacing(3),
 		`HBox(
-		    `HSpacing(6),
+		    `HSpacing(3),
 		     // label above list of joystick types
 		    `SelectionBox(`id(`os), _("&Select your joystick type:"), boxitems),
-		    `HSpacing(6)
+            `HSpacing(3),
+            `PushButton(`id(`test), _("&Test")),
+		    `HSpacing(3)
 		),
 		`VSpacing(3)
 	    );
@@ -173,6 +178,29 @@ before pressing Next.
 		s = `skip;
 	    }
 
+        if (s == `test)
+        {
+	    integer idx = UI::QueryWidget(`id(`os), `CurrentItem);
+	    string joymod = select(select(joylist, idx, ["", _("No joystick")]), 0, "");
+	    if (joymod == "")
+		    UI::MessagePopup(_("You have to select the joystick you want to test."));
+	    else
+        {
+            boolean test = true;
+            if (SCR::Execute(.target.bash, "rpm -q joystick")!=0)
+            {
+                if (UI::YesNoPopup(_("If you want to test your joystick now, you need the \"joystick\" package.
+It is currently not installed. Do you want to install it now?")))
+                {
+                    include "require.ycp";
+                    DoInstallAndRemove(["joystick"], []);
+                }
+                else test = false;
+            }
+            if (test) joy_test_popup(card_id, idx, joymod);
+        }
+        }
+
 	} while (!contains([`next, `back, `abort, `cancel], s));
 
 	if (s == `next)
@@ -204,6 +232,7 @@ before pressing Next.
 	    }
 
 	    Joystick::joystick[card_id] = joy_entry;
+        Joystick::modified = true;
 
 	    y2milestone("New joystick configuration: %1", joy_entry);
 	}
@@ -217,4 +246,286 @@ before pressing Next.
 	return s;
     }
 
+    /**
+     * Dialog for joystick testing.
+     * @param card_id Sound card card_id
+     * @param joymodidx model id
+     * @param joymod joystick module
+     * @return boolean false when Abort was pressed or some problems occured
+     */
+   global define boolean joy_test_popup(integer card_id, integer joymodidx, string joymod) ``{
+
+    any ret = nil;
+    UI::OpenDialog(`opt(`decorated), `HBox(`HSpacing(1.5),
+    `VBox(
+        `VSpacing(1),
+        // Wait text label
+        `Label(_("Initializing joystick - please wait ...")),
+        `VSpacing(1),
+        `PushButton(`id(`done), `opt(`default), AbortButtonLabel()),
+        `VSpacing(1)),
+    `HSpacing(1.5)
+    ));
+
+    // store old joystick configuration:
+    list current_conf = eval (Joystick::joystick);
+
+    // if new joystick type was selected:
+    boolean testing_new = false;
+
+    string modname = lookup(select(Sound::modules_conf, card_id, $[]), "module", "");
+    map joy_entry = Sound::GetJoystickSettings(modname);
+    string model = select(select(joylist, joymodidx, ["none", ""]), 1, "");
+
+	// do not translate model in /etc/sysconfig/joystick
+	if (model == Joystick::generic_joystick_translated)
+	{
+	    model = Joystick::generic_joystick;
+	}
+
+	joy_entry = add(joy_entry, "JOYSTICK_MODULE", joymod);
+	joy_entry = add(joy_entry, "model", model);
+
+	if (model != lookup(select (current_conf,card_id,""), "model", ""))
+		testing_new = true;
+
+    Joystick::joystick[card_id] = joy_entry;
+    y2milestone("Tested joystick configuration: %1", joy_entry);
+
+    // unload old and load new modules if necessary:
+    if (testing_new)
+    {
+        Joystick::Stop();
+        Joystick::SaveOneJoystick(card_id);
+        Joystick::WriteConfig();
+        Joystick::StartAndEnable();
+    }
+
+    integer js_id = card_id; // default number of device
+    list joysticks = [];
+    integer i = 0;
+    while (i < 4)
+    {
+        if (SCR::Execute(.target.bash, sformat("echo < /dev/input/js%1",i)) == 0)
+        {
+            joysticks = add (joysticks, i);
+            y2milestone("existing device: /dev/input/js%1", i);
+        }
+        i = i + 1;
+    }
+
+    if (size (joysticks) == 0)
+    {
+        UI::MessagePopup(_("No joystick is connected."));
+        if (testing_new)
+        {
+            Joystick::joystick = current_conf;
+            Joystick::Stop();
+            Joystick::SaveOneJoystick(card_id);
+            Joystick::WriteConfig();
+            Joystick::StartAndEnable();
+        }
+        UI::CloseDialog();
+        return false;
+    }
+
+    if (size (joysticks) > 1)
+    {
+        UI::CloseDialog();
+        UI::OpenDialog(`opt(`decorated), `HBox(`HSpacing(1.5),
+        `VBox(
+            `VSpacing(1),
+            // text label
+            `Label(_("You have more than one joystick connected.
+Please choose the one you want to test
+and press some of its buttons several times.")),
+            `VSpacing(1),
+            `PushButton(`id(`abort), `opt(`default), AbortButtonLabel()),
+            `VSpacing(1)),
+        `HSpacing(1.5)
+        ));
+	    i = 0;
+	    while (ret == nil)
+	    {
+        ret = UI::PollInput();
+
+        js_id = select (joysticks, i, 0);
+        SCR::Execute(.background.run_output, sformat("/usr/bin/jstest --event /dev/input/js%1", js_id));
+        sleep (500);
+        if (SCR::Read(.background.output_open) && SCR::Read(.background.newlines)>0)
+        {
+            list test_output = SCR::Read(.background.newout);
+            string last_output = select (test_output, size (test_output)-1,"");
+            last_output = deletechars(last_output, ",");
+            list listed_output = splitstring(last_output," ");
+            integer event_type = tointeger (select(listed_output, 2, "0"));
+            integer value = tointeger (select(listed_output, 8, "0"));
+            if (event_type == 1)
+            {
+                y2debug ("output from /dev/js%1: %2", js_id, listed_output);
+                ret = `found;
+            }
+        }
+        SCR::Execute(.background.kill, nil);
+        if (i == size (joysticks)) i = 0;
+        else i = i + 1;
+        }
+    }
+    if (ret == `abort)
+    {
+        y2debug ("Abort pressed");
+        if (testing_new)
+        {
+            Joystick::joystick = current_conf;
+            Joystick::Stop();
+            Joystick::SaveOneJoystick(card_id);
+            Joystick::WriteConfig();
+            Joystick::StartAndEnable();
+        }
+        UI::CloseDialog();
+        return false;
+    }
+
+    SCR::Execute(.background.run_output,
+        sformat("/usr/bin/jstest --event /dev/input/js%1",js_id));
+
+    // read the output of joystick initialization
+    while (SCR::Read(.background.output_open) && SCR::Read(.background.newlines) == 0)
+    {
+        ret = UI::PollInput();
+        if (ret != nil)
+        {
+            SCR::Execute(.background.kill, nil);
+            if (testing_new)
+            {
+                Joystick::joystick = current_conf;
+                Joystick::Stop();
+                Joystick::SaveOneJoystick(card_id);
+                Joystick::WriteConfig();
+                Joystick::StartAndEnable();
+            }
+            UI::CloseDialog();
+            return false;
+        }
+    }
+    // get the number of axes and buttons
+    list test_output = SCR::Read(.background.newout);
+    string last_output = select(test_output,0,"");
+    list listed_output = splitstring(last_output," ");
+    integer axes = 2;
+    integer buttons = 2;
+    i = 0;
+    while (i < size(listed_output))
+    {
+        // depends on output of jstest !
+        if (select (listed_output,i, "") == "has" && select (listed_output, i+2, "") == "axes" )
+            axes = tointeger(select (listed_output, i+1, "2"));
+        if (select (listed_output,i, "") == "and" && select (listed_output, i+2, "") == "buttons." )
+            buttons = tointeger(select (listed_output, i+1, "2"));
+        i = i + 1;
+    }
+
+    // generate appropriate dialog for the joystick
+    term joy_attrib = `VBox();
+    string widget_name = "";
+    integer min = -32767; // see js_event.value in linux/joystick.h
+    integer max = 32767;
+    i = 0;
+    while (i < axes)
+    {
+        widget_name = sformat(_("Axis %1"), i);
+/*        joy_attrib = add (joy_attrib, `BarGraph(`id(widget_name),
+            `opt(`autoShortcut), [ max, max ], [ "", "" ]));*/
+        joy_attrib = add (joy_attrib, `ProgressBar(`id(widget_name),
+            `opt(`autoShortcut), widget_name, 2*max, max));
+        joy_attrib = add (joy_attrib,
+            `VSpacing(1));
+        i = i+ 1;
+    }
+    i = 0;
+    term joy_buttons = `HBox();
+    string not_pressed = "    ";
+    string pressed = UI::Glyph(`CheckMark);
+    while (i < buttons )
+    {
+        widget_name = sformat(_("Button %1"), i);
+        joy_buttons = add (joy_buttons,
+            `Label (`id(widget_name), widget_name + " " + not_pressed));
+        joy_buttons = add (joy_buttons,
+            `HSpacing(2));
+        i = i+ 1;
+    }
+    joy_attrib = add (joy_attrib, joy_buttons);
+
+    UI::CloseDialog();
+    UI::OpenDialog(`opt(`decorated), `HBox(`HSpacing(1.5),
+    `VSpacing(18),
+    `VBox(
+        `HSpacing(50),
+        `VSpacing(1),
+	    // Popup label
+        `Label(_("Joystick test")),
+        `VSpacing(1),
+        joy_attrib,
+        `VSpacing(1),
+        `PushButton(`id(`done), `opt(`default), OKButtonLabel()),
+        `VSpacing(1)),
+    `HSpacing(1.5)
+    ));
+
+    // cycle for reading the jstest output
+    do
+    {
+        if (SCR::Read(.background.output_open) && SCR::Read(.background.newlines)>0)
+        {
+            // read the output line from jstest:
+            test_output = SCR::Read(.background.newout);
+            // select the last item of the list:
+            last_output = select (test_output, size (test_output) - 1, "");
+
+            last_output = deletechars(last_output, ",");
+            listed_output = splitstring(last_output," ");
+            listed_output = filter (`it, listed_output, ``(it != ""));
+
+            // positions in list depend on jstest output
+            integer type = tointeger(select(listed_output, 2, "0"));
+            integer number = tointeger(select(listed_output, 6, "0"));
+            integer val = tointeger(select(listed_output, 8, "0"));
+
+            if (type == 1)
+            {
+                // button pressed
+                if (val == 1)
+                    UI::ChangeWidget(`id(sformat("Button %1", number)), `Value,
+                        sformat("Button %1", number) + " " + pressed);
+                else
+                    UI::ChangeWidget(`id(sformat("Button %1", number)), `Value,
+                        sformat("Button %1", number) + " " + not_pressed);
+            }
+            else if (type == 2)
+            {
+                // change in some axis
+                UI::ChangeWidget(`id(sformat ("Axis %1", number)), `Value, max + val) ;
+                // for BarGraph widget:
+//                UI::ChangeWidget(`id(sformat ("Axis %1", number)), `Values,  [ max + val, max - val ]);
+            }
+        }
+	ret = UI::PollInput();
+    }
+    while (ret == nil);
+
+    SCR::Execute(.background.kill, nil);
+
+    // back to the old values
+    Joystick::joystick = current_conf;
+    if (testing_new)
+    {
+        Joystick::Stop();
+        Joystick::SaveOneJoystick(card_id);
+        Joystick::WriteConfig();
+        Joystick::StartAndEnable();
+    }
+    UI::CloseDialog();
+    return true;
+   }
 }
