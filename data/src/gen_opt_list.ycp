@@ -1,65 +1,68 @@
 {
     include "./include/gen_routines.ycp";
 
-    global define translate_descr(string descr) ``{
-	list matches = [
+    define any translate_descr (string descr) {
+
+	list<string> matches = [
 	    "(.*for) (.*) (soundcard.)",
             "(.*for) (.*) (driver.)",
             "(.*for) (.*) (interface.)",
             "(.*for) (.*) (MIDI.)",
-            "(.*for) (.*) (bridge.)" ];
+            "(.*for) (.*) (bridge.)"
+	];
 
-	list guess = maplist(`e, matches,
+	list<list> guess = maplist(string e, matches,
 	    ``(regexptokenize(descr, e))
 	);
 
-	guess = filter(`e, guess, ``(size(e)==3));
+	guess = filter (list e, guess, ``(size(e)==3));
 
 	if (size(guess) >= 1)
 	{
-	    list l = select(guess, 0, []);
+	    list l = select (guess, 0, []);
 	    y2error("translating %1...", descr);
-	    string s = sformat("%1 %%1 %2", select(l, 0, ""), select(l, 2, ""));
-	    any a = s;
-	    locale loc = a;
-	    return [loc, select(l, 1, "")];
+	    string s = sformat("%1 %%1 %2", l[0]:"", l[2]:"");
+	    any a	= s;
+	    locale loc	= (locale) a;
+	    return [loc, l[1]:""];
 	}
 	any a = descr;
-	locale l = a;
-	return l;
+	return (locale) a;
+	// FIXME changing "text" into _("text") cannot work this way any more!
     }
 
     // collect param descriptions of all snd-card-* modules
 
-    map mod_idx = SCR::Read(.target.ycp, "./src/module_index.ycp");
-    map mixer   = SCR::Read(.target.ycp, "./addons/mixer.ycp");
+    map<integer,string> mod_idx	=
+	(map<integer,string>) SCR::Read (.target.ycp, "./src/module_index.ycp");
 
-    map joy_mods = SCR::Read(.target.ycp, "./addons/joy_mods.ycp");
+    map<string,map> mixer	=
+	(map<string,map>) SCR::Read (.target.ycp, "./addons/mixer.ycp");
+
+    map<string,map> joy_mods	=
+	(map<string,map>) SCR::Read (.target.ycp, "./addons/joy_mods.ycp");
 
 
-    list mods = maplist(`k, `v, mod_idx, ``(v)); // SCR::Dir(.modinfo.misc);
+    // SCR::Dir(.modinfo.misc);
+    list<string> mods	= maplist (integer k, string v, mod_idx, ``(v));
 
 //    mods = filter(`e, mods, ``(regexpmatch(e, "^snd-card-.*")));
     map modopts = $[];
     map subopt = $[];
 
 
-    foreach(`e, mods, 
-    ``{
-	subopt = SCR::Read(add(.modinfo, e));
-	modopts = add(modopts, e, subopt);
+    foreach (string e, mods, {
+	subopt	= (map) SCR::Read(add(.modinfo, e));
+	modopts = add (modopts, e, subopt);
     });
 
-    string mod_name = "";
-    string mod_descr = "";
-    map mod_params = $[];
+    string mod_name		= "";
+    string mod_descr		= "";
+    map mod_params		= $[];
+    map<string,map> database	= $[];
+    map mod_data		= $[];
 
-    map database = $[];
-
-    map mod_data = $[];
-
-    foreach (`e, mods,
-    ``{
+    foreach (string e, mods, {
 	mod_name = e;
 	mod_descr = lookup(lookup(modopts, mod_name, $[]), "module_description", "");
 	mod_params = $[];
@@ -68,7 +71,9 @@
                      "params" : mod_params
                      ];
 
-	maplist(`k, `v, lookup(mixer, mod_name, $[]), ``{mod_data[k]=v;});
+	maplist (string k, map v, (map<string,map>) mixer[mod_name]:$[], ``{
+	    mod_data[k]=v;
+	});
 
 	database = add(database, mod_name, mod_data);
 //			$[
@@ -77,11 +82,16 @@
 //			]);
     });
 
-    string kernel_ver = lookup(SCR::Execute(.target.bash_output, "uname -r", $[]), "stdout", "");
-
+    map out	= (map) SCR::Execute (.target.bash_output, "uname -r", $[]);
+    string kernel_ver = out["stdout"]:"";
     kernel_ver = select(splitstring(kernel_ver, "\n"), 0, "");
-    string generic_string = SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.generic_string");
-    list gs = splitstring(generic_string, "\n");
+
+    string generic_string = (string) SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.generic_string");
+    if (generic_string == nil)
+	generic_string	= "";
+
+
+    list<string> gs	= splitstring(generic_string, "\n");
 
 //    string pattern = "(snd-[^ \t]*)[\t ]*info_parm_(snd_[^=]*)=enable:\\(snd_enable\\)(.*)";
     string pattern = "(snd-[^ \t]*)[\t ]*info_parm_([^=]*)=enable:\\(enable\\)(.*)";
@@ -95,37 +105,39 @@
     string descr = "";
 
 
-    maplist(`e, gs,
-    ``{
+    maplist (string e, gs, {
+
 	lx = regexptokenize(e, pattern);
-	parmname = select(lx, 1, "");
-	if (size(lx) > 0 &&
-        !contains(["index", "enable", "id"], parmname))
+	parmname = lx[1]:"";
+
+	if (size(lx) > 0 && !contains(["index", "enable", "id"], parmname))
 	{
-	    tmpmap = parse_line(select(lx, 2, ""));
-	    modname = select(lx, 0, "");
+	    tmpmap	= parse_line (lx[2]:"");
+	    modname	= lx[0]:"";
 	    if (!contains(mods, modname))
 	    {
 		return;
 	    }
-	    descr = lookup(lookup(modopts, modname, $[]), parmname, " ");
+	    descr = modopts[modname, parmname]:" ";
 
 	    // these two declaration must be here
 	    any anydescr = translate_descr(descr);
 
-	    if (is(anydescr, list) && size(anydescr) > 1)
+	    if (is(anydescr, list) && size((list)anydescr) > 1)
 	    {
-		if (select(anydescr, 1, "") == "specified")
+		list lanydescr	= (list) anydescr;
+		if (lanydescr[1]:"" == "specified")
 		{
-		    anydescr[1] = lookup(lookup(database, modname, $[]), "description", "");
+		    lanydescr[1] = database[modname, "description"]:"";
+		    anydescr	= lanydescr;
 		}
 	    }
 //	    locale locdescr = anydescr;
 
 //	    y2error("%1 %2 %3", modname, parmname, tmpmap);
 
-	    map oldmap = lookup(database, modname, $[]);
-	    map oldopts = lookup(oldmap, "params", $[]);
+	    map oldmap	= database[modname]:$[];
+	    map oldopts = oldmap["params"]:$[];
 
 	    tmpmap = add (tmpmap, "descr", anydescr); //locdescr);
 
@@ -142,19 +154,29 @@
 
     // now merge stuff from ../addons/mod_addons.ycp
 
-    map addm = SCR::Read(.target.ycp, "./addons/mod_addons.ycp");
+    map<string,map> addm	=
+	(map<string,map>) SCR::Read (.target.ycp, "./addons/mod_addons.ycp");
 
-    foreach(`k, `v, addm,
-    ``{
-	database = add(database, k, v);
+    foreach (string k, map v, addm, {
+
+	map added	= eval (v);
+	// FIXME this is hack for one current addon module... FIXME
+	string descr = added["params", "snd_enable_beep", "descr"]:" ";
+
+	if (descr != " ")
+	{
+	    added["params", "snd_enable_beep", "descr"]	=
+		translate_descr(descr);
+	}
+
+	database = add (database, k, added);
     });
 
     // now add joystick data
 
-    map outdb= $[];
+    map outdb = $[];
 
-    foreach(`k, `v, database,
-    ``{
+    foreach (string k, map v, database, {
 	if (haskey(joy_mods, k))
 	{
 	    v = add(v, "joystick", lookup(joy_mods, k, $[]));

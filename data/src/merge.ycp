@@ -1,12 +1,11 @@
 {
-    map mod_idx	    = SCR::Read(.target.ycp, "./src/module_index.ycp");
-    map cards	    = SCR::Read(.target.ycp, "./cardlist.ycp");
-    map mods	    = SCR::Read(.target.ycp, "./modlist.ycp");
-    map idlist	    = SCR::Read(.target.ycp, "./idlist.ycp");
-    map vendors	    = SCR::Read(.target.ycp, "./vendors.ycp");
+    map mod_idx	    = (map) SCR::Read(.target.ycp, "./src/module_index.ycp");
+    map cards	    = (map) SCR::Read(.target.ycp, "./cardlist.ycp");
+    map mods	    = (map) SCR::Read(.target.ycp, "./modlist.ycp");
+    map idlist	    = (map) SCR::Read(.target.ycp, "./idlist.ycp");
+    map vendors	    = (map) SCR::Read(.target.ycp, "./vendors.ycp");
 
-    map db =
-    $[
+    map db = $[
 	"cards"	    :   cards,
 	"modules"   :	mods,
 	"indices"   :	idlist,
