@@ -268,18 +268,18 @@ define read_save_info () ``{
 	// oss (poor support, should be enhanced ... )
 	
 	// list of aliases to be read
-	list aliases = ["char-major-14",
-		       "sound",
-		       "midi",
-		       "sound-slot-0",
-		       "sound-service-0-0"];
+	list local_aliases = ["char-major-14",
+			     "sound",
+			     "midi",
+			     "sound-slot-0",
+			     "sound-service-0-0"];
 
 	map entry      = $[];
 	map option     = $[];
 	string module_name  = "";
 	string comment = "";
 	
-	maplist (`alias, aliases, ``{
+	maplist (`alias, local_aliases, ``{
 	    if (contains (aliases, alias)) {
 		entry   = $[];
 		module_name  = SCR (`Read(topath (sformat ("%1.modules.alias", prefix)), alias));

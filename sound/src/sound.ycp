@@ -254,7 +254,7 @@ configure an other card than the one that is displayed on the right.</p>"));
 	
 
 	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id))),
-		      ``(CallModule ("sound_volume", [card, card_id]))];
+		      ``(CallModule ("sound_volume", [card, card_id, (size (sound_cards) == 1)] ))];
 			//$["ui" : `next, "return" : true]];
 
 
@@ -363,6 +363,7 @@ configure an other card than the one that is displayed on the right.</p>"));
     map result        = $[];
     any ui            = nil;
     boolean cont      = true;
+    boolean call_complex_dialog = false;	
     list configured_unique = []; // list of unique keys, that was configured
 
     // get all the apropriate information from the database
@@ -377,7 +378,7 @@ configure an other card than the one that is displayed on the right.</p>"));
 
 
     boolean skipped = false;
-
+    call_complex_dialog = size (sound_cards) != 1;	
     while (cont) {
 
 				// wizards ...
@@ -413,7 +414,7 @@ configure an other card than the one that is displayed on the right.</p>"));
 
 	if (ui == `back) break;
 	
-	if (from_menu || size (get_running_cards ()) > 0) {
+	if (call_complex_dialog) {
 
 	    result = CallModule ("sound_complex", [sound_cards, save_info, configured_unique]);
 	}
@@ -422,7 +423,7 @@ configure an other card than the one that is displayed on the right.</p>"));
 
 	ui = lookup (result, "ui", `cancel);
 
-	if (ui == `next) {
+	if (ui == `next && (size (sound_cards) != 1)) {
 	    
 	    // confirmation popup message
 	    string warn_msg = UI (_("Sound volume and the configuration\nfor the sound card will be saved now."));
@@ -433,10 +434,15 @@ configure an other card than the one that is displayed on the right.</p>"));
 	    // Yes, No - button label
 	    cont = !(UI (`YesOrNo (warn_msg, _("&Yes"), _("&No"))));
 	    
-	    save_info = lookup (result, "save_info");
-	    rc_vars   = lookup (result, "rc", $[]);
-	    configured_unique = lookup (result, "configured_unique", []);
+	    if (call_complex_dialog) {
+		save_info = lookup (result, "save_info");
+		rc_vars   = lookup (result, "rc", $[]);
+		configured_unique = lookup (result, "configured_unique", []);
+	    }
+	    else
+		skipped = true;
 	}
+	else if ((size (sound_cards) != 1)) cont = false;
 	else if (ui == `back) card_id = card_id - 1;
     
     }

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Jan  9 10:05:13 CET 2001 - dan@suse.cz
+
+- fix playing sound sample on background (bug #5263)
+
+-------------------------------------------------------------------
 Fri Jan  5 13:38:42 CET 2001 - kkaempf@suse.de
 
 - fix frame caption for gettext

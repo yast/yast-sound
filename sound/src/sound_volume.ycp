@@ -9,6 +9,7 @@
  *
  * parameters: 1st: module, Map, map of card
  *             2nd: card_id, integer
+ *             3rd: boolean - finish
  *
  */
 
@@ -67,7 +68,6 @@
 	string module_options = mergestring (maplist (`e, params, ``(sformat("%1=%2", lookup (e, "name", ""), lookup (e, "value", "")))), " ");
 	boolean probe         = lookup (lookup (card, "module", $[]), "modprobe", true);
 	boolean mod_active    = lookup (lookup (card, "module", $[]), "active", false);
-	boolean no_alsa       = lookup (lookup (card, "module", $[]), "no_alsa", false);
 
 	if (size (module_name) == 0)
 	    // To translators: error message
@@ -172,6 +172,8 @@
 
 	// dialog title
 	UI(`SetWizardContents (_("Sound cards"), con, help_text, true, true));
+	if (finish)
+	    UI(`ChangeWidget (`id(`next), `Label, _("&Finish")));
 	SetVolume (lookup (user_settings, "mixer"), "Master", sformat ("%1", vol), card_id);
 
 	repeat {
@@ -183,9 +185,16 @@
 
 		SetVolume (lookup (user_settings, "mixer"), "Master", sformat ("%1", vol), card_id);
 	    }
-	    else if (ui == `test)
+	    else if (ui == `test) {
 		if (!test_mode)
 		    PlayTest ();
+	    }
+	    else if (ui == `next) {
+		if (finish)
+		    if (!UI (`YesOrNo (_("Sound volume and the configuration\nfor the sound card will be saved now."), _("&Yes"), _("&No"))))
+			continue;
+		ui = `next;
+	    }
 		
 	} until ((ui == `back) || (ui == `next) || ui == `cancel);
 
@@ -222,6 +231,8 @@
 	
 	// dialog title
 	UI(`SetWizardContents (_("Sound cards"), con, help_text, true, false));
+	if (finish)
+	    UI(`ChangeWidget (`id(`next), `Label, _("&Finish")));
 
 	repeat {
 	    
@@ -244,6 +255,10 @@
 
     map card = Args (0);
     integer card_id = Args (1);
+    boolean finish = false;
+
+    if (size (Args ()) > 2)
+	finish = Args (2);
 
     if (!haskey(card, "module"))
 	card = add(card, "module", get_module (card));
@@ -257,7 +272,7 @@
 
 
     string err_msg = "";
-
+    boolean no_alsa = lookup (lookup (module_map, "module", $[]), "no_alsa", false);
     if (!test_mode)
 	err_msg = probe_module (module_map);
 
@@ -271,7 +286,7 @@
     if (ui == `back)
 	SCR(`Execute (.target.modprobe, sformat ("-r %1", lookup (lookup (module_map, "module", $[]), "name", "")), ""));
 
-    
+    UI(`ChangeWidget (`id(`next), `Label, _("&Next")));
     return $["ui" : ui, "return" : size (err_msg) == 0];
 
 }
