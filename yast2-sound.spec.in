@@ -1,22 +1,20 @@
 @HEADER-COMMENT@
-
-# neededforbuild  alsa alsa-devel gpp hwinfo libgpp yast2-devel-packages
+# neededforbuild alsa alsa-devel gpp libgpp yast2-devel-packages
 
 @HEADER@
+Requires:	yast2 alsa
 
-Requires:	yast2 yast2-core hwinfo alsa
+Provides:	yast2-config-sound yast2-agent-audio yast2-agent-audio-devel
+Obsoletes:	yast2-config-sound yast2-agent-audio yast2-agent-audio-devel
+Provides:	yast2-trans-sound yast2-trans-soundd y2c_snd y2t_snd y2t_sndd
+Obsoletes:	yast2-trans-sound yast2-trans-soundd y2c_snd y2t_snd y2t_sndd
+Provides:	y2c_sparc y2c_sprc yast2-db-sound y2d_snd
+Obsoletes:	y2c_sparc y2c_sprc yast2-db-sound y2d_snd
+
 Summary:	Yast2 - Sound configuration
 
-Provides:	yast2-config-sound yast2-agent-audio yast2-agent-audio-devel yast2-db-sound
-Obsoletes:	yast2-config-sound yast2-agent-audio yast2-agent-audio-devel yast2-db-sound
-Provides:	yast2-trans-sound yast2-trans-soundd y2c_snd y2t_snd y2t_sndd y2c_sparc y2d_snd
-Obsoletes:	yast2-trans-sound yast2-trans-soundd y2c_snd y2t_snd y2t_sndd y2c_sparc y2d_snd
-Provides:	y2c_sprc
-Obsoletes:	y2c_sprc
-
 %description
-This package is a part of YaST2. It contains the necessary scripts to
-configure sound card.
+-
 
 @PREP@
 
@@ -49,5 +47,4 @@ configure sound card.
 
 @plugindir@/libpy2ag_audio.so
 @plugindir@/libpy2ag_audio.la
-%docdir @docdir@
-%doc @docdir@/*
+%doc @docdir@

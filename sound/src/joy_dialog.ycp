@@ -1,21 +1,11 @@
 /**
- *
- *
- * File:
- *   joystick.ycp
- *
- * Module:
- *   Sound
- *
- * Authors:
- *   Dan Meszaros <dmeszar@suse.cz>
- *   Ladislav Slezak <lslezak@suse.cz>
+ * File:	include/sound/joy_dialog.ycp
+ * Package:	Joystick configuration
+ * Summary:	Joystick dialogs
+ * Authors:	Dan Meszaros <dmeszar@suse.cz>
+ *		Ladislav Slezak <lslezak@suse.cz>
  *
  * $Id$
- *
- * YaST2 joystick configuration client
- *
- *
  */
 
 {
@@ -53,24 +43,22 @@
 
 	// dialog header
 	string caption = _("Joystick configuration") + sformat (" - %1 (snd-card-%2)", cardname, card_id);
+
 	string helptext =
 	// help text for joystick configuration 1/4
 _("<P>In this dialog, specify your joystick type. If your
-joystick type is not in the list, select <B>Generic analog joystick</B>.</P>
-") +
+joystick type is not in the list, select <B>Generic analog joystick</B>.</P>") +
 
 	// help text for joystick configuration 2/4
 _("<P>To remove the configured joystick from the system
-or if you do not have any joystick, select <B>No joystick</B>.</P>
-") +
+or if you do not have any joystick, select <B>No joystick</B>.</P>") +
 
 	// help text for joystick configuration 3/4
-_("<P>Press <B>Test</B> to test functionality of selected joystick type.") +
+_("<P>Press <B>Test</B> to test functionality of selected joystick type.</P>") +
 
 	// help text for joystick configuration 4/4
 _("<P><B>Note:</B> Connect your joystick to your computer
 before pressing <B>Test</B> or <B>Next</B>.</P>");
-
 
 	map joy = select(Joystick::joystick, card_id, $[]);
 
@@ -528,4 +516,6 @@ and press some of its buttons several times.")),
     UI::CloseDialog();
     return true;
    }
+
+/* EOF */
 }

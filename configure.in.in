@@ -11,8 +11,7 @@
 @YAST2-CHECKS-PROGRAM@
 
 ## special stuff
-AC_CHECK_LIB(asound, snd_mixer_open, LIBASOUND=-lasound, LIBASOUND=)
-AC_SUBST(LIBASOUND)
+AM_PATH_ALSA(0.9.0)
 
 ## and generate the output...
 @YAST2-OUTPUT@

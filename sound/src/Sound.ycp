@@ -1,35 +1,24 @@
 /**
- * File:
- *   modules/Sound.ycp
- *
- * Package:
- *   Configuration of sound
- *
- * Summary:
- *   Input and output functions.
- *
- * Authors:
- *   Dan Meszaros <dmeszar@suse.cz>
+ * File:	modules/Sound.ycp
+ * Package:	Sound configuration
+ * Summary:	Sound data
+ * Authors:	Ladislav Slezak <lslezak@suse.cz>
  *
  * $Id$
- *
- * Representation of the configuration of sound.
- * Input and output routines.
- *
  */
 
 {
-    // Set the name of the module
+
     module "Sound";
+    textdomain "sound";
+
+    import "Arch";
+    import "Mode";
     import "Runlevel";
     import "Summary";
-    import "Mode";
-    import "Arch";
 
     include "sound/read_routines.ycp";
     include "sound/routines.ycp";
-
-    textdomain "sound";
 
     /**
      * what sound system we're using (true=alsa, false=oss)
@@ -772,4 +761,5 @@
 	return filtered;
     }
 
+/* EOF */
 }
