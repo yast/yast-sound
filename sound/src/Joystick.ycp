@@ -13,7 +13,6 @@
     textdomain "sound";
 
     import "Mode";
-    import "Progress";
     import "Runlevel";
 
     /**

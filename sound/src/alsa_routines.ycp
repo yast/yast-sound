@@ -20,6 +20,7 @@
 {
     textdomain "sound";
     import "Sound";
+    import "Mode";
 
     /**
      * sets volume in percents (0..100) for given card and card_id
@@ -30,7 +31,7 @@
      */
 
     global define boolean setVolume (string group, integer cardid, integer value) ``{
-	if (!Sound::autoinstallation)
+	if (!Mode::config)
 	{
 	    string p = sformat(".audio.alsa.cards.%1.channels.%2.volume", cardid, group);
 

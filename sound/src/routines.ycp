@@ -306,7 +306,7 @@
      */
 
     global define void unmute(list devices, integer card_id) ``{
-	if (Sound::autoinstallation)
+	if (Mode::config)
 	{
 	    // TODO: store this info some elsewhere...
 	    return;
@@ -571,9 +571,9 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      */
 
     global define boolean HasFonts(map save_entry) ``{
-	if (Sound::autoinstallation)
+	if (Mode::config)
 	{
-	    // don't install sound fonts during autoinstallation
+	    // don't install sound fonts during autoinstallation config TODO?
 	    return false;
 	}
 
@@ -713,7 +713,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      */
 
     global define boolean stop_programs() ``{
-	if (Sound::autoinstallation)
+	if (Mode::config)
 	{
 	    return true;
 	}
@@ -721,10 +721,8 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
 	if (fuser == 0)
         {
-                  // To translators: To reset the sound configuration these programs must be terminated
-                  // To translators: label message
+            // some programs must be terminated
 	    string msg = lookup(STRINGS, "WhichDialogMsg", "");
-                  // Yes, No - button labels
             boolean terminate = Popup::YesNo (msg);
             if (terminate)
             {

@@ -14,8 +14,8 @@
  *
  * $Id$
  *
- * Params:
- *         1st ... save info- list of configured cards:
+ * Parameters are given in a pam
+ *         "modules_conf" ... save info- list of configured cards:
  *	   [
  *		$[
  *		    "model"	: "sb live!",
@@ -33,22 +33,17 @@
  *              ]
  *         ]
  *
- *	   2nd ... sysconfig values
+ *	   "rc_vars" ... sysconfig values
  *	   $[
  *		"LOAD_SEQUENCER" : "yes"
  *         ]
  *
- *	   3rd ... use_alsa - boolean
- *
- *	   4th ... autoinstall mode boolean
- *
- *	   5th ... volume setting (usefull only for autoconfig)
+ *	   "volume_settings" ... volume setting (usefull only for autoconfig)
  *	   [
  *		[  // card #1
  *		    ["PCM", 32, false], ["Master", 100, true] ...
  *	        ],
  *		[  // card #2
- *		    
  *		],
  *		...
  *
@@ -89,23 +84,21 @@
 
     list save_info	= [];
     boolean alsa	= Sound::use_alsa;
-    boolean autoinstall = false;
+    boolean write_only  = false;
 
     map settings = WFM::Args(0);
     save_info = lookup(settings, "modules_conf", []);
     rc_values = lookup(settings, "rc_vars", []);
     volume_settings = lookup(settings, "volume_settings", []);
-    autoinstall = lookup(settings, "autoinstall", false);
+
+    // not really necessary for Progress stuf (it is set off in _auto client)
+    write_only = Sound::write_only;
 
     // do nothing when proposal is empty (Sound::installation is set to true in proposal mode)
     if (Sound::installation && size(save_info) == 0)
     {
 	y2debug("empty proposal. exiting.");
 	return true;
-    }
-    if (autoinstall)
-    {
-//	UI::Wizard::CreateDialog();
     }
 
     list stones = [
@@ -137,7 +130,7 @@
 	    _("Storing joystick settings...")];
 
 
-    if (!autoinstall)
+    if (!write_only)
     {
 	// progres bar label
 	Progress::New (_("Saving sound card settings."), " ", size(stones) - 1,
@@ -148,28 +141,28 @@
 
     integer step = 0;
 
-    if (!autoinstall) { Progress::NextStage(); }
+    if (!write_only) { Progress::NextStage(); }
 
     step = step + 1;
     SaveModulesEntry(save_info, []);
 
-    if (!autoinstall) { sleep(100); Progress::NextStage(); }
+    if (!write_only) { sleep(100); Progress::NextStage(); }
     step = step + 1;
-    if (!autoinstall)
+    if (!write_only)
     {
 	Sound::StoreUniqueKeys();
     }
 
-    if (!autoinstall) { sleep(100); Progress::NextStage(); }
+    if (!write_only) { sleep(100); Progress::NextStage(); }
     step = step + 1;
     SaveRCValues(rc_values);
 
-    if (!autoinstall) { sleep(100); Progress::NextStage(); }
+    if (!write_only) { sleep(100); Progress::NextStage(); }
     step = step + 1;
 
     list configuredcards = Sound::GetSoundCardList();
 
-    if (!autoinstall)
+    if (!write_only)
     {
 	// stop joystick before restarting ALSA
 	SCR::Execute(.target.bash, "/etc/init.d/joystick stop", $[]);
@@ -181,7 +174,7 @@
 	}
     }
 
-    if (!autoinstall) { Progress::NextStage(); }
+    if (!write_only) { Progress::NextStage(); }
     if (size(WFM::Args()) >= 4)
     {
 	set_vol_settings(volume_settings);
@@ -196,9 +189,9 @@
     }
 
     SaveVolume();
-    if (!autoinstall) sleep(100);
+    if (!write_only) sleep(100);
 
-    if (!autoinstall) { sleep(100); Progress::NextStage(); }
+    if (!write_only) { sleep(100); Progress::NextStage(); }
 
     // write joystick configuration and restart service
     Joystick::Write(``{ return false;});

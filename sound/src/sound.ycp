@@ -34,9 +34,10 @@
     import "Directory";
 
     include "wizard/sequencer.ycp";
-    import  "Wizard_hw";
+    import "Wizard_hw";
     import "Popup";
-    import  "Wizard";
+    import "Wizard";
+    import "Mode";
 
     include "sound/card_wizard.ycp";
     include "sound/read_routines.ycp";
@@ -48,8 +49,6 @@
     include "sound/complex.ycp";
     include "sound/select.ycp";
     include "sound/manual.ycp";
-
-    boolean autoinstall = false;
 
 // this is currently set in constructor Sound::Sound
 //    if (size(WFM::Args()) > 0 && WFM::Args(0)==.oss)
@@ -276,7 +275,7 @@
 		    Sound::volume_settings[card_id]:[]);
 	    }
 
-	    if (!Sound::autoinstallation)
+	    if (!Mode::config)
 	    {
 		sound_stop();
 		sound_start_tmp(true);
@@ -349,7 +348,6 @@
 
     boolean test_mode     = false;
     boolean config_mode   = false;
-    boolean autoinst_mode = false;
     boolean from_menu     = false;
 
     integer arg_n = size (WFM::Args ()) - 1;
@@ -358,10 +356,6 @@
 	if (WFM::Args(arg_n) == .test)
 	{
 	    test_mode     = true;
-	}
-	if (WFM::Args(arg_n) == .autoinst_mode)
-	{
-	    autoinst_mode = true;
 	}
 	if (WFM::Args(arg_n) == .conf_mode)
 	{
@@ -374,7 +368,7 @@
 	arg_n = arg_n - 1;
     }
 
-    if (!Sound::autoinstallation && !Sound::installation)
+    if (!Mode::config && !Sound::installation)
     {
 	if (!Sound::Read(true))
 	    return `abort;
@@ -585,12 +579,9 @@
 	    ui = `next; // in installation mode, `finish is end of installation
     }
 
-    if (ui == `finish && !Sound::autoinstallation)
+    if (ui == `finish && !Mode::config)
     {
-	if (!Sound::installation &&
-		(
-		    Sound::Changed() || Joystick::Changed()
-		))
+	if (!Sound::installation && ( Sound::Changed() || Joystick::Changed()))
 	{
 	    Sound::Write(``{}, ``{});
 	}

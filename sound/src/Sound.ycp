@@ -43,11 +43,6 @@
     global boolean proposal_created = false;
 
     /**
-     * autoinstallation mode?
-     */
-    global boolean autoinstallation = false;
-
-    /**
      * list for storing detected cards
      */
     global list detected_cards = nil;
@@ -354,7 +349,7 @@ could make your system unstable.
 	    return true;
 	}
 
-	if (autoinstallation)
+	if (Mode::config)
 	{
 	    detected_cards = [];
 	}
@@ -524,7 +519,6 @@ could make your system unstable.
 	if (Mode::test == false)
 	{
 	    map settings = Export();
-	    settings = add (settings, "autoinstall", false);
 	    WFM::CallFunction (`sound_write(settings));
 	}
 
@@ -541,7 +535,6 @@ could make your system unstable.
 		"modules_conf"	    : modules_conf,
 		"rc_vars"	    : rc_vars,
 		"volume_settings"   : volume_settings,
-		"autoinstall"	    : true
 	    ];
     }
 
@@ -881,7 +874,7 @@ could make your system unstable.
 
     global define void SetVolume(integer card_id, string channel, integer value) ``{
 	// two cases: we have sound system already running:
-	if (!autoinstallation && size(SCR::Dir(.audio.alsa.cards)) > card_id)
+	if (!Mode::config && size(SCR::Dir(.audio.alsa.cards)) > card_id)
 	{
             string p = sformat(".audio.alsa.cards.%1.channels.%2.volume", card_id, channel);
 	    string p2 = sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, channel);
