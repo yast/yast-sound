@@ -91,8 +91,8 @@ YCPValue AudioAgent::Read(const YCPPath &path, const YCPValue& arg) {
 	} 
     }
     
-    y2error("Wrong path '%s' in Read().", path->toString().c_str());
-    return YCPVoid();
+    string error = string("Wrong path in Read(): .audio") +  path->toString().c_str();
+    return YCPError(error);
 }
 
 /**
@@ -111,8 +111,11 @@ YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCP
         args.push_back(path->component_str(i));
 
     if(!value->isInteger() && !value->isBoolean()) {
-	y2error("bad argument to Write: %s", value->toString().c_str());
-	return YCPBoolean(false);
+	string error = string("Wrong argument (") 
+			+ value->toString().c_str() 
+			+ ") passed to Write(): .audio" 
+			+ path->toString().c_str();
+	return YCPError(error);
     }
 
 
@@ -151,8 +154,8 @@ YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCP
         }
     }
 
-    y2error("Wrong path '%s' in Write().", path->toString().c_str());
-    return YCPVoid();
+    string error = string("Wrong path in Write(): .audio") + path->toString().c_str();
+    return YCPError(error);
 }
 
 /** 
@@ -217,8 +220,8 @@ YCPValue AudioAgent::Dir(const YCPPath& path) {
 	    break;
     }
 
-    y2error("Wrong path '%s' in Dir().", path->toString().c_str());
-    return YCPVoid();
+    string error = string("Wrong path in Dir(): .audio") + path->toString().c_str();
+    return YCPError(error);
 }
 
 YCPValue AudioAgent::Execute(const YCPPath& path, const YCPValue& value = YCPNull(),
@@ -251,7 +254,7 @@ YCPValue AudioAgent::Execute(const YCPPath& path, const YCPValue& value = YCPNul
 	// oss part
     }
 
-    y2error("Wrong path '%s' in Dir().", path->toString().c_str());
+    string error = string("Wrong path in Execute(): .audio") + path->toString().c_str();
     return YCPVoid(); 
 }
 

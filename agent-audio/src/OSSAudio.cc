@@ -67,7 +67,6 @@ int ossDevice(const string channel) {
     else if(channel=="MONITOR") return SOUND_MIXER_MONITOR;
     // else if(channel=="") return SOUND_MIXER_;
     else {
-	y2error("bad channel specification: %s", channel.c_str());
 	return -1;
     }
 }
@@ -103,7 +102,10 @@ YCPValue ossSetVolume(const string card, const string channel, const int value) 
     if(channel!="") {
 	device = ossDevice(channel);
 	if(device == -1)
-	    return YCPBoolean(false);
+	{
+	    string error = string("bad channel specification: ") + channel.c_str();
+	    return YCPError(error);
+	}
     }
 
     stereovolume volume;
@@ -112,16 +114,18 @@ YCPValue ossSetVolume(const string card, const string channel, const int value) 
 
     int mixer_fd = open(mixerfile.c_str(), O_RDWR, 0);
     if(mixer_fd < 0) {
-	y2error("%s",string("cannot open mixer: '" + string(mixerfile) +
-			    "' : " + string(strerror(errno))).c_str());
-	/* FIXME y2error -> YCPError */
-	return YCPBoolean(false);
+	string error = string("cannot open mixer: '" 
+			+ string(mixerfile) 
+			+ "' : " 
+			+ string(strerror(errno))).c_str();
+	return YCPError(error, YCPBoolean(false));
     }
 
     if(ioctl(mixer_fd,MIXER_WRITE(device),&volume) == -1) {
-	y2error(string("ioctl failed : " + string(strerror(errno))).c_str());
+	string error = string("ioctl failed : ")
+			+ strerror(errno);
 	close(mixer_fd);
-	return YCPBoolean(false);
+	return YCPError(error, YCPBoolean(false));
     }
 
     close(mixer_fd);
@@ -152,22 +156,26 @@ YCPValue ossGetVolume(const string card, const string channel) {
     if(channel!="") {
 	device = ossDevice(channel);
 	if(device == -1)
-	    return YCPBoolean(false);
+	{
+	    string error = string("bad channel specification: ") + channel.c_str();
+            return YCPError(error);	    
+	}
     }
     y2debug("device=%d",device);
 
     int mixer_fd = open(mixerfile.c_str(), O_RDWR, 0);
     if(mixer_fd < 0) {
-	y2error("%s",string("cannot open mixer: '" + string(mixerfile) +
-			    "' : " + string(strerror(errno))).c_str());
-	/* FIXME y2error -> YCPError */
-	return YCPInteger(-1);
+	string error = string("cannot open mixer: '")
+			+ mixerfile 
+			+ "' : " 
+			+ strerror(errno);
+	return YCPError(error, YCPInteger(-1));
     }
 
     if(ioctl(mixer_fd,MIXER_READ(device),&volume) == -1) {
-	y2error(string("ioctl failed : " + string(strerror(errno))).c_str());
+	string error = string("ioctl failed : ") + strerror(errno);
 	close(mixer_fd);
-	return YCPInteger(-1);
+	return YCPError(error, YCPInteger(-1));
     }
 
     if(volume.left != volume.right)
