@@ -20,206 +20,228 @@
 #endif
 
 #if __HAVE_ALSA
-#include <sys/asoundlib.h>
+#include <alsa/asoundlib.h>
 
-YCPValue alsaGetVolume(int card, const string& channel)
+#define INIT_MIXER	char card[32];	\
+			sprintf(card, "hw:%d", card_id); \
+			\
+			int err; \
+			snd_mixer_t *handle; \
+			snd_mixer_selem_id_t *sid; \
+			snd_mixer_elem_t *elem; \
+			snd_mixer_selem_id_alloca(&sid); \
+			\
+			if ((err = snd_mixer_open(&handle, 0)) < 0) \
+			{ \
+				y2error("Mixer %s open error: %s", card, snd_strerror(err)); \
+				return YCPVoid(); \
+			} \
+			\
+			if ((err = snd_mixer_attach(handle, card)) < 0) \
+			{ \
+				y2error("Mixer attach %s error: %s", card, snd_strerror(err)); \
+				snd_mixer_close(handle); \
+				return YCPVoid(); \
+			} \
+			\
+			if ((err = snd_mixer_selem_register(handle, NULL, NULL)) < 0) \
+			{ \
+				y2error("Mixer register error: %s", snd_strerror(err)); \
+				snd_mixer_close(handle); \
+				return YCPVoid(); \
+			} \
+			\
+			err = snd_mixer_load(handle); \
+			if (err < 0) \
+			{ \
+				y2error("Mixer load error: %s %s", card, snd_strerror(err)); \
+				snd_mixer_close(handle); \
+				return YCPVoid(); \
+			}
+
+
+YCPValue alsaGetVolume(int card_id, const string& channel)
 {
-    snd_mixer_t* handle;
-    int err=snd_mixer_open(&handle, card, 0);
-    if(err<0)
+    INIT_MIXER
+    
+    long from, to, value;
+    long left;
+
+    snd_mixer_selem_channel_id_t chn;
+    
+
+    for (elem = snd_mixer_first_elem(handle); elem; elem = snd_mixer_elem_next(elem))
     {
-        return YCPVoid();
+	snd_mixer_selem_get_id(elem, sid);
+	if (snd_mixer_selem_id_get_name(sid) == channel 
+	    && snd_mixer_selem_is_active(elem)
+	    && snd_mixer_selem_has_playback_volume(elem))
+	{
+	    snd_mixer_selem_get_playback_volume_range(elem, &from, &to);
+	    for (chn = (snd_mixer_selem_channel_id_t)0;
+                    chn <= SND_MIXER_SCHN_LAST; 
+                    chn=(snd_mixer_selem_channel_id_t)((int)chn+(snd_mixer_selem_channel_id_t)1))
+            {
+		if (!snd_mixer_selem_has_playback_channel(elem, chn))
+                      continue;
+                snd_mixer_selem_get_playback_volume(elem, chn, &left);
+
+		if (to - from == 0)
+		{
+		    return YCPInteger((long long) 0);
+		}
+		value = (long long)(100.0 * ((double)(left - from) / (double)(to - from)));
+		return YCPInteger(value);
+            }
+	}
     }
-    snd_mixer_gid_t gid;
-    snd_mixer_group_t group;
 
-    memset(&gid, 0, sizeof(gid));
-    memset(&group, 0, sizeof(group));
-
-    strcpy((char*)gid.name, channel.c_str());
-    group.gid=gid;
-
-    if(snd_mixer_group_read(handle, &group)<0)
-    {
-	string error = string("invalid group (channel) ") 
-			+ channel;
-        snd_mixer_close(handle);
-        return YCPError(error);
-    }
     snd_mixer_close(handle);
-
-    int val=group.volume.values[0];
-
-    int range = group.max - group.min;
-    int tmp;
-
-    if (range == 0)
-    {
-	return YCPInteger((long long int)0);
-    }
-
-    tmp = (int)rint((double)(val - group.min)/(double)(range)*100.0);
-    return YCPInteger((long long int)tmp);
+    return YCPInteger((long long)0);
 }
 
-YCPValue alsaGetMute(int card, const string& channel)
+YCPValue alsaGetMute(int card_id, const string& channel)
 {
-    snd_mixer_t* handle;
-    int err=snd_mixer_open(&handle, card, 0);
-    if(err<0)
+    INIT_MIXER
+
+    int left;
+
+    snd_mixer_selem_channel_id_t chn;
+
+    for (elem = snd_mixer_first_elem(handle); elem; elem = snd_mixer_elem_next(elem))
     {
-        return YCPVoid();
+        snd_mixer_selem_get_id(elem, sid);
+        if (snd_mixer_selem_id_get_name(sid) == channel
+            && snd_mixer_selem_is_active(elem)
+            && snd_mixer_selem_has_playback_switch(elem))
+        {
+            for (chn = (snd_mixer_selem_channel_id_t)0;
+                    chn <= SND_MIXER_SCHN_LAST;
+                    chn=(snd_mixer_selem_channel_id_t)((int)chn+(snd_mixer_selem_channel_id_t)1))
+            {
+	//	if (
+                snd_mixer_selem_get_playback_switch(elem, chn, &left);
+
+                return left ? YCPBoolean(false) : YCPBoolean(true);
+            }
+        }
     }
-    snd_mixer_gid_t gid;
-    snd_mixer_group_t group;
 
-    memset(&gid, 0, sizeof(gid));
-    memset(&group, 0, sizeof(group));
-
-    strcpy((char*)gid.name, channel.c_str());
-    group.gid=gid;
-
-    if(snd_mixer_group_read(handle, &group)<0)
-    {
-        string error = string("invalid group (channel) ")
-			+ channel.c_str();
-        snd_mixer_close(handle);
-        return YCPError(error);
-    }
     snd_mixer_close(handle);
-
-    return group.mute?YCPBoolean(true):YCPBoolean(false);
+    return YCPBoolean(false);
 }
 
-YCPValue alsaSetVolume(int card, const string& channel, int value) 
+YCPValue alsaSetVolume(int card_id, const string& channel, int value) 
 {
-    snd_mixer_t* handle;
+    INIT_MIXER
 
-    int err=snd_mixer_open(&handle, card, 0);
-    if(err<0)
+    long from, to, val;
+    long left;
+
+    snd_mixer_selem_channel_id_t chn;
+
+
+    for (elem = snd_mixer_first_elem(handle); elem; elem = snd_mixer_elem_next(elem))
     {
-	string error = string("unable to open mixer device");
-        return YCPError(error, YCPBoolean(false));
+        snd_mixer_selem_get_id(elem, sid);
+        if (snd_mixer_selem_id_get_name(sid) == channel
+            && snd_mixer_selem_is_active(elem)
+            && snd_mixer_selem_has_playback_volume(elem))
+        {
+            snd_mixer_selem_get_playback_volume_range(elem, &from, &to);
+
+	    val = (long)( (double)(value * (to - from)) / 100.0 );
+
+	    snd_mixer_selem_set_playback_volume_all(elem, val);
+
+//            for (chn = (snd_mixer_selem_channel_id_t)0;
+//                    chn <= SND_MIXER_SCHN_LAST;
+//                    chn=(snd_mixer_selem_channel_id_t)((int)chn+(snd_mixer_selem_channel_id_t)1))
+//            {
+//                if (!snd_mixer_selem_has_playback_channel(elem, chn))
+//                      continue;
+//                snd_mixer_selem_set_playback_volume(elem, chn, val);
+//            }
+	    snd_mixer_close(handle);
+	    return YCPBoolean(true);
+        }
     }
 
-    snd_mixer_gid_t gid;
-    snd_mixer_group_t group;
 
-    memset(&gid, 0, sizeof(gid));
-    memset(&group, 0, sizeof(group));
-
-    strcpy((char*)gid.name, channel.c_str());
-    group.gid=gid;
-
-    if(snd_mixer_group_read(handle, &group)<0)
-    {
-	string error = string("invalid group (channel) ")	    
-			+ channel;
-        snd_mixer_close(handle);
-        return YCPError(error, YCPBoolean(false));
-    }
-
-    int range = group.max - group.min;
-    int tmp;
-
-    if (range == 0)
-    {
-	tmp=0;
-    }
-    else
-    {
-	tmp = (int)rint((double)(value)*(double)(range)*0.01);
-    }
-
-    for(uint pos=0; pos<group.channels; pos++)
-    {
-	group.volume.values[pos]=tmp;
-    }
-
-    snd_mixer_group_write(handle, &group);
     snd_mixer_close(handle);
-
-    return YCPBoolean(true);
+    return YCPBoolean(false);
 }
 
-YCPValue alsaSetMute(int card, const string& channel, bool value)
+YCPValue alsaSetMute(int card_id, const string& channel, bool value)
 {
-    snd_mixer_t* handle;
+    INIT_MIXER
 
-    int err=snd_mixer_open(&handle, card, 0);
-    if(err<0)
+    snd_mixer_selem_channel_id_t chn;
+
+    for (elem = snd_mixer_first_elem(handle); elem; elem = snd_mixer_elem_next(elem))
     {
-        return YCPBoolean(false);
+        snd_mixer_selem_get_id(elem, sid);
+        if (snd_mixer_selem_id_get_name(sid) == channel
+            && snd_mixer_selem_is_active(elem)
+            && snd_mixer_selem_has_playback_switch(elem))
+        {
+	    snd_mixer_selem_set_playback_switch_all(elem, value ? 0 : 1);
+	    snd_mixer_close(handle);
+	    return YCPBoolean(true);
+        }
     }
     
-    snd_mixer_gid_t gid;
-    snd_mixer_group_t group;
-
-    memset(&gid, 0, sizeof(gid));
-    memset(&group, 0, sizeof(group));
-
-    strcpy((char*)gid.name, channel.c_str());
-    group.gid=gid;
-
-    if(snd_mixer_group_read(handle, &group)<0)
-    {
-	string error = string("invalid group (channel) ") + channel;
-        snd_mixer_close(handle);
-        return YCPError(error, YCPBoolean(false));
-    }
-
-    group.mute=value;
-
-    snd_mixer_group_write(handle, &group);
     snd_mixer_close(handle);
-
-    return YCPBoolean(true);
+    return YCPBoolean(false);
 }
 
-YCPValue alsaGetChannels(int card)
+YCPValue alsaGetChannels(int card_id)
 {
-    snd_mixer_t *handle;
-    snd_mixer_groups_t groups;
-    snd_mixer_gid_t *group;
+    YCPList outlist;
 
-    if(snd_mixer_open(&handle, card, 0)<0)
+    INIT_MIXER // well, this doesn't look like a c++ code... i'm sorry for that... see definition above
+
+    for (elem = snd_mixer_first_elem(handle); elem; elem = snd_mixer_elem_next(elem))
     {
-        return YCPVoid();
+	snd_mixer_selem_get_id(elem, sid);
+        if (!snd_mixer_selem_is_active(elem))
+        {
+	    continue;
+	}
+
+        if (!snd_mixer_selem_has_playback_volume(elem))
+	{
+	    continue;
+	}
+
+	outlist->add(YCPString(snd_mixer_selem_id_get_name(sid)));
+	
     }
 
-    memset(&groups, 0, sizeof(groups));
-
-    YCPList list;
-    snd_mixer_groups(handle, &groups);
-    groups.pgroups = (snd_mixer_gid_t *)malloc(groups.groups_over * sizeof(snd_mixer_eid_t));
-    groups.groups_size = groups.groups_over;
-    groups.groups_over = groups.groups = 0;
-    snd_mixer_groups(handle, &groups);
-
-    for (int idx = 0; idx < groups.groups; idx++) {
-            group = &groups.pgroups[idx];
-            list->add(YCPString((char*)group->name));
-    }
-    free(groups.pgroups);
     snd_mixer_close(handle);
-    return list;
+    
+    return outlist;
 }
 
 YCPValue alsaGetCards()
 {
     YCPList list;
-    int cnt=snd_cards();
     char str[4];
-    for(int i=0; i<cnt; i++)
+    char *dummy;
+    for(int i=0; i < 7; i++)
     {
-        sprintf(str, "%d", i);
-        list->add(YCPString(str));
+	if (!snd_card_get_name(i, &dummy))
+	{
+	    sprintf(str, "%d", i);
+            list->add(YCPString(str));
+	}
     }
     return list;
 }
 
 YCPValue alsaStore(int card=-1)
 {
+
     string cmd="/usr/sbin/alsactl store";
     if(card>=0)
     {
@@ -236,10 +258,12 @@ YCPValue alsaStore(int card=-1)
 	return YCPBoolean(true);
     }
     return YCPBoolean(false);
+
 }
 
 YCPValue alsaRestore(int card=-1)
 {
+
     string cmd="/usr/sbin/alsactl restore";
     if(card>=0)
     {
@@ -256,18 +280,20 @@ YCPValue alsaRestore(int card=-1)
         return YCPBoolean(true);
     }
     return YCPBoolean(false);
+
 }
 
 YCPValue alsaGetCardName(int card_id)
 {
-    if(card_id>=snd_cards())
+    char *cname;
+
+    if (snd_card_get_name(card_id, &cname) != 0)
     {
 	return YCPVoid();
     }
 
-    char* cname;
-    snd_card_get_name(card_id, &cname);
     return YCPString(cname);
+
 }
 
 #else // __HAVE_ALSA
