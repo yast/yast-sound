@@ -1,8 +1,22 @@
 -------------------------------------------------------------------
+Tue May 15 15:17:09 CEST 2001 - dmeszar@suse.cz
+
+- doubled text fixed. when a new card is manually added, module description is
+  used as a manufacturer name. (bug #8315, file routines.ycp). 
+- fixed bug in adding sound cards. (not reported)
+  (files routines.ycp, sound_complex- list of all cards was compared 
+  against /var/lib/YaST/unique.inf, which was not correct. dialog
+  with the choice "Add autodetected"/"Select from list" was not shown
+  properly.  now it's compared
+  with local copy of unique keys list. new parameter added to get_not_yet 
+  (function returning list of not configured soundcards))
+- removed commented block of source code from 'sound_summary.ycp'
+
+-------------------------------------------------------------------
 Tue May 15 13:45:09 CEST 2001 - dmeszar@suse.cz
 
 - doubled text fixed. when a new card is manually added, module description is
-  used as a manufacturer name. (bug #8315). fixed bug in adding sound cards. (not reported)  
+  used as a manufacturer name. (bug #8315). fixed bug in adding sound cards. (not reported)
 
 -------------------------------------------------------------------
 Mon May 14 10:52:29 CEST 2001 - dmeszar@suse.cz
