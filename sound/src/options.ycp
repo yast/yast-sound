@@ -246,7 +246,6 @@
      * @return map result
      *
      */
-
     global define map OptionsDialog (string cardlabel, map opts) ``{
 
 
@@ -255,38 +254,37 @@
 	term con = `VBox ();
 
 	map origOptions = opts;
-//	y2error(sformat("%1", origOptions));
-				    // always omit these options -- they are assigned dynamically
-//	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_id"));
-//	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_index"));
-	// description of option is not available
-	list options = maplist (`e, `f, opts, ``($["description" : getDescr(lookup (f, "descr", _("No description available"))),
-						// if no option name is available
-						"name"         : e,
-						"value"        : lookup (f, "value", ""),
-						"type"         : lookup (f, "type", "string"),
-						"default"      : lookup (f, "default", "")]));
+	list options = maplist (`e, `f, opts, ``($[
+	    // label: description of option is not available
+	    "description" : getDescr(f["descr"]:_("No description available")),
+	    "name"	  : e,
+	    "value"	  : f["value"]:"",
+	    "type"        : f["type"]:"string",
+	    "default"     : f["default"]:""]
+	));
 
-	list itemized_descriptions = create_table (options, ["description", "name", "value"]);
+	list itemized_descriptions = create_table (options,
+	    ["description", "name", "value"]);
 
 	integer current_option = 0;
-	string current_option_name = lookup (select (options, 0, $[]), "name", "");
+	string current_option_name = lookup (options[0]:$[], "name", "");
 
 	if (size (itemized_descriptions) > 0)
 	{
-	    con = OptionsCon(cardlabel, itemized_descriptions, current_option, current_option_name);
+	    con = OptionsCon (cardlabel, itemized_descriptions, current_option,
+		    current_option_name);
 	}
-	else			// there are no options
+	else	// there are no options
 	{
-	    con = `VBox (//`Top(`Label ( cardlabel)),
-			       // To translators: label message
-			       `HVCenter (`Label (_("There are no options for this module"))));
-
+	    con = `VBox (
+		// To translators: label message
+		`HVCenter (`Label (_("There are no options for this module")))
+	    );
 	}
 
-
-		// dialog title
-	Wizard::SetContents (_("Sound card advanced options"), con, help_text, true, true);
+	// dialog title
+	Wizard::SetContents (_("Sound card advanced options"), con, help_text,
+	    true, true);
 	if (size (itemized_descriptions) > 0)
 	{
 	    UI::ChangeWidget(`id(`table), `CurrentItem, 0);
@@ -299,14 +297,18 @@
 	    if (ui == `table)
 	    {
 		current_option = UI::QueryWidget (`id(`table), `CurrentItem);
-		current_option_name = select(UI::QueryWidget(`id(`table), `Item(current_option)), 2, "");
+		current_option_name = select (
+		    UI::QueryWidget(`id(`table), `Item(current_option)), 2, "");
 
-		    // to translators: name of currently selected option: eg. 'Option: snd_asdf'
-		UI::ChangeWidget(`id(`des), `Label, sformat("%1 %2", _("&Option: "),current_option_name));
-		UI::ChangeWidget(`id(`des), `Value, select(UI::QueryWidget(`id(`table), `Item(current_option)), 3, ""));
+		UI::ChangeWidget(`id(`des), `Label,
+		    // name of currently selected option: eg. 'Option: snd_asdf'
+		    sformat ("%1 %2", _("&Option: "),current_option_name));
 
-		    // update possible values
-		map optmap = lookup(origOptions, current_option_name, $[]);
+		UI::ChangeWidget(`id(`des), `Value, select (
+		    UI::QueryWidget(`id(`table),`Item(current_option)), 3, ""));
+
+		// update possible values
+		map optmap = origOptions[current_option_name]:$[];
 		string vals = "";
 		if (size(optmap) == 0)
 		{
@@ -314,22 +316,24 @@
 		}
 		else
 		{
-		    vals = lookup(optmap, "allows", "");
+		    vals = optmap["allows"]:"";
 		}
 
-		updatePossibleValues(vals, select(UI::QueryWidget(`id(`table), `Item(current_option)), 3, ""));
+		updatePossibleValues (vals, select(
+		    UI::QueryWidget(`id(`table),`Item(current_option)), 3, ""));
 
 	    }
 	    if (ui == `poss)
 	    {
 		current_option = UI::QueryWidget (`id(`table), `CurrentItem);
-                current_option_name = select(UI::QueryWidget(`id(`table), `Item(current_option)), 2, "");
+                current_option_name = select (
+		    UI::QueryWidget(`id(`table), `Item(current_option)), 2, "");
 
-		string value = sformat("%1", (UI::QueryWidget(`id(`poss), `Value)));
+		string value = sformat("%1",UI::QueryWidget(`id(`poss),`Value));
 
 		UI::ChangeWidget(`id(`des), `Value, value);
 	    }
-	    if (ui == `set)	// ui ==`set) set button pressed
+	    if (ui == `set)	// set button pressed
 	    {
 		string value = UI::QueryWidget(`id(`des), `Value);
 
@@ -340,46 +344,52 @@
 		    continue;
 		}
 
-		list possible_values = parse_values(lookup (select (options, current_option, ""), "values", ""));
+		// Should the value be checked, if it is in 'possible values'?
+		list possible_values = string2vallist(
+		    origOptions [current_option_name, "allows"]:"");
 
 		string err = check_value (value,
-						  lookup (select (options, current_option, ""), "type", "string"),
-						  []); //possible_values);
+		    options [current_option, "type"]:"string", possible_values);
 
-		if (size (err) > 0)  // error - wrong value
+		if (size (err) > 0)	// error - wrong value
 		{
 		    Popup::Message (err);
 		    UI::ChangeWidget(`id(`des), `Value, "");
-
 		}
-		else		// value is correct
+		else			// value is correct
 		{
+		    UI::ChangeWidget(`id(`table),`Item(current_option,2),value);
 
-		    UI::ChangeWidget(`id(`table), `Item(current_option, 2), value);
 		    list tmp = [];
-		    maplist (`e, itemized_descriptions, ``{
-				  if (current_option == select(select (e, 0, ""), 0, ""))
-				      tmp = add (tmp, `item(select (e, 0, ""), 
-					    select (e, 1, ""), select (e, 2, ""), value));
-				  else
-				      tmp = add (tmp, e);
-			      });
+		    maplist (term e, itemized_descriptions, ``{
+			if (current_option == select(select (e, 0, ""), 0, ""))
+			    tmp = add (tmp, `item(select (e, 0, ""),
+				select (e, 1, ""), select (e, 2, ""), value));
+			else
+			    tmp = add (tmp, e);
+		    });
 		    itemized_descriptions = tmp;
 		}
 
 	    }
-	    // popup question
-	    else if (ui == `reset && Popup::YesNo(_("Do you really want to reset all values?")))
+	    else if (ui == `reset &&
+		    // popup question
+		    Popup::YesNo(_("Do you really want to reset all values?")))
 	    {
 		UI::ChangeWidget(`id(`des), `Value, "");
 
 		integer i = 0;
 		while (i < size (itemized_descriptions))
 		{
-		  UI::ChangeWidget(`id(`table), `Item(i, 2), lookup (select(options, i, ""), "default", ""));
-		  i = i + 1;
+		    UI::ChangeWidget (`id(`table), `Item(i, 2),
+			options[i,"default"]:"");
+		    // reset the values in items list
+		    term e = itemized_descriptions [i]:`item(`id(i),"","","");
+		    itemized_descriptions [i] =
+			`item (select (e, 0, `id(i)), select (e, 1, ""),
+			       select (e, 2, ""), options[i,"default"]:"");
+		    i = i + 1;
 		}
-
 	    }
 	    else if (ui == `abort || ui == `cancel)
 	    {
@@ -390,7 +400,7 @@
 		}
 	    }
 	    ui = UI::UserInput();
-	} until (((ui == `back) || (ui == `next) || ui == `cancel));
+	} until (ui == `back || ui == `next || ui == `cancel);
 
 	return $["ui" : ui, "return" : itemized_descriptions];
     }
@@ -405,11 +415,9 @@
 
     global define map sound_options(map save_entry) ``{
 
-//    map save_entry	= WFM::Args(0);
     string modname	= lookup(save_entry, "module", "");
     string cardlabel	= lookup(save_entry, "model", "");
     map params		= get_module_params(modname);
-
 
     map p2 = restore_mod_params(params, lookup(save_entry, "options", []));
 

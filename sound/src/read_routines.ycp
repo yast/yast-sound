@@ -100,7 +100,8 @@
         list save     = [];             // structure to save
         integer i     = 0;
 
-	// since parameters in modules options are separated by comas (eg. options mod snd_id=1,2,3, snd_index=1,2,3)
+	// since parameters in modules options are separated by comas
+	// (eg. options mod snd_id=1,2,3, snd_index=1,2,3),
 	// we have to count occurences for each module
 
         if (true) // use_alsa )//contains (aliases, "char-major-116"))
@@ -114,8 +115,8 @@
 
 	    integer position = -1;
 
-	    foreach(`e, aliases,
-	    ``{
+	    foreach(`e, aliases, ``{
+
 		position = position + 1;
 		map entry = $[];
 		string modname = SCR::Read(add (.modules.alias, e));
