@@ -29,6 +29,15 @@
 
     import "Summary";
 
+
+    // flag for letting the module know, that it's launched from then hardware
+    // installation screen
+    global boolean installation = false;
+
+    // was the proposal already generated?
+    global boolean proposal_created = false;
+
+    //
     global boolean autoinstallation = false;
     // list for storing detected cards
     global list detected_cards = nil;
@@ -220,6 +229,197 @@
 
 	return Summary::DevicesList(retlist);
 
+    }
+
+    /**
+     *
+     *
+     */
+
+    global define string CollectOptions(string modname) ``{
+	// first filter out entries with other module
+	list mod_entries = filter(`e, modules_conf, ``(lookup(e, "module", "off") == modname));
+
+	// create list of options (list of maps)
+	list mod_opts = maplist(`e, mod_entries, ``(lookup(e, "options", $[])));
+
+	list opts = [];
+
+	foreach(`a, mod_opts,
+	``{
+	    foreach(`b, `c, a,
+	    ``{
+	        opts = add(opts, b);
+	    });
+	});
+	opts = toset(opts);
+	opts = filter(`e, opts, ``(e != "snd_id"));
+
+	map res = $[];
+	// for each option collect their values
+	foreach(`opname, opts,
+	``{
+	    boolean coma = false;
+	    string value = "";
+	    foreach(`s, mod_opts,
+	    ``{
+	        if (coma)
+	        {
+	            value = value + ",";
+	        }
+	        value = value + lookup(s, opname, "");
+
+	        coma = true;
+	    });
+	    res = add(res, opname, value);
+	});
+
+	return res;
+
+    }
+
+    global define list CreateModprobeCommands() ``{
+	list outlist = [];
+	// create distinct list of all modules
+        list mods = toset(maplist(`e, modules_conf, ``(lookup(e, "module", "off"))));
+	maplist(`modname, mods, ``{
+	    map opts = CollectOptions(modname);
+	    string optstr = "";
+	    maplist(`k, `v, opts, ``{
+		optstr = optstr+ sformat(" %1=%2", k, v);
+	    });
+	    string modprobe = sformat("modprobe %1 %2", modname, optstr);
+	    outlist = add(outlist, modprobe);
+	});
+
+	return outlist;
+
+    }
+
+    /**
+     *
+     * reset settings
+     *
+     */
+
+    global define ForceReset() ``{
+	modules_conf = [];
+	DetectHardware();
+	UpdateUnconfiguredCards();
+	proposal_created = false;
+    }
+
+    /**
+     *
+     * create a proposal
+     *
+     */
+
+    global define Propose() ``{
+	if (proposal_created)
+	{
+	    return true;
+	}
+	ForceReset();
+
+	// TODO: fix for nm256/opl3sa2 hack
+
+	modules_conf = recalc_save_entries(unconfigured_cards);
+	rc_vars = $[
+		"LOAD_ALSA" : "yes",
+		"LOAD_ALSA_SEQ": "yes"
+	    ];
+	proposal_created = true;
+	return true;
+    }
+
+    /* settings' backup */
+
+    list modules_conf_b = nil;
+    list rc_vars_b = nil;
+    list volume_settings_b = nil;
+
+    global define void StoreSettings() ``{
+	modules_conf_b = modules_conf;
+	rc_vars_b = rc_vars;
+	volume_settings_b = volume_settings;
+    }
+
+    global define void RestoreSettings() ``{
+	if (modules_conf_b == nil)
+	{
+	    y2error("restoring sound setting without storing them before. bailing out.");
+	}
+	modules_conf = modules_conf_b;
+	rc_vars = rc_vars_b;
+	volume_settings = volume_settings_b;
+    }
+
+    /**
+     * returns list of configured/proposed sound cards.
+     * @return list of maps: [$["name": "ASDASD", "card_no": 0]...]
+     *
+     */
+
+    global define list GetSoundCardList() ``{
+	if (installation)
+	{
+	    integer pos = -1;
+	    return maplist(`c, modules_conf, ``{
+		    pos = pos + 1;
+		    return
+		    $[
+			"name" : lookup(c, "model", _("Sound card")),
+			"card_no": pos
+		    ];
+		});
+	}
+	else
+	{
+	    path cards_path = .audio.alsa.cards;
+
+	    list cards_numbers = SCR::Dir(cards_path);
+
+	    list cards = [];
+	    if (cards_numbers != nil)
+	    {
+		cards =
+		    maplist(`card_no, cards_numbers, ``{
+			path curcard_path = add(cards_path, sformat("%1", card_no));
+			return $[ "card_no" : tointeger(card_no),
+                              "name" :    SCR::Read(curcard_path + .name) ];
+		    });
+	    }
+
+	    y2debug("List of the sound cards: %1", cards);
+	    return cards;
+	}
+    }
+
+    global define void StoreMixer() ``{
+	if (size(SCR::Dir(.audio.alsa.cards)) == 0)
+	{
+	    return;
+	}
+	volume_settings = [];
+	path p = nil;
+	list cards = SCR::Dir(.audio.alsa.cards);
+	maplist(`c, cards, ``{
+	    p = topath(sformat(".audio.alsa.cards.%1.channels", c));
+	    list channels = SCR::Dir(p);
+	    maplist(`ch, channels, ``{
+		p = topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", c, ch));
+		if (!SCR::Read(p))
+		{
+		    p = topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", c, ch));
+		    volume_settings[tointeger(c)] = add(volume_settings[tointeger(c)]:$[],
+			ch, SCR::Read(p));
+
+		}
+
+	    });
+
+	});
     }
 
 }

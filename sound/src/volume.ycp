@@ -254,6 +254,8 @@ its parameters using the 'Advanced setup'.");
 
     Wizard::DisableAbortButton();
 
+    list modules_conf_backup = Sound::modules_conf;
+
     string err_msg = "";
 
     if (Sound::autoinstallation)
@@ -280,10 +282,11 @@ its parameters using the 'Advanced setup'.");
 	    });
 	}
 
+	Sound::modules_conf = new_save;
+
 	if (!Sound::autoinstallation)
 	{
 	    sound_stop();
-	    SaveModulesEntry (new_save, [], true);
 	    sound_start_tmp(true/*, size(new_save)*/);
 	    err_msg = check_module(save_entry, card_id);
 	}
@@ -326,7 +329,7 @@ its parameters using the 'Advanced setup'.");
 	}
 	else
 	{
-	    string master_elem = lookup(lookup(Sound::db_modules, modname, $[]), 
+	    string master_elem = lookup(lookup(Sound::db_modules, modname, $[]),
 		"main_volume", "Master");
 
 	    SetVolume (master_elem, card_id, 75);
@@ -335,11 +338,15 @@ its parameters using the 'Advanced setup'.");
 	storeVolume(card_id);
     }
 
+    Sound::modules_conf = modules_conf_backup;
+
     if (ui == `back || ui == `cancel || ui == `abort)
     {
 	if (!Sound::autoinstallation)
 	{
-	    SaveModulesEntry(save_info, [], true);
+//	    SaveModulesEntry(save_info, [], true);
+
+	    sound_stop();
 	    sound_start_tmp(true);
 	}
     }
@@ -350,6 +357,7 @@ its parameters using the 'Advanced setup'.");
     }
 
     UI::ChangeWidget (`id(`next), `Label, UI::NextButtonLabel());
+
 
     return $["ui" : ui, "return" : size (err_msg) == 0];
 

@@ -271,7 +271,7 @@
      */
 
     global define boolean nm256hack (string modname) ``{
-        if (modname == "snd-card-nm256")
+        if (modname == "snd-nm256")
         {
             // special warning message for in a special case
             string warn_text = lookup(STRINGS, "nm256hackWarning", "");
@@ -607,7 +607,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	    return false;
 	}
 
-	if (contains(["snd-card-emu10k1", "snd-card-sbawe", "emu10k1"], lookup(save_entry, "module", "")))
+	if (contains(["snd-emu10k1", "snd-sbawe", "emu10k1"], lookup(save_entry, "module", "")))
 	{
 	    return true;
 	}
@@ -673,15 +673,30 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
     }
 
     /**
+     * does this machine need a nm256/opl3sa warning?
+     * @return boolean
+     *
+     */
+
+    global define need_nm256_opl3sa2_warn(list sound_cards) ``{
+	list mods = maplist(`e, sound_cards, lookup(e, "module", ""));
+	if (contains(mods, "snd-nm256") && contains(mods, "snd-opl3sa2"))
+	{
+	    return true;
+	}
+	return false;
+    }
+
+    /**
      * shows warning message when both nm265 and opl3sa2 cards are present
      * @param sound_cards list of sound cards
      */
 
     global define void nm256_opl3sa2_warn(list sound_cards) ``{
 	list s1 = filter(`e, sound_cards,
-	    ``(lookup(e, "module", "") == "snd-card-nm256"));
+	    ``(lookup(e, "module", "") == "snd-nm256"));
 	list s2 = filter(`e, sound_cards,
-	    ``(lookup(e, "module", "") == "snd-card-opl3sa2"));
+	    ``(lookup(e, "module", "") == "snd-opl3sa2"));
 
 	if (size(s1) > 0 && size(s2) > 0)
 	{

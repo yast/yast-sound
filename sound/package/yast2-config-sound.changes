@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Feb 11 14:29:33 CET 2002 - dmeszar@suse.cz
+
+- speed improvements, proposal implemented
+
+-------------------------------------------------------------------
 Fri Feb  8 18:25:12 CET 2002 - lnussel@suse.de
 
 - command line argument is of type string

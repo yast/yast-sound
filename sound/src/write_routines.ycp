@@ -83,39 +83,7 @@
 	list mods = toset(maplist(`e, save_info, ``(lookup(e, "module", "off"))));
 	foreach(`modname, mods,
 	``{
-	    list si = filter(`e, save_info, ``(lookup(e, "module", "off") == modname));
-	    si = maplist(`e, si, ``(lookup(e, "options", $[])));
-	    // create a set of at least once used option
-	    list opts = [];
-	    foreach(`a, si,
-	    ``{
-		foreach(`b, `c, a,
-		``{
-		    opts = add(opts, b);
-		});
-	    });
-	    opts = toset(opts);
-	    opts = filter(`e, opts, ``(e != "snd_id"));
-
-	    map res = $[];
-	    // for each option collect their values
-	    foreach(`opname, opts,
-	    ``{
-		boolean coma = false;
-		string value = "";
-		foreach(`s, si,
-		``{
-		    if (coma)
-		    {
-			value = value + ",";
-		    }
-		    value = value + lookup(s, opname, "");
-
-		    coma = true;
-		});
-		res = add(res, opname, value);
-	    });
-	    // write result to modules.conf
+	    map res = Sound::CollectOptions(modname);
 
 	    SCR::Write(mod_options, res, modname);
 	});
@@ -227,25 +195,6 @@
     }
 
     /**
-     * Additional hack to enable ALSA joystick support
-     * @return boolean
-     */
-    global define boolean EnableJoystick () ``{
-        string tmpdir = SCR::Read(.target.tmpdir);
-        return SCR::Execute(.target.bash, "/usr/sbin/alsactl -f " + tmpdir + "/asound.conf store;\
-                /usr/bin/sed /\"Joystick\"/s/false/true/ " + tmpdir + "/asound.conf >/etc/asound.conf;\
-                /bin/rm -f " + tmpdir + "/asound.conf;\
-                /usr/sbin/alsactl restore", $[]);
-    }
-
-    /**
-     * function to finish ALSA instalation
-     * @return void
-     */
-    global define void AlsaFinish () ``{
-        EnableJoystick ();
-    }
-    /**
      * saves rc values that are stored in map
      * @param rc map "variable" : "value", ....
      * @return string error string
@@ -256,16 +205,6 @@
 	Runlevel::ServiceAdjust("alsasound", start);
 
 	SCR::Write(.sysconfig.sound.LOAD_ALSA_SEQ, lookup(rc, "LOAD_ALSA_SEQ", "no"));
-	/*
-        string err_msg = "";
-	if (contains (maplist (`k, `v, rc, ``(SCR::Write(topath(sformat(".sysconfig.alsa.%1", k)), v))), false) ||
-            !SCR::Write(.rc.system, nil))
-            {
-                // Error message
-                err_msg = sformat (lookup(STRINGS, "saveRCValues", ""), "/etc/rc.config");
-            }
-	return err_msg;
-	*/
 	return "";
     }
 
