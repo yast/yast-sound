@@ -152,7 +152,7 @@
 		    `Label (`opt(`outputField), hardware_name (card))
 		    )),
 		// To translators keep backlash here
-		`Frame (_("Level adjust \& test"), `HBox(
+		`Frame (_("Volume adjust and test"), `HBox(
 		    `HSpacing (),
 		    `VBox(
 			`VSpacing (0.5),
