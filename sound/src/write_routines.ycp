@@ -26,6 +26,7 @@
      * create special comment for given model
      * @param model card description
      * @param uniq_key unique key
+     * @return string comment for the alias
      */
 
     global define string createAliasComment(string model, string uniq_key) ``{
@@ -37,7 +38,7 @@
      * Saves one '/etc/modules.conf' entry
      * @param entry card config
      * @param tmp save to temporary file, not to /etc/modules.conf
-     * @return boolean
+     * @return boolean success/failure
      */
     global define boolean SaveOneModulesEntry (map entry, boolean tmp) ``{
 	path mod		= .modules;
@@ -66,9 +67,9 @@
     /**
      * saves modules options. this function has to collect parameters that use
      * different cards that use single module and create a coma separated list of values
-     * @param save_info
+     * @param save_info save info
      * @param tmp write to tmp modules.conf, not to /etc/modules.conf
-     *
+     * @return void
      */
 
     global define void SaveModulesOptions(list save_info, boolean tmp)
@@ -188,7 +189,7 @@
 
     /**
      * Save volume (for alsa it's alsactl store
-     * @return map return struct: $["return": integer, "err_msg": string]
+     * @return boolean success/failure
      */
     global define boolean SaveVolume () ``{
 	return SCR::Execute(.audio.alsa.store, 0, 0);

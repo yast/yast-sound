@@ -29,7 +29,7 @@
      * @param label label for slider
      * @param value initial value
      * @param spec true-slider false-intfield
-     *
+     * @return term widget
      */
 
     global define term volElement(string label, integer value, boolean spec) ``{
@@ -147,7 +147,8 @@
 
 /**
  * shows mixer dialog for respective card
- * @param card_id
+ * @param card_id card id
+ * @return map result
  *
  */
 

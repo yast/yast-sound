@@ -30,8 +30,7 @@
 
     /**
      * creates summary table with card labels and thier states (running/not running/dissappeared)
-     * @param save_info info about configured cards
-     * @return table contents
+     * @return list table contents
      */
 
     global define list createTable() ``{
@@ -104,7 +103,7 @@
     /**
      * shows list of soundcards
      *
-     * @return map
+     * @return map result
      */
 
     global define map ComplexDialog () ``{
@@ -294,6 +293,7 @@ Restart sound system now?
 
     /**
      * just calls ComplexDialog
+     * @return map passed from ComplexDialog
      */
 
     global define map sound_complex() ``{

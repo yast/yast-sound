@@ -34,7 +34,7 @@
     /**
      * This dialog sipmply reads user input and calls apropriate set funtion
      *
-     * @return symbol
+     * @return symbol next dialog
      */
 
     global define symbol VolumeDialog () ``{
@@ -235,7 +235,7 @@ its parameters using the 'Advanced setup'.");
      * @param finish show 'finish' button instead of 'next'
      * @param quick quick/normal config
      * @param save_info config of previuosly configured cards
-     * @return symbol
+     * @return map result and next dialog
      */
 
     global define map sound_volume(map save_entry, integer card_id, boolean finish,

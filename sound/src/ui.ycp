@@ -25,7 +25,7 @@
      *	InitializingDialog
      *
      *
-     * @return symbol
+     * @return symbol next dialog
      */
 
     global define symbol InitializingDialog () ``{
@@ -47,7 +47,7 @@
      * @param cpos cards position
      * @param flags enable/disable radiobuttons accordingly
      *
-     * @return map
+     * @return map symbol of next dialog
      */
 
     global define map DisplayName (string name, string cname, integer cpos, integer flags) ``{
@@ -110,7 +110,7 @@
      * @param cname alias for modules conf
      * @param cpos position of the soud card
      * @param flags enable/disable radio buttons
-     * @return symbol of pressed button
+     * @return map symbol for next dialog
      */
 
     global define map quickConfig(string name, string cname, integer cpos, integer flags) ``{
@@ -181,7 +181,7 @@
      *
      *  @param save_entry map with card info
      *  @param vol initial volume (0-100)
-     *  @return term
+     *  @return term volume dialog contents
      */
 
     global define term VolumeCon(map save_entry , integer vol) ``{
@@ -242,7 +242,7 @@
      *  @param itemized_descriptions option list (preformated using 'create_table' with tripples: description, name, value
      *  @param current_option index of initially selected item
      *  @param current_option_name initially selected item name
-     *  @return term
+     *  @return term options dialog contents
      *  @see sound_options#create_table
      */
 
@@ -283,6 +283,7 @@
      * dialog to be displayed in WhichDialog function
      *
      * @param nc list of not configured cards
+     * @return term card type selection dialog contents
      * @see WhichDialog
      */
 
@@ -483,7 +484,7 @@
 
     /**
      *  dialog to be displayed when user presses 'Abort' button
-     *	@return boolean
+     *	@return boolean yes/no
      */
 
     global define boolean ReallyAbort()

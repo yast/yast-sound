@@ -27,9 +27,9 @@
     import "Wizard";
 
     /**
-     * parses string eg. '{{0,2},{0,100,20}}' to a list [0,1,2,0,20,40,60,80]
+     * parses string eg. '{{0,2},{0,100,20}}' to a list [0,1,2,0,20,40,60,80,100]
      * @param input input string
-     * @return list
+     * @return list of possible values
      */
 
     global define list parse_bracket(string input) ``{
@@ -78,6 +78,13 @@
         }
         return output;
     }
+
+    /**
+     * gets an 'modules.generic_string' like options description string
+     * and returns a list of possible values
+     * @param input string
+     * @return list of values
+     */
 
     global define list string2vallist(string input) ``{
 	boolean parse_error = false;
@@ -175,7 +182,7 @@
 
     /**
      * widget for choosing one value from list
-     * @param tail string with values eg. "12,3,4,6"
+     * @param vals string with values eg. "12,3,4,6"
      * @param default string default value (preselected in combo)
      * @return term combobox widget
      */
@@ -185,6 +192,14 @@
 
 	return `ComboBox(`id(`poss), `opt(`notify), _("&Possible value:"), vals);
     }
+
+    /**
+     * when thew selected option in table changes, we need to update combo with values
+     * @param values list of values
+     * @param default item
+     * @return void
+     *
+     */
 
     global define void updatePossibleValues(string values, string default) ``{
 	list l = string2vallist(values);
@@ -203,10 +218,10 @@
      * displays dialog with card options
      *
      * @param cardlabel string label for the card
-     * @param options list. list where each item is map
+     * @param opts list. list where each item is map
      *        with keys: name, value, type, default, description.
      *	      values in map are strings
-     * @return map
+     * @return map result
      *
      */
 
@@ -360,7 +375,7 @@
     /**
      * just calls options dialog
      * @param save_entry map with card configuration
-     * @return symbol
+     * @return map result
      */
 
     global define map sound_options(map save_entry) ``{

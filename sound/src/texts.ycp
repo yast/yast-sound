@@ -21,7 +21,7 @@
 
     /**
      *	Returns map with string values
-     *  @return map
+     *  @return map with translated strings
      */
 
     global define map STRINGS_() ``{

@@ -88,7 +88,7 @@
 
     /**
      * card selection dialog
-     *
+     * @return symbol next dialog
      */
 
     global define symbol _snd_select() ``{
@@ -114,7 +114,7 @@
 
     /**
      * quick configuration step #1 dialog
-     *
+     * @return symbol next dialog
      */
 
     global define symbol _snd_quick() ``{
@@ -129,6 +129,7 @@
     /**
      * quick config step #2 dialog
      * @param type boolean quick/normal config
+     * @return symbol next dialog
      */
 
     global define symbol _snd_quick2(boolean type) ``{
@@ -145,7 +146,7 @@
 
     /**
      * dialog for manual card selection
-     *
+     * @return symbol next dialog
      */
 
     global define symbol _snd_manual() ``{
@@ -204,7 +205,7 @@
 
     /**
      * add card from complex dialog
-     *
+     * @return symbol next dialog
      */
 
     global define symbol _snd_add() ``{
@@ -222,7 +223,7 @@
 
     /**
      * sound card deletion
-     *
+     * @return symbol next dialog
      */
 
     global define symbol _snd_delete() ``{
@@ -242,7 +243,7 @@
             Sound::modules_conf	    = remove(Sound::modules_conf, card_id);
 	    Sound::modules_conf	    = recalc_save_entries(Sound::modules_conf);
 
-	    vol_settings    = remove(vol_settings, card_id); //multi_remove(vol_settings, rem);
+	    vol_settings    = remove(vol_settings, card_id); 
 
 	    if (!Sound::autoinstallation)
 	    {
@@ -261,7 +262,7 @@
 
     /**
      * configure selected card
-     *
+     * @return symbol next dialog
      */
 
     global define symbol _snd_config() ``{
@@ -293,7 +294,7 @@
 
     /**
      * complex dialog
-     *
+     * @return symbol next dialog
      */
 
     global define symbol _snd_complex() ``{

@@ -25,7 +25,7 @@
 
     /**
      *	dialog for manual settings
-     *  @return list
+     *  @return map result
      */
 
 
@@ -130,7 +130,7 @@
 
     /**
      * just calls ManualDialog
-     *
+     * @return map passed result from ManualDialog
      */
 
     global define map sound_manual() ``{
