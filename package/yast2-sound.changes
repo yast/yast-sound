@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Aug 20 14:23:43 CEST 2003 - jsuchome@suse.de
+
+- removed redundant "initialization dialog" (#28779)
+- 2.8.5
+
+-------------------------------------------------------------------
 Thu Aug 14 11:11:16 CEST 2003 - jsuchome@suse.de
 
 - removed SuccessDialog (#28774)

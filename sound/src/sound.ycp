@@ -344,7 +344,6 @@
      */
 
     OpenMainDialog();
-    InitializingDialog ();
 
     boolean test_mode     = false;
     boolean config_mode   = false;
