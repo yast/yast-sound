@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Mar  3 12:54:58 CET 2003 - jsuchome@suse.de
+
+- merged proofreaded texts
+
+-------------------------------------------------------------------
 Fri Feb 21 14:35:31 CET 2003 - jsuchome@suse.de
 
 - fixes: stderr of some commands (echo, aplay) goes to /dev/null,
