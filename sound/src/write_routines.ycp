@@ -70,10 +70,10 @@
 	path mod_options = .modules.options;
 
 	// create distinct list of all modules
-	list mods = toset(maplist(map card, save_info,
+	list mods = toset(maplist(map card, (list<map<string,any> >) save_info,
 	    ``(card["module"]:"off")));
 
-	foreach(string modname, mods, ``{
+	foreach(string modname, (list<string>) mods, ``{
 	    map res = Sound::CollectOptions(modname);
 	    SCR::Write( add (mod_options, modname ), res);
 	});
@@ -86,7 +86,7 @@
      */
 
     define void removeOldEntries(list als) ``{
-	maplist(string e, als, ``{
+	maplist(string e, (list<string>) als, ``{
 	    if (is_snd_alias(e) ||
 		issubstring(e, "sound-service-") ||
 		issubstring(e, "sound-slot-"))
@@ -157,7 +157,7 @@
 	    }
 	}
 
-        if ((contains (maplist (map entry, save_info,
+        if ((contains (maplist (map entry, (list<map<string,any> >)save_info,
 		``(SaveOneModulesEntry (entry))), false)))
         {
             // Error message
@@ -168,7 +168,7 @@
 	{
 
 	    list oss_aliases = alsa_oss(size(save_info));
-	    foreach(map a, oss_aliases, ``{
+	    foreach(map a, (list<map<string,any> >)oss_aliases, ``{
 		SCR::Write(add (mod_alias, a["alias"]:""), a["module"]:"");
 	    });
 	    SCR::Write(add (add (mod_alias, "sound-slot-0"), "comment"),
