@@ -900,36 +900,23 @@ could make your system unstable.")),
     global define void  InitMixer(integer card_id, string modname) ``{
         map devs = lookup(lookup(Sound::db_modules, modname, $[]), "mixer",
             $["Master":70, "PCM":70, "CD":70, "Synth": 70]);
-y2internal ("devs: %1", devs);
-
-//FIXME: there are used volume_settings from currently deleted card!!!
-// it should be map with card IDs as keys!!!
 
 	// now let's merge settings from volume_settings list
 	if (size(volume_settings) != 0)
 	{
-	    // FIXME: list volume_settings doesn't have maps as values!
-	    /*
-	    maplist(`k, `v, volume_settings[card_id]:$[],
-	    ``{
-		devs = add(devs, k, v);
-	    });
-	    */
 	    foreach (`channel, volume_settings[card_id]:[], ``{
 		devs = add (devs, channel[0]:"Master", channel[1]:70);
 	    });
 	}
-y2internal ("devs: %1", devs);
 
         list devs2 = maplist(`k, `v, devs, ``(k));
+
 
         foreach (`dev, `vol, devs, ``{
 	    SetVolume (card_id, dev, vol);
 	});
 
         unmute(devs2, card_id);
-
-	// in addidtion, some other channels can be specified or some volumes may be overriden
     }
 
     /**

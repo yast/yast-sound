@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu May 22 11:12:21 CEST 2003 - jsuchome@suse.cz
+
+- fixed: mixed volume settings after removing and adding first card
+  while there is present another one
+
+-------------------------------------------------------------------
 Mon May 12 09:59:19 CEST 2003 - jsuchome@suse.de
 
 - probe old ISA cards with alsaconf (#25285)
