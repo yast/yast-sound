@@ -111,7 +111,7 @@
         path mod_alias_comment	=
             add ( add (.modprobe_sound.alias, entry ["alias"]:"off"),"comment");
 
-	y2internal("entry: %1", entry);
+	y2debug("entry: %1", entry);
 
 	// save hwcfg config file
 	string file = "";
@@ -122,6 +122,7 @@
 	    // get all static configurations
 	    list<string> configs = HWConfig::ConfigFiles();
 	    configs = filter(string f, configs, {return regexpmatch(f, "^static-[0-9]*");});
+	    y2milestone("found static configs: %1", configs);
 
 	    // search existing config file
 	    if (size(configs) > 0)
@@ -138,24 +139,29 @@
 
 			    if (comment != nil && comment != "")
 			    {
+				y2debug("comment: %1", comment);
+				y2debug("alias: %1", entry["alias"]:"");
+				y2debug("unique_key: %1", entry["unique_key"]:"");
 				// search for sound alias and uniqID
 				if (regexpmatch(comment, entry["alias"]:"") && regexpmatch(comment, entry["unique_key"]:""))
 				{
 				    file = f;
 				    found = true;
+				    y2milestone("Found flags in file: %1", f);
 				}
-				else
-				{
-				    // not found, check config number
-				    string num = regexpsub(f, "^static-([0-9]*)", "\\1");
+			    }
 
-				    if (num != nil)
+			    if (!found)
+			    {
+				// not found, check config number
+				string num = regexpsub(f, "^static-([0-9]*)", "\\1");
+
+				if (num != nil)
+				{
+				    integer num_i = tointeger(num);
+				    if (num_i != nil && num_i > greatest)
 				    {
-					integer num_i = tointeger(num);
-					if (num_i != nil && num_i > greatest)
-					{
-					    greatest = num_i;
-					}
+					greatest = num_i;
 				    }
 				}
 			    }
@@ -165,6 +171,7 @@
 
 		if (file == nil || file == "")
 		{
+		    y2debug("file empty, greatest: %1", greatest);
 		    // not found - create new config
 		    file = sformat("static-%1", greatest + 1);
 		}

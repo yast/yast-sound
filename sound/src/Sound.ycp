@@ -488,7 +488,10 @@ could make your system unstable.
 
 	/* Confirmation: label text (detecting hardware: xxx) */
 	if (!Confirm::Detection (_("Sound Cards")))
+	{
 	    detected_cards = [];
+	    return true;
+	}
 
 	// do noop if cards were already detected
 	if (size (detected_cards) > 0)
