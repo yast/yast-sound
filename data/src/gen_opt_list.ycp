@@ -2,6 +2,34 @@
     include "browser.ycp";
     include "gen_routines.ycp";
 
+    global define translate_descr(string descr) ``{
+	list matches = [
+	    "(.*for) (.*) (soundcard.)",
+            "(.*for) (.*) (driver.)",
+            "(.*for) (.*) (interface.)",
+            "(.*for) (.*) (MIDI.)",
+            "(.*for) (.*) (bridge.)" ];
+
+	list guess = maplist(`e, matches,
+	    ``(regexptokenize(descr, e))
+	);
+
+	guess = filter(`e, guess, ``(size(e)==3));
+
+	if (size(guess) >= 1)
+	{
+	    list l = select(guess, 0, []);
+	    y2error("translating %1...", descr);
+	    string s = sformat("%1 %%1 %2", select(l, 0, ""), select(l, 2, ""));
+	    any a = s;
+	    locale loc = a;
+	    return [loc, select(l, 1, "")];
+	}
+	any a = descr;
+	locale l = a;
+	return l;
+    }
+
     // collect param descriptions of all snd-card-* modules
 
     map mod_idx = SCR::Read(.target.ycp, "./src/module_index.ycp");
@@ -61,7 +89,7 @@
     maplist(`e, gs,
     ``{
 	lx = regexptokenize(e, pattern);
-	y2error(e);
+//	y2error(e);
 	if (size(lx) > 0 && !contains(["snd_index", "snd_enable", "snd_id"], select(lx, 1, "")))
 	{
 	    tmpmap = parse_line(select(lx, 2, ""));
@@ -74,15 +102,15 @@
 	    descr = lookup(lookup(modopts, modname, $[]), parmname, $[]);
 
 	    // these two declaration must be here
-	    any anydescr = descr;
-	    locale locdescr = anydescr;
+	    any anydescr = translate_descr(descr);
+//	    locale locdescr = anydescr;
 
-	    y2error("%1 %2 %3", modname, parmname, tmpmap);
+//	    y2error("%1 %2 %3", modname, parmname, tmpmap);
 
 	    map oldmap = lookup(database, modname, $[]);
 	    map oldopts = lookup(oldmap, "params", $[]);
 
-	    tmpmap = add (tmpmap, "descr", locdescr);
+	    tmpmap = add (tmpmap, "descr", anydescr); //locdescr);
 
 	    oldopts = add(oldopts, parmname, tmpmap);
 	    oldmap = add(oldmap, "params", oldopts);
