@@ -176,9 +176,9 @@
 
 	if (module_name == "snd-card-nm256"){
 	    // special warning message for in a special case
-	    string warn_text = UI(_("Configuring this sound card on some Sony notebooks
-may be unsuccessful with running X. You may avoid these problems by specifying snd_buffer-top
-option value or configuring this card outside X. Proceed?"));
+	    string warn_text = UI(_("Configuring this sound card on some Sony VAIO notebooks
+may be unsuccessful with running X. You may avoid these problems by specifying snd_vaio_hack
+option value to 1 or configuring this card outside X. Proceed?"));
 	    return UI(`WarnDialog (warn_text));
 	}
 	return true;
