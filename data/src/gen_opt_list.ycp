@@ -1,6 +1,5 @@
 {
     include "./include/gen_routines.ycp";
-//    include "gen_routines.ycp";
 
     global define translate_descr(string descr) ``{
 	list matches = [
@@ -99,9 +98,11 @@
     maplist(`e, gs,
     ``{
 	lx = regexptokenize(e, pattern);
-//	y2error("e = %1", e);
-//	y2error("lx = %1", lx);
-	if (size(lx) > 0 && !contains(["snd_index", "snd_enable", "snd_id"], select(lx, 1, "")))
+	parmname = select(lx, 1, "");
+    if (substring (parmname, 0, 4) != "snd_")
+        parmname = "snd_" + parmname;
+	if (size(lx) > 0 &&
+        !contains(["snd_index", "snd_enable", "snd_id"], parmname))
 	{
 	    tmpmap = parse_line(select(lx, 2, ""));
 	    modname = select(lx, 0, "");
@@ -109,8 +110,6 @@
 	    {
 		return;
 	    }
-	    parmname = select(lx, 1, "");
-        parmname = "snd_" + parmname;
 	    descr = lookup(lookup(modopts, modname, $[]), parmname, " ");
 
 	    // these two declaration must be here

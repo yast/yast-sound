@@ -1,5 +1,5 @@
 {
-    include "gen_routines.ycp";
+    include "./include/gen_routines.ycp";
 
     string pattern = "(snd-[^ \t]*)[\t ]*(0x[0-9a-f]*)[\t ]*(0x[0-9a-f]*).*";
 
