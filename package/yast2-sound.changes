@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Sun Jul 07 22:43:21 CEST 2002 - arvin@suse.de
+
+- moved non binary files to /usr/share/YaST2
+
+-------------------------------------------------------------------
 Mon Jul  1 10:24:03 CEST 2002 - lslezak@suse.cz
 
 - merged yast2 sound packages: yast2-agent-audio,
@@ -158,14 +163,14 @@ Thu Oct  4 14:19:08 CEST 2001 - dmeszar@suse.cz
 -------------------------------------------------------------------
 Fri Sep 21 12:16:42 CEST 2001 - dmeszar@suse.cz
 
-- bug #7198 fixed (warning popup for nm256 sound cards 
-  not shown when the card is configured and module is 
+- bug #7198 fixed (warning popup for nm256 sound cards
+  not shown when the card is configured and module is
   launched again)
 
 -------------------------------------------------------------------
 Thu Sep 20 13:48:34 CEST 2001 - dmeszar@suse.cz
 
-- bug #10941 ('nil' shown as card label when uniq_id has changed 
+- bug #10941 ('nil' shown as card label when uniq_id has changed
   after update)
 - comment added for translators
 
@@ -173,7 +178,7 @@ Thu Sep 20 13:48:34 CEST 2001 - dmeszar@suse.cz
 Tue Sep 18 15:49:56 CEST 2001 - dmeszar@suse.cz
 
 - corrected abort behaviour in complex dialog (#not reported)
-  (when user pressed abort, module ended even if she pressed 
+  (when user pressed abort, module ended even if she pressed
   'no' in 'really abort' dialog)
 
 -------------------------------------------------------------------
@@ -220,7 +225,7 @@ Wed Aug 29 10:10:05 CEST 2001 - dmeszar@suse.cz
 -------------------------------------------------------------------
 Mon Aug 27 15:48:05 CEST 2001 - dmeszar@suse.cz
 
-- use module name as alias 'char-major-14' on sparc 
+- use module name as alias 'char-major-14' on sparc
   instead of 'sound'
 
 -------------------------------------------------------------------
@@ -280,13 +285,13 @@ Mon Jul 23 12:59:27 CEST 2001 - dmeszar@suse.cz
 Tue May 15 15:17:09 CEST 2001 - dmeszar@suse.cz
 
 - doubled text fixed. when a new card is manually added, module description is
-  used as a manufacturer name. (bug #8315, file routines.ycp). 
+  used as a manufacturer name. (bug #8315, file routines.ycp).
 - fixed bug in adding sound cards. (not reported)
-  (files routines.ycp, sound_complex- list of all cards was compared 
+  (files routines.ycp, sound_complex- list of all cards was compared
   against /var/lib/YaST/unique.inf, which was not correct. dialog
   with the choice "Add autodetected"/"Select from list" was not shown
   properly.  now it's compared
-  with local copy of unique keys list. new parameter added to get_not_yet 
+  with local copy of unique keys list. new parameter added to get_not_yet
   (function returning list of not configured soundcards))
 - removed commented block of source code from 'sound_summary.ycp'
 
@@ -314,12 +319,12 @@ Thu May 10 12:07:56 CEST 2001 - dmeszar@suse.cz
 -------------------------------------------------------------------
 Mon May  7 17:16:08 CEST 2001 - dmeszar@suse.cz
 
-- module options fixed, card removing fixed 
+- module options fixed, card removing fixed
 
 -------------------------------------------------------------------
 Mon Apr 30 16:21:03 CEST 2001 - dmeszar@suse.cz
 
-- sound fonts loading enabled, abort dialog unified, summary spaces fixed 
+- sound fonts loading enabled, abort dialog unified, summary spaces fixed
 
 -------------------------------------------------------------------
 Tue Apr 24 16:08:09 CEST 2001 - ro@suse.de
@@ -360,12 +365,12 @@ Fri Mar 30 11:35:16 CEST 2001 - dmeszar@suse.cz
 -------------------------------------------------------------------
 Sat Mar 17 16:41:04 CET 2001 - dan@suse.cz
 
-- ycpdoc removed from requires 
+- ycpdoc removed from requires
 
 -------------------------------------------------------------------
 Wed Mar  7 11:12:27 CET 2001 - dan@suse.cz
 
-- package rename 
+- package rename
 
 -------------------------------------------------------------------
 Thu Jan 25 16:39:14 CET 2001 - dan@suse.cz
@@ -375,17 +380,17 @@ Thu Jan 25 16:39:14 CET 2001 - dan@suse.cz
 -------------------------------------------------------------------
 Mon Jan 22 16:33:58 CET 2001 - dan@suse.cz
 
-- another locale fix 
+- another locale fix
 
 -------------------------------------------------------------------
 Mon Jan 22 15:47:20 CET 2001 - dan@suse.cz
 
-- locale problem for displaying all cards fixed 
+- locale problem for displaying all cards fixed
 
 -------------------------------------------------------------------
 Thu Jan 18 10:20:19 CET 2001 - dan@suse.cz
 
-- options passing fix (bug 5855) 
+- options passing fix (bug 5855)
 
 -------------------------------------------------------------------
 Fri Jan 12 11:52:28 CET 2001 - kkaempf@suse.de
@@ -395,7 +400,7 @@ Fri Jan 12 11:52:28 CET 2001 - kkaempf@suse.de
 -------------------------------------------------------------------
 Fri Jan 12 04:38:11 CET 2001 - dan@suse.de
 
-- dialog sequence for one card fix 
+- dialog sequence for one card fix
 
 -------------------------------------------------------------------
 Wed Jan 10 16:15:41 CET 2001 - dan@suse.cz
@@ -436,12 +441,12 @@ Tue Dec 12 16:59:11 CET 2000 - kkaempf@suse.de
 -------------------------------------------------------------------
 Sat Dec  9 13:29:27 CET 2000 - dan@suse.cz
 
-- options exist test, disabling sound table omitted 
+- options exist test, disabling sound table omitted
 
 -------------------------------------------------------------------
 Fri Dec  8 13:26:35 CET 2000 - dan@suse.cz
 
-- spec file fix 
+- spec file fix
 
 -------------------------------------------------------------------
 Fri Dec  8 01:24:50 CET 2000 - kendy@suse.cz
@@ -461,7 +466,7 @@ Thu Dec  7 16:00:25 CET 2000 - arvin@suse.de
 -------------------------------------------------------------------
 Thu Dec  7 09:03:44 CET 2000 - dan@suse.cz
 
-- y2d_snd is required, amixer call differ for more cards 
+- y2d_snd is required, amixer call differ for more cards
 
 -------------------------------------------------------------------
 Wed Dec  6 13:08:08 CET 2000 - kkaempf@suse.de
@@ -484,22 +489,22 @@ Wed Sep 27 11:18:00 CEST 2000 - dan@suse.cz
 -------------------------------------------------------------------
 Mon Sep 18 17:00:46 CEST 2000 - dan@suse.cz
 
-- exception for ppc hardcoded 
+- exception for ppc hardcoded
 
 -------------------------------------------------------------------
 Thu Jul 13 09:21:50 MEST 2000 - dan@suse.de
 
-- minor fixes ('\n' added, etc.) 
+- minor fixes ('\n' added, etc.)
 
 -------------------------------------------------------------------
 Tue Jul 11 11:14:06 MEST 2000 - dan@suse.de
 
-- fixed writing of modules.conf (last line) 
+- fixed writing of modules.conf (last line)
 
 -------------------------------------------------------------------
 Tue Jul  4 16:59:01 MEST 2000 - dan@suse.de
 
-- fixed aplay calling 
+- fixed aplay calling
 
 -------------------------------------------------------------------
 Mon Jul  3 10:27:16 CEST 2000 - kkaempf@suse.de
@@ -515,7 +520,7 @@ Thu Jun 29 14:31:03 CEST 2000 - kkaempf@suse.de
 -------------------------------------------------------------------
 Tue Jun 27 13:35:59 MEST 2000 - dan@suse.de
 
-- more comments for translators 
+- more comments for translators
 
 -------------------------------------------------------------------
 Mon Jun 26 18:18:03 CEST 2000 - kkaempf@suse.de
@@ -526,22 +531,22 @@ Mon Jun 26 18:18:03 CEST 2000 - kkaempf@suse.de
 -------------------------------------------------------------------
 Fri Jun 23 11:16:51 MEST 2000 - dan@suse.de
 
-- comments for translators added 
+- comments for translators added
 
 -------------------------------------------------------------------
 Wed Jun 21 13:19:01 MEST 2000 - dan@suse.de
 
-- messages correction 
+- messages correction
 
 -------------------------------------------------------------------
 Tue Jun 20 11:01:17 CEST 2000 - dan@suse.de
 
-- fixed volume setting 
+- fixed volume setting
 
 -------------------------------------------------------------------
 Fri Jun 16 10:59:13 MEST 2000 - dan@suse.de
 
-- minor layout changes 
+- minor layout changes
 
 -------------------------------------------------------------------
 Fri May 19 09:44:08 CEST 2000 - kkaempf@suse.de

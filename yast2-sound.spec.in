@@ -1,6 +1,6 @@
 @HEADER-COMMENT@
 
-# neededforbuild  alsa alsa-devel autoconf automake dejagnu expect gpp hwinfo libgpp tcl yast2 yast2-core yast2-core-devel yast2-devtools yast2-runlevel yast2-testsuite
+# neededforbuild  alsa alsa-devel gpp hwinfo libgpp yast2-devel-packages yast2-runlevel yast2-testsuite
 
 @HEADER@
 
@@ -29,7 +29,6 @@ configure sound card.
 %dir @yncludedir@/sound
 @yncludedir@/sound/*.ycp
 @clientdir@/sound*.ycp
-@clientdir@/proposal_sound.ycp
 @clientdir@/joystick.ycp
 @configdir@/sound.y2cc
 @configdir@/joystick.y2cc
@@ -48,4 +47,3 @@ configure sound card.
 @plugindir@/libpy2ag_audio.la
 %docdir @docdir@
 %doc @docdir@/*
-
