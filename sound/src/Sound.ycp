@@ -620,7 +620,7 @@ could make your system unstable.
 	    if (use_ui)
 	    {
 		string message = _("Loading the sound card database...");
-		UI::`OpenDialog(`opt(`decorated), `Label(message));
+		UI::OpenDialog(`opt(`decorated), `Label(message));
 	    }
 	    textdomain "sound_db";
 	    y2debug("Reading card database");

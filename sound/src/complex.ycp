@@ -169,7 +169,7 @@ Try to restart sound system?")))
 		SCR::Execute(.audio.alsa.restore, 0, 0);
 	    }
 
-	    ui = (symbol) UI::`UserInput ();
+	    ui = (symbol) UI::UserInput ();
 
 	    if (ui == `b_delete)
 	    {
