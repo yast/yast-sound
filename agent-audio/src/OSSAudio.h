@@ -14,8 +14,6 @@
 #include <scr/SCRAgent.h>
 #include <scr/SCRInterpreter.h>
 
-//int blah(int X = 0, string Y);
-
 /** 
  *  volume setting
  *  @param card card id
