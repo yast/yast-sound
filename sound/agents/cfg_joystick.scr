@@ -28,5 +28,5 @@
 .sysconfig.joystick
 
 `ag_ini(
-  SysConfigFile("/etc/sysconfig/joystick")
+  SCR::SysConfigFile("/etc/sysconfig/joystick")
 )
