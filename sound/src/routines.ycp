@@ -287,6 +287,8 @@
      */
     global define map get_module (map card) ``{
 
+	Sound::LoadDatabase();
+
 	string bus        = lookup (card, "bus", "");
 	integer offset    = (tolower (bus) == "isa") ? 0x20000 : 0x10000;
 	integer vendor_id = lookup (card, "vendor_id", 0) - offset;

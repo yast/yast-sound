@@ -21,6 +21,8 @@
 
     textdomain "sound";
 
+    // REMOVEME
+
     import "Arch";
     import "Runlevel";
 
@@ -354,12 +356,14 @@ in order to configure sound cards."));
 
 //#    list save_info    = read_save_info ();
     // module initialization
-    Sound::LoadDatabase(); // FIXME TODO read on demand
+//    Sound::LoadDatabase(); // FIXME TODO read on demand
 //    Sound::DetectHardware();
     if (!Sound::autoinstallation)
     {
 	Sound::Read(``{});
     }
+
+    Sound::use_ui = true;
 
     /*
      * this variable will not be touched.
