@@ -99,12 +99,8 @@
     ``{
 	lx = regexptokenize(e, pattern);
 	parmname = select(lx, 1, "");
-	if (substring (parmname, 0, 4) != "snd_" && parmname != "")
-	{
-	    parmname = "snd_" + parmname;
-	}
 	if (size(lx) > 0 &&
-        !contains(["snd_index", "snd_enable", "snd_id"], parmname))
+        !contains(["index", "enable", "id"], parmname))
 	{
 	    tmpmap = parse_line(select(lx, 2, ""));
 	    modname = select(lx, 0, "");
