@@ -179,7 +179,7 @@ before pressing Next.
             boolean test = true;
             if (SCR::Execute(.target.bash, "rpm -q joystick")!=0)
             {
-                if (UI::YesNoPopup(_("To test your joystick now, the \"joystick\" package is required.
+                if (UI::YesNoPopup(_("To test your joystick, the \"joystick\" package is required.
 It is currently not installed. Install it now?
 ")))
                 {
