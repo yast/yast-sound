@@ -169,7 +169,7 @@
             `VBox
             (
                     // error message
-              `Label (_("Your soud card is ready to use.")),
+              `Label (_("Your sound card is ready to use.")),
               `VSpacing (),
               `Label (`opt(`outputField), hardware_name (card)),
               `VSpacing (),
