@@ -293,7 +293,7 @@
 	    {
 		if (contains(SCR::Dir(.audio.alsa.cards), sformat("%1", i)))
 		{
-		    chans = SCR::Dir(topath(
+		    chans = (list<string>) SCR::Dir(topath(
 			sformat(".audio.alsa.cards.%1.channels", i)));
 		}
 		else
