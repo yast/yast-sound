@@ -147,7 +147,7 @@
 	    string err = "";
 	    
 	    if (Shell("/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`") == 127)
-		return UI (_("Cannot make a list of module dependencies.\nProgram 'depmod' missing,\nplease check 'modules' package (series 'a1')."));
+		return UI (_("Cannot make a list of module dependencies.\nProgram 'depmod' missing,\nplease check 'modules' package (series 'a')."));
 	    
 	    err = ConfModules (modules_conf);
 
@@ -155,12 +155,12 @@
 		return err;
 
 	    if (Shell("/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`") == 127)
-		return UI (_("Cannot make a list of module dependencies.\nProgram 'depmod' missing,\nplease check 'modules' package (series 'a1')."));
+		return UI (_("Cannot make a list of module dependencies.\nProgram 'depmod' missing,\nplease check 'modules' package (series 'a')."));
 
 		//if (Shell ("/usr/sbin/alsactl store") == 127)
 		//return UI(_("Cannot find 'alsactl'\nPlease check your installation of ALSA package (series 'snd1')"));
 	    if (EnableJoystick () == 127)
-		return UI(_("Cannot find 'alsactl'\nPlease check your installation of ALSA package (series 'snd1')"));
+		return UI(_("Cannot find 'alsactl'\nPlease check your installation of ALSA package (series 'snd')"));
 	    
 	    return "";
 	    

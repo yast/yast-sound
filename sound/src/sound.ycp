@@ -267,7 +267,7 @@
 
 		if (ret == 127) {
 			// To translators: This is just popup message, shouldn't be too long
-		    UI (`DisplayMessage (_("Cannot execute the program \"rpm\".\nPlease check if the 'rpm' package from the series 'a1' is installed.")));
+		    UI (`DisplayMessage (_("Cannot execute the program \"rpm\".\nPlease check if the 'rpm' package from the series 'a' is installed.")));
 
 		}
 

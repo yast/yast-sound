@@ -46,7 +46,7 @@
 	    integer ret = Shell ("/usr/bin/amixer set \"$DEV\" $VOL% unmute 2>/dev/null", $["DEV" : device, "VOL" : v]);
 	    if (ret == 127){
 				// To translators: This is just popup message, shouldn't be too long
-		UI (`DisplayMessage (_("Cannot find program 'amixer'.\nPlease install the package 'ALSA' from the 'snd1' series")));
+		UI (`DisplayMessage (_("Cannot find program 'amixer'.\nPlease install the package 'ALSA' from the 'snd' series")));
 	    }
 	    return ret;
 	};
@@ -188,7 +188,7 @@
 	    help_text = UI(_("<p>An error has occured. </p>"));
 				// Help text - intenal YaST2 error 2/3
 	    help_text = help_text + UI(_("<p>Check that you have
- installed the correct <b>ALSA</b> package (series 'snd1') and that
+ installed the correct <b>ALSA</b> package (series 'snd') and that
  you are running this as a root.</p>"));
 	    
 				// Help text - intenal YaST2 error 3/3
