@@ -4,6 +4,11 @@ Fri Jan 12 11:52:28 CET 2001 - kkaempf@suse.de
 - bump version for latest fixes
 
 -------------------------------------------------------------------
+Fri Jan 12 04:38:11 CET 2001 - dan@suse.de
+
+- dialog sequence for one card fix 
+
+-------------------------------------------------------------------
 Wed Jan 10 16:15:41 CET 2001 - dan@suse.cz
 
 - don't call complex dialog when just one sound card is beeing installed
