@@ -183,7 +183,7 @@
      * saves uniq keys to .probe.status
      * @param configured list of strings of configured cards uniq keys
      * @param unconfigured list of string of unconfigured cards uniq keys
-     * @return boolean
+     * @return boolean true
      */
 
     global define boolean SaveUniqueKeys(list configured, list unconfigured) ``{

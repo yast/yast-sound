@@ -33,7 +33,7 @@
  *              ]
  *         ]
  *
- *	   2nd ... rc_values
+ *	   2nd ... sysconfig values
  *	   $[
  *		"LOAD_SEQUENCER" : "yes"
  *         ]
@@ -155,7 +155,7 @@
     if (!autoinstall) { Progress::NextStage(); }
 
     step = step + 1;
-    SaveModulesEntry(save_info, [], false);
+    SaveModulesEntry(save_info, []);
 
     if (!autoinstall) { sleep(100); Progress::NextStage(); }
     step = step + 1;

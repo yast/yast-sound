@@ -134,6 +134,11 @@
 	joystick_backup = joystick;
     }
 
+    /**
+     * Return configuration status
+     * @return true if configuration was changed
+     */
+
     global define boolean Changed() ``{
 	if (joystick != joystick_backup)
 	{

@@ -47,7 +47,7 @@
      * @param cname sound card alias for modules conf
      * @param cpos cards position
      * @param flags enable/disable radiobuttons accordingly
-     *
+     * @param has_joy sound card supports joystick
      * @return map symbol of next dialog
      */
 
@@ -119,7 +119,7 @@
      * @param name card model
      * @param cname alias for modules conf
      * @param cpos position of the soud card
-     * @param flags enable/disable radio buttons
+     * @param has_joy set to true if configured card supports joystick
      * @return map symbol for next dialog
      */
 
@@ -325,7 +325,6 @@
     /**
      * widget for complex dialog
      * @param cc list of configured cards
-     * @param start_alsa check/ucheck start_alsa checkbox
      * @param start_alsa_seq as previous
      * @param show_font_but show button for sound fonts installation
      * @return widget

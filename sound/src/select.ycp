@@ -24,7 +24,7 @@
 
     /**
      * dialog with list of unconfigured hardware
-     * @param sound_cardsunconfigured cards
+     * @param sound_cards unconfigured cards
      * @param save_info configured cards
      * @return map result
      *

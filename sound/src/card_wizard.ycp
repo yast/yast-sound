@@ -85,11 +85,10 @@ global define symbol _optVolume()
      * Wizard steps: 1. displayname 
      * <br>
      * 2. modprobe and volume settings
-     * @param   card_info as returned by libhd
-     * @param   car_id index of configured car
+     * @param   card_id index of configured car
      * @param   flags defines which radioboxes has to be enabled (0x1 - first, 0x2 second, 0x4 third...)
      * @param   finish true if no complex dialog is to be called (then the popup "Config will be saved.." will appear)
-     * @return  list with save info, as required by sound_write for one cards
+     * @return  map with save info, as required by sound_write for one cards
      */
 global define map OneCardWizard (map save_entry, integer card_id,  
 			     integer flags, boolean finish, list save_info) ``{
