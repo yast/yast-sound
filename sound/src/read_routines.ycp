@@ -91,7 +91,7 @@
      *	    ],
      *	    $[...]
      *	]
-     * @return ist 
+     * @return list
      */
     global define list read_save_info () ``{
         string prefix = "";
@@ -122,7 +122,8 @@
 
 		integer opt_pos = lookup(mod_occur, modname, 0);
 
-		mod_occur = add(mod_occur, modname, lookup(mod_occur, modname, 0) + 1);
+		mod_occur = add (mod_occur, modname,
+		    lookup(mod_occur, modname, 0) + 1);
 
 		map options = SCR::Read(add (.modules.options, modname));
 		options = mapmap(`k, `v, options,
@@ -137,47 +138,21 @@
 		);
 
 		string comment = SCR::Read(add (add (.modules.alias, e), "comment"));
-		// first remove trash from the end and beginning of the comment string
+		// read card info from the comment string
 		string uniq = "";
 		string model = "";
-		map res = extractUniqueKey(comment); //  parseModuleComment(comment);
+		map res = extractUniqueKey(comment);
 		y2debug("%1", res);
 		if (res != nil)
 		{
-		    uniq = lookup(res, "unique_key", ""); //substring(comment, 0, pos);
-		    model = lookup(res, "name", ""); //substring(comment, pos+1, size(comment)-pos-1);
+		    uniq = lookup(res, "unique_key", "");
+		    model = lookup(res, "name", "");
 		}
-
 		else
 		{
 		    // probably system upgrade
-		    list cards = Sound::detected_cards;
-		    // although the /var/lib/YaST/unique.inf is deprecated since 8.0,
-		    // sometimes (if it exists) can help to assign old configuration
-		    // to detected hardware (this applies only to upgrade)
-
-            // but there is no agent for reading...
-		    list keys = read_unique_keys();
-		    if (size(keys) <= position)
-		    {
-			uniq = isa_uniq();
-			model = read_card_name_from_alsa(position);
-		    }
-		    else
-		    {
-			string key = select(keys, position, "");
-			list card = filter(`cc, cards, ``(lookup(cc, "unique_key", "") == key));
-			if (size(card) > 0)
-			{
-			    uniq = key;
-			    model = get_card_label(select(card, 0, ""));
-			}
-			else
-			{
-			    uniq = isa_uniq();
-			    model = read_card_name_from_alsa(position);
-			}
-		    }
+		    uniq = isa_uniq();
+		    model = read_card_name_from_alsa(position);
 		}
 
 		entry = $[    "alias"	: e,
@@ -191,9 +166,7 @@
 	    });
 
         }
-
         return save;
     }
-
 
 }

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon May 12 09:59:19 CEST 2003 - jsuchome@suse.de
+
+- probe old ISA cards with alsaconf (#25285)
+- added Progress steps to Read function
+- 2.8.1 
+
+-------------------------------------------------------------------
 Thu Mar 20 15:40:09 CET 2003 - jsuchome@suse.de
 
 - adapted to Require interface

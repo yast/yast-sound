@@ -73,7 +73,10 @@
 		ret = Sound::Export();
 	}
 	else if (func == "Read") {
-		ret = Sound::Read(``{});
+		import "Progress";
+		Progress::off();
+		ret = Sound::Read(false);
+		Progress::on();
 	}
 	/* Write givven settings */
 	else if (func == "Write") {

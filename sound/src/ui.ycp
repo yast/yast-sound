@@ -376,7 +376,6 @@
                     // table header labels
                         `header(_("Number"), _("Card model"), _("State")), cc),
                     `VSpacing (0.5),
-            // Delete - button label
                     `HBox
                     (
 			// push button label

@@ -49,10 +49,9 @@
         if (haskey (entry, "alias"))
         {
             ret = ret && SCR::Write(mod_alias, entry["module"]:"off");
-
-		    string comment = createAliasComment( entry ["model"]: "",
-                entry ["unique_key"]:"");
-	        ret = ret && SCR::Write(mod_alias_comment, comment);
+	    string comment = createAliasComment( entry ["model"]: "",
+		entry["unique_key"]:"");
+	    ret = ret && SCR::Write(mod_alias_comment, comment);
         }
         return ret;
     }

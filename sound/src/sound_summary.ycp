@@ -22,7 +22,10 @@
     textdomain "sound";
 
     import "Sound";
+    import "Progress";
 
-    Sound::Read(``{});
+    Progress::off();
+    Sound::Read(false);
+    Progress::on();
     return Sound::Summary();
 }
