@@ -73,7 +73,7 @@
     });
 
     // now add manual add-ons if available
-    list ladd = SCR::Read(.target.ycp, "./card_addons.ycp");
+    list ladd = SCR::Read(.target.ycp, "./addons/card_addons.ycp");
     foreach(`e, ladd,
     ``{
 	integer i = lookup(index, select(e, 0), -1);
