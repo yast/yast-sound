@@ -156,9 +156,8 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 from your Soundblaster Live! / AWE driver CD ?")),
 
 	    "soundFontAppeal":
-	    // to translators: %1 will be replaced by eg. 'cdrom'
 	    UI(_("Please insert the driver CD for the 
-Soundblaster Live! / AWE card in drive %1.")),
+Soundblaster Live! / AWE card in the cdrom drive.")),
 
 	    "soundFontFinal":
 	    // To translators: the messaage below will look like this: "14 soundfont-files have been installed in /usr/lli/asdf"
