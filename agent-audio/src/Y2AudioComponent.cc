@@ -16,6 +16,8 @@ Y2AudioComponent::~Y2AudioComponent()
 {
     if (interpreter) {
         delete interpreter;
+    }
+    if(agent) {
         delete agent;
     }
 }
