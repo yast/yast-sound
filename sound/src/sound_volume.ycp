@@ -274,10 +274,12 @@ boolean need_restart=true;
 //	    y2error("alsa restarted");
 //	    SCR(`Execute(.target.bash, "/etc/init.d/rcalsasound restart", $[]));
 //	}
+	boolean use_alsa=true;
 	if (use_alsa)
         {
             maplist (`dev, ["Master", "PCM", "PCM,1", "Wave", "Master Digital", "Synth"],
-                           ``(SetVolume (lookup (user_settings, "mixer", "amixer"), dev, sformat ("%1", 70), card_id)));
+    		    ``(SetVolume (lookup (user_settings, "mixer", "amixer"), dev, sformat ("%1", 70), card_id)));
+//                           ``(SetVolume (lookup (user_settings, "mixer", "amixer"), dev, "70"), card_id));
         }
 	if(!quick)
 	{

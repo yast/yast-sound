@@ -1212,6 +1212,7 @@
 
 	string cmd=sformat("/bin/grep \"alias.*snd-card-[0-9]\" %1 | cut -f 3 | sort | uniq | while read A ;do modprobe -C %2 $A; done", get_tmp_modules_conf(), get_tmp_modules_conf());
 	SCR(`Execute(.target.bash, cmd, $[]));	
+	SCR(`Execute(.target.bash, "/usr/sbin/alsactl restore", $[]));
     }
  
     /** 
