@@ -86,7 +86,7 @@
     string helptext	= "";
     string err_msg	= "";
 
-    list save_info	= Args (0);
+    list save_info	= []; //Args (0);
     boolean use_alsa	= true;
     boolean autoinstall = false;
 
