@@ -139,6 +139,12 @@
     global integer default_volume = 75;
 
     /**
+     * This is true, if sound data were read from /etc/modprobe.conf
+     * On write, they shoud be removed and written only to /etc/modprobe.d/sound
+     */
+    global boolean used_modprobe_conf	= false;
+
+    /**
      * backup structures for sound settings
      */
     list<map> modules_conf_b = nil;
@@ -929,7 +935,8 @@ could make your system unstable.
      */
     global define boolean Changed() ``{
 	if (modules_conf != modules_conf_b ||
-	    rc_vars != rc_vars_b)
+	    rc_vars != rc_vars_b ||
+	    used_modprobe_conf)
 	{
 	    return true;
 	}

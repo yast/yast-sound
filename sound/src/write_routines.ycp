@@ -43,11 +43,7 @@
      * @return boolean success/failure
      */
     define boolean SaveOneModulesEntry (map entry) ``{
-	/*
-        path mod_alias		= add (.modules.alias, entry ["alias"]:"off");
-        path mod_alias_comment	=
-            add ( add (.modules.alias, entry ["alias"]:"off"), "comment");
-	*/
+
         path mod_alias	= add (.modprobe_sound.alias, entry ["alias"]:"off");
         path mod_alias_comment	=
             add ( add (.modprobe_sound.alias, entry ["alias"]:"off"),"comment");
@@ -72,7 +68,6 @@
 
     define void SaveModulesOptions(list save_info) ``{
 
-//	path mod_options = .modules.options;
 	path mod_options = .modprobe_sound.options;
 
 	// create distinct list of all modules
@@ -88,49 +83,56 @@
     /**
      * removeOldAliases
      * @param als list with old aliases
-     *
      */
-
     define void removeOldEntries(list als) ``{
 	maplist(string e, (list<string>) als, ``{
 	    if (is_snd_alias(e) ||
 		issubstring(e, "sound-service-") ||
 		issubstring(e, "sound-slot-"))
 		{
-//		    SCR::Write( add (.modules.alias, e), nil);
 		    SCR::Write( add (.modprobe_sound.alias, e), nil);
 		}
 	});
-	// seting off-values due to kdm log (bug #19602)
-	integer i=0;
-	while (i<4)
-	{
-	    /*
-	    SCR::Write(add (.modules.alias, sformat ("sound-slot-%1", i)),
-		"off");
-	    SCR::Write(add (.modules.alias, sformat ("sound-service-%1-0", i)),
-		"off");
-	    */
-	    SCR::Write (add (.modprobe_sound.alias,
-		sformat ("sound-slot-%1", i)), "off");
-	    SCR::Write (add (.modprobe_sound.alias,
-		sformat ("sound-service-%1-0", i)), "off");
-	    i = i + 1;
-	}
     }
 
     /**
-     * Saves all '/etc/modules.conf' entries
+     * Remove sound configuration from /etc/modprobe.conf
+     */
+    define void RemoveOldConfiguration () ``{
+
+	y2milestone ("removing old sound configuration from /etc/modprobe.conf (it was already saved to /etc/modprobe.d/sound)");
+
+	path mod		= .modules;
+	path mod_alias		= .modules.alias;
+	path mod_options	= .modules.options;
+
+	if (contains(SCR::Dir(mod), "alias"))
+	{
+	    list<string> als = (list<string>)SCR::Read(mod_alias);
+	    foreach (string e, als, ``{
+		if (is_snd_alias(e) ||
+		    issubstring(e, "sound-service-") ||
+		    issubstring(e, "sound-slot-") ||
+		    e == "char-major-14" ||
+		    e == "char-major-116")
+		{
+		    SCR::Write (add (mod_alias, e), nil);
+		}
+	    });
+	}
+	// TODO remove also old options
+//	SCR::Write( add (mod_options, modname ), nil);
+	SCR::Write (mod, nil);
+    }
+
+    /**
+     * Saves all '/etc/modprobe.d/sound' entries
      * @param save_info cards save info
      * @param system sytem dependent part
      * @return map return struct: $["return": boolean, "err_msg": string]
      */
     define map SaveModulesEntry (list save_info, list system) ``{
-	/*
-	path mod		= .modules;
-	path mod_alias		= .modules.alias;
-	path mod_options	= .modules.options;
-	*/
+
 	path mod		= .modprobe_sound;
 	path mod_alias		= .modprobe_sound.alias;
 	path mod_options	= .modprobe_sound.options;
@@ -145,33 +147,17 @@
 	}
 	// remove old entries
 
-	removeOldEntries(als);
-
-	SCR::Write(add (mod_alias, "char-major-14"), "off");
-	SCR::Write(add (mod_alias,"char-major-116"), "off");
+	removeOldEntries (als);
 
 	if (size(save_info) >0)
 	{
-	    if (Sound::use_alsa)
-	    {
-		SCR::Write(add (mod_alias, "char-major-116"), "snd");
-		SCR::Write(add (add (mod_alias, "char-major-116"), "comment"), "\n# Alsa sound support. \n# Warning: please don't modify comments over " +
-		    "aliases 'snd-card-#'");
-		string cards_limit = Sound::snd_prefix() + "cards_limit";
-		string major = Sound::snd_prefix() + "major";
-		SCR::Write (add (mod_options, "snd"),
-		    $[ cards_limit: sformat ("%1", size(save_info)),
-		       major:"116"]);
-		SCR::Write(add (mod_alias, "char-major-14"), "off");
-	    }
-	    else
+	    if (!Sound::use_alsa)
 	    {
 		if (Arch::sparc)
 		{
 		    string modname = save_info[0, "module"]:"off";
 		    SCR::Write(add (mod_alias, "sound"), "sound-slot-0");
 		}
-		SCR::Write( add (mod_alias, "char-major-14"), "sound");
 	    }
 	}
 
@@ -182,6 +168,7 @@
             err_msg = err_msg + Sound::STRINGS["SaveModuleEntry"]:"";
             return $["return": false, "err_msg": err_msg];
         }
+	/* also this is not neccessary now... (?)
 	if (size(save_info) > 0 && Sound::use_alsa)
 	{
 
@@ -189,10 +176,15 @@
 	    foreach(map a, (list<map<string,any> >)oss_aliases, ``{
 		SCR::Write(add (mod_alias, a["alias"]:""), a["module"]:"");
 	    });
-	    SCR::Write(add (add (mod_alias, "sound-slot-0"), "comment"),
-            "\n\n\n# YaST2: sound system dependent part\n#\n");
 	}
+	*/
 	SCR::Write(mod, nil);
+
+	// now, when new configuration was succesfully written, we should remove
+	// the old one from /etc/modprobe.conf...
+	if (Sound::used_modprobe_conf)
+	    RemoveOldConfiguration ();
+
         return $["return" : true, "err_msg" : ""];
     }
 

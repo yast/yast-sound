@@ -16,6 +16,7 @@
  */
 
 {
+    import "Sound";
 
     include "sound/routines.ycp";// for is_snd_alias()
 
@@ -77,31 +78,23 @@
 
 
     /**
-     * reads already saved info from modules.conf
-     * @example of return value:
-     * [
-     *	    $[
-     *		"alias":    "snd-card-0",
-     *		"module":   "snd-card-emu10k1",
-     *		"options":  ["snd_id":"0", "snd_index":"card1"],
-     *		"unique_key":"asdf.asdfasdfasdf",
-     *		"model":    "Sound Blaster Live!"
-     *	    ],
-     *	    $[...]
-     *	]
+     * reads already saved info from given file
      * @return list
      */
-    define list<map> read_save_info () ``{
+    define list<map> read_modprobe (path mod_path) ``{
 
         list<map> save	= [];	// structure to save
 
+	/*
 	path mod_path	= .modprobe_sound;
 
 	// read from /etc/modprobe/conf if /etc/modprobe.d/sound is not present
 	if (SCR::Read(.target.size, "/etc/modprobe.d/sound") == -1)
 	{
-	    mod_path	= .modules;
+	    mod_path			= .modules;
+	    Sound::used_modprobe_conf	= true;
 	}
+	*/
 
 	path mod_alias	= add (mod_path, "alias");
 	path mod_options= add (mod_path, "options");
@@ -163,6 +156,37 @@
 	    save = add (save, entry);
 	});
         return save;
+    }
+
+    /**
+     * reads already saved info from modules.conf
+     * @example of return value:
+     * [
+     *	    $[
+     *		"alias":    "snd-card-0",
+     *		"module":   "snd-card-emu10k1",
+     *		"options":  ["snd_id":"0", "snd_index":"card1"],
+     *		"unique_key":"asdf.asdfasdfasdf",
+     *		"model":    "Sound Blaster Live!"
+     *	    ],
+     *	    $[...]
+     *	]
+     * @return list
+     */
+    define list<map> read_save_info () ``{
+
+	// First, read from /etc/modprobe.d/sound
+        list<map> saved	= read_modprobe (.modprobe_sound);
+	if (saved == [])
+	{
+	    // Nothing was there. So, try /etc/modprobe.conf...
+	    saved	= read_modprobe (.modules);
+	    if (saved != [])
+	    {
+		Sound::used_modprobe_conf	= true;
+	    }
+	}
+	return saved;
     }
 
 }//EOF
