@@ -18,6 +18,28 @@
     textdomain "sound";
 
     /**
+     * common function to extract 'name' of hardware
+     * @param hardware_entry map
+     * @return string
+     */
+
+    global define hardware_name (map hardware_entry) ``{
+        string sub_vendor = "";
+        string sub_device = "";
+
+        sub_vendor = lookup (hardware_entry, "sub_vendor", "");
+        sub_device = lookup (hardware_entry, "sub_device", "");
+
+        if ((sub_vendor != "") && (sub_device != ""))
+            return (sub_vendor + "\n" + sub_device);
+        else
+            return (lookup (hardware_entry, "vendor", "") + 
+                    ((lookup (hardware_entry, "vendor", "") != "") ? "\n" : "") + 
+                    lookup (hardware_entry, "device", ""));
+    };
+
+
+    /**
      * fliters out already configured cards
      * @param save_info info from modules.conf
      * @param cards autodetected cards

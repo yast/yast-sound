@@ -1,7 +1,6 @@
 {
     include "testsuite.ycp";
     include "sound/routines.ycp";
-    include "misc_defines.ycp";
 
     map card = $[];
 
