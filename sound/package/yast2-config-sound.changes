@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Apr 24 07:26:02 PDT 2001 - dmeszar@suse.cz
+
+- sound fonts loading temporarily removed
+
+-------------------------------------------------------------------
 Tue Apr 24 03:39:14 PDT 2001 - dmeszar@suse.cz
 
 - 'install sndfonts' button in summary dialog

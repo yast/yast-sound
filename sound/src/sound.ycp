@@ -243,7 +243,7 @@
     // get all the apropriate information from the database
     sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
 
-    // filter out modules with unspecified module name (sound card not supported by alsa)
+    // filter out modules with unspecified module name (sound card not supported by alsa / not autodetected)
     sound_cards = filter(`e, sound_cards, ``(lookup(e, "module", $[])!=$[]));
 
     integer all_cards_num=size(sound_cards);

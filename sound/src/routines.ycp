@@ -1195,6 +1195,7 @@
      */
     
     global define get_tmp_modules_conf() ``{
+	string tmpdir=SCR (`Read (.target.tmpdir));
 	// TODO: move this file to yast tmp dir
 	return "/tmp/modules.conf.tmp";
     }
@@ -1296,6 +1297,7 @@
      */
 
     global define HasFonts(map card) ``{
+	return false;
 	if(lookup(card, "sub_vendor_id", "0")==69890)
 	{
 	    return true;
