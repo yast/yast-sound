@@ -15,8 +15,6 @@
     lpci = maplist(`e, lpci, ``(regexptokenize(e, pattern)));
     lpci = filter(`e, lpci, ``(e!=[]));
 
-    BrowseTree(lpci);
-
     // now we have tripples: [modname, vendor_id, device_id]
 
     // isapnp map:
@@ -40,7 +38,7 @@
 
 
     // open the module index database
-    map mod_idx = SCR::Read(.target.ycp, "./module_index.ycp");
+    map mod_idx = SCR::Read(.target.ycp, "./src/module_index.ycp");
 
     // we need 'reverse' map od module index:
 
@@ -85,7 +83,6 @@
 	}
     });
 
-//    BrowseTree(output);
 
 
 

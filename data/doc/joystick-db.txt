@@ -1,0 +1,50 @@
+soundcard	module		control		port
+==============================================================
+PCI cards
+
+als4000		ns558
+cmipci		ns558		Joystick
+cs4281		off
+cs46xx		cs461x
+emu10k1		emu10k1-gp
+ens1370		ns558		Joystick
+ens1371		ns558		Joystick	0x200-0x207
+es1938		off
+es1968		ns558		Joystick
+fm801		fm801-gp
+sonicvibes	off
+trident		pcigame
+via686		ns558		(option snd_joystick=1)
+ymfpci		ns558		(option snd_joystick_port=0x201,202,204,205)
+
+(perhaps via686 and ymfpci will be configured via alsactl.)
+
+
+ISA (all with ns558)
+
+es1688		ns558
+es18xx		ns558
+cs4231		ns558
+cs4232		ns558
+cs4236		ns558
+gusclassic	ns558
+gusextreme	ns558
+gusmax		ns558
+interwave	ns558
+interwave-stb	ns558
+sb8		ns558
+sb16		ns558
+sbawe		ns558
+opl3sa2		ns558
+
+Unknown but possibly work (dependeing on pnp id..)
+
+ad1816a		ns558
+als100		ns558
+azt2320		ns558
+cmi8330		ns558
+sgalaxy		ns558
+opti92x-ad1848	ns558
+opti92x-cs4231	ns558
+opti93x		ns558
+wavefront	ns558

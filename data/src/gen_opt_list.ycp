@@ -4,7 +4,9 @@
 
     // collect param descriptions of all snd-card-* modules
 
-    map mod_idx = SCR::Read(.target.ycp, "./module_index.ycp");
+    map mod_idx = SCR::Read(.target.ycp, "./src/module_index.ycp");
+
+    BrowseTree(mod_idx);
 
     list mods = maplist(`k, `v, mod_idx, ``(v)); // SCR::Dir(.modinfo.misc);
 
@@ -39,6 +41,7 @@
     });
 
     string kernel_ver = lookup(SCR::Execute(.target.bash_output, "uname -r", $[]), "stdout", "");
+
     kernel_ver = select(splitstring(kernel_ver, "\n"), 0, "");
     string generic_string = SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.generic_string");
     list gs = splitstring(generic_string, "\n");
@@ -52,8 +55,6 @@
     string modname = "";
     string parmname = "";
     string descr = "";
-
-y2error("entering stage #6");
 
 
     maplist(`e, gs,
@@ -88,6 +89,5 @@ y2error("entering stage #6");
 	}
     });
 
-//    BrowseTree(database);
     SCR::Write(.target.ycp, "./modlist.ycp.in", database);
 }

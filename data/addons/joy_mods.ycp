@@ -1,0 +1,58 @@
+/**
+ *
+ * File:
+ *   joy_mods.ycp
+ *
+ * Module:
+ *   joystick/sound
+ *
+ * Authors:
+ *   Dan Meszaros <dmeszar@suse.cz>
+ *
+ * Summary:
+ *   database for information needed for joystick configuration
+ *   note that modules list is not exhaustive, because most modules
+ *   (isa pnp, first of all) don't need any special parameters-
+ *   they just need to have 'ns558' module loaded to kernel
+ *
+ * $Id$
+ *
+ */
+
+
+$[
+    "snd-cmipci":
+    $[
+	"control": "Joystick"
+    ],
+    "snd-cs4281":
+    $[
+	"module": "off"
+    ],
+    "snd-cs46xx":
+    $[
+	"module": "cs461x"
+    ],
+    "snd-emu10k1":
+    $[
+	"module": "emu10k1-gp"
+    ],
+    "snd-ens1370":
+    $[
+	"control": "Joystick"
+    ],
+    "snd-ens1371":
+    $[
+	"control": "Joystick"
+    ],
+    "snd-es1938":
+    $[
+	"module": "off"
+    ],
+    "snd-trident":
+    $[
+	"module": "pcigame"
+    ],
+    // FIXME: via686 & ymfpci modules
+    
+]
