@@ -52,11 +52,31 @@
      * @return map
      */
 	  
-    global define DisplayName (string name, string cname, integer cpos) ``{
+    global define DisplayName (string name, string cname, integer cpos, integer flags) ``{
 	string helptext=lookup(STRINGS, "DisplayName");
 	term con=AutoconfDlg(name, cname, cpos);
-		// dialog title
 	UI(`SetWizardContents (_("Sound card configuration"), con, helptext, true, true));
+		// dialog title
+	integer flagc=1;
+	integer flagp=0;
+	integer selected=false;
+	while(flagp<4)
+	{
+	    if((flagc & flags) ==0)
+	    {
+		UI(`ChangeWidget(`id(flagp), `Enabled, false));
+	    }
+	    else
+	    {
+		if(!selected)
+		{
+		    selected=true;
+		    UI(`ChangeWidget(`id(`action), `CurrentButton, flagp));
+		}
+	    }
+	    flagp=flagp+1;
+	    flagc=flagc*2;
+	}
 		// Next button label    
 	UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
 	symbol input=UI(`UserInput());

@@ -158,6 +158,8 @@
 	if (size (cc) == 0) 
 	{
 	    UI(`ChangeWidget(`id(`b_delete), `Enabled, false));
+	    UI(`ChangeWidget(`id(`b_options), `Enabled, false));
+
 	}
 	else 
 	{
@@ -232,6 +234,7 @@
 		{
 		    SCR(`Execute (.target.bash, "/etc/init.d/alsasound stop", $[]));
 		    UI(`ChangeWidget(`id(`b_delete), `Enabled, false));
+		    UI(`ChangeWidget(`id(`b_options), `Enabled, false));
 		}
 		else
 		{ 
@@ -304,7 +307,7 @@
 		    
 			    if (size (card) > 0) 
 			    {
-				map result = OneCardWizard (card, size (save_info), ui);
+				map result = OneCardWizard (card, size (save_info), ui, 6);
 				any ui     = lookup (result, "ui", `cancel); 
 				if (ui == `next) 
 				{
@@ -347,7 +350,7 @@
 
 				    if (id == 0)
 				    {
-					dialog = add (dialog, ``(OneCardWizard (lookup (result, "return"), size (save_info), ui)));
+					dialog = add (dialog, ``(OneCardWizard (lookup (result, "return"), size (save_info), ui, 6)));
 				    }
 				    if (id == 1) 
 				    {
@@ -383,6 +386,7 @@
 		if (size (cc) == 0) 
 		{
 		    UI(`ChangeWidget(`id(`b_delete), `Enabled, false));
+		    UI(`ChangeWidget(`id(`b_options), `Enabled, false));
 		}
 		else
 		{

@@ -50,11 +50,14 @@
      * <br>
      * 2. modprobe and volume settings
      * @param   card_info as returned by libhd
+     * @param	car_id index of configured car
+     * @param	ui 
+     * @param	flags defines which radioboxes has to be enabled (0x1 - first, 0x2 second, 0x4 third...)
      * @return  list with save info, as required by sound_write for one cards
      */
-    global define OneCardWizard (map card, integer card_id, any ui) ``{
+    global define OneCardWizard (map card, integer card_id, any ui, integer flags) ``{
 	    // 3rd param for "sound_module" will be defined later
-	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id), card_id)),
+	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id), card_id, flags)),
 		    ``(CallModule ("sound_volume", [card, card_id, (size (sound_cards) == 1), quick] ))];
 
 	integer id = 0;
@@ -239,7 +242,7 @@
 	while ((card_id >= 0) && (card_id < size (sound_cards))) 
 	{
 
-	    result = OneCardWizard (select (sound_cards, card_id), size (save_info), condition (skipped, `next, ui));
+	    result = OneCardWizard (select (sound_cards, card_id), size (save_info), condition (skipped, `next, ui), 15);
 
 	    ui       = lookup (result, "ui", `cancel);
 	    use_alsa = lookup (result, "use_alsa", true);
