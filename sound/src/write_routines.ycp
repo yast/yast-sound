@@ -12,7 +12,7 @@
  *   API for writings sound configuration
  *
  * Authors:
- *   Dan Veselý <dan@suse.cz>
+ *   Dan Vesely <dan@suse.cz>
  *   Dan Meszaros <dmeszar@suse.cz>
  *
  *
@@ -23,6 +23,7 @@
 
     import "Arch";
     import "Sound";
+    import "HWConfig";
     include "sound/routines.ycp";
 
     /**
@@ -37,6 +38,68 @@
 	return comment;
     }
 
+    define string MergeOptions(map<string,string> options) {
+	string ret = "";
+
+	if (options != nil && size(options) > 0)
+	{
+	    foreach(string key, string val, options, {
+		    if (key != nil && key != "" && val != nil)
+		    {
+			if (ret == "")
+			{
+			    ret = key + "=" + val;
+			}
+			else
+			{
+			    ret = ret + " " + key + "=" + val;
+			}
+		    }
+		}
+	    );
+	}
+
+	return ret;
+    }
+
+    // search hwcfg-static file with required string in comment of MODULE variable
+    define string FindStaticHWConfig(string uniq) {
+	string file = nil;
+
+	// get all static configurations
+	list<string> configs = HWConfig::ConfigFiles();
+	configs = filter(string f, configs, {return regexpmatch(f, "^static-[0-9]*");});
+
+	// search existing config file
+	if (size(configs) > 0)
+	{
+	    integer greatest = -1;
+	    boolean found = false;
+
+	    // search existing config
+	    foreach(string f, configs, {
+		    if (!found)
+		    {
+			// read MODULE comment
+			string comment = HWConfig::GetComment(f, "MODULE");
+
+			if (comment != nil && comment != "")
+			{
+			    // search for sound alias and uniqID
+			    if (regexpmatch(comment, uniq))
+			    {
+				file = f;
+				found = true;
+			    }
+			}
+		    }
+		}
+	    );
+	}
+
+	return file;
+    }
+
     /**
      * Saves one '/etc/modules.conf' entry
      * @param entry card config
@@ -48,13 +111,100 @@
         path mod_alias_comment	=
             add ( add (.modprobe_sound.alias, entry ["alias"]:"off"),"comment");
 
+	y2debug("entry: %1", entry);
+
+	// save hwcfg config file
+	string file = "";
+	if (entry["bus"]:"" != "pci")
+	{
+	    y2milestone("The soundcard is not attached to PCI");
+
+	    // get all static configurations
+	    list<string> configs = HWConfig::ConfigFiles();
+	    configs = filter(string f, configs, {return regexpmatch(f, "^static-[0-9]*");});
+	    y2milestone("found static configs: %1", configs);
+
+	    // search existing config file
+	    if (size(configs) > 0)
+	    {
+		integer greatest = -1;
+		boolean found = false;
+
+		// search existing config
+		foreach(string f, configs, {
+			if (!found)
+			{
+			    // read MODULE comment
+			    string comment = HWConfig::GetComment(f, "MODULE");
+
+			    if (comment != nil && comment != "")
+			    {
+				y2debug("comment: %1", comment);
+				y2debug("alias: %1", entry["alias"]:"");
+				y2debug("unique_key: %1", entry["unique_key"]:"");
+				// search for sound alias and uniqID
+				if (regexpmatch(comment, entry["alias"]:"") && regexpmatch(comment, entry["unique_key"]:""))
+				{
+				    file = f;
+				    found = true;
+				    y2milestone("Found flags in file: %1", f);
+				}
+			    }
+
+			    if (!found)
+			    {
+				// not found, check config number
+				string num = regexpsub(f, "^static-([0-9]*)", "\\1");
+
+				if (num != nil)
+				{
+				    integer num_i = tointeger(num);
+				    if (num_i != nil && num_i > greatest)
+				    {
+					greatest = num_i;
+				    }
+				}
+			    }
+			}
+		    }
+		);
+
+		if (file == nil || file == "")
+		{
+		    y2debug("file empty, greatest: %1", greatest);
+		    // not found - create new config
+		    file = sformat("static-%1", greatest + 1);
+		}
+	    }
+	    else
+	    {
+		file = "static-0";
+	    }
+	}
+	else
+	{
+	    file = "bus-pci-" + entry["bus_id"]:"";
+	}
+	y2milestone("using hwcfg file: hwcfg-%1", file);
+
         boolean ret = true;
         if (haskey (entry, "alias"))
         {
+	    // set module name
+	    ret = ret && HWConfig::SetValue(file, "MODULE", entry["module"]:"");
+	    // set automatic start at boot
+	    ret = ret && HWConfig::SetValue(file, "STARTMODE", "auto");
+
+	    // TODO LATER: for now save options to modprobe.d only, later to hwcfg
+	    // string options = MergeOptions(entry["options"]:$[]);
+	    // ret = ret && HWConfig::SetValue(file, "MODULE_OPTIONS", options);
+
+	    string modcomment = createAliasComment(entry["model"]: "", entry["unique_key"]:"");
+	    string comment = "# YaST configured sound card " + entry["alias"]:"" + "\n" + modcomment;
+	    ret = ret && HWConfig::SetComment(file, "MODULE", comment);
+
             ret = ret && SCR::Write(mod_alias, entry["module"]:"off");
-	    string comment = createAliasComment( entry ["model"]: "",
-		entry["unique_key"]:"");
-	    ret = ret && SCR::Write(mod_alias_comment, comment);
+	    ret = ret && SCR::Write(mod_alias_comment, modcomment);
         }
         return ret;
     }
@@ -129,6 +279,40 @@
 	SCR::Write (mod, nil);
     }
 
+    define boolean RemoveHWConfig() {
+	boolean ret = true;
+
+	if (Sound::removed_info != nil)
+	{
+	    foreach(map info, Sound::removed_info, {
+		    string bus = info["bus_hwcfg"]:"";
+		    string bus_id = info["sysfs_bus_id"]:"";
+		    string uk = info["unique_key"]:"";
+
+		    if (bus == "pci")
+		    {
+			string file = "pci-" + bus_id;
+
+			y2milestone("Removing file: %1", file);
+			HWConfig::RemoveConfig(file);
+		    }
+		    else
+		    {
+			if (uk != nil && uk != "")
+			{
+			    string file = FindStaticHWConfig(uk);
+
+			    if (file != nil)
+			    {
+				y2milestone("Removing file: %1", file);
+				HWConfig::RemoveConfig(file);
+			    }
+			}
+		    }
+		}
+	    );
+	}
+    }
     /**
      * Saves all '/etc/modprobe.d/sound' entries
      * @param save_info cards save info
@@ -172,6 +356,13 @@
             err_msg = err_msg + Sound::STRINGS["SaveModuleEntry"]:"";
             return $["return": false, "err_msg": err_msg];
         }
+
+	// remove deleted sound cards
+	RemoveHWConfig();
+
+	// write the settings
+	HWConfig::Flush();
+
 	/* also this is not neccessary now... (?)
 	if (size(save_info) > 0 && Sound::use_alsa)
 	{
