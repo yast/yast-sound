@@ -209,7 +209,7 @@ y2error("entering stage #6");
 	    map oldmap = lookup(database, modname, $[]);
 	    map oldopts = lookup(oldmap, "params", $[]);
 
-	    tmpmap = add (tmpmap, "description", locdescr);
+	    tmpmap = add (tmpmap, "descr", locdescr);
 
 	    oldopts = add(oldopts, parmname, tmpmap);
 	    oldmap = add(oldmap, "params", oldopts);
@@ -217,6 +217,6 @@ y2error("entering stage #6");
 	}
     });
 
-    BrowseTree(database);
-    SCR::Write(.target.ycp, "./modlist.ycp", database);
+//    BrowseTree(database);
+    SCR::Write(.target.ycp, "./modlist.ycp.in", database);
 }

@@ -90,8 +90,8 @@
 	}
     });
 
-    BrowseTree(output);
+//    BrowseTree(output);
 
-    SCR::Write(.target.ycp, "./cardlist.ycp", output);
+    SCR::Write(.target.ycp, "./cardlist.ycp.in", output);
 
 }
