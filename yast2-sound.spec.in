@@ -1,6 +1,6 @@
 @HEADER-COMMENT@
 
-# neededforbuild  alsa alsa-devel autoconf automake dejagnu expect tcl yast2 yast2-core yast2-core-devel yast2-devtools yast2-testsuite gpp libgpp yast2-runlevel hwinfo
+# neededforbuild  alsa alsa-devel autoconf automake dejagnu expect gpp hwinfo libgpp tcl yast2 yast2-core yast2-core-devel yast2-devtools yast2-runlevel yast2-testsuite
 
 @HEADER@
 
@@ -16,9 +16,9 @@ configure sound card.
 
 @PREP@
 
-@BUILD-YCP@
+@BUILD@
 
-@INSTALL-YCP@
+@INSTALL@
 
 @CLEAN@
 
