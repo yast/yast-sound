@@ -68,7 +68,8 @@
     maplist(string e, l, {
 
 	toks = regexptokenize(e, "(snd-[^ \t]*)[\t ]*info_devices=");
-	if (lookup(index, toks[0]:" ", -1) == -1)
+	string firsttok = toks[0]:" ";
+	if (index[firsttok]:-1 == -1)
 	{
 	    return;
 	}
@@ -86,7 +87,8 @@
 		else
 		    vendors_cards [vendor] = [ card[0]:"" ];
 	    });
-	    output = add (output, lookup(index, toks[0]:" ", -1), cardlist);
+	    string ftok = toks[0]:" ";
+	    output = add (output, index[ftok]:-1, cardlist);
 	}
 
     });
@@ -97,7 +99,7 @@
 
     foreach (list e, ladd,
     {
-	integer i = lookup(index, e[0]:"", -1);
+	integer i = index[e[0]:""]:-1;
 	if (i == -1)
 	{
 	    y2error("module %1 not defined in module_index.ycp file!", e[0]:"");
@@ -115,7 +117,7 @@
 
 	if (haskey(output, i))
 	{
-	    list oldlist = lookup(output, i, []);
+	    list oldlist = output[i]:[];
 	    oldlist = add(oldlist, cardname);
 	    output = add(output, i, oldlist);
 	}

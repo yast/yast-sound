@@ -158,7 +158,7 @@ snd-sb8 dma8    enable:(enable),allows:{{0,1},{3}},dialog:list
 
 //	    if (haskey(joy_mods, modname))
 //	    {
-//		oldmap = add(oldmap, "joystick", lookup(joy_mods, modname, $[]));
+//		oldmap = add(oldmap, "joystick", joy_mods[modname]:$[]);
 //	    }
 	    database[modname]	= oldmap;
 	}

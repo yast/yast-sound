@@ -75,7 +75,7 @@
     {
 	vendor_id	= tointeger(e[1]:"");
 	device_id	= tointeger(e[2]:"");
-	mod_id		= lookup (index, e[0]:"", -1);
+	mod_id		= index[e[0]:""]:-1;
 	if (mod_id == -1)
 	{
 	    return;

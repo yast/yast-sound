@@ -19,6 +19,7 @@
     import "Progress";
     import "Label";
     import "Confirm";
+    import "String";
 
     /**
      * what sound system we're using (true=alsa, false=oss)
@@ -537,7 +538,7 @@ could make your system unstable.
 			if (size(m) > 0)
 			{
 			    modname = m[0,0]:"";
-			    modname = select(splitstring(modname, "."), 0, "");
+			    modname = String::FirstChunk(modname, ".");
 			}
 		    }
 		    return $[
@@ -1131,8 +1132,7 @@ could make your system unstable.
      * @param modname name of sound module
      */
     global define void  InitMixer(integer c_id, string modname) ``{
-        map devs = lookup(db_modules[modname]:$[], "mixer",
-            $["Master":70, "PCM":70, "CD":70, "Synth": 70]);
+        map devs = db_modules[modname, "mixer"]:$["Master":70, "PCM":70, "CD":70, "Synth": 70];
 
 	// now let's merge settings from volume_settings list
 	if (is (volume_settings[c_id]:nil, list))

@@ -331,8 +331,7 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
 	}
 	else
 	{
-	    string master_elem = lookup (Sound::db_modules[modname]:$[],
-		"main_volume", "Master");
+	    string master_elem = Sound::db_modules[modname, "main_volume"]:"Master";
 
 	    setVolume (master_elem, card_id, Sound::default_volume);
 	    setVolume ("Headphone", card_id, Sound::default_volume);

@@ -238,9 +238,8 @@
 		ret = add(ret, "emu10k1");
 		ret = add(ret, "cs4281");
 		list<term> ret_t = maplist(string e, ret,``{
-		    string descr = lookup(
-			(map)SCR::Read(add(.modinfo.kernel.sound.oss, e)),
-			"module_description", "");
+		    map modinfo = (map)SCR::Read(add(.modinfo.kernel.sound.oss, e));
+		    string descr = modinfo["module_description"]:"";
 		    return
 		    `item(`id(e), (descr != "" && descr != "<none>")? descr: e);
 		});
