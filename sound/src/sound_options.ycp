@@ -143,7 +143,8 @@
 	    if (type == "int") {
 		if (tolower(substring (value, 0, 2)) == "0x") {		// hex number
 		    string rest = tolower(substring (value, 2));
-		    if (filterchars(rest, "0123456789abcdef") != rest) 
+		    if (filterchars(rest, "0123456789abcdef") != rest)
+			    // To translators: popup message, wrong value
 			return sformat (UI(_("The value: %1 must be a number")), value);
 		}
 		else {		// decimal number
@@ -151,6 +152,7 @@
 		    if (substring (value, 0, 1) == "-")	 // negative number
 			rest = substring (value, 1);
 		    if (filterchars(rest, "0123456789") != rest)
+			    // To translators: popup message, wrong value
 			return sformat (UI(_("The value: %1 must be a number")), value);
 		}
 	    }
@@ -163,6 +165,7 @@
 				// To translators: "space" means blank character
 			wrong_char = wrong_char + " " + UI(_("(space)"));
 		    }
+			// To translators: popup message, wrong value
 		    return  sformat (UI(_("String cannot contain: %1")), wrong_char);
 		}
 	    }
@@ -178,6 +181,7 @@
 		    poss_list = maplist (`v, poss, ``(value == v));
 		
 		if (!contains (poss_list, true))
+			// To translators: popup message, wrong value
 		    return sformat (UI(_("The value must be one of %1")), poss);
 	    }
 	    
@@ -274,13 +278,16 @@
 
 	    con = `VBox (
 		`VSquash(`Top(`Label (Args (0)))),
+		    // To translators: Table headers "description" -- option description, "option" -- option name, "value" -- value of an option
 		`Table (`id(`table), `opt (`notify, `immediate, `hshrinkable), `header(_("Description"), _("Option"),
 										       `Right(_("Value"))), itemized_descriptions),
 		`VBox (
 		    `TextEntry (`id (`des), current_option_name,
 				lookup (entered_options, current_option_name, "")),
 		    `HBox (
+			    // "set" button: Sets the option value
 			`PushButton (`id (`set), `opt(`default), _("&Set")),
+			    // "reset" button: Resets all values
 			`PushButton (`id (`reset), _("&Reset"))
 			)
 		    )
@@ -289,6 +296,7 @@
 	}
 	else {			// there are no options
 	    con = `VBox (`Top(`Label (Args (0))),
+			     // To translators: label message
 			 `HVCenter (`Label (_("There are no options for this module"))));
 	    
 	}

@@ -147,6 +147,7 @@
 	    string err = "";
 	    
 	    if (Shell("/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`") == 127)
+		    // To translators: error popup message
 		return UI (_("Cannot make a list of module dependencies.\nProgram 'depmod' missing,\nplease check 'modules' package (series 'a')."));
 	    
 	    err = ConfModules (modules_conf);
@@ -155,11 +156,13 @@
 		return err;
 
 	    if (Shell("/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`") == 127)
+		    // To translators: error popup message
 		return UI (_("Cannot make a list of module dependencies.\nProgram 'depmod' missing,\nplease check 'modules' package (series 'a')."));
 
 		//if (Shell ("/usr/sbin/alsactl store") == 127)
 		//return UI(_("Cannot find 'alsactl'\nPlease check your installation of ALSA package (series 'snd1')"));
 	    if (EnableJoystick () == 127)
+		    // To translators: error popup message
 		return UI(_("Cannot find 'alsactl'\nPlease check your installation of ALSA package (series 'snd')"));
 	    
 	    return "";
@@ -207,7 +210,7 @@
 	if (size (err) > 0) {
 	    
 	    UI(`ChangeWidget(`id(`back), `Enabled, true));
-		    
+		// To translators: error label message
 	    UI(`ReplaceWidget(`id(`la), `Label(sformat (UI(_("The sound card configuration cannot be saved,\n due to following error:\n%1")),
 							err))));
 
@@ -223,6 +226,7 @@
 	}
 	else {
 
+		// To translators: label message
 	    UI (`DisplayMessage (_("The sound card was succesfully configured and\nyou can now use it.")));
 	}
 

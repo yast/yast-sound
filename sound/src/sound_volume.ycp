@@ -82,6 +82,7 @@
 				"snd-card-interwave-stb"];
 
 	    if (size (cmd) == 0)
+		    // To translators: error message
 		return _("Invalid module name.");
 
 		//  tried to load with just snd_isapnp=0
@@ -119,9 +120,11 @@
 		    Shell("/sbin/modprobe " + cmd);
 		    Shell("/sbin/modprobe snd-pcm-oss"); // backwards OSS compatibility
 		    if (!haskey (pm, module_name))
+			    // To translators: label to error popup
 			return sformat (UI(_("The kernel module %1 for sound support\ncannot be loaded.")), module_name);
 		}
 
+		    // To translators: label to error popup
 		return sformat (UI(_("The kernel module %1 for sound support\ncannot be loaded.")), module_name);
 	    }
 
@@ -238,6 +241,7 @@
 	}
 
 	UI(`SetContents (_("Sound cards"), con, help_text, back, next));
+	    // "Finish" button: Proceed to finish the configuration
 	UI(`ChangeWidget (`id(`next), `Label, _("&Finish")));
 
 	any ui = nil;
@@ -279,6 +283,7 @@
 	    } until ((ui == `back) || (ui == `next) || ui == `cancel);
 
 	    if (ui == `next) {
+		    // To translators: popup message to confirm saving configuration
 		volume_continue = UI(`YesOrNo (_("Sound volume and the configuration\nfor the sound card will be saved now."), _("&Yes"), _("&No")));
 	    }
 	    else

@@ -79,6 +79,7 @@
 			`VBox(
 			    `VSpacing(0.2),
 			    `Label(message),
+				// "OK" button: User confirmation
 			    `PushButton(`opt(`default), _("&OK")),
 			    `VSpacing(0.2)
 			    ),
@@ -120,11 +121,15 @@
 		t = add(t, `Left(`Label(message)));
 		term b = `HBox();
 		if (d) {
+			// "Yes" button: Answer to the dialog question
 		    b = add (b, `PushButton(`id(`yes), `opt (`default), _("&Yes")));
+			// "No" button: Answer to the dialog question
 		    b = add (b, `PushButton(`id(`no), _("&No")));
 		}
 		else {
+			// "No" button: Answer to the dialog question
 		    b = add (b, `PushButton(`id(`no), `opt (`default), _("&No")));
+			// "Yes" button: Answer to the dialog question
 		    b = add (b, `PushButton(`id(`yes), _("&Yes")));
 		}
 
@@ -282,8 +287,8 @@
 				// this dialog is displayed if ALSA
 				// not istalled
 	    define NotInstalled () ``{
+		
 				// Help text when Alsa-drivers are not installed 1/1
-
 		string help_text = UI(_("\
 Sound support requires the <b>ALSA</b> package.\
  You can find it in the <b>SuSE</b> distribution (series 'snd')\
@@ -292,7 +297,7 @@ Sound support requires the <b>ALSA</b> package.\
 		UI(`SetContents (_("Sound cards"),
 				 `HVCenter (
 				// This label is displayed when no alsa package is not installed
-				// To translators: label message
+				// To translators: label message, please insert \n after each aprox. 70 chars
 				     `Label (_("Please install the
  package ALSA (Advanced Linux Sound Architecture)\n before you proceed
  with the configuration of your sound system."))
@@ -386,8 +391,10 @@ An internal <b>YaST2</b> file is missing or corrupted.\
  simply quit by pressing the <i>Back</i> button.</p>"));
 
 
+		    // To translators: label message
 		message = UI (_("No sound cards were found on your system.\n Try manual setup."));
 		con = add (con, `HVCenter(`ReplacePoint(`id(`rp), `Label(message))));
+		    // "Manual" button: Runs dialog where user manually chooses the sound card from a list
 		con = add (con, `Bottom(`PushButton(`id (`manual), _("&Manual"))));
 		next = false;
 	    }
@@ -410,6 +417,8 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 			message = sformat (UI(_("The sound card\n%1\ncan not be configured,\nbecause there is no available driver.")),
 					   soundcard_name (ret));
 			con = add (con, `HVCenter(`ReplacePoint (`id(`rp), `Label(message))));
+			    // "Let me choose" button: Runs dialog where user manually chooses the sound card from a list
+			    // this button is displayed when sound card was detected (by libhd), but no appropriate module can be found in DB
 			con =  add (con, `Bottom(`PushButton(`id (`manual), _("&Let me choose"))));
 
 			    // Help text 1/2 (driver not available)
@@ -427,11 +436,14 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 
 			term lab = `VBox (
 			    `VStretch (),
+				// To translators: label message 1/2 The sound card XY will be configured
 			    `Label (_("The sound card\n")),
 			    `Label (`opt(`outputField), soundcard_name (ret)),
+				// To translators: label message 2/2 The sound card XY will be configured
 			    `Label (_("\nwill be configured."))
 			    );
 			con = add (con, lab);
+			    // "Options" button: Runs dialog where user manually can modify module specific options
 			con = add (con, `Bottom(`PushButton(`id (`options), _("&Options"))));
 
 			    // Help text 1/2 (one sound card found)
@@ -453,12 +465,13 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 		    // more sound cards
 		else {
 		    integer i = 0;
+			// To translators: label over selection box
 		    con = add (con, `SelectionBox (`id(`fc), `opt(`notify), _("Sound card models"),
 						   maplist(`card, found, ``(`item(`id(sformat ("%1/%2",
 											       lookup (card, "vendor_id", 0),
 											       lookup (card, "device_id", 0))),
 										  soundcard_name (card))))));
-		    
+			// "Options" button: Runs dialog where user manually can modify module specific options
 		    con = add (con, `PushButton(`id (`options), `opt(`disabled), _("&Options")));
 
 		    			    // Help text 1/1 (more sound cards detected)
@@ -497,6 +510,7 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 			UI(`ChangeWidget(`id(`next), `Enabled, false));
 			UI(`ChangeWidget(`id(`options), `Enabled, false));
 
+			    // To translators: popup message (more sound cards was detected, and user choosed the one where driver can not be found in DB
 			if (UI (`YesOrNo (_("\
 There is no available driver for the selected card.
 Do you want to select the driver manually?"),
@@ -511,6 +525,7 @@ Do you want to select the driver manually?"),
 			    map|void manual = CallFunction (`sound_manual (database_name, manual_driver, manual_model));
 
 			    if (manual == nil) {
+				// To translators: internal yast2 error
 				message = sformat (UI(_("Cannot find module: %1")), "sound_manual");
 				UI (`DisplayMessage (message));
 			    }
@@ -538,11 +553,14 @@ Do you want to select the driver manually?"),
 
 				term lab = `VBox (
 				    `VStretch (),
+					// To translators: label message 1/2 The sound card XY will be configured
 				    `Label (_("The sound card\n")),
 				    `Label (`opt(`outputField), soundcard_name (ret)),
+					// To translators: label message 2/2 The sound card XY will be configured
 				    `Label (_("\nwill be configured."))
 				    );
 				con = add (con, `ReplacePoint (`id(`rp), `HVCenter(lab)));
+				// "Options" button: Runs dialog where user manually can modify module specific options
 				con = add (con, `Bottom(`PushButton(`id (`options), _("&Options"))));
 				next = true;
 
@@ -583,6 +601,7 @@ Do you want to select the driver manually?"),
 									 options_entered, 0));
 
 		    if (options == nil) {
+			// To translators: internal yast2 error
 			message = sformat (UI(_("Cannot find module: %1")), "sound_options");
 			UI (`DisplayMessage (message));
 		    }
@@ -609,6 +628,7 @@ Do you want to select the driver manually?"),
 		    map|void manual = CallFunction (`sound_manual (database_name, manual_driver, manual_model));
 
 		    if (manual == nil) {
+			    // To translators: internal yast2 error
 			message = sformat (UI(_("Cannot find module: %1")), "sound_manual");
 			UI (`DisplayMessage (message));
 		    }
@@ -634,11 +654,14 @@ Do you want to select the driver manually?"),
 
 			term lab = `VBox (
 			    `VStretch (),
+				// To translators: label message 1/2 The sound card XY will be configured
 			    `Label (_("The sound card\n")),
 			    `Label (`opt(`outputField), soundcard_name (ret)),
+				// To translators: label message 2/2 The sound card XY will be configured
 			    `Label (_("\nwill be configured."))
 			    );
 			con = add (con, `ReplacePoint (`id(`rp), `HVCenter(lab)));
+			    // "Options" button: Runs dialog where user manually can modify module specific options
 			con = add (con, `Bottom(`PushButton(`id (`options), _("&Options"))));
 			next = true;
 

@@ -172,6 +172,7 @@
 
 	boolean prev = false;
 	boolean next = false;
+	    // To translators: label message
 	locale msg = _("Reading sound card database ...");
 	term con = `Label (msg);
 
@@ -187,6 +188,8 @@
 	snd_database = sort (`x, `y, snd_database, ``(lookup(x, "name") <= lookup(y, "name")));
 	
 	list drivers = [];
+
+	    /// To translators: All stands for all sound cards entry in the selection box
 	drivers = add (drivers, UI(_("All")));
 	drivers = union (drivers, maplist (`v, snd_database, ``(lookup(v, "name", "unknown driver"))));
 	
@@ -208,12 +211,15 @@
 	con = `VBox ();
 	con = add (con, `HBox (
 	    `ReplacePoint (`id (`rep_drv),
+			       // To translators: selection box title
 			   `SelectionBox (`id (`sel_drv), `opt(`notify), _("Sound card driver"), itemized_drivers)
 			   ),
 	    `ReplacePoint(`id(`rep_mod),
+			      // To translators: selection box title
 			  `SelectionBox (`id (`sel_mod), `opt(`notify), _("Sound card model"), itemized_models)
 			  )
 	    ));
+	    // To translators: text entry label
 	con = add (con, `TextEntry (`id(`search), `opt(`notify), _("Search")));
 	
 	prev = true;
@@ -288,7 +294,7 @@
 			  "model"   : UI (`QueryWidget (`id(`sel_mod), `CurrentItem))];
 
 	    map mod_rec = $[];
-
+		/// To translators: All stands for all sound cards entry in the selection box
 	    if (current_driver == UI(_("All")))
 		mod_rec = GetModule (UI (`QueryWidget (`id(`sel_mod), `CurrentItem)));
 	    else

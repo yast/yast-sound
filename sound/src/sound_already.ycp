@@ -40,7 +40,9 @@
 	    return true;
 	};
 	
-	
+
+	    // This help text is displayed during some "userless" operations,
+	    // like searching in DB, saving, etc ...
 	string help_text = UI (_("<p>No help text available.<p>"));
 
 	boolean next = false;
@@ -139,11 +141,12 @@
 
 		    if (already_configured != nil){
 
+			    // To translators: label message
 			con = `HVCenter(`Label(_("The previous configuration cannot be reset.")));
 
-			    // Help text 1/2
+			    // Help text 1/2 when removing kernel modules were unsuccessfull
 			help_text = UI (_("<p>Removing of sound kernel modules were unsuccessful.</p>"));
-			    // Help text 1/2
+			    // Help text 2/2 when removing kernel modules were unsuccessfull
 			help_text = help_text + UI (_("<p>This might\
  be because there are in use by some program or you don't have\
  privileges to do that.</p>"));
@@ -155,7 +158,7 @@
 		    else {
 			back = false;
 			next = true;
-
+			    // To translators: label message
 			con = `HVCenter(`Label(_("The previous configuration has been reset.")));
 
 						    // Help text 1/1
