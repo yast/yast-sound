@@ -70,7 +70,7 @@ $[
     49	: "snd-opti92x-ad1848",
     50	: "snd-opti92x-cs4231",
     51	: "snd-opti93x",
-    52	: "snd-pdaudio-cf",
+    52	: "snd-pdaudiocf",
     53	: "snd-rme32",
     54	: "snd-rme96",
     55	: "snd-rme9652",
@@ -94,7 +94,8 @@ $[
     73	: "snd-atiixp",
     74	: "snd-atiixp-modem",
     75	: "snd-via82xx-modem",
-    /* 76	: "snd-azx", */
+    76	: "snd-emu10k1x",
+    77	: "snd-audigyls",
 
     100 : "snd-powermac"
 ]
