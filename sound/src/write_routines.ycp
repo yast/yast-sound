@@ -26,87 +26,87 @@
 
     map STRINGS=STRINGS_();
 
-      /**
-       * Saves one '/etc/modules.conf' entry
-       * @return boolean
-       */
+    /**
+     * Saves one '/etc/modules.conf' entry
+     * @return boolean
+     */
     global define SaveOneModulesEntry (string entry_name, map entry) ``{
         boolean ret = true;
         if (haskey (entry, "alias")) 
-        {
-            ret = ret && SCR(`Write(.modules.alias, entry_name, lookup(entry, "alias")));
-            if (haskey (entry, "options"))
             {
-                ret = ret && SCR(`Write(.modules.options, lookup(entry, "options"), entry_name));
+                ret = ret && SCR(`Write(.modules.alias, entry_name, lookup(entry, "alias")));
+                if (haskey (entry, "options"))
+                    {
+                        ret = ret && SCR(`Write(.modules.options, lookup(entry, "options"), entry_name));
+                    }
             }
-        }
         return ret;
     }
 
     
-      /**
-       * Saves all '/etc/modules.conf' entries
-       * @return map return struct: $["return": boolean, "err_msg": string]
-       */
+    /**
+     * Saves all '/etc/modules.conf' entries
+     * @return map return struct: $["return": boolean, "err_msg": string]
+     */
     global define SaveModulesEntry (list cards, list system) ``{
         string err_msg="";
     
         if ((contains(maplist (`e, cards, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) 
-        {
-                                      // Error message
-            err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry"); 
-            return $["return": false, "err_msg": err_msg];
-        }
+            {
+                // Error message
+                err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry"); 
+                return $["return": false, "err_msg": err_msg];
+            }
 
         if (size (cards) > 0)
-        {
-            SCR(`Write(.modules.alias.comment, "\n#\n# YaST2: sound cards support\n#\n", 
-                      lookup (lookup (select (cards, 0), "modules", $[]), "alias")));
-        }
+            {
+                SCR(`Write(.modules.alias.comment, "\n#\n# YaST2: sound cards support\n#\n", 
+                           lookup (lookup (select (cards, 0), "modules", $[]), "alias")));
+            }
 
         if ((contains(maplist (`e, system, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) 
-        {
-                                      // Error message      
-            err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry");
-            return $["return": false, "err_msg": err_msg];
-        }
+            {
+                // Error message      
+                err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry");
+                return $["return": false, "err_msg": err_msg];
+            }
 
         if (size (system) > 0)
-        {
-            SCR(`Write(.modules.alias.comment, "\n#\n# YaST2: sound system dependent part\n#\n", 
-                lookup (lookup (select (system, 0), "modules", $[]), "alias")));
-        }
+            {
+                SCR(`Write(.modules.alias.comment, "\n#\n# YaST2: sound system dependent part\n#\n", 
+                           lookup (lookup (select (system, 0), "modules", $[]), "alias")));
+            }
 
         if (!SCR(`Write(.modules, nil))) 
-        {
-                                      // Error message
-            err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry");
-            return $["return": false, "err_msg": err_msg];
-        }
+            {
+                // Error message
+                err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry");
+                return $["return": false, "err_msg": err_msg];
+            }
             
         return $["return": true, "err_msg": ""];
     }
 
-      /**
-       * Sets volume for all channels
-       * @return map return struct: $["return": boolean, "err_msg": string]
-       */
+    /**
+     * Sets volume for all channels
+     * @return map return struct: $["return": boolean, "err_msg": string]
+     */
     global define SetAllChannels (list cards, string command) ``{
 	string err_msg="";
         if (contains (maplist (`e, cards, ``(maplist(`ch, `v, lookup (e, "volume", $[]), ``(SetVolume (command, ch, v,
-                           tointeger(lookup(lookup(lookup (e, "modules", $[]), "options", $[]), "snd_index", 0))))))), false))
-        {
-                                      // Error message
-            err_msg = lookup(STRINGS, "SetAllChannels");
-            return $["return": false, "err_msg": err_msg];
-        }
+                                                                                                       tointeger(lookup(lookup(lookup (e, "modules", $[]), "options", $[]), "snd_index", 0))))))), false))
+            {
+                // Error message
+                err_msg = lookup(STRINGS, "SetAllChannels");
+                return $["return": false, "err_msg": err_msg];
+            }
         return $["return": true, "err_msg": ""];
     }
 
-      /**
-       * Save volume (for alsa it's alsactl store
-       * @return map return struct: $["return": integer, "err_msg": string]
-       */
+    /**
+     * Save volume (for alsa it's alsactl store
+     * @return map return struct: $["return": integer, "err_msg": string]
+     */
     global define SaveVolume (string function, string mixer_command, list cards) ``{
         string err_msg="";
         map res=SetAllChannels (cards, mixer_command);
@@ -115,10 +115,10 @@
         return $["return": SCR(`Execute(.target.bash, function, $[])), "err_msg": err_msg];
     }
 
-      /**
-       * Additional hack to enable ALSA joystick support
-       * @return boolean
-       */
+    /**
+     * Additional hack to enable ALSA joystick support
+     * @return boolean
+     */
     global define EnableJoystick () ``{
         string tmpdir = SCR(`Read(.target.tmpdir));
         return SCR(`Execute(.target.bash, "/usr/sbin/alsactl -f "+tmpdir+"/asound.conf store;\
@@ -127,26 +127,26 @@
                 /usr/sbin/alsactl restore", $[]));
     }
 
-      /**
-       * function to finish ALSA instalation
-       * @return void
-       */
+    /**
+     * function to finish ALSA instalation
+     * @return void
+     */
     global define AlsaFinish () ``{
         EnableJoystick ();
     }
-      /**
-       *
-       * @return string error string
-       */
+    /**
+     *
+     * @return string error string
+     */
 
     global define SaveRCValues (map rc) ``{
         string err_msg="";
 	if (contains (maplist (`k, `v, rc, ``(SCR(`Write(topath(sformat(".rc.system.%1", k)), v)))), false) ||
-                !SCR(`Write(.rc.system, nil)))
-        {
-                                    // Error message
-            err_msg = sformat (lookup(STRINGS, "saveRCValues"), UI(_("/etc/rc.config")));
-        }
+            !SCR(`Write(.rc.system, nil)))
+            {
+                // Error message
+                err_msg = sformat (lookup(STRINGS, "saveRCValues"), "/etc/rc.config");
+            }
 	return err_msg;
     }
 
