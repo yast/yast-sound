@@ -92,11 +92,12 @@
 
             if (type == "int")
             {
-                poss_list = maplist (`v, poss, ``(tointeger (value) == v));
+		// currently is not possible to have integer values... (?)
+                poss_list = maplist (integer v, poss,``(tointeger(value) == v));
             }
             else
             {
-                poss_list = maplist (`v, poss, ``(value == v));
+                poss_list = maplist (string v, poss, ``(value == v));
             }
 
             if (!contains (poss_list, true))

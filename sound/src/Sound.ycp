@@ -256,7 +256,7 @@ Probe the chip now?
 
 	list chips = ["opl3sa2", "cs4236", "cs4232", "cs4231", "es18xx", "es1688", "sb16", "sb8"];
 
-	string command = "/usr/bin/alsaconf -P";
+	string command = "/usr/sbin/alsaconf -P";
 	map out = (map) SCR::Execute(.target.bash_output, command);
 	if (out["exit"]:1 != 0)
 	    return false;
@@ -824,7 +824,7 @@ could make your system unstable.
 	maplist (string modname, mods, ``{
 	    map opts = CollectOptions(modname);
 	    string optstr = "";
-	    maplist(`k, `v, opts, ``{
+	    maplist(string k, string v, opts, ``{
 		optstr = optstr+ sformat(" %1=%2", k, v);
 	    });
 	    // we need to tell 'modprobe' not to look into modules.conf now,
@@ -1043,7 +1043,7 @@ could make your system unstable.
             $["Master":70, "PCM":70, "CD":70, "Synth": 70]);
 
 	// now let's merge settings from volume_settings list
-	if (is (volume_settings[c_id]:[], list))
+	if (is (volume_settings[c_id]:nil, list))
 	{
 	    foreach (list channel, volume_settings[c_id]:[], ``{
 		devs = add (devs, channel[0]:"Master", channel[1]:70);

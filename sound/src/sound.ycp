@@ -34,7 +34,6 @@ import "Report";
 import "CommandLine";
 import "RichText";
 
-include "commandline/commandline.ycp";
 include "wizard/sequencer.ycp";
 
 include "sound/wizards.ycp";
@@ -418,7 +417,7 @@ map cmdline = $[
 any ret = nil;
 
 if (Sound::use_alsa)
-    ret = CommandLineRun ( cmdline );
+    ret = CommandLine::Run ( cmdline );
 else
     ret = SoundSequence ();
 
