@@ -118,7 +118,7 @@
         else
         {
             SCR::Execute (.target.bash_background,
-		sformat("/usr/bin/aplay -D plughw:%1 %2 > /dev/null 2>&1",
+		sformat("/usr/bin/aplay -q -N -D default:%1 %2 > /dev/null 2>&1",
 		    card_id, fname));
         }
         return "";
