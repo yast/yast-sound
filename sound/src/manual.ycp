@@ -1,18 +1,18 @@
 /**
  * File:
  *   sound_manual.ycp
- * 
+ *
  * Module:
  *   Sound
- * 
+ *
  * Summary:
  *   Module for manual selection of sound card from the database
- * 
+ *
  * Authors:
  *   Dan Veselý <dan@suse.cz>, Dan Meszaros <dmeszar@suse.cz>
  *
  * String corrections by Christian Steinruecken <cstein@suse.de>, 2001/08/01
- * 
+ *
  *
  * $Id$
  *
@@ -33,15 +33,15 @@
 	string helptext	    = lookup(STRINGS, "ManualDialog", "");
 	list module_names   = get_module_names();
 
-	string initial = use_alsa ? "all" : select(select(module_names, 0), 1);
-	list card_names	    = get_card_names(initial);//get_cards ("All");
+	string initial = use_alsa ? "all" : select(select(module_names, 0, []), 1, "");
+	list card_names	    = get_card_names(initial);
 	term con	    = `VBox ();
-	
+
 //	module_names = prepend(module_names, `item(`id("all"), _("All")));
 
 	con = add (con, `VBox
 	    (
-		`HBox 
+		`HBox
 		(
 		    `ReplacePoint (`id (`rep_drv),
 			    // To translators: selection box title
@@ -61,53 +61,53 @@
 
 	    // dialog title
 	Wizard::SetContents (_("Manual sound card selection"), con, helptext, true, true);
-	UI::ChangeWidget(`id(`sel_drv), `CurrentItem, select(select (module_names, 0), 1, select (module_names, 0)));
-	UI::ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0));
+	UI::ChangeWidget(`id(`sel_drv), `CurrentItem, select(select (module_names, 0, []), 1, "")); //!!!
+	UI::ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0, ""));
 	    // Next - button label
 	UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
 
 	symbol ui = nil;
 
-	do 
+	do
 	{
 	    ui = UI::UserInput ();
-	        
-	    if (ui == `sel_drv) 
+
+	    if (ui == `sel_drv)
 	    {
 		string drv = UI::QueryWidget (`id(`sel_drv), `CurrentItem);
 		card_names = get_card_names (drv);
 
 		UI::ReplaceWidget (`id(`rep_mod),
 				// To translators: selection box title
-		    `SelectionBox (`id (`sel_mod), _("Sound card &model"), card_names));		
+		    `SelectionBox (`id (`sel_mod), _("Sound card &model"), card_names));
 
 		// TODO: this would be nice to have from libyui instead of replacing widget
-		UI::ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0));
+		UI::ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0, ""));
 	    }
-	    else if (ui == `search) 
+	    else if (ui == `search)
 	    {
 		string entry = UI::QueryWidget (`id(`search), `Value);
 		integer card_id = search_card_id (entry);
-		card_names = get_cards ("all");
+		card_names = get_card_names ("all");
 		// always "all" field
-		UI::ChangeWidget(`id(`sel_drv), `CurrentItem, select (module_names, 0));
-		if (card_id >= 0) 
+		UI::ChangeWidget(`id(`sel_drv), `CurrentItem, select (module_names, 0, ""));
+		if (card_id >= 0)
 		{
 		    UI::ReplaceWidget (`id(`rep_mod),
 				// To translators: selection box title
 				       `SelectionBox (`id (`sel_mod), _("Sound card &model"), card_names));
-		
-		    UI::ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, card_id));
+
+		    UI::ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, card_id, ""));
 		}
 	    }
 	    else if (ui == `abort || ui == `cancel)
-	    {	
+	    {
 		if (ReallyAbort())
-		{   
+		{
 		    ui = `abort;
 		    break;
 		}
-	    }	
+	    }
 
 	} while (!contains([`next, `back], ui));
 
@@ -116,8 +116,8 @@
 
 	string model   = UI::QueryWidget (`id(`sel_mod), `CurrentItem);
 	string modname = UI::QueryWidget (`id(`sel_drv), `CurrentItem);
-    
-	if (ui == `next) 
+
+	if (ui == `next)
 	{
 	    if (modname == "all")
 	    {

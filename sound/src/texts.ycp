@@ -1,22 +1,22 @@
 /**
  *
  * File:
- *   texts.ycp		
+ *   texts.ycp
  *
- * Module:                      
+ * Module:
  *   Sound
- * 
- * Authors:            
+ *
+ * Authors:
  *   Dan Veselý <dan@suse.cz>, Dan Meszaros <dmeszar@suse.cz>
  *
- * Summary:     
- *   Text constants for sound module                
- * 
+ * Summary:
+ *   Text constants for sound module
+ *
  * $Id$
  *
  */
 {
-  
+
     textdomain "sound";
 
     /**
@@ -30,7 +30,7 @@
 _("<p>
 If you want to configure this sound card and adjust 
 its volume check <b>Normal setup</b>.
-</p>") + 
+</p>") +
 _("<p>If you want to 
 set a special option, check the <b>Advanced setup</b> radio 
 button. Most users won't need this.
@@ -45,7 +45,7 @@ change options later.
 _("<p>
 If you want to configure this sound card and adjust its 
 volume check <b>Normal setup</b>.
-</p>") + 
+</p>") +
 _("<p>
 If you don't wish to adjust volume now, check <b>Quick 
 automatic setup</b>. You can set volume and change options 
@@ -55,7 +55,7 @@ _("<P>
 If you want to configure another card that was not detected, 
 check the <B>More detailed installation of sound cards</B>.
 </P>"),
-	    
+
 	    "ManualDialog":
 	    // to translators: please don't translate "<b>All</b>"- add there a comment saying
 	    // something like 'all sound cards'
@@ -68,7 +68,7 @@ _("<p>
 Select <b>All</b> if you want to see the whole list of 
 supported sound card models.
 </p>"),
-      
+
 
 	    "WhichDialog":
 _("<p>
@@ -80,7 +80,7 @@ configured) cards, select one and go ahead. Otherwise
 use <b>manual selection</b>.
 </p>"),
 
-	
+
 	    "WhichDialogMsg":
 _("There are programs running that are currently using 
 the audio device.\n To reset the configuration these 
@@ -99,7 +99,7 @@ _("<p>
 Here, you can modify the options for the sound modules. 
 If you are not <b>absolutely sure</b> what you are doing, 
 please leave this dialog untouched. 
-</p>") + 
+</p>") +
 _("<p>
 Choose the option you want to set, use the <b>Set</b> button
 to enable new value. If there are known possible values for 
@@ -116,11 +116,11 @@ Please adjust the volume.
 _("<p>
 You can test your sound card by pressing the <b>Test</b> 
 button.
-</p>") + 
+</p>") +
 _("<p>
 After the configuration is done you can use <b>amixer</b> 
 (or any program of your choice) for adjusting the volume.
-</p>") + 
+</p>") +
 _("<p><b>WARNING/SPECIAL NOTE:</b>Please start testing your
 sound card with <b>very</b> low volume settings to prevent 
 an accident with too much loud noise.
@@ -130,7 +130,7 @@ an accident with too much loud noise.
 _("<P>
 Automatic configuration finished successfully.
 </P>"),
- 
+
 	    "nm256hackWarning":
 _("Configuring this sound card on some Sony VAIO notebooks 
 may be unsuccessful with running X. You may avoid these 
@@ -142,7 +142,7 @@ _("Error while saving '/etc/modules.conf'.\n"),
 
 	    "saveFinal1":
 _("These errors occurred during saving configuration:\n%1"),
-    
+
 	    "saveFinal2":
 _("The sound card was successfully configured.\nYou can now 
 use it immediately."),
@@ -186,7 +186,7 @@ card in the cdrom drive."),
 	    "soundFontFinal":
 	    // To translators: the messaage below will look like this: "14 soundfont-files have been installed in /usr/lli/asdf"
 _("%1 soundfont-files have been installed in %2."),
-	    
+
 	    "soundFontNotFound":
 _("No Soundfont-files found."),
 
@@ -203,10 +203,10 @@ _("<P>
 Hardware detection found new sound card. To configure it, 
 select the appropriate item in list and press the 
 <B>Configure<B> button.
-</P>") + 
+</P>") +
 _("<P>
 Press the <B>Edit</B> button to configure already installed cards
-</P>") + 
+</P>") +
 _("<P>
 To save current configuration, press the <B>Finish</B> button.
 </P>")
@@ -223,7 +223,7 @@ _("<p>
 Use <b>Delete</b> button to remove configured sound card. 
 <b>Add sound card</b> button can be used for adding sound 
 card.
-</p>") + 
+</p>") +
 _("<p>
 Use the <b>start ALSA</b> check button to enable (resp. 
 disable) ALSA start-up during boot time. Check the <b>start 
@@ -235,13 +235,13 @@ files during boot-time (these modules can be loaded on demand).
 _("<p>
 You should check that you have correctly installed the 
 <b>ALSA</b> package (from the series 'snd').
-</p>") + 
+</p>") +
 _("<p>
 If the the problem persists, you can try to pass some 
 <b>options</b> to the ALSA module. If you still can't get 
 your sound card working, you can try <i>OSS/Free</i> or 
 another module.
-</p>") + 
+</p>") +
 _("<p>
 In this case launch YaST2 sound configuration module from 
 shell using the <PRE>yast2 sound .oss</PRE> command.
@@ -253,7 +253,7 @@ shell using the <PRE>yast2 sound .oss</PRE> command.
 _("<p>
 The complete sound cards list. Use the <b>Finish</b> button 
 to save sound card information.
-</p>") + 
+</p>") +
 _("<p>
 Use <b>Delete</b> button to remove configured sound card. 
 <b>Add sound card</b> button can be used for adding sound card.
@@ -262,10 +262,7 @@ Use <b>Delete</b> button to remove configured sound card.
             _("<p>An error has occurred. </p>")+
             _("<p>You can try to pass some <b>options</b> to the module.</p>"));
 	}
-	return ret;	
+	return ret;
     }
-
-//   return STRINGS_();
-    
 }
 

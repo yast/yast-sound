@@ -8,12 +8,12 @@
  * Summary:
  *   sound card selection dialog
  *
- * Authors: 
+ * Authors:
  * Dan Meszaros <dmeszar@suse.cz>
- * 
- * 
+ *
+ *
  * $Id$
- * 
+ *
  * Params: 1st ... list of strings of new hardware
  *         2nd ... list of strings of configured hardware
  */
@@ -23,17 +23,12 @@
     include "ui/summary.ycp";
 
     global define sound_select(list sound_cards, list save_info) ``{
-//    include "sound/ui.ycp";
-//    include "sound/routines.ycp";
-
-//    list sound_cards	= Args(0);
-//    list save_info	= Args(1);
 
     // show the dialog
     string confhw = ConfCardsRT(save_info);
 
-    selectHardware( sound_cards, //maplist(`e, sound_cards, ``(lookup(e, "model", ""))),
-                    confhw); //maplist(`e, save_info, ``(lookup(e, "model", ""))));
+    selectHardware( sound_cards,
+                    confhw);
 
     UI::ChangeWidget(`id(`next), `Label, UI::FinishButtonLabel());
 
@@ -45,7 +40,7 @@
         {
 	    return $["ui": `abort];
 	}
-    } while (!contains([`back, `next, `edit_button, `configure_button], ui)); //(ui==`back || ui==`next ||  ui==`edit_button || ui==`configure_button);
+    } while (!contains([`back, `next, `edit_button, `configure_button], ui));
 
     symbol type = nil;
     integer index = 0;

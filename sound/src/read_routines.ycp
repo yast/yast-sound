@@ -1,13 +1,13 @@
 /**
  * File:
  *   read_routines.ycp
- * 
+ *
  * Module:
  *   Sound
- * 
+ *
  * Summary:
  *   Routines for reading sound card configuration
- * 
+ *
  * Authors:
  *   Dan Meszaros <dmeszar@suse.cz>
  *
@@ -30,7 +30,7 @@
 	{
 	    return "Sound card";
 	}
-	return name;	
+	return name;
     }
 
 
@@ -114,7 +114,7 @@
 
 	    integer position = -1;
 
-	    foreach(`e, aliases, 
+	    foreach(`e, aliases,
 	    ``{
 		position = position + 1;
 		map entry = $[];
@@ -122,15 +122,15 @@
 
 		integer opt_pos = lookup(mod_occur, modname, 0);
 
-		mod_occur = add(mod_occur, modname, lookup(mod_occur, modname, 0) + 1);		    
+		mod_occur = add(mod_occur, modname, lookup(mod_occur, modname, 0) + 1);
 
 		map options = SCR::Read(.modules.options, modname);
-		options = mapmap(`k, `v, options, 
+		options = mapmap(`k, `v, options,
 		``{
 		    list vals = splitstring(v, ",");
 		    if (size(v) > opt_pos)
 		    {
-			return [k, select(vals, opt_pos)];
+			return [k, select(vals, opt_pos, "")];
 		    }
 		    return [nil, nil];
 		}
@@ -146,12 +146,12 @@
 		{
 		    uniq = lookup(res, "unique_key", ""); //substring(comment, 0, pos);
 		    model = lookup(res, "name", ""); //substring(comment, pos+1, size(comment)-pos-1);
-		}   
-		
-		else 
+		}
+
+		else
 		{
 		    // probably system upgrade
-		    list cards = get_audio();
+		    list cards = Sound::detected_cards;
 		    list keys = read_unique_keys();
 		    if (size(keys) <= position)
 		    {
@@ -160,12 +160,12 @@
 		    }
 		    else
 		    {
-			string key = select(keys, position);
+			string key = select(keys, position, "");
 			list card = filter(`cc, cards, ``(lookup(cc, "unique_key", "") == key));
 			if (size(card) > 0)
 			{
 			    uniq = key;
-			    model = get_card_label(select(card, 0));
+			    model = get_card_label(select(card, 0, ""));
 			}
 			else
 			{
@@ -174,19 +174,19 @@
 			}
 		    }
 		}
-	
+
 		entry = $[    "alias"	: e,
 			    "module"	: modname,
 			    "options"	: options,
 			    "unique_key": uniq,
 			    "model"	: model
 		];
-		
+
 		save = add(save, entry);
-	    });	
+	    });
 
         }
-	
+
         return save;
     }
 

@@ -95,7 +95,7 @@
      *
      */
 
-    global define sound_start_tmp(boolean restore) ``{
+    global define sound_start_tmp(boolean restore, integer unused) ``{
         string cmd = "/sbin/depmod -C " + get_tmp_modules_conf() + " /dev/null 2>&1";
         SCR::Execute(.target.bash, cmd, $[]);
 
@@ -184,7 +184,7 @@
 	    return `item(`id(e), (descr != "" && descr != "<none>") ? descr : e);
 	});  
 
-	ret = sort(`a, `b, ret, ``(select(a, 1) < select(b, 1)));
+	ret = sort(`a, `b, ret, ``(select(a, 1, "") < select(b, 1, "")));
 
 	return ret;
     }
@@ -257,12 +257,12 @@
 	    list drivers = lookup(e, "drivers", []);
 	    if (size(drivers) > 0)
 	    {
-		map driver = select(drivers, 0);
+		map driver = select(drivers, 0, $[]);
 		list m = lookup(driver, "modules", []);
 		if (size(m) > 0)
 		{
-		    modname = select(select(m, 0), 0);
-		    modname = select(splitstring(modname, "."), 0);
+		    modname = select(select(m, 0 ,[]), 0, "");
+		    modname = select(splitstring(modname, "."), 0, "");
 		}
 	    }
 
@@ -331,7 +331,7 @@
     
 
     global define getConfigurableCards(list save_info) ``{
-        list snd = get_audio();
+        list snd = Sound::detected_cards;
         snd = filter_configured(save_info, snd);
         if (size(snd) > 0)
         {

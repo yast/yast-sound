@@ -1,7 +1,7 @@
 /**
  * File:
  *   sound_write.ycp
- * 
+ *
  * Module:
  *   Sound
  *
@@ -37,7 +37,7 @@
  *		"START_ALSA" : "yes",
  *		"START_SEQUENCER" : "yes"
  *         ]
- *	    
+ *
  *	   3rd ... use_alsa - boolean
  *
  *	   4th ... autoinstall mode boolean
@@ -108,7 +108,7 @@
     if (autoinstall)
     {
 //	UI::Wizard::CreateDialog();
-    }	
+    }
 
     list stones = [
 	    _("Save modules configuration"),
@@ -124,7 +124,7 @@
 	    _("Starting sound card..."),
 	    _("Storing volume settings")];
 
-    Progress::New (_("Saving sound card settings."), " ", size(stones) - 1, 
+    Progress::New (_("Saving sound card settings."), " ", size(stones) - 1,
 		stones, stones2, "TODO: help");
 
 
@@ -133,7 +133,6 @@
         Wizard::DisableAbortButton();
     }
 
-    
     integer step = 0;
 
     Progress::NextStage();
@@ -166,6 +165,6 @@
     }
     SaveVolume();
     sleep(100);
-    
+
     return (size (err_msg) == 0);
 }

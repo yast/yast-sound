@@ -8,14 +8,14 @@
  * Summary:
  *   sound complex dialog
  *
- * Authors: 
+ * Authors:
  * Dan Vesely <dan@suse.cz>, Dan Meszaros <dmeszar@suse.cz>
  *
  * String corrections by Christian Steinruecken <cstein@suse.de>, 2001/08/01
- * 
- * 
+ *
+ *
  * $Id$
- * 
+ *
  * Params: 1st ... list of sound_cards
  *         2nd ... list with save_info
  *         3rd ... list with configured_unique
@@ -29,19 +29,6 @@
     include "browser.ycp";
     import  "Wizard";
 
-//    include "misc_defines.ycp";
-//    include "sound/routines.ycp";
-//    include "sound/ui.ycp";
-//    include "sound/texts.ycp";	
-//    include "sound/alsa_routines.ycp";
-//    include "sound/write_routines.ycp";
-//    include "sound/card_wizard.ycp";
-
-
-//    map STRINGS=STRINGS_();
-
-
-
     /**
      * creates summary table with card labels and thier states (running/not running/dissappeared)
      * @param save_info info about configured cards
@@ -51,7 +38,7 @@
     global define createTable(list save_info) ``{
 	list runn   = get_running_cards();
 	integer pos = 0;
-	list ret    = maplist(`e, save_info, 
+	list ret    = maplist(`e, save_info,
 	``{
 	    string state = "";
 	    if (use_alsa)
@@ -68,7 +55,7 @@
 		if( haskey (SCR::Read(.proc.modules), mname) )
 		{
 		    state = _("Running");
-		}   
+		}
 	    }
 
 	    if (state == "")
@@ -79,9 +66,9 @@
 		    state = _("Not running");
 		}
 		else
-		// card was autodetected	
+		// card was autodetected
 		{
-		    list audio = get_audio();
+		    list audio = Sound::detected_cards;
 		    audio = filter(`g, audio, ``(lookup(g, "unique_key", "") == lookup(e, "unique_key", "")));
 		    if (size(audio) != 0)
 		    {
@@ -116,24 +103,24 @@
     }
 
     /**
-     * shows list of soundcards 
+     * shows list of soundcards
      *
      * @return map
      */
 
     global define ComplexDialog () ``{
-	// help text 
+	// help text
 	symbol ui = nil;
         string helptext = lookup(STRINGS, "ComplexDialog", "");
 
 	y2debug(" save_info %1, agent %2", size(save_info), size(SCR::Dir(.audio.alsa.cards)));
 
-	if (use_alsa && (size(save_info) != size(get_running_cards()))) 
+	if (use_alsa && (size(save_info) != size(get_running_cards())))
 	{
 	    if (UI::YesNoPopup(_("The number of currently running cards doesn't match 
 the number of configured cards in your configuration files. 
 Try to restart sound system?")))
- 
+
 	    {
 		sound_stop();
 		sound_start_tmp(true);
@@ -142,39 +129,39 @@ Try to restart sound system?")))
 	}
 
 	list cc = createTable(save_info);
- 
+
 	boolean show_fonts = false;
 	maplist(`e, save_info, ``{ if (HasFonts(e)) show_fonts = true;});
-	
-	term con = ComplexDlgCon(cc, 
-			(lookup (rc_vars, "START_ALSA", "no") == "yes"), 
+
+	term con = ComplexDlgCon(cc,
+			(lookup (rc_vars, "START_ALSA", "no") == "yes"),
 			(lookup (rc_vars, "START_ALSA_SEQ", "no") == "yes"), show_fonts);
 
         // dialog title
 	Wizard::SetContents (_("Sound configuration"), con, helptext, true, true);
 	// Finish - button label
 	UI::ChangeWidget(`id(`next), `Label, UI::FinishButtonLabel());
-    
-	if (size (cc) == 0) 
+
+	if (size (cc) == 0)
 	{
 	    enableButtons(false);
 	}
-	else 
+	else
 	{
 	    UI::ChangeWidget(`id(`configured_table), `CurrentItem, 0);
 	}
-    
+
 	if (lookup (rc_vars, "START_ALSA", "") != "yes")
 	{
 	    UI::ChangeWidget(`id(`b_seq), `Enabled, false);
 	}
 
-	do 
+	do
 	{
 	    SCR::Execute(.audio.alsa.restore, 0, 0);
 
 	    ui = UI::`UserInput ();
-	    if (ui == `b_delete) // && UI::YesNoPopup(_("Do you really want to delete this entry?"))) 
+	    if (ui == `b_delete)
 	    {
 		ui = `delete;
 		// global variable card_id
@@ -184,15 +171,15 @@ Try to restart sound system?")))
 	    {
 		integer card_id = UI::QueryWidget (`id(`configured_table), `CurrentItem);
 
-		map entry = select(save_info, card_id);    
-	
+		map entry = select(save_info, card_id, $[]);
+
 		map res = sound_options(entry);
 		if (lookup(res, "ui", nil) == `next)
 		{
 		    entry = lookup(res, "return", $[]);
 		    entry = add_common_options(entry, card_id);
 		    integer pos = 0;
-		    save_info = maplist(`e, save_info, 
+		    save_info = maplist(`e, save_info,
 		    ``{
 			if (pos != card_id)
 			{
@@ -220,15 +207,15 @@ Try to restart sound system?")))
 	    }
 	    else if (ui == `b_volume)
 	    {
-		integer card_id = UI::QueryWidget (`id(`configured_table), `CurrentItem);	
+		integer card_id = UI::QueryWidget (`id(`configured_table), `CurrentItem);
 		map res = mixerDialog(card_id);
 		if (lookup(res, "ui", nil) == `abort || lookup(res, "ui", nil) == `cancel)
-                {       
+                {
                     return $["ui": `abort];
                 }
 
 		UI::ChangeWidget(`id(`next), `Label, UI::FinishButtonLabel());
-        
+
                 Wizard::SetContents (_("Sound configuration"), con, helptext, true, true);
                 cc = createTable(save_info);
                 UI::ChangeWidget (`id(`configured_table), `Items, cc);
@@ -238,28 +225,28 @@ Try to restart sound system?")))
 	    {
 		InstallFonts("", true);
 	    }
-	    else if (ui == `b_alsa) 
+	    else if (ui == `b_alsa)
 	    {
 		string value = UI::QueryWidget(`id(`b_alsa), `Value) ?  "yes" : "no";
 		rc_vars = add(rc_vars, "START_ALSA", value);
 		UI::ChangeWidget(`id(`b_seq), `Enabled, value == "yes");
 	    }
-	    else if (ui == `b_seq) 
+	    else if (ui == `b_seq)
 	    {
 		string value = UI::QueryWidget(`id(`b_seq), `Value) ? "yes" : "no";
 		rc_vars = add(rc_vars, "START_ALSA_SEQ", value);
 	    }
-	    else if (ui == `b_conf2) 
+	    else if (ui == `b_conf2)
 	    // add soundcard
 	    {
-		list cards = get_audio();
+		list cards = Sound::detected_cards;
 		if (size(cards) != 0)
 		{
 		    cards = maplist(`e, cards, ``(add (e, "module", get_module (e))));
 		    cards = filter(`e, cards, ``(lookup(e, "module", $[]) != $[]));
 		    cards = filter_configured(save_info, cards);
 		}
-		
+
 
 		if (size(cards) == 0)
 		{
@@ -275,16 +262,16 @@ Try to restart sound system?")))
 		if (ReallyAbort())
 		{
 		    break;
-		}   
+		}
 		else
 		{
 		    ui = `skip_event;
 		}
 	    }
-	
-	
+
+
 	} while (!contains([`back, `next, `cancel, `abort, `add_manual, `add_select, `delete], ui));
-    
+
 
 	return $["ui"       : ui,
 		"save_info" : save_info,
@@ -295,9 +282,9 @@ Try to restart sound system?")))
 
     /**
      * just calls ComplexDialog
-     * @param save_info list 
+     * @param save_info list
      */
-    
+
     global define sound_complex(list save_info) ``{
 
 //    list save_info	= Args(0);
