@@ -60,7 +60,7 @@
 
  //   map STRINGS = STRINGS_();
 
-//    include "sound/write_routines.ycp";
+    include "sound/write_routines.ycp";
 
       // ==== MAIN ====
 

@@ -288,8 +288,8 @@
     if (whoami() != "root")
     {
 	y2error("'%1'", whoami());
-	UI::MessagePopup("You need to be logged in as root 
-in order to configure sound cards.");
+	UI::MessagePopup(_("You need to be logged in as root 
+in order to configure sound cards."));
 	UI::CloseDialog();
 	return;
     }

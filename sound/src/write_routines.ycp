@@ -20,8 +20,8 @@
 {
     textdomain "sound";
 
-//    include "misc_defines.ycp";
-//    include "sound/routines.ycp";
+    include "misc_defines.ycp";
+    include "sound/routines.ycp";
 //    include "sound/texts.ycp";
 //    include "sound/alsa_routines.ycp";
 
