@@ -17,7 +17,6 @@
 
 
 {
-
     textdomain "sound";
     include "misc_defines.ycp";
     include "lan/lan_routines.ycp";
@@ -163,7 +162,7 @@
         ret = add (ret, "sub_vendor", card_name);
         if (tolower (module_name) == "all")
         {
-            ret = add (ret, "sub_device", sformat ("(%1)", card_name));
+            ret = add (ret, "sub_device", sformat ("(%1)", lookup(db_entry, "name", card_name)));
         }
         else
         {
@@ -1112,13 +1111,14 @@
    /**
    * Detected, but not configured cards. contains only cards supported by alsa
    *
+   * @param unique_keys
    * @return list
    */
-    global define get_not_yet () ``{
+    global define get_not_yet (list uniques) ``{
 
 
         list all = get_audio (test_mode, config_mode);
-        list not_yet = get_unique_not (all, ["configured"], "sound", false, config_mode);
+/*        list not_yet = get_unique_not (all, ["configured"], "sound", false, config_mode);
 
 	if(size(not_yet)>0)
 	{
@@ -1127,8 +1127,12 @@
 	}
 
 	not_yet=filter(e, not_yet, ``(lookup(`e, "module", $[])!=$[]));	
+*/
+	all=filter(`e, all,
+	``(!contains(uniques, lookup(e, "unique_key", "##")))
+	);
 
-        return not_yet;
+        return all;
     }
 
     /**

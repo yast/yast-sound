@@ -76,31 +76,7 @@
     // copy cards: configured are added to the front of list, unconfigured to the end
 	
     string key="";
-/*    foreach(`card, cards, 
-    ``{
-	key=lookup(card, "unique_key", "");
-	if(contains(keys, key))
-        {
-            conflist=add(conflist, removeBlanks(hardware_name(card)));
-        }
-        else 
-        {
-            notlist=add(notlist, removeBlanks(hardware_name(card)));
-        }
-    });
-
-    integer i=0;
-
-    if(size(runcards) > size(conflist)) 
-    {
-	i=size(conflist); 
-	while(i<size(runcards))
-	{
-	    conflist=add(conflist, removeBlanks(lookup(select(runcards, i), "line1", "")));
-	    i=i+1;
-	}
-    }
-*/
+    
     foreach(`card, runcards, 
     ``{
 	conflist=add(conflist, removeBlanks(lookup(card, "line1", "")));
