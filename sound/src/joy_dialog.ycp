@@ -534,7 +534,7 @@ before pressing Next.
 		if (joymod == "")
 		    // error message (no joystick selected)
 		    Popup::Message(_("Select the joystick to test."));
-		else if (Require::RequireAndConflict(["joystick"],[],
+		else if (Require::RequireAndConflict(["input-utils"],[],
 // popup: %1 is required application
 _("<p>To test your joystick, the <b>%1</b> package is required.
 It is currently not installed. Install it now?</p>")))

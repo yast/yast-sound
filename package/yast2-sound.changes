@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jul 28 12:40:55 CEST 2004 - lslezak@suse.cz
+
+- joystick package has been renamed to input-utils (#43297)
+- version 2.10.2
+
+-------------------------------------------------------------------
 Mon Jun 28 16:47:18 CEST 2004 - jsuchome@suse.cz
 
 - fixed build (docu dependencies), fixed paths for sound drivers
