@@ -184,23 +184,23 @@
     }
 
 
-    /** 
+    /**
      * creates a list of sound modules for selection box
      * @return list of items: [`item(`id(module_name), "module label")]
      */
     global define list get_module_names() ``{
 	Sound::LoadDatabase();
-	list mods = maplist(`k, `v, Sound::db_modules,
-	    ``(`item(`id(k), lookup(v, "description", k))));
+	list mods = maplist(`k, `v, Sound::db_modules, ``{
+//y2warning ("desc: -%1- , k: %2", v["description"]:nil, k); FIXME empty desc for snd-mixart?
+	    return `item(`id(k), lookup(v, "description", k));
+	});
 
-	mods = sort(`a, `b, mods, 
-	``{
+	mods = sort(`a, `b, mods, ``{
 	    return select(a, 1, "") <= select(b, 1, "");
-
 	});
 
 	// item for all sound card models in sound card driver list
-	mods = prepend(mods,  `item(`id("all"), _("All")));
+	mods = prepend(mods, `item(`id("all"), _("All")));
 	return mods;
     }
 

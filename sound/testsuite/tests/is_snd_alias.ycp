@@ -1,12 +1,12 @@
 {
     include "testsuite.ycp";
-    include "sound/routines.ycp";
 
     // initialization is needed because module Sound imports the module Arch
     // and Arch module does a SCR call .probe.system
     map READ = $[
     "target": $[
-        "size": -1],
+        "size": -1,
+	"tmpdir": "/tmp"],
     "probe" : $[
 	    "system" : [],
     ]];
@@ -14,6 +14,7 @@
     TESTSUITE_INIT([READ], nil);
 
     import "Sound";
+    include "sound/routines.ycp";
 
     foreach(`snd, [true, false],  // check for both alsa and oss behaviour
     ``{

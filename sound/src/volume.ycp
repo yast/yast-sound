@@ -239,6 +239,12 @@ its parameters using the 'Advanced setup'.");
 	    }
         } until ((ui == `back) || ui == `next);
 
+	if (ui == `next)
+	{
+	    // reset table pointers
+	    Sound::curr_driver = "";
+	    Sound::curr_model = "";
+	}
         return ui;
     }
 

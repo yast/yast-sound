@@ -97,6 +97,9 @@
      */
     global boolean use_ui = false;
 
+    global string curr_driver = "";
+    global string curr_model = "";
+
     /**
      * ctor
      */

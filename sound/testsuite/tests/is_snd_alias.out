@@ -4,6 +4,7 @@ Read	.probe.has_pcmcia nil
 Read	.probe.has_smp nil
 Read	.probe.system []
 Read	.target.size "/etc/install.inf" -1
+Read	.target.tmpdir "/tmp"
 Return	false
 Return	true
 Return	true

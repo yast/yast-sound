@@ -166,6 +166,7 @@
      */
 
     global define symbol _snd_manual() ``{
+
 	map res = sound_manual();
 
 	// if user selects the soundcards that has been already autodetected,
@@ -520,13 +521,13 @@
 		    `abort	    :	`abort		
 		],
 
-	    "config2"	: 
+	    "config2"	:
 		$[
 		    `next	    :	"complex",
 		    `detail	    :	"complex",
 		    `abort	    :   `abort
 		],
-	    "manual2"	: 
+	    "manual2"	:
 		$[
 		    `next	    :	"config2",
 		    `abort	    :	`abort		
