@@ -2,7 +2,6 @@
 # Makefile.am for modules/y2c_snd/src
 #
 
-menudir = $(YAST2DIR)/menuentries
 clientsdir = $(YAST2DIR)/clients
 yincludedir = $(YAST2DIR)/include/sound
 modulesdir = $(YAST2DIR)/modules
@@ -35,12 +34,13 @@ clients_DATA = 	\
 	joystick.ycp		\
 	proposal_sound.ycp
 
-menu_DATA = menuentry_sound.y2cc \
-	    menuentry_joystick.y2cc
+config_DATA = \
+	sound.y2cc \
+	joystick.y2cc
 
 modules_DATA = Sound.ycp	\
 	Joystick.ycp
 
 bin_SCRIPTS = copyfonts
 
-EXTRA_DIST = $(modules_DATA) $(menu_DATA) $(yinclude_DATA) $(bin_SCRIPTS) $(clients_DATA) 
+EXTRA_DIST = $(modules_DATA) $(config_DATA) $(yinclude_DATA) $(bin_SCRIPTS) $(clients_DATA) 

@@ -24,7 +24,7 @@
      */
 
     global define string read_card_name_from_alsa(integer card_id) ``{
-	string pth = topath(sformat(".audio.alsa.cards.%1.name", card_id));
+	path pth = topath(sformat(".audio.alsa.cards.%1.name", card_id));
 	string name = SCR::Read(pth);
 	if (name == nil)
 	{
