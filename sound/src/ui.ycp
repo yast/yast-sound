@@ -24,6 +24,7 @@
     include "sound/routines.ycp";
     include "sound/texts.ycp";
     include "ui/common_popups.ycp";
+    include "ui/wizard_dialog.ycp";
 
     map STRINGS=STRINGS_();
 
@@ -113,6 +114,7 @@
      */
 
     global define OpenMainDialog() ``{
+/*
 	UI(`OpenDialog(`opt(`defaultsize), `VBox
 	  (
 	    `Image(`suseheader, "SuSE"),
@@ -137,6 +139,8 @@
 	    )
 	  )
 	));
+*/
+	UI(`CreateWizardDialog());
     }
 
 
