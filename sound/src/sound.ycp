@@ -353,7 +353,7 @@
     }
     SCR::Execute(.target.bash, "/bin/rm /tmp/modules.conf > /dev/null 2>&1; /bin/touch /tmp/modules.conf > /dev/null 2>&1", $[]);
     
-    nm256_opl3sa2_warn(sound_cards);
+    nm256_opl3sa2_warn(flatten(add([save_info], sound_cards)));
 
     symbol state = `card_select;
 
