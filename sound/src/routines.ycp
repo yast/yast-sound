@@ -46,7 +46,7 @@
 	    if (all_card_names == [] || all_card_names == nil)
 	    {
 		// use card names from db_cards (they contain the vendor name)
-		list<list<string> > all_card_names_list = (list<list<string> >) maplist (integer k, list v, Sound::db_cards,
+		list<list<string> > all_card_names_list = (list<list<string> >) maplist (integer k, list<string> v, (map <integer, list<string> >)Sound::db_cards,
 		    ``(v));
 		all_card_names = sort ((list<string>) flatten (all_card_names_list));
 	    }
@@ -63,7 +63,7 @@
 	    if (!Sound::use_alsa)
 		return [sformat("Sound card (%1)", key)];
 
-	    map mods = mapmap (integer k, string v, Sound::db_module_index,
+	    map<string,integer> mods = mapmap (integer k, string v, (map <integer,string>) Sound::db_module_index,
 		``($[v : k]));
 	    integer index	= mods[key]:0;
 	    list<string> cards		= sort ((list<string>) (Sound::db_cards[index]:[]));
@@ -87,7 +87,7 @@
 	    return [1,2,3,4,5];
 
 	path proot = .audio.alsa.cards;
-	list cards = SCR::Dir (proot);
+	list<string> cards = (list<string>) SCR::Dir (proot);
 
 	return maplist(string c, cards, ``($[
 	    "number"	: tointeger (c),
@@ -121,7 +121,7 @@
 
 	if (!Sound::use_alsa)
 	{
-	    map params = (map) SCR::Read (
+	    map<string,string> params = (map<string,string>) SCR::Read (
 		topath(sformat(".modinfo.kernel.drivers.sound.%1", modname)));
 	    params = filter(string k, string v, params, ``(
 		!contains(["module_author","module_description","module_filename"],k)
@@ -136,7 +136,7 @@
 	}
 
 	Sound::LoadDatabase(true);
-	map params = Sound::db_modules[modname, "params"]:$[];
+	map<string,map<any,any> > params = Sound::db_modules[modname, "params"]:$[];
 
 	// change the names of parameters if necessary
 	return mapmap (string parname, map parsettings, params, ``{
@@ -172,10 +172,10 @@
 	if (!Sound::use_alsa)
 	{
 
-	    map parms = get_module_params(entry["module"]:"");
+	    map<string,any> parms = (map<string,any>) get_module_params(entry["module"]:"");
 	    if (size(parms) != 0)
 	    {
-		map enab = filter (string name, map e, parms,
+		map enab = filter (string name, any e, parms,
 		    ``(name == "snd_enable"));
 		if (size(enab) != 0)
 		    opts = add(opts, "snd_enable", "1");
@@ -231,7 +231,7 @@
 	    if (Sound::use_alsa)
 	    {
 		Sound::LoadDatabase(true);
-		list mods = maplist (string k, map v, Sound::db_modules, ``{
+		list<term> mods = maplist (string k, map v, (map<string,map<string,any> >)Sound::db_modules, ``{
 		    return `item(`id(k), v["description"]:k);
 		});
 
@@ -245,20 +245,20 @@
 	    }
 	    else
 	    {
-		list ret = SCR::Dir(.modinfo.kernel.drivers.sound);
+		list<string> ret = (list<string>) SCR::Dir(.modinfo.kernel.drivers.sound);
 		ret = filter(string mod, ret, ``(mod != "sound"));
 		ret = add(ret, "emu10k1");
 		ret = add(ret, "cs4281");
-		ret = maplist(string e, ret,``{
+		list<term> ret_t = maplist(string e, ret,``{
 		    string descr = lookup(
 			(map)SCR::Read(add(.modinfo.kernel.drivers.sound, e)),
 			"module_description", "");
 		    return
 		    `item(`id(e), (descr != "" && descr != "<none>")? descr: e);
 		});
-		ret = sort(term a, term b, ret,
+		ret_t = sort(term a, term b, ret_t,
 		    ``(select(a, 1, "") < select(b, 1, "")));
-		all_module_items = ret;
+		all_module_items = ret_t;
 	    }
 	}
 	return all_module_items;
@@ -287,7 +287,7 @@
 	{
 	    list sublist = [];
 	    string modname = Sound::modules_conf[i,"module"]:"snd-dummy";
-	    list chans = Sound::db_modules[modname, "mixer_elements"]:[];
+	    list<string> chans = Sound::db_modules[modname, "mixer_elements"]:[];
 
 	    if (chans == [])
 	    {
@@ -324,8 +324,8 @@
 	    return true;
 
 	integer i = 0;
-	foreach(list channels, vol_settings, ``{
-	    foreach(list channel, channels, ``{
+	foreach(list<list<any> > channels, (list<list<list<any> > >)vol_settings, ``{
+	    foreach(list<any> channel, channels, ``{
 		string name = channel[0]:"Master";
 		path pth1 = topath (
 		    sformat(".audio.alsa.cards.%1.channels.%2.volume", i,name));
@@ -468,11 +468,11 @@
      * @return boolean true
      */
     define boolean SaveUniqueKeys(list configured, list unconfigured) ``{
-        maplist (string uk, configured, ``{
+        maplist (string uk, (list<string>) configured, ``{
             SCR::Write(.probe.status.configured, uk, `yes);
         });
 
-        maplist(string uk, unconfigured, ``{
+        maplist(string uk, (list<string>) unconfigured, ``{
             SCR::Write(.probe.status.configured, uk, `no);
         });
 
@@ -599,7 +599,7 @@
 	{
 	    avail = [];
 	}
-	foreach(string dev, devices,
+	foreach(string dev, (list<string>) devices,
 	``{
 	    if (contains(avail, dev))
 	    {
@@ -642,7 +642,7 @@ module parameters, including invalid IO or IRQ parameters."), modname);
      *
      */
     define map restore_mod_params(map params, map values) ``{
-	return mapmap(string parname, map parmap, params, ``{
+	return mapmap(string parname, map parmap, (map<string,map<string,any> >)params, ``{
 	    parmap = add (parmap, "value", values[parname]:"");
 	    return $[parname : parmap];
 	});
@@ -749,7 +749,7 @@ module parameters, including invalid IO or IRQ parameters."), modname);
      * @return boolean see as above
      */
     define boolean need_nm256_opl3sa2_warn(list sound_cards) ``{
-	list mods = maplist (map card, sound_cards, ``(card["module"]:""));
+	list mods = maplist (map card, (list<map<string,any> >)sound_cards, ``(card["module"]:""));
 	if (contains(mods, "snd-nm256") && contains(mods, "snd-opl3sa2"))
 	{
 	    return true;
@@ -763,8 +763,8 @@ module parameters, including invalid IO or IRQ parameters."), modname);
      * @return void
      */
     define void nm256_opl3sa2_warn(list sound_cards) ``{
-	list s1 = filter(map e, sound_cards, ``(e["module"]:"" == "snd-nm256"));
-	list s2 = filter(map e, sound_cards, ``(e["module"]:""=="snd-opl3sa2"));
+	list s1 = filter(map e, (list<map<string,string> >) sound_cards, ``(e["module"]:"" == "snd-nm256"));
+	list s2 = filter(map e, (list<map<string,string> >)sound_cards, ``(e["module"]:""=="snd-opl3sa2"));
 
 	if (size(s1) > 0 && size(s2) > 0)
 	{
