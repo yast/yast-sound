@@ -203,10 +203,7 @@
      */
 
     global define string SaveRCValues (map rc) ``{
-	string start = (lookup(rc, "LOAD_ALSA", "no") == "yes") ? "enable" : "disable";
-	Runlevel::ServiceAdjust("alsasound", start);
-
-	SCR::Write(.sysconfig.sound.LOAD_ALSA_SEQ, lookup(rc, "LOAD_ALSA_SEQ", "no"));
+	SCR::Write(.sysconfig.sound.LOAD_SEQUENCER, lookup(rc, "LOAD_ALSA_SEQ", "no"));
 	return "";
     }
 

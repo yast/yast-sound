@@ -62,6 +62,9 @@
 		j = add(j, v, tmp);
 	    });
 
+	    // read model comment
+	    j = add(j, "model", SCR::Read(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%2.comment", pos))));
+
 	    joystick = add(joystick, j);
 
 	    pos = pos + 1;
@@ -97,6 +100,7 @@
 	    maplist(`e, vars, ``(SCR::Write(topath(sformat(".sysconfig.joystick.%1_%2", e, pos)), "")));
 
 	    j = select(joystick, pos, $[]);
+
 	    foreach(`v, vars, ``{
 		SCR::Write(topath(sformat(".sysconfig.joystick.%1_%2", v, pos)), lookup(j, v, ""));
 		if (lookup(j, v, "") != "")
@@ -104,12 +108,26 @@
 			// if there is variable with value != "" enable joystick service
                         start = "enable";
                 }
+
+		// write model comment
+		string model = lookup(j, "model", nil);
+
+		if (model != nil)
+		{
+		    SCR::Write(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment", pos)), "#" + model + "\n");
+		}
+		else
+		{
+		    // delete old model
+		    SCR::Write(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment", pos)), nil);
+		}
 	    });
 	    pos = pos + 1;
 	}
 
 	// flush config to file
 	SCR::Write(.sysconfig.joystick, nil);
+
 	// enable/disable service
         Runlevel::ServiceAdjust("joystick", start);
 

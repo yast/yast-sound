@@ -332,17 +332,15 @@
      *
      */
 
-    global define term ComplexDlgCon(list cc, boolean start_alsa, boolean start_alsa_seq, boolean show_font_but) ``{
+    global define term ComplexDlgCon(list cc, boolean start_alsa_seq, boolean show_font_but) ``{
 	term butts = nil;
 	term alsabuts = `Empty();
 	if  (Sound::use_alsa)
 	{
-	    alsabuts = `VBox
-                         (
-                            `Left(`CheckBox(`id(`b_alsa), `opt(`notify), _("Start &ALSA"), start_alsa)),
-                         // check button label
-                            `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("&Start sequencer"), start_alsa_seq))
-                         );
+	    alsabuts = `HBox(
+                         `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("&Start sequencer"), start_alsa_seq))
+//			 `PushButton(`id(`b_joy), _("&Joystick"))
+		    );
 	}
 	if (show_font_but)
         {

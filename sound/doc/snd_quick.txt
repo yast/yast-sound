@@ -2,7 +2,7 @@
 # description: sound config design & strategy
 # author: dan meszaros <dmeszar@suse.cz>
 #
-# $id$
+# $Id$
 #
 
 1 sound card config quick overview

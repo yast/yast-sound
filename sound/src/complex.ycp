@@ -11,6 +11,7 @@
  * Authors:
  * Dan Vesely <dan@suse.cz>
  * Dan Meszaros <dmeszar@suse.cz>
+ * Ladislav Slezak <lslezak@suse.cz>
  *
  * String corrections by Christian Steinruecken <cstein@suse.de>, 2001/08/01
  *
@@ -98,7 +99,6 @@
 	UI::ChangeWidget(`id(`b_delete),    `Enabled, val);
         UI::ChangeWidget(`id(`b_options),   `Enabled, val);
 	UI::ChangeWidget(`id(`b_volume),    `Enabled, val);
-
     }
 
     /**
@@ -132,7 +132,6 @@ Try to restart sound system?")))
 	maplist(`e, Sound::modules_conf, ``{ if (HasFonts(e)) show_fonts = true;});
 
 	term con = ComplexDlgCon(cc,
-			(lookup (Sound::rc_vars, "LOAD_ALSA", "no") == "yes"),
 			(lookup (Sound::rc_vars, "LOAD_ALSA_SEQ", "no") == "yes"), show_fonts);
 
         // dialog title
@@ -149,11 +148,6 @@ Try to restart sound system?")))
 	    UI::ChangeWidget(`id(`configured_table), `CurrentItem, 0);
 	}
 
-	if (lookup (Sound::rc_vars, "LOAD_ALSA", "") != "yes")
-	{
-	    UI::ChangeWidget(`id(`b_seq), `Enabled, false);
-	}
-
 	do
 	{
 	    if (!Sound::autoinstallation)
@@ -162,6 +156,7 @@ Try to restart sound system?")))
 	    }
 
 	    ui = UI::`UserInput ();
+
 	    if (ui == `b_delete)
 	    {
 		ui = `delete;
@@ -238,12 +233,6 @@ Restart sound system now?
 	    else if (ui == `b_fonts)
 	    {
 		InstallFonts("", true);
-	    }
-	    else if (ui == `b_alsa)
-	    {
-		string value = UI::QueryWidget(`id(`b_alsa), `Value) ?  "yes" : "no";
-		Sound::rc_vars = add(Sound::rc_vars, "LOAD_ALSA", value);
-		UI::ChangeWidget(`id(`b_seq), `Enabled, value == "yes");
 	    }
 	    else if (ui == `b_seq)
 	    {
