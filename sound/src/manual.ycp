@@ -156,6 +156,11 @@
 	    curr_key		= Sound::curr_driver;
 	    keys_names		= module_names;
 	}
+	if (!Sound::use_alsa && curr_key == "")
+	{
+	    Sound::curr_driver	= module_names[0]:"";
+	    curr_key		= Sound::curr_driver;
+	}
 	list card_names		= get_card_names (curr_key, keys);
 	term contents = `VBox (
 	    `HBox (

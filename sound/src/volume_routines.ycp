@@ -171,7 +171,7 @@
 	}
 	else
 	{
-	    list mods = SCR::Dir(.modinfo.kernel.drivers.sound);
+	    list mods = SCR::Dir(.modinfo.kernel.sound.oss);
 	    mods = add(mods, "emu10k1");
 	    mods = add(mods, "cs4281");
 	    map modules = (map) SCR::Read(.proc.modules);
