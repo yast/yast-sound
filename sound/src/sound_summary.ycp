@@ -48,7 +48,6 @@ else
     list keys	    = read_unique_keys();
     list save_info  = read_save_info ();
 
-y2error("%1", save_info);
 
     list conflist   = [];	// configured
     list notlist    = [];	// not configured

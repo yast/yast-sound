@@ -214,7 +214,6 @@
 	    retlist = add(retlist, sublist);
 	    i = i + 1;
 	}
-	y2error(sformat("%1", retlist));
 	return retlist;
 
     }

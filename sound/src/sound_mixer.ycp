@@ -42,11 +42,7 @@
 	integer nchan = size(channels)-2;	 // don't count in 'Master' and 'PCM'
 	integer ncols = 4; //tointeger(tofloat(nchan) / 4.0 + 0.999);	 // how many columns will we have?
 
-	y2error("### %1 columns", ncols);
-
 	integer chansPerCol = tointeger(tofloat(nchan) / tofloat(ncols) +0.999); // how many channels per column
-
-	y2error("### %1 chans per column", chansPerCol);
 
 	term mainGroup = `Frame(_("&Master volume"));
 
