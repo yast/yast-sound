@@ -79,9 +79,9 @@
 	}
     });
 
-    BrowseTree(output);
+//    BrowseTree(output);
 
 
 
-    SCR::Write(.target.ycp, "./idlist.ycp", output);
+    SCR::Write(.target.ycp, "./idlist.ycp.in", output);
 }

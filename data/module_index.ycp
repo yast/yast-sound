@@ -73,5 +73,5 @@ $[
     52	: "snd-card-wavefront",
     53	: "snd-card-ymfpci",
 
-    100 : "snd-card-awacs"
+    100 : "snd-card-pmac"
 ]

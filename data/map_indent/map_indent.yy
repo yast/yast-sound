@@ -22,7 +22,7 @@ int indent(int tabs)
 "\$["|"["	{
 	    printf("\n");
 	    indent(depth);
-	    printf("$[\n");
+	    printf("%s\n", yytext);
 	    doind = 1;
 	    depth++;
 	}
