@@ -27,6 +27,8 @@
     include "sound/routines.ycp";
     include "sound/ui.ycp";
     include "sound/texts.ycp";	
+    
+    include "browser.ycp";
 
     map STRINGS=STRINGS_();
 
@@ -134,7 +136,7 @@
         string helptext=lookup(STRINGS, "ComplexDialog");
 
 	list conf_cards = get_running_cards ();
-	list uniq_keys = read_unique_keys ();
+	list uniq_keys = configured_unique; //read_unique_keys ();
 
 	if(size(conf_cards) < size(uniq_keys))
 	{
@@ -207,7 +209,9 @@
 		    string mod = SCR(`Read(.modules.alias, sformat ("snd-card-%1", card_id)));
 		    SCR(`Execute(.target.modprobe, sformat ("-r %1", mod), ""));
 		    to_delete = add (to_delete, mod);
-		    
+		   
+		    remove_tmp_module_by_name(mod);
+ 
 		    configured_unique=remove(configured_unique, card_id);
 		}
 		else if (size (conf_cards) > card_id) 
@@ -253,7 +257,7 @@
 	    else if (ui == `b_options)
 	    {
 		integer card_id = UI(`QueryWidget (`id(`configured_table), `CurrentItem));
-		list cards=get_audio (false,false);
+// cards are inherited from main \|/		list cards=get_audio (false,false);
 		map card=RestoreCardInfo(select(cards, card_id), save_info);
 		UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
 		map res=CallModule("sound_options", [card]);
@@ -452,6 +456,11 @@
     list cards     = Args(0);
     list save_info = Args(1);
     list configured_unique = Args(2);
+
+//    BrowseTree(save_info);
+
+    cards=order_cards_by_uniques(cards, configured_unique);
+    
 
     list to_delete = [];
     boolean config_mode = false;
