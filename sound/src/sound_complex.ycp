@@ -194,6 +194,13 @@
     }
 
 
+    define enableButtons(boolean val) ``{
+	UI(`ChangeWidget(`id(`b_delete), `Enabled, val));
+        UI(`ChangeWidget(`id(`b_options), `Enabled, val));
+	UI(`ChangeWidget(`id(`b_volume), `Enabled, val));
+
+    }
+
     /**
      * shows list of soundcards 
      *
@@ -239,9 +246,7 @@ Try to restart sound system?"))))
     
 	if (size (cc) == 0) 
 	{
-	    UI(`ChangeWidget(`id(`b_delete), `Enabled, false));
-	    UI(`ChangeWidget(`id(`b_options), `Enabled, false));
-
+	    enableButtons(false);
 	}
 	else 
 	{
@@ -255,6 +260,8 @@ Try to restart sound system?"))))
 
 	repeat 
 	{
+	    SCR(`Execute(.audio.alsa.restore));
+
 	    ui = UI (`UserInput ());
 	    if (ui == `b_delete && UI(`YesNoPopup(_("Really delete this entry?")))) 
 	    {
@@ -278,7 +285,7 @@ Try to restart sound system?"))))
 		SaveModulesEntry (save_info, [], true);
 
 		SCR(`Execute (.target.bash, "/etc/init.d/alsasound stop ", $[]));
-		alsasound_start_tmp(false);
+		alsasound_start_tmp(true);
 		y2error(sformat("%1", vol_settings));
 		set_vol_settings(vol_settings);
 		
@@ -288,8 +295,7 @@ Try to restart sound system?"))))
 		if (size (cc) == 0) 
 		{
 		    SCR(`Execute (.target.bash, "/etc/init.d/alsasound stop", $[]));
-		    UI(`ChangeWidget(`id(`b_delete), `Enabled, false));
-		    UI(`ChangeWidget(`id(`b_options), `Enabled, false));
+		    enableButtons(false);
 		}
 		else
 		{ 
@@ -443,12 +449,12 @@ Try to restart sound system?"))))
 	    
 		if (size (cc) == 0) 
 		{
-		    UI(`ChangeWidget(`id(`b_delete), `Enabled, false));
-		    UI(`ChangeWidget(`id(`b_options), `Enabled, false));
+		    enableButtons(false);
 		}
 		else
 		{
 		    UI(`ChangeWidget(`id(`configured_table), `CurrentItem, 0));
+		    enableButtons(true);
 		}
 	    }
 	    else if(ui == `cancel || ui == `abort)

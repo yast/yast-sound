@@ -25,6 +25,7 @@
     include "sound/texts.ycp";
     include "ui/common_popups.ycp";
     include "ui/wizard_dialog.ycp";
+    include "ui/wizard_hw.ycp";
 
     map STRINGS=STRINGS_();
 
@@ -457,136 +458,6 @@
      */
 
     global define selectHardware(list newHw, string confHw) ``{
-/*        list titles=[];
-
-	integer index=-1;
-	newHw=maplist(`e, newHw, ``{
-	    index=index+1;
-	    return `item(`id(index), e);
-	    });
-
-	index=-1;
-	confHw=maplist(`e, confHw, ``{
-            index=index+1;
-            return `item(`id(index), e);
-            });
-
-        titles=add(titles, _("Hardware detection didn't find any devices"));
-            // 1:new 0:already
-        titles=add(titles, _("Hardware detection found a new device"));
-            // 2:new 0:already
-        titles=add(titles, _("Hardware detection found new devices"));
-            // 0:new 1:already
-        titles=add(titles, _("Hardware detection found already installed device"));
-            // 1:new 1:already
-        titles=add(titles, _("Hardware detection found a new device and already\ninstalled device"));
-            // 2:new 1:already
-        titles=add(titles, _("Hardware detection found new devices and already\ninstalled device"));
-            // 0:new 2:already
-        titles=add(titles, _("Hardware detection found already installed devices"));
-            // 1:new 2:already
-        titles=add(titles, _("Hardware detection found a new device and already\ninstalled devices"));
-            // 2:new 2:already
-        titles=add(titles, _("Hardware detection found new devices and already\ninstalled devices"));
-
-	titles=UI(titles);
-
-        integer pos=0;
-        boolean enab1=true; // listbox for new devices enabled flag
-        boolean enab2=true; // listbox for configured devices enabled flag
-
-        if(size(newHw)>0)
-        {
-            if(size(newHw)==1)
-            {
-                pos=1;
-            }
-            else
-            {
-                pos=2;
-            }
-        }
-        else
-        {
-            enab1=false;
-        }
-
-        if(size(confHw)>0)
-        {
-            if(size(confHw)==1)
-            {
-                pos=pos+3;
-            }
-            else
-            {
-                pos=pos+6;
-            }
-        }
-        else
-        {
-            enab2=false;
-        }
-
-        term con=
-            `VBox (
-                `VSpacing (1),
-                `Label (`opt (`hstretch), select(titles, pos)),
-                `VSpacing (1),
-                `HBox (`HSpacing (5), `RadioButtonGroup (
-                    `id (`action),
-                    `VBox (
-                        `HBox(
-                            `Top(`RadioButton (`id (`new),  "", true)),
-                            `Top(`SelectionBox(`id(`nh), `opt(`notify), _("&Activate new found device"), newHw))
-                        ),
-                        `VSpacing (0.3),
-                        `HBox(
-                            `Top(`RadioButton (`id (`configured), "")),
-                            `Top(
-                                `VBox(
-                                    `SelectionBox(`id(`ch), `opt(`notify), _("&Edit already installed device"), confHw),
-                                    `Right(`PushButton(`id(`detail), _("&Show detailed list")))
-                                )
-                            )
-                        ),
-                        `VSpacing (0.3),
-                        `HBox(
-                            `Top(`RadioButton (`id (`manual), "")),
-                            `Top(`Label(`opt(`hstretch), _("Add &device manually")))
-                        )
-                    )
-                    )),
-                `VStretch ()
-                );
-	string helptext=_("<P>Hardware detection found new soundcard. Check the <B>Activate new found device</B> or <B>Edit already installed device</B> respectively.</P>");
-    
-        UI(`SetWizardContents (_("Sound card configuration"), con, helptext, true, true));
-        if(!enab1)
-        {
-            UI(`ChangeWidget (`id(`action), `CurrentButton, 1));
-            UI(`ChangeWidget (`id(`nh), `Enabled, false));
-            UI(`ChangeWidget (`id(`new), `Enabled, false));
-        }
-	else
-	{
-	    UI(`ChangeWidget (`id(`nh), `CurrentItem, 0));
-	}
-
-        if(!enab2)
-        {
-            if(!enab1)
-            {
-                UI(`ChangeWidget (`id(`action), `CurrentButton, 2));
-            }
-            UI(`ChangeWidget (`id(`ch), `Enabled, false));
-            UI(`ChangeWidget (`id(`configured), `Enabled, false));
-        }
-	else 
-	{
-	    UI(`ChangeWidget (`id(`ch), `CurrentItem, 0));
-	}
-*/
-
 	integer index=-1;
         newHw=maplist(`e, newHw, ``{
             index=index+1;              // select first item
@@ -596,6 +467,9 @@
 	    // to translators: the full meaning of message is: "Add other not detected soundcard"
 	newHw=add(newHw, `item(`id(-1), _("Other (not detected)"), size(newHw)==0));
 
+	any widget=HwCreateDetectedContent(_("&Sound cards to configure"), newHw, false, 
+					sformat(_("<P><B>Already configured soundcards:</B>%1</P>"), confHw));
+/*
 	any widget=`HBox(`HSpacing(1.5),
               `VBox(
                   `VSpacing(0.4),
@@ -620,7 +494,7 @@
               ),
               `HSpacing(1.5)
         );
-
+*/
 	string helptext=lookup(STRINGS, "selectHardware");
 
 
