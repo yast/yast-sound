@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Mar 10 17:56:10 CET 2003 - jsuchome@suse.de
+
+- tiwai@suse.de:
+- added ICH5 support.
+- fixed HDSP description.
+
+-------------------------------------------------------------------
 Tue Mar  4 21:40:11 CET 2003 - nashif@suse.de
 
 - fixed testsuite
