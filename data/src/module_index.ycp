@@ -73,6 +73,13 @@ $[
     52	: "snd-wavefront",
     53	: "snd-ymfpci",
     54  : "snd-korg1212",
+    55  : "snd-azt3328",
+    56  : "snd-sscape",
+    57  : "snd-serialmidi",
+    58  : "snd-usb-audio",
+    59  : "snd-rme32",
+    60  : "snd-hdsp",
+    61  : "snd-msnd-pinnacle",
 
     100 : "snd-powermac"
 ]
