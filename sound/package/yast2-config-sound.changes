@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Sep 21 12:16:42 CEST 2001 - dmeszar@suse.cz
+
+- bug #7198 fixed (warning popup for nm256 sound cards 
+  not shown when the card is configured and module is 
+  launched again)
+
+-------------------------------------------------------------------
 Thu Sep 20 13:48:34 CEST 2001 - dmeszar@suse.cz
 
 - bug #10941 ('nil' shown as card label when uniq_id has changed 
