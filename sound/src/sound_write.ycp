@@ -66,6 +66,7 @@
     import "Progress";
     import "Wizard";
     import "Service";
+    import "Package";
 
     import "Sound";
     import "Joystick";
@@ -127,6 +128,15 @@
 
     Progress::NextStage();
 
+    // ensure that all required kernel modules are installed
+    list<string> reqmodules = Sound::RequiredKernelModules();
+
+    if (reqmodules != nil && size(reqmodules) > 0)
+    {
+	Package::InstallKernel(Sound::RequiredKernelModules());
+    }
+
+    // save config to /etc/modprobe.d/sound
     SaveModulesEntry(save_info, []);
 
     sleep(10);
