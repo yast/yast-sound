@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed May 15 11:58:51 CEST 2002 - arvin@suse.de
+
+- use %{_libdir} in plugin path
+
+-------------------------------------------------------------------
 Wed Apr 17 08:34:00 CEST 2002 - lslezak@suse.cz
 
 - use y2autoconf, create-spec
