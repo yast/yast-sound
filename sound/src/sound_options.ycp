@@ -67,7 +67,7 @@
 	if (size (msg) == 0) return "";
 
 	integer i = 1;
-	term format = ``sformat (Trans (select (msg, 0), lang));;
+	term format = ``(sformat (Trans (select (msg, 0), lang)));
 
 	while (i < size (msg)) {
 	    format = add (format, select (msg, i));

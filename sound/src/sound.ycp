@@ -199,8 +199,8 @@
     define OneCardWizard (map card, integer card_id, any ui) ``{
 	
 
-	list dialog = [``DisplayName (hardware_name (card), sformat("snd-card-%1", card_id)),
-		      ``CallModule ("sound_volume", [card, card_id])];
+	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id))),
+		      ``(CallModule ("sound_volume", [card, card_id]))];
 			//$["ui" : `next, "return" : true]];
 
 
@@ -238,7 +238,7 @@
 
 		id = id - 1;
 		
-		if (id == 0) dialog = filter (`e, dialog, ``(e != ``CallModule ("sound_options", [card])));
+		if (id == 0) dialog = filter (`e, dialog, ``(e != ``(CallModule ("sound_options", [card]))));
 		
 	    }
 	    else if (ui == `options) {
@@ -246,7 +246,7 @@
 		integer i = 0;
 		// insert into the pre-last position
 		foreach (`e, dialog, ``{
-		    if ((size (dialog) - 1) == i) nd = add (nd, ``CallModule ("sound_options", [card]));
+		    if ((size (dialog) - 1) == i) nd = add (nd, ``(CallModule ("sound_options", [card])));
 		    nd = add (nd, select(dialog, i));
 		    i = i + 1;
 		});
@@ -383,7 +383,7 @@
 	    save_map = add (save_map, "cards",  save_info);
 	    save_map = add (save_map, "system", $["modules" : alsa_oss (n_cards),
 						 "rc"       : rc_vars]);
-	    save_map = add (save_map, "other",  ``AlsaFinish ());
+	    save_map = add (save_map, "other",  ``(AlsaFinish ()));
 	
 
 	}

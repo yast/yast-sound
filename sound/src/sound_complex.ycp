@@ -306,7 +306,7 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 		    }
 		    else if (lookup (result, "way") == `manual) {
 
-			list dialog = [``CallModule ("sound_manual", [])];
+			list dialog = [``(CallModule ("sound_manual", []))];
 			integer id      = 0;
 
 			while ((id >= 0) && (id < size (dialog))) {
@@ -315,7 +315,7 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 			    ui     = lookup (result, "ui", `cancel);
 
 			    if (ui == `back) {
-				dialog = filter (`e, dialog, ``(e == ``CallModule ("sound_manual", [])));
+				dialog = filter (`e, dialog, ``(e == ``(CallModule ("sound_manual", []))));
 				id = id - 1;
 			    }
 			    else if ((ui == `cancel) || (ui == `skip))
@@ -323,7 +323,7 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 			    else if (ui == `next) {
 
 				if (id == 0)
-				    dialog = add (dialog, ``OneCardWizard (lookup (result, "return"), size (save_info), ui));
+				    dialog = add (dialog, ``(OneCardWizard (lookup (result, "return"), size (save_info), ui)));
 				if (id == 1) {
 			
 				    save_info = add (save_info, lookup (result, "return"));

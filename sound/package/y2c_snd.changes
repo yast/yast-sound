@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Dec  7 16:00:25 CET 2000 - arvin@suse.de
+
+- fix double quoted symbol
+
+-------------------------------------------------------------------
 Thu Dec  7 09:03:44 CET 2000 - dan@suse.cz
 
 - y2d_snd is required, amixer call differ for more cards 
