@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Aug 10 09:20:14 CEST 2004 - jsuchome@suse.cz
+
+- merged proofread texts
+
+-------------------------------------------------------------------
 Wed Jul 28 12:40:55 CEST 2004 - lslezak@suse.cz
 
 - joystick package has been renamed to input-utils (#43297)
