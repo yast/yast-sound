@@ -283,7 +283,7 @@
 				// not istalled
 	    define NotInstalled () ``{
 				// Help text when Alsa-drivers are not installed 1/1
-		string help_text = UI(_("Sound support needs to have installed <b>ALSA</b> package. You find it in the <b>SuSE</b> distribution (series 'snd') or you can download it from <i>http://www.alsa-project.org</i>"));
+		string help_text = UI(_("Sound support requires the <b>ALSA</b> package. You can find it in the <b>SuSE</b> distribution (series 'snd') or you can download it from <i>http://www.alsa-project.org</i> and than install it."));
 		
 		UI(`SetContents (_("Sound cards"),
 				 `HVCenter (
@@ -303,7 +303,7 @@
 
 	    define DBNotFound () ``{
 				// Help text when sndcards database not found 1/1
-		string help_text = UI(_("This generally means that some internal <b>YaST2</b> file is missing or corrupted. Please try to reinstall <b>YaST2</b>, you find it in <b>SuSE</b> distribution, series 'a1'."));
+		string help_text = UI(_("An internal <b>YaST2</b> file is missing or corrupted. Please try to reinstall <b>YaST2</b>. You will find it in <b>SuSE</b> distribution, series 'a1'."));
 		
 		UI(`SetContents (_("Sound cards"),
 				 `HVCenter (
@@ -374,7 +374,7 @@
 				// Help text 1/2 (autodetection failed)
 		help_text = help_text + UI(_("If you still want to configure your sound card, press the <i>Manual</i> button. Otherwise simply quit by pressing the <i>Back</i> button.</p>"));
 		
-		message = UI (_("There were found no sound cards on your system.\n Try manual setup."));
+		message = UI (_("No sound cards were found on your system.\n Try manual setup."));
 		con = add (con, `HVCenter(`ReplacePoint(`id(`rp), `Label(message))));
 		con = add (con, `Bottom(`PushButton(`id (`manual), _("&Manual"))));
 	    
@@ -404,7 +404,7 @@
 			    // Help text 1/2 (driver not available)
 			help_text = UI(_("<p>This means that appropriate driver for your your sound card is not available<p>."));
 			    // Help text 2/2 (driver not available)			
-			help_text = help_text + UI(_("<p>You may try to use one of available drivers that can fit to your sound card by pressing <i>Let me choose</i> button.</p>"));
+			help_text = help_text + UI(_("<p>You may try to use one of available drivers that can fit to your sound card by pressing the <i>Let me choose</i> button.</p>"));
 			
 			next = false;
 		    }
@@ -424,7 +424,7 @@
 			    // Help text 1/2 (one sound card found)
 			help_text = UI (_("<p>The sound card was found. If you want to configure this sound card press <i>Next</i> otherwise quit by pressing <i>Back</i><p/>"));
 			    // Help text 2/2 (one sound card found)
-			help_text = help_text + UI (_("<p>You can change options that are passed to the module by pressing <i>Options</i> buton.</p>"));
+			help_text = help_text + UI (_("<p>You can change option values that are passed to the module by pressing the <i>Options</i> button.</p>"));
 
 			ret = add (ret, "module", module);
 		    }
@@ -488,7 +488,7 @@
 			    map|void manual = CallFunction (`sound_manual (database_name, manual_driver, manual_model));
 
 			    if (manual == nil) {
-				message = sformat (UI(_("Can not find module: %1")), "sound_manual");
+				message = sformat (UI(_("Cannot find module: %1")), "sound_manual");
 				UI (`DisplayMessage (message));
 			    }
 		    
@@ -504,7 +504,7 @@
 				// help text 1/1
 				help_text = UI (_("<p>By pressing the <i>Next</i> button you should get your sound card working.</p>"));
 				    // help text 2/2
-				help_text = help_text + UI (_("<p>You can change options that are passed to the module by pressing <i>Options</i> buton.</p>"));
+				help_text = help_text + UI (_("<p>You can change option values that are passed to the module by pressing the <i>Options</i> button.</p>"));
 				
 				//message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
 
@@ -555,7 +555,7 @@
 									 options_entered, 0));
 
 		    if (options == nil) {
-			message = sformat (UI(_("Can not find module: %1")), "sound_options");
+			message = sformat (UI(_("Cannot find module: %1")), "sound_options");
 			UI (`DisplayMessage (message));
 		    }
 		    else if (size (options) > 0) {
@@ -581,7 +581,7 @@
 		    map|void manual = CallFunction (`sound_manual (database_name, manual_driver, manual_model));
 
 		    if (manual == nil) {
-			message = sformat (UI(_("Can not find module: %1")), "sound_manual");
+			message = sformat (UI(_("Cannot find module: %1")), "sound_manual");
 			UI (`DisplayMessage (message));
 		    }
 		    
@@ -597,7 +597,7 @@
 			    // help text 1/2
 			help_text = UI (_("<p>By pressing the <i>Next</i> button you should get your sound card working.</p>"));
 			    // help text 2/2
-			help_text = help_text + UI (_("<p>You can change options that are passed to the module by pressing <i>Options</i> buton.</p>"));
+			help_text = help_text + UI (_("<p>You can change option values that are passed to the module by pressing the <i>Options</i> button.</p>"));
 			
 			    //message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
 

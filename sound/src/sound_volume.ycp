@@ -186,11 +186,11 @@
 		// error
 
 				// Help text - intenal YaST2 error 1/3
-	    help_text = UI(_("<p>This indicates some kind of error. There might be several reasons. </p>"));
+	    help_text = UI(_("<p>An error has occured. </p>"));
 				// Help text - intenal YaST2 error 2/3
-	    help_text = help_text + UI(_("<p>You should check that you have installed right <b>ALSA</b> package (series 'snd') for sound support or you're running this as a root.</p>"));
+	    help_text = help_text + UI(_("<p>Check that you have installed the correct <b>ALSA</b> package (series 'snd') and that you are running this as a root.</p>"));
 				// Help text - intenal YaST2 error 3/3
-	    help_text = help_text + UI (_("<p>If the the problem persist you can try to pass some <b>options</b> to the ALSA kernel module. If you still can't get sound card working, you can try <i>OSS/Free</i> or another modules, which are currently not supported by <b>YaST2</b>.</p>"));
+	    help_text = help_text + UI (_("<p>If the the problem persist, you can try to pass <b>options</b> to the ALSA kernel module. If you still cannot get sound card to work, you can try <i>OSS/Free</i> or another modules(drivers). However <b>YaST2</b> sound configuration currently supports only ALSA modules.</p>"));
 	    
 	    con = `VBox(`Top (`Label (soundcard_name (snd_info))),
 			`HVCenter(`Label (err)));

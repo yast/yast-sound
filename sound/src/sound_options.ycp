@@ -144,14 +144,14 @@
 		if (tolower(substring (value, 0, 2)) == "0x") {		// hex number
 		    string rest = tolower(substring (value, 2));
 		    if (filterchars(rest, "0123456789abcdef") != rest) 
-			return sformat (UI(_("The value: %1 must be integer")), value);
+			return sformat (UI(_("The value: %1 must be a number")), value);
 		}
 		else {		// decimal number
 		    string rest = value;
 		    if (substring (value, 0, 1) == "-")	 // negative number
 			rest = substring (value, 1);
 		    if (filterchars(rest, "0123456789") != rest)
-			return sformat (UI(_("The value: %1 must be integer")), value);
+			return sformat (UI(_("The value: %1 must be a number")), value);
 		}
 	    }
 	    else if (type == "string") {
@@ -220,7 +220,7 @@
 	help_text = help_text + UI(_("If you are not <b>absolutely sure</b> what are you doing, please leave this dialog untouched."));
 
 				// Help text for options 3/4
-	help_text = help_text + UI (_("<p>Choose the option you want to set, use <i>Set</i> button for setting option value, you can reset all values by pressing <i>Reset</i>. Number values can be entered as decimal or hexadecimal (hexadecimal with <b>0x</b> prefix).</p>"));
+	help_text = help_text + UI (_("<p>Choose the option you want to set, use the <i>Set</i> button to enable new value. You can reset all values by pressing <i>Reset</i>. Number values can be entered as decimal or hexadecimal (hexadecimal with a <b>0x</b> prefix).</p>"));
 	
 				// Help text for options 4/4
 	help_text = help_text + UI (_("Please refer to the <b>SuSE</b> help system, section 'package description', series 'snd', <b>alsa</b> package for more information."));

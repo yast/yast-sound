@@ -67,11 +67,11 @@
 				   )));
 
 				// Help text, if an attempt for configuration failed 1/2
-	    help_text = UI (_("<p>This indicates that there <b>already</b> was an attempt to configure the sound card, but the card is not functioning. There might be several reasons: 1. you have tried to configure the sound outside the <b>YaST2</b> and you were unsuccessful, 2. the card you want to configure needs some options to be set up manually and you didn't make it, 3. you have passed some wrong options to the sound card module."));
+	    help_text = UI (_("<p>The sound card does not function correctly although it has <b>previously</b> been configured. Possible causes are: 1. You have tried to configure the sound outside the <b>YaST2</b> and you were unsuccessful. 2. The card requires option values which you must enter manually. 3. You have passed some incorrect options or option values to the sound card module."));
 
 
 				// Help text, if an attempt for configuration failed 2/2
-    help_text = help_text + UI(_("<p>You can reset the previous configuration by pressing <i>Reset</i> button and try to configure the card again. Please refer to the <b>SuSE</b> help system, section 'package description', series 'snd', <b>alsa</b> package for more information."));
+    help_text = help_text + UI(_("<p>You can reset the configuration process by pressing the <i>Reset</i> button and try to configure the card again. Please refer to the <b>SuSE</b> help system, section 'package description', series 'snd', <b>alsa</b> package for more information."));
 
 
 	}
@@ -89,7 +89,7 @@
 	    help_text = UI(_("<p>There <b>already exists</b> a configured sound card.</p>"));
 				// Help text - existing sound card 2/2
 				// To translators: the only way to change the configuration is to delete an old one and create another
-	    help_text = help_text + UI(_("<p>Currently YaST2 <b>cannot</b> be used for editing previously configured sound cards, you can just <b>reset</b> previous configuration. If you want to reconfigure this sound card, you have to reset previous configuration and configure it from scratch.</p>"));
+	    help_text = help_text + UI(_("<p>Currently, YaST2 <b>cannot</b> be used for modifying existing sound card configurations. If you want to change a sound card's configuration, you must <b>reset</b> the existing card configuration and reconfigure the card from scratch.</p>"));
 
 
 	}

@@ -34,8 +34,7 @@
 				// dialog when DB not found or corrupted
 	define DBNotFound () ``{
 				// Help text when sndcards database not found 1/1
-	    string help_text = UI(_("<p>This generally means that some
- internal <b>YaST2</b> file is missing or corrupted. Please try to
+	    string help_text = UI(_("<p>An internal <b>YaST2</b> file is missing or corrupted. Please try to
  reinstall <b>YaST2</b>, you find it in <b>SuSE</b> distribution,
  series 'a1'.</p>"));
 	    
@@ -134,7 +133,7 @@
 	list itemized_models = itemize_list (models, Args(2));
 
 	    // Help text - manual configuration 1/1
-	help_text = UI(_("<p>Please choose the sound card, you want to configure <b>manually</b>. You can use the text entry at the bottom for searching for a particular sound card.</p>"));
+	help_text = UI(_("<p>Please <b>manually</b> choose the sound card, you want to configure. You can search for a particular sound card by entering the name in the search box.</p>"));
 	
 	con = `VBox ();
 	con = add (con, `HBox (
