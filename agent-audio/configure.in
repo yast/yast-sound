@@ -52,12 +52,15 @@ AC_DEFINE_UNQUOTED(YAST2HOME, "${YAST2DIR}")
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
 
+AC_CHECK_LIB(asound, snd_mixer_open, LIBASOUND=-lasound, LIBASOUND=)
+AC_SUBST(LIBASOUND)
+
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_INLINE
 
 AC_OUTPUT(Makefile
-	package/$RPMNAME.spec:$RPMNAME.spec.in
+	package/yast2-agent-audio.spec:yast2-agent-audio.spec.in
 	src/Makefile
 	doc/Makefile
 	doc/autodocs/Makefile
