@@ -707,7 +707,7 @@ Do you want to select the driver manually?"),
 	define isPPCexception (map snd_info) ``{
 	    if (tolower(lookup(snd_info, "bus", "")) == "pci"
 		&& lookup (snd_info, "device_id", 0) == 262160
-		&& lookup (snd_info, "vendor_id", 0) == 263169)
+		&& lookup (snd_info, "vendor_id", 0) == 263170)
 		return true;
 
 	    return false;
