@@ -264,7 +264,7 @@
 
 
 	    con = `VBox (
-		`Top(`Label (Args (0))),
+		`VSquash(`Top(`Label (Args (0)))),
 		`Table (`id(`table), `opt (`notify, `immediate, `hshrinkable), `header(_("Description"), _("Option"),
 										       `Right(_("Value"))), itemized_descriptions),
 		`VBox (
