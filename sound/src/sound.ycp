@@ -376,7 +376,7 @@
 		    else {
  			    // To translators: parameter is sound card name
 			message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
-			con = add (con, `HVCenter(`Label(message)));
+			con = add (con, `HVCenter(`Label(`opt(`outputField), message)));
 			con = add (con, `Bottom(`PushButton(`id (`options), _("&Options"))));
 			
 			    // Help text 1/2 (one sound card found)
@@ -464,7 +464,7 @@
 				help_text = help_text + UI (_("<p>You can change options that are passed to the module by pressing <i>Options</i> buton.</p>"));
 				
 				message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
-				con = add (con, `ReplacePoint (`id(`rp), `HVCenter(`Label(message))));
+				con = add (con, `ReplacePoint (`id(`rp), `HVCenter(`Label(`opt (`outputField), message))));
 				con = add (con, `Bottom(`PushButton(`id (`options), _("&Options"))));
 				next = true;
 				
@@ -550,7 +550,7 @@
 			help_text = help_text + UI (_("<p>You can change options that are passed to the module by pressing <i>Options</i> buton.</p>"));
 			
 			message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
-			con = add (con, `ReplacePoint (`id(`rp), `HVCenter(`Label(message))));
+			con = add (con, `ReplacePoint (`id(`rp), `HVCenter(`Label(`opt (`outputField), message))));
 			con = add (con, `Bottom(`PushButton(`id (`options), _("&Options"))));
 			next = true;
 			
