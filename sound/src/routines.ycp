@@ -46,8 +46,8 @@
 	    if (all_card_names == [] || all_card_names == nil)
 	    {
 		// use card names from db_cards (they contain the vendor name)
-		list<list<string> > all_card_names_list = (list<list<string> >) maplist (integer k, list<string> v, (map <integer, list<string> >)Sound::db_cards,
-		    ``(v));
+		list<list> all_card_names_list = maplist (integer k, list v,
+		    (map <integer,list>) Sound::db_cards, ``(v));
 		all_card_names = sort ((list<string>) flatten (all_card_names_list));
 	    }
 	    return all_card_names;
@@ -63,10 +63,11 @@
 	    if (!Sound::use_alsa)
 		return [sformat("Sound card (%1)", key)];
 
-	    map<string,integer> mods = mapmap (integer k, string v, (map <integer,string>) Sound::db_module_index,
-		``($[v : k]));
+	    map mods = mapmap (integer k, string v,
+		(map <integer,string>) Sound::db_module_index, ``($[v : k]));
 	    integer index	= mods[key]:0;
-	    list<string> cards		= sort ((list<string>) (Sound::db_cards[index]:[]));
+	    list<string> cards	= sort (
+		(list<string>) (Sound::db_cards[index]:[]));
 
 	    if (cards == [])
 	    {
@@ -226,13 +227,13 @@
 	    }
 	    else
 	    {
-		list<string> ret = (list<string>) SCR::Dir(.modinfo.kernel.drivers.sound);
+		list<string> ret = (list<string>) SCR::Dir(.modinfo.kernel.sound.oss);
 		ret = filter(string mod, ret, ``(mod != "sound"));
 		ret = add(ret, "emu10k1");
 		ret = add(ret, "cs4281");
 		list<term> ret_t = maplist(string e, ret,``{
 		    string descr = lookup(
-			(map)SCR::Read(add(.modinfo.kernel.drivers.sound, e)),
+			(map)SCR::Read(add(.modinfo.kernel.sound.oss, e)),
 			"module_description", "");
 		    return
 		    `item(`id(e), (descr != "" && descr != "<none>")? descr: e);

@@ -480,7 +480,7 @@ define boolean ListModulesHandler (map options) ``{
 /* the command line description map */
 map cmdline = $[
     "id"		: "sound",
-    // translators: command line help text for Tv module
+    // translators: command line help text for Sound module
     "help"		: _("Sound card configuration module."),
     "guihandler"	: SoundSequence,
     "initialize"	: SoundRead,
@@ -496,7 +496,7 @@ map cmdline = $[
 	    // translators: command line help text for add action
 	    "help"	: _("Add sound card. Without parameters, add first one detected."),
 	    "options"	: [ "non_strict" ],
-	    // help text for unknownd parameters; do not translate 'show'
+	    // help text for unknownd parameters
 	    "non_strict_help" : _("Value of the specific module parameter."),
 	],
 	"remove" :$[
@@ -543,7 +543,7 @@ map cmdline = $[
     ],
     "options"		: $[
 	"card"	:$[
-	    // translators: command line help text for the 'no' option
+	    // translators: command line help text for the 'card' option
 	    "help"	: _("Number of sound card"),
 	    "type"	: "string"
 	],
@@ -569,10 +569,10 @@ map cmdline = $[
     "mappings"		: $[
 	"summary"	: [],
 	"add"		: [ "card", "all", "module", "play", "volume"],
-	"remove"	: [ "card", "all" ],
+	"remove"	: [ "card", "all" ],//delete alias
 	"playtest"	: [ "card" ],
 	"show"		: [ "card" ],
-	"set"		: [ "card", "volume" ],
+	"set"		: [ "card", "volume" ],//edit alias
 	"channels"	: [ "card" ],
 	"volume"	: [ "card", "play" ],
 	"modules"	: [],
