@@ -77,10 +77,11 @@
 
 /* end of sound fonts installation */
 
-
 	string master_elem = lookup(lookup(Sound::db_modules, modname, $[]), 
 	    "main_volume", "Master");
         setVolume (master_elem, card_id, vol);
+	// some cards use Headphone instead of Master (bug #26539):
+	setVolume("Headphone", card_id, vol);
 
 	do
 	{
@@ -90,6 +91,7 @@
 	    {
 		vol = UI::QueryWidget(`id(`volume), `Value );
 		setVolume(master_elem, card_id, vol);
+		setVolume("Headphone", card_id, vol);
 	    }
 	    else if (ui == `test)
 	    {

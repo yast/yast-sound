@@ -29,6 +29,7 @@
     include "ui/common_popups.ycp";
     include "sound/joy_dialog.ycp";
     import  "Wizard";
+    import  "Progress";
 
     import  "Joystick";
     import  "Sound";
@@ -199,24 +200,18 @@
     Wizard::CreateDialog();
 
     // read sound card configuration
-    Sound::Read(``{});
-    Sound::LoadDatabase();
+    Progress::off();
+    if (!Sound::Read(false))
+	return `abort;
+    Progress::on();
 
     // read joystick configuration
     Joystick::Read(``{});
 
     y2debug("Read joystick configuration: %1", Joystick::joystick);
 
-/*  TODO: test mode
-    if (Mode::test == true)
-    {
-	// display all dialogs
-    }
-    else*/
-    {
-	// start wizard sequencer
-	WizardSequencer(aliases, sequence);
-    }
+    // start wizard sequencer
+    WizardSequencer(aliases, sequence);
 
     // close dialog
     Wizard::CloseDialog();

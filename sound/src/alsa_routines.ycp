@@ -82,6 +82,7 @@
     global define void sound_start_tmp(boolean restore) ``{
 	string snd = sformat("/sbin/modprobe snd snd_cards_limit=%1 snd_major=116", size(Sound::modules_conf));
 
+
 	// get the list of commands needed for start
 	list cmds = Sound::CreateModprobeCommands();
 
@@ -376,7 +377,7 @@
         }
         return modules;
     }
-    
+
     /**
      * returns list of autodetected sound cards that haven't been already configured
      * @param save_info list of already configured cards
@@ -388,13 +389,11 @@
         snd = filter_configured(save_info, snd);
         if (size(snd) > 0)
         {
-            // get all the apropriate information from the database
-            snd =  maplist(`e, snd, ``(add (e, "module", get_module (e))));
-
-            // filter out modules with unspecified module name (sound card not supported by alsa / no module found)
             // create save_info entries
-
 	    snd = maplist(`c, snd, ``{
+		if (c["alsaconf_detected"]:false)
+		    return c;
+		// get all the apropriate information from the database
 		map mod = get_module (c);
 		if (mod == $[])
 		{
@@ -416,26 +415,10 @@
 		    "options"   : opts];
 		return entry;
 	    });
-	    snd = filter(`e, snd, ``(lookup(e, "module", $[])!=$[]));
+            // filter out modules with unspecified module name
+	    // (sound card not supported by alsa / no module found)
+	    snd = filter(`e, snd, ``(lookup(e, "module", "")!=""));
         }
-
-	// just for testing the nm256-opl3sa2 stuff
-
-//	return [
-//	    $[
-//		"model" : "first opl3sa2 card",
-//		"module": "snd-opl3sa2",
-//		"unique_key": "sdfasdfas",
-//		"options": $[]
-//	    ],
-//	    $[
-//		"model" : "second nm256 card",
-//		"module": "snd-nm256",
-//		"unique_key": "234tqadz",
-//		"options": $[]
-//	    ]
-//
-//	];
 
         return snd;
     }

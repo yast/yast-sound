@@ -16,6 +16,8 @@
     import "Mode";
     import "Runlevel";
     import "Summary";
+    import "Crash";
+    import "Progress";
 
     include "sound/read_routines.ycp";
     include "sound/routines.ycp";
@@ -97,7 +99,6 @@
     /**
      * ctor
      */
-
     global define void Sound() ``{
 	if (Arch::sparc)
 	{
@@ -127,10 +128,164 @@
     }
 
     /**
+     * Probe one card with alsaconf call
+     * @param chip chip name
+     * @return non-empty string with card options when card is present
+     */
+    global define string ProbeOldChip (string chip) ``{
+
+	string command = sformat ("/usr/bin/alsaconf -p %1", chip);
+	string name = Sound::db_modules["snd-"+chip,"description"]:chip;
+
+	// yes/no popup text, %1 is chip name
+	if (Crash::AskRun(command, sformat (_("It is looks like probing the chip
+%1
+failed last time.
+
+Probe the chip now?"), name)))
+	{
+	    Crash::Run(command);
+	    map out = SCR::Execute(.target.bash_output, command);
+	    Crash::Finish(command);
+	    if (out["stderr"]:"" != "")
+		y2warning ("alsaconf returns error: %1", out["stderr"]:"");
+
+	    if (out["exit"]:1 == 0)
+		return out["stdout"]:"";
+	}
+	return "";
+    }
+
+    /**
+     * Detect old ISA cards (which hwinfo doesn't know) using alsaconf
+     * @return success
+     */
+    global define boolean DetectOldCards() ``{
+
+	list chips = ["opl3sa2", "cs4236", "cs4232", "cs4231", "es18xx", "es1688", "sb16", "sb8"];
+
+	string command = "/usr/bin/alsaconf -P";
+	string out = deletechars (lookup(
+	    SCR::Execute(.target.bash_output, command), "stdout", ""), "\n");
+	if (out != "")
+	{
+	    chips = splitstring (out, " ");
+	}
+
+	list probelist = [];
+	foreach (`chip, chips, ``{
+	    // FIXME snd- prefix could be removed from sndcards database?
+	    string name = Sound::db_modules["snd-"+chip,"description"]:"";
+	    if (name != "")
+		name = sformat ("%1 (%2)", name, chip);
+	    else
+		name = chip;
+
+	    probelist = add (probelist,
+		`item(`id(chip), name, true));
+	});
+
+	integer height = size (chips) + 12;
+	if (height > 25)
+	    height = 25;
+
+	UI::OpenDialog (`HBox (`VSpacing(height),`HSpacing(1), `VBox(
+	    `HSpacing (50),
+	    `VSpacing(0.5),
+	    // label
+	    `Label (`id(`l), _("No card was found.
+Do you want to let YaST look for presence of some old chips?
+
+Warning: The probe procedure can take some time and
+could make your system unstable.")),
+	    `VSpacing(),
+	    `MultiSelectionBox(`id(`probelist),
+		// selection box label
+		_("&Select the drivers to probe"), probelist),
+	    `HBox(
+		// button label
+		`PushButton(`id(`ok),`opt(`key_F10, `default),_("&Yes, Probe")),
+		// button label
+		`PushButton(`id(`cancel),`opt(`key_F9), UI::CancelButtonLabel())
+	    ),
+	    `VSpacing(0.5)
+	    ),
+	    `HSpacing(1)
+	));
+
+	symbol ret = UI::UserInput();
+	if (ret == `ok)
+	{
+	    chips = UI::QueryWidget(`id(`probelist),`SelectedItems);
+
+	    UI::OpenDialog(`HBox(
+		`VSpacing(7),
+		`VBox(
+		    `HSpacing(40),
+		    // popup dialog header
+		    `Label(_("Probing:")),
+		    `HBox( `HWeight(1, `Label(`id(`probed), ""))),
+		    // progress bar label
+		    `ProgressBar(`id(`progress), _("Progress:"), size(chips),0),
+		    `VSpacing(0.5),
+		    `PushButton(
+			`id(`abort), `opt(`key_F9), UI::AbortButtonLabel())
+		))
+	    );
+	    boolean aborted = false;
+	    foreach (`chip, chips, ``{
+
+		if (aborted) return;
+		aborted = (UI::PollInput() == `abort);
+
+		UI::ChangeWidget (`id(`probed), `Value,
+		    Sound::db_modules["snd-"+chip,"description"]:chip);
+
+		string ret = ProbeOldChip (chip);
+		if (ret != "")
+		{
+		    // parse the output and add new entry to detected_cards
+		    chip = sformat ("snd-%1", chip);
+		    list returned = splitstring (ret, "\n");
+		    y2milestone ("probed with alsaconf: %1", returned);
+		    // label (%1 is name of the chip)
+		    string default_name = sformat (_("Card with %1 chip"),
+			Sound::db_modules[chip, "description"]:chip);
+		    string model = returned[1]:default_name;
+		    if (model == "")
+			model = default_name;
+		    ret = returned[0]:"";
+
+		    map options = $[];
+		    foreach (`o, splitstring (ret, " "), ``{
+			list op = splitstring (o, "=");
+			if (size (op) == 2)
+			{
+			    options = add (options, op[0]:"", op[1]:"");
+			}
+		    });
+
+		    detected_cards = add (detected_cards, $[
+			"model": model,
+			"module": chip,
+			"options": options,
+			"alsaconf_detected": true ]
+		    );
+		}
+		// advance the progress bar
+		UI::ChangeWidget (`id(`progress), `Value,
+		    UI::QueryWidget (`id(`progress), `Value) + 1);
+	    });
+	    UI::CloseDialog (); //progress window
+	}
+	UI::CloseDialog();
+	return true;
+    }
+
+    /**
      * do hardware detection
      * @return boolean success/failure
      */
-
     global define boolean DetectHardware() ``{
 	if (Mode::test)
 	{
@@ -208,49 +363,111 @@
      * searches for sound alias in /etc/modules.conf
      * @return void
      */
-
     global define void ReadModulesConf() ``{
 	modules_conf = read_save_info();
     }
 
     /**
-     * update list of unconfigured cards (necessaty when deleting configured card)
+     * update list of unconfigured cards
+     * (necessary when deleting configured card)
      * @return void
      */
-
     global define void UpdateUnconfiguredCards() ``{
-//	if (autoinstallation)
-//	{
-//	    return;
-//	}
 	unconfigured_cards = getConfigurableCards(modules_conf);
+    }
+
+    global define boolean PollAbort() ``{
+	return UI::PollInput() == `abort;
     }
 
     /**
      * Read all sound settings from the SCR
-     * @param _unused unused parameter
+     * @param interactive if user could be asked for actions
+     *	(currently only for detecting with alsaconf)
      * @return boolean True on success
      */
-    global define boolean Read(block _unused) ``{
-	// first detect sound cards
-	DetectHardware();
+    global define boolean Read (boolean interactive) ``{
 
+	// sound Read dialog caption:
+	string caption = _("Initializing sound configuration");
+
+	integer steps = 5;
+
+	Progress::New( caption, " ", steps, [
+		// progress stage
+		_("Read cards database"),
+		// progress stage
+		_("Read previous saved configuration"),
+		// progress stage
+		_("Detect sound cards"),
+		// progress stage
+		_("Read sysconfig values"),
+		// progress stage
+		_("Read volume settings"),
+	    ], [
+		// progress step label
+		_("Reading cards database..."),
+		// progress step label
+		_("Reading previously saved configuration..."),
+		// progress step label
+		_("Detecting sound cards..."),
+		// progress step label
+		_("Reading sysconfig values..."),
+		// progress step label
+		_("Reading volume settings..."),
+		// progress step label
+		_("Finished")
+	    ],
+	    ""
+	);
 	if (Mode::test)
 	{
+	    DetectHardware();
 	    modules_conf = [];
 	    rc_vars = $[];
 	    UpdateUnconfiguredCards();
 	    return true;
 	}
+	if (PollAbort()) return false;
+
+	// load cards database
+	Progress::NextStage ();
+	LoadDatabase ();
+
 	// load data from /etc/modules.conf
+	Progress::NextStage ();
 	ReadModulesConf();
+
+	if (PollAbort()) return false;
+
+	// detect sound cards
+	Progress::NextStage ();
+	DetectHardware();
+
+	if (PollAbort()) return false;
+
+	// check old isa cards (bug25285)
+	if (interactive && detected_cards == [] && modules_conf == [])
+	    DetectOldCards();
+
+	if (PollAbort()) return false;
+	// read rc.config values
+	Progress::NextStage ();
+	rc_vars = read_rc_vars ();
+
+	if (PollAbort()) return false;
+
+	// load volume settings
+	Progress::NextStage ();
+	volume_settings = get_vol_settings();
+
+	if (PollAbort()) return false;
+
 	// create list of unconfigured cards
 	UpdateUnconfiguredCards();
-	// read rc.config values
-	rc_vars = read_rc_vars ();
-	// load volume settings
-	volume_settings = get_vol_settings();
-	UpdateUnconfiguredCards();
+
+	// increase the progress to "finish"
+	Progress::NextStage ();
 	return true;
     }
 
@@ -275,7 +492,7 @@
 
 	return true;
     }
-    
+
     /**
      * Just Set module data
      * @param settings Sound configuration settings
@@ -284,7 +501,7 @@
     global define void Set(map settings)  ``{
 	modules_conf = lookup(settings, "modules_conf", []);
 	rc_vars = lookup(settings, "rc_vars", $[]);
-	volume_settings = lookup(settings, "volume_settings", []);	
+	volume_settings = lookup(settings, "volume_settings", []);
     }
 
     /**
@@ -430,7 +647,8 @@
 	        }
 	        value = value + lookup(s, opname, "");
 
-	        coma = true;
+		if (s[opname]:"" != "")
+		    coma = true;
 	    });
 	    res = add(res, opname, value);
 	});
@@ -488,7 +706,7 @@
 	{
 	    return true;
 	}
-	ForceReset();
+	ForceReset();// FIXME this sould not be called every time??? (also from sound_proposal)
 
 	// fix for nm256 cards: see bug #10384: leave this card unconfigured.
 	// loading of this module fails under some notebooks, nm256 module
@@ -682,15 +900,26 @@
     global define void  InitMixer(integer card_id, string modname) ``{
         map devs = lookup(lookup(Sound::db_modules, modname, $[]), "mixer",
             $["Master":70, "PCM":70, "CD":70, "Synth": 70]);
+y2internal ("devs: %1", devs);
+
+//FIXME: there are used volume_settings from currently deleted card!!!
+// it should be map with card IDs as keys!!!
 
 	// now let's merge settings from volume_settings list
 	if (size(volume_settings) != 0)
 	{
+	    // FIXME: list volume_settings doesn't have maps as values!
+	    /*
 	    maplist(`k, `v, volume_settings[card_id]:$[],
 	    ``{
 		devs = add(devs, k, v);
 	    });
+	    */
+	    foreach (`channel, volume_settings[card_id]:[], ``{
+		devs = add (devs, channel[0]:"Master", channel[1]:70);
+	    });
 	}
+y2internal ("devs: %1", devs);
 
         list devs2 = maplist(`k, `v, devs, ``(k));
 

@@ -238,17 +238,6 @@
     };
 
 
-
-    /**
-     * Returns list of keys read from /var/lib/YaST/unique.inf
-     * @return list with unique keys
-     */
-
-    global define list read_unique_keys () ``{
-    // actually, we do not have agent for reading /var/lib/YaST/unique.inf !
-    return [];
-    }
-
     /**
      *	show a warning popup for nm256 snd cards if needed
      *  @param modname string module name
@@ -272,7 +261,7 @@
      */
     global define map get_module (map card) ``{
 
-	Sound::LoadDatabase();
+	Sound::LoadDatabase();// TODO not needed here
 
 	string bus        = lookup (card, "bus", "");
 	integer offset    = (tolower (bus) == "isa") ? 0x20000 : 0x10000;
