@@ -1,8 +1,10 @@
 #
 # Makefile.am for .../testsuite
+# $Id$
 #
 
 AUTOMAKE_OPTIONS = dejagnu
+EXTRA_DIST = tests/ tests/*.out tests/*.err tests/*.ycp $(wildcard tests/*.yh)
 
 testsuite_prepare=/usr/lib/YaST2/testsuite/Makefile.testsuite
 
@@ -12,7 +14,4 @@ all-local: $(testsuite_prepare)
 clean-local: $(testsuite_prepare)
 	make -f $(testsuite_prepare) RPMNAME=$(RPMNAME) srcdir=$(srcdir) clean
 
-#%:
-	#make -f $(testsuite_prepare) RPMNAME=$(RPMNAME) srcdir=$(srcdir) $@
-
-#EXTRA_DIST = README
+# EOF

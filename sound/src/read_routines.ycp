@@ -48,8 +48,30 @@
 	    map mod_occur=$[];
 
 	    list aliases=SCR(`Read(.modules.alias));
+
+/*
 	    aliases=filter(`e, aliases, ``(find(e, "snd-card-")==0));
-    
+   
+	    aliases=filter(`e, aliases, 
+	    ``{
+		// skip aliases like snd-card-asdf
+		integer i=size("snd-card-");
+		if(i==size(e))
+		{
+		    return false;
+		}
+		while(i<size(e))
+		{
+		    if(!contains(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], substring(e, i, 1)))
+		    {
+			return false;
+		    }
+		    i=i+1;
+		}
+		return true;
+	    });
+ */
+	    aliases=filter(`e, aliases, ``(is_snd_alias(e)));
 	    integer position=-1;
 
 	    foreach(`e, aliases, 

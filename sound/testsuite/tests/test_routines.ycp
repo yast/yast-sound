@@ -18,13 +18,21 @@
 
 {
     include "testsuite.ycp";
-    include "sound/sound_routines.ycp";
+    include "sound/routines.ycp";
 
     /*
      *	itemize_list
      */
 
     list l=["item1", "item2", "item3"];
+
+    TEST (``(is_snd_alias("snd-ward-0")), [], nil);
+    TEST (``(is_snd_alias("snd-card0")), [], nil);
+    TEST (``(is_snd_alias("snd-rd-0")), [], nil);
+    TEST (``(is_snd_alias("snd-card-dummy")), [], nil);
+    TEST (``(is_snd_alias("snd-card-1")), [], nil);
+    TEST (``(is_snd_alias("snd-card-2")), [], nil);
+    
 
     TEST (``(itemize_list(l, 1)), [], nil);
     TEST (``(itemize_list(l, 4)), [], nil);

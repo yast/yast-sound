@@ -130,7 +130,7 @@
 	// remove old entries
 	maplist(`e, als, 
 	``{
-	    if(	issubstring(e, "snd-card-") ||
+	    if(	is_snd_alias(e) ||
 		issubstring(e, "sound-service-") ||
 		issubstring(e, "sound-slot-"))
 		{
