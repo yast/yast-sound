@@ -1148,7 +1148,7 @@
           "allows" : "{{0,Disabled},{1,Latency},{2,Bridge},{3,Both},{255,Auto}}",
           "default" : "4",
           "descr" : [
-            _("Enable VIA-workaround for %1 soundcard."),
+            _("Enable VIA work-around for %1 sound card."),
             "Aureal Advantage 3D Sound Processor"
           ],
           "dialog" : "check"
@@ -1162,7 +1162,7 @@
           "allows" : "{{0,Disabled},{1,Latency},{2,Bridge},{3,Both},{255,Auto}}",
           "default" : "4",
           "descr" : [
-            _("Enable VIA-workaround for %1 soundcard."),
+            _("Enable VIA work-around for %1 sound card."),
             "Aureal Vortex 3D Sound Processor"
           ],
           "dialog" : "check"
@@ -1176,7 +1176,7 @@
           "allows" : "{{0,Disabled},{1,Latency},{2,Bridge},{3,Both},{255,Auto}}",
           "default" : "4",
           "descr" : [
-            _("Enable VIA-workaround for %1 soundcard."),
+            _("Enable VIA work-around for %1 sound card."),
             "Aureal Vortex 2 3D Sound Processor"
           ],
           "dialog" : "check"
@@ -1267,7 +1267,7 @@
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
           "descr" : [
-            _("Enable joystick for %1 soundcard."),
+            _("Enable joystick for %1 sound card."),
             "AZF3328"
           ],
           "dialog" : "check"
@@ -1279,7 +1279,7 @@
       "params" : $[
         "digital_rate" : $[
           "descr" :
-	   _("Digital input rate for Bt87x soundcard")
+	   _("Digital input rate for Bt87x sound card")
         ]
       ]
     ],
@@ -1293,7 +1293,7 @@
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
           "descr" : [
-            _("PnP detection for %1 soundcard."),
+            _("PnP detection for %1 sound card."),
             "C-Media CMI8330"
           ],
           "dialog" : "check"
@@ -1913,7 +1913,7 @@
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
           "descr" : [
-            _("PnP detection for %1 soundcard."),
+            _("PnP detection for %1 sound card."),
             "ESS ES18xx AudioDrive"
           ],
           "dialog" : "check"
@@ -1995,7 +1995,7 @@
           "allows" : "{{0,1,2}}",
           "default" : "2",
           "descr" :
-	   _("Toggle power-management.  (0 = off, 1 = on, 2 = auto)"),
+	   _("Toggle power management.  (0 = off, 1 = on, 2 = auto)"),
           "skill" : "advanced"
         ]
       ]
@@ -2301,7 +2301,7 @@
           "allows" : "{{1,1000}}",
           "default" : "500",
           "descr" :
-	   _("Define reset timeout for cs8427 chip in msec resolution."),
+	   _("Define reset time-out for cs8427 chip in msec resolution."),
           "skill" : "advanced"
         ],
         "omni" : $[
@@ -2340,7 +2340,7 @@
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
           "descr" :
-	   _("Enable workaround for buggy interrupts on some motherboards."),
+	   _("Enable work-around for buggy interrupts on some motherboards."),
           "dialog" : "check"
         ]
       ]
@@ -2694,7 +2694,7 @@
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
           "descr" : [
-            _("PnP detection for %1 soundcard."),
+            _("PnP detection for %1 sound card."),
             "Yamaha OPL3SA2+"
           ],
           "dialog" : "check"
@@ -3035,7 +3035,7 @@
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
           "descr" : [
-            _("PnP detection for %1 soundcard."),
+            _("PnP detection for %1 sound card."),
             "Sound Blaster 16"
           ],
           "dialog" : "check"
@@ -3154,7 +3154,7 @@
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
           "descr" : [
-            _("PnP detection for %1 soundcard."),
+            _("PnP detection for %1 sound card."),
             "Sound Blaster AWE"
           ],
           "dialog" : "check"
@@ -3487,7 +3487,7 @@
       "params" : $[
         "ibl" : $[
           "descr" : [
-            _("Capture IBL size for %1 soundcard."),
+            _("Capture IBL size for %1 sound card."),
             "VXPocket440"
           ]
         ]
@@ -3498,7 +3498,7 @@
       "params" : $[
         "ibl" : $[
           "descr" : [
-            _("Capture IBL size for %1 soundcard."),
+            _("Capture IBL size for %1 sound card."),
             "VXPocket"
           ]
         ]
@@ -3580,7 +3580,7 @@
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
           "descr" : [
-            _("ISA PnP detection for %1 soundcards"),
+            _("ISA PnP detection for %1 sound cards"),
             "WaveFront"
           ],
           "dialog" : "check"

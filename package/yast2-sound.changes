@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Feb  7 17:07:57 CET 2005 - lslezak@suse.cz
+
+- merged proofread texts
+- version 2.11.4
+
+-------------------------------------------------------------------
 Mon Nov 22 18:54:28 CET 2004 - lslezak@suse.cz
 
 - select&lookup were replaced by bracket operator
