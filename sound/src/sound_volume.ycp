@@ -267,6 +267,12 @@
 		volume_continue = true;
 	
 	}
+
+
+	if (ui == `back) {
+	    UI(`ChangeWidget (`id(`next), `Label, _("&Next")));
+	    Shell ("/etc/rc.d/alsasound stop");
+	}
 	
 	return ui;
 	

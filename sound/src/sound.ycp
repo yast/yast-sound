@@ -402,7 +402,7 @@
 			con =  add (con, `Bottom(`PushButton(`id (`manual), _("&Let me choose"))));
 
 			    // Help text 1/2 (driver not available)
-			help_text = UI(_("<p>This means that appropriate driver for your your sound card is not available<p>."));
+			help_text = UI(_("<p>This means that appropriate driver for your your sound card is not available.<p>"));
 			    // Help text 2/2 (driver not available)			
 			help_text = help_text + UI(_("<p>You may try to use one of available drivers that can fit to your sound card by pressing the <i>Let me choose</i> button.</p>"));
 			
@@ -685,8 +685,10 @@
 			    cont = (vol_ui != `next);
 			    if (vol_ui == `next)
 				cont = (CallFunction (`sound_save (snd_info, options_entered)) != `next);
-			    else if (vol_ui == `back)
+			    else if (vol_ui == `back) {
+				found = FindCard ();
 				break;
+			    }
 			}
 		    }
 		    else {

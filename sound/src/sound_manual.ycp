@@ -49,16 +49,35 @@
 	    return $[];
 	};
 
+
+	define GetModule (integer n) ``{
+
+	    list cards = [];
+	    maplist (`c, snd_database, ``{ cards = union (cards, lookup (c, "cards")); });
+	    string card_name = select (sort(cards), n);
+	    
+	    list modules = filter (`s, snd_database, ``(contains (lookup (s, "cards", []), card_name)));
+	    
+	    return select (modules, 0);
+	};
+		
 				// return list of cards for the module "module_name"
 	define GetCards (string module_name, list db) ``{
 	    
-	    list|void modules = filter (`s, db, ``(lookup (s, "name", "uknown_driver") == module_name));
+	    list|void modules = nil;
+
+		/// To translators: All stands for all sound cards entry in the selection box
+	    if (module_name == UI(_("All")))
+		modules = db;
+	    else
+		modules = filter (`s, db, ``(lookup (s, "name", "uknown_driver") == module_name));
 	    list cards = [];
 
 	    if ((modules == nil) || (modules == []))
 		return cards;
 
-	    cards = lookup (select (modules, 0), "cards");
+		//cards = lookup (select (modules, 0), "cards");
+	    maplist (`c, modules, ``{ cards = union (cards, lookup (c, "cards")); });
 	    
 	    if (size (cards) == 0)
 		cards = add (cards, module_name); // to have at least one card name for the module
@@ -126,14 +145,18 @@
 	snd_database = sort (`x, `y, snd_database, ``(lookup(x, "name") <= lookup(y, "name")));
 	
 	list drivers = maplist (`v, snd_database, ``(lookup(v, "name", "unknown driver")));
+	drivers = add (drivers, UI(_("All")));
+	
 	string current_driver = select (drivers, Args(1));
 	list models = GetCards (current_driver, snd_database);
 
 	list itemized_drivers = itemize_list (drivers, Args(1));
 	list itemized_models = itemize_list (models, Args(2));
 
-	    // Help text - manual configuration 1/1
+	    // Help text - manual configuration 1/2
 	help_text = UI(_("<p>Please <b>manually</b> choose the sound card, you want to configure. You can search for a particular sound card by entering the name in the search box.</p>"));
+	    // Help text - manual configuration 2/2
+	help_text = help_text + UI(_("<p>Select <b>All</b> (at the end of the list) if you want to see the whole list of supported sound card models.</p>"));
 	
 	con = `VBox ();
 	con = add (con, `HBox (
@@ -217,7 +240,12 @@
 	    map retval = $["driver" : n_drv,
 			  "model"   : UI (`QueryWidget (`id(`sel_mod), `CurrentItem))];
 
-	    map mod_rec = select (snd_database, n_drv);
+	    map mod_rec = $[];
+
+	    if (current_driver == UI(_("All")))
+		mod_rec = GetModule (UI (`QueryWidget (`id(`sel_mod), `CurrentItem)));
+	    else
+		mod_rec = select (snd_database, n_drv);
 	    
 	    scr = add (scr, "device", sformat ("%1", // \n(driver: %2)",
 					       select (models, UI (`QueryWidget (`id(`sel_mod), `CurrentItem)))));
