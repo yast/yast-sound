@@ -91,7 +91,7 @@
      * Read all example settings from the SCR
      * @return boolean True on success
      */
-    global define Read() ``{
+    global define Read(block _unused) ``{
 	DetectHardware();
 	ReadModulesConf();
 	UpdateUnconfiguredCards();
@@ -130,7 +130,7 @@
      * Update the SCR according to example settings
      * @return boolean True on success
      */
-    global define Write() ``{
+    global define Write(block _unused, block _unused2) ``{
 	CallFunction (`sound_write(modules_conf, rc_vars));
 	return true;
     }
