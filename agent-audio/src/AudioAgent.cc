@@ -52,14 +52,21 @@ YCPValue AudioAgent::Read(const YCPPath &path, const YCPValue& arg) {
 	args.push_back(path->component_str(i));
 
     /* OSS Read handling */
-    if(path->length()>1 && args[0]=="oss" && args[1]=="cards") {
+    if(args[0]=="oss") {
+	y2debug("oss: (%ld) %s", path->length(), path->toString().c_str());
 	switch(path->length()) {
-	    case 2:
+	    case 1:
 		return ossGetVolume("", "");
+	    case 2:
+		if(args[1]=="cards")
+		    return ossGetVolume("", "");
+		break;
 	    case 3:
-		return ossGetVolume(args[2], "");
+		if(args[1]=="cards")
+		    return ossGetVolume(args[2], "");
+		break;
 	    case 5:
-		if(args[3]=="channels")
+		if(args[1]=="cards" && args[3]=="channels")
 		    return ossGetVolume(args[2], args[4]);
 	}
     }
@@ -111,14 +118,20 @@ YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCP
     int volume = value->asInteger()->value();
 
     /* OSS Write handling */
-    if(path->length()>1 && args[0]=="oss" && args[1]=="cards") {
+    if(args[0]=="oss") {
 	switch(path->length()) {
-	    case 2:
+	    case 1:
 		return ossSetVolume("", "", volume);
+	    case 2:
+		if(args[1]=="cards")
+		    return ossSetVolume("", "", volume);
+		break;
 	    case 3:
-		return ossSetVolume(args[2], "", volume);
+		if(args[1]=="cards")
+		    return ossSetVolume(args[2], "", volume);
+		break;
 	    case 5:
-		if(args[3]=="channels")
+		if(args[1]=="cards" && args[3]=="channels")
 		    return ossSetVolume(args[2], args[4], volume);
 	}
     }

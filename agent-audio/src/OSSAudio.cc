@@ -37,8 +37,19 @@ typedef struct {
  */
 int ossDevice(const string channel) {
     if(channel=="" || channel=="Master") return SOUND_MIXER_VOLUME;
-    else if(channel=="PCM") return SOUND_MIXER_PCM;
+    else if(channel=="BASS") return SOUND_MIXER_BASS;
+    else if(channel=="TREBLE") return SOUND_MIXER_TREBLE;
     else if(channel=="SYNTH") return SOUND_MIXER_SYNTH;
+    else if(channel=="PCM") return SOUND_MIXER_PCM;
+    else if(channel=="SPEAKER") return SOUND_MIXER_SPEAKER;
+    else if(channel=="LINE") return SOUND_MIXER_LINE;
+    else if(channel=="MIC") return SOUND_MIXER_MIC;
+    else if(channel=="CD") return SOUND_MIXER_CD;
+    else if(channel=="IMIX") return SOUND_MIXER_IMIX;
+    else if(channel=="ALTPCM") return SOUND_MIXER_ALTPCM;
+    else if(channel=="RECLEV") return SOUND_MIXER_RECLEV;
+    else if(channel=="IGAIN") return SOUND_MIXER_IGAIN;
+    else if(channel=="OGAIN") return SOUND_MIXER_OGAIN;
     // else if(channel=="") return SOUND_MIXER_;
     else {
 	y2error("bad channel specification: %s", channel.c_str());
@@ -94,6 +105,7 @@ YCPValue ossSetVolume(const string card, const string channel, const int value) 
 
     if(ioctl(mixer_fd,MIXER_WRITE(device),&volume) == -1) {
 	y2error(string("ioctl failed : " + string(strerror(errno))).c_str());
+	close(mixer_fd);
 	return YCPBoolean(false);
     }
 
@@ -117,6 +129,7 @@ YCPValue ossGetVolume(const string card, const string channel) {
 
     string mixerfile = "/dev/mixer";
     mixerfile += card;
+    y2debug("mixerfile=%s",mixerfile.c_str());
 
     stereovolume volume;
 
@@ -126,6 +139,7 @@ YCPValue ossGetVolume(const string card, const string channel) {
 	if(device == -1)
 	    return YCPBoolean(false);
     }
+    y2debug("device=%d",device);
 
     int mixer_fd = open(mixerfile.c_str(), O_RDWR, 0);
     if(mixer_fd < 0) {
@@ -137,6 +151,7 @@ YCPValue ossGetVolume(const string card, const string channel) {
 
     if(ioctl(mixer_fd,MIXER_READ(device),&volume) == -1) {
 	y2error(string("ioctl failed : " + string(strerror(errno))).c_str());
+	close(mixer_fd);
 	return YCPInteger(-1);
     }
 
@@ -152,5 +167,8 @@ YCPValue ossGetVolume(const string card, const string channel) {
 	y2warning("read volume set to 99");
 	vol=99;
     }
+
+    close(mixer_fd);
+    return YCPInteger(vol);
 }
 
