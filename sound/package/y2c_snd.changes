@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Dec  7 09:03:44 CET 2000 - dan@suse.cz
+
+- y2d_snd is required, amixer call differ for more cards 
+
+-------------------------------------------------------------------
 Wed Dec  6 13:08:08 CET 2000 - kkaempf@suse.de
 
 - adapt to new alsa package
