@@ -28,7 +28,7 @@
     include "sound/ui.ycp";
     include "sound/texts.ycp";	
     
-    include "browser.ycp";
+//    include "browser.ycp";
 
     map STRINGS=STRINGS_();
 
@@ -184,7 +184,7 @@
 	    ui = UI (`UserInput ());
 	    if (ui == `b_delete && UI(`YesNoPopup(_("Really delete this entry?")))) 
 	    {
-		integer fuser = SCR(`Execute (.target.bash, "/bin/fuser /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]));
+	/*	integer fuser = SCR(`Execute (.target.bash, "/bin/fuser /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]));
 
 		if (fuser == 0) 
 		{
@@ -201,6 +201,13 @@
 		    {
 			continue;
 		    }
+		}
+		
+*/		
+		boolean terminate=stop_programs();
+		if(terminate==false)
+		{
+		    continue;
 		}
 		integer card_id = UI(`QueryWidget (`id(`configured_table), `CurrentItem));
 

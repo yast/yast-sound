@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon May  7 17:16:08 CEST 2001 - dmeszar@suse.cz
+
+- module options fixed, card removing fixed 
+
+-------------------------------------------------------------------
 Mon Apr 30 16:21:03 CEST 2001 - dmeszar@suse.cz
 
 - sound fonts loading enabled, abort dialog unified, summary spaces fixed 
