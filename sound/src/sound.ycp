@@ -235,14 +235,17 @@
         symbol ui = lookup(res, "ui", nil);
         if (ui == `next)
         {
+	    // copy card_entry from unconfigured to configured list
             save_info = add(save_info, lookup(res, "return", $[]));
 	    if (card_id >= 0)
 	    {
+		// if this this card was autodetedted
+		// remove card we've just configured from unconfigured card list.
 		sound_cards = remove(sound_cards, card_id);
 	    }
-            // TODO: another dialog should be called
 	    if (size(sound_cards) == 0)
 	    {
+		// no other detected && unconfigured cards remained
 		return `detail;
 	    }
         }
@@ -287,7 +290,6 @@
 
     if (whoami() != "root")
     {
-	y2error("'%1'", whoami());
 	UI::MessagePopup(_("You need to be logged in as root 
 in order to configure sound cards."));
 	UI::CloseDialog();

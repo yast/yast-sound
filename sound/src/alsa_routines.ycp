@@ -144,7 +144,7 @@
     global define get_module_by_cardname(string cardname) ``{
         read_db();
         list mod = filter(`e, sound_db,
-        ``(contains(lookup(e, "cards"), cardname))
+        ``(contains(lookup(e, "cards", []), cardname))
         );
         return lookup(lookup(select(mod, 0), "module", $[]), "name", "unknown");
     }
@@ -286,7 +286,7 @@
     global define convert_to_save_info(list cards) ``{
 	cards = maplist(`e, cards,
 	``{
-	    list options = lookup(e, "options", []);
+	    list options = lookup(lookup(e, "module", $[]), "params", []);
 	    map opts = $[];
 	    maplist(`op, options,
 	    ``{

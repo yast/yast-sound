@@ -37,7 +37,7 @@ boolean finish	= false;
 global define _showName()
 ``{
     string modelname = lookup(save_entry, "model", "");
-    map res = DisplayName(modelname, lookup(save_entry, "alias"), card_id, flags);
+    map res = DisplayName(modelname, lookup(save_entry, "alias", ""), card_id, flags);
     symbol ui = lookup(res, "ui", nil);
     return ui;
 }

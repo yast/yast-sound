@@ -17,7 +17,7 @@
 {
     textdomain "sound";
 //    include "misc_defines.ycp";
-    include "lan/lan_routines.ycp";
+//    include "lan/lan_routines.ycp";
 //    include "ui/summary.ycp";
 
     global define is_sparc() ``{

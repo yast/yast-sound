@@ -1,0 +1,7 @@
+{
+    include "testsuite.ycp";
+    include "sound/routines.ycp";
+//    include "misc_defines.ycp";
+
+	TEST(``(isa_uniq()), [], nil);
+}
