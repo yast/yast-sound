@@ -68,6 +68,10 @@
 	else if (func == "Change") {
 		ret =  WFM::CallFunction(`sound());
 	}
+	/* Return required package list */
+	else if (func == "Packages") {
+		ret = $[];
+	}
 	/* Return actual state */
 	else if (func == "Export") {
 		ret = Sound::Export();
