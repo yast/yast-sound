@@ -59,6 +59,6 @@
 	i=i+1;
     }
 
-    y2error(sformat("%1",summaryDevicesList(retlist)));
+    return summaryDevicesList(retlist);
 
 }
