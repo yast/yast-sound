@@ -242,7 +242,7 @@ To save the current configuration, press <B>Finish</B>.
 ")
 	    ];
 	// sound system dependent part:
-	if ( use_alsa )
+	if ( Sound::use_alsa )
 	{
 	    ret = add(ret, "ComplexDialog",
 _("<p>

@@ -28,10 +28,9 @@
 
     textdomain "sound";
 
-    // REMOVEME
-
     import "Arch";
     import "Runlevel";
+    import "Sound";
 
     include "wizard/sequencer.ycp";
     import  "Wizard_hw";
@@ -52,13 +51,12 @@
 
     boolean autoinstall = false;
 
-    boolean use_alsa = !Arch::sparc;
-    if (size(Args()) > 0 && Args(0)==.oss)
-    {
-	use_alsa=false;
-    }
+//    if (size(Args()) > 0 && Args(0)==.oss)
+//    {
+//	use_alsa=false;
+//    }
 
-    if (use_alsa)
+    if (Sound::use_alsa)
     {
 	include "sound/alsa_routines.ycp";
     }
@@ -71,14 +69,13 @@
 
     // check for database existence
 
-    if (use_alsa && SCR::Read(.target.size, "/usr/lib/YaST2/sndcards.ycp")==-1)
+    if (Sound::use_alsa && SCR::Read(.target.size, "/usr/lib/YaST2/sndcards.ycp")==-1)
     {
         UI::MessagePopup(_("Sound card database not found. Please check your installation."));
         UI::CloseDialog();
         return;
     }
 
-    import "Sound";
     // text constants for sound module
     map STRINGS=STRINGS_();
     float oldf=0.0;
@@ -420,7 +417,7 @@
 
     boolean exit = false;
 
-    if (use_alsa && SCR::Read(.target.size, "/usr/lib/YaST2/sndcards.ycp")==-1)
+    if (Sound::use_alsa && SCR::Read(.target.size, "/usr/lib/YaST2/sndcards.ycp")==-1)
     {
 	UI::MessagePopup(_("Sound card database not found. Please check your installation."));
 	UI::CloseDialog();

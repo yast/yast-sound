@@ -161,7 +161,7 @@ global define map mixerDialog(integer card_id) ``{
 
     string modname = "";
 
-    if (use_alsa)
+    if (Sound::use_alsa)
     {
 	modname = lookup(select(Sound::modules_conf, card_id, $[]), "module", "snd-dummy");
 	channels = lookup(lookup(Sound::db_modules, modname, $[]), "mixer_elements", SCR::Dir(pth));
@@ -174,10 +174,10 @@ global define map mixerDialog(integer card_id) ``{
     list muted		= [];
 
     pth = topath(sformat(".audio.alsa.cards.%1.name", card_id));
-    string card_name	= use_alsa ? SCR::Read(pth) : sformat("%1", card_id);
+    string card_name	= Sound::use_alsa ? SCR::Read(pth) : sformat("%1", card_id);
 
     // get list of muted channels
-    if (use_alsa)
+    if (Sound::use_alsa)
     {
 	foreach(`e, channels,
 	``{
@@ -248,7 +248,7 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
 		SCR::Write(pth3, false);
 	    }
 	    // set volume
-	    if (use_alsa)
+	    if (Sound::use_alsa)
 	    {
 		pth = topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", card_id, ui));
 		value = UI::QueryWidget(`id(ui), `Value);

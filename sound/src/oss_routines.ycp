@@ -97,7 +97,21 @@
 
     global define void sound_start_tmp(boolean restore) ``{
 	// broken: TODO: reimplement this function in the alsa style (see alsa_routines:sound_start_tmp)
-        string cmd = "/sbin/depmod -C " + get_tmp_modules_conf() + " /dev/null 2>&1";
+	string snd = sformat("/sbin/modprobe snd snd_cards_limit=%1 snd_major=116", size(Sound::modules_conf));
+        // get the list of commands needed for start
+        list cmds = Sound::CreateModprobeCommands();
+
+        // start 'snd' module first
+        cmds = flatten ([[snd], cmds]);
+        maplist(`cmd, cmds, ``{
+            map res = SCR::Execute(.target.bash_output, cmd, $[]);
+            if (lookup(res, "stderr", "") != "")
+            {
+                y2error("/sbin/modprobe error output: \n" + lookup(res, "stderr", ""));
+            }
+        });
+
+/*        string cmd = "/sbin/depmod -C " + get_tmp_modules_conf() + " /dev/null 2>&1";
         SCR::Execute(.target.bash, cmd, $[]);
 
         list als = SCR::Read(.tmp.modules.alias);
@@ -121,7 +135,7 @@
 	    }
 	    pos = pos + 1;
         }
-    }
+*/    }
 
     /**
      * returns list of sound card names that are supported by given module
