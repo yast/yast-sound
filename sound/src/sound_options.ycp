@@ -30,52 +30,19 @@
     map STRINGS=STRINGS_();
 
 
-    /**
-     * Chooses one message according to
-     * the language, used for translating
-     * sndcard options 
-     * @return string
-     */
-   define Trans (map|void msgs, string lang) 
-   ``{
-    	string|void message = "";
-	if (msgs != nil) 
-	{
-	      message = lookup(msgs, lang);
-	      if (message == nil)
-	      {
-		    message = lookup(msgs, substring (lang, 0, 2));
-	      }
-	      if (message == nil)
-	      {
-		    message = lookup(msgs, "default");
-	      }
-	      if (message == nil)
-	      {
-		    message = "";             // Everything has failed.
-	      }
-	}
-	return message;
-  };
-
-
   /**
    * "sformates" list from sound database, where are localized messages, with 
    * optional formating information
    * @return string
    */
-    define mysformat (list msg) 
+/*    define mysformat (list msg) 
     ``{
-//	y2error(sformat("%1", msg));
-//	return msg;
-
 	if (size (msg) == 0) 
 	{
 	    return "";
 	}
 
 	integer i = 1;
-//	term format = ``(sformat (Trans (select (msg, 0), lang)));
 	term format = ``(sformat (select(msg, 0)));
 
 	while (i < size (msg)) 
@@ -85,7 +52,7 @@
 	}
 	return eval (format);
     }
-
+*/
 
     /**
      * just tests, if the item exists

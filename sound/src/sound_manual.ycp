@@ -130,7 +130,7 @@
     // ==== main ====
 
 
-    list|void db = SCR(`Read (.target.yast2, "sndcards.ycp"));
+    list|void db = GetCardDatabase(); 
     
     if (is (db, void)) 
     {

@@ -199,7 +199,7 @@
     list configured_unique = []; // list of unique keys, that was configured
 
     boolean exit = false;
-    list|void db = GetCardDatabase(); //SCR(`Read (.target.yast2, "sndcards.ycp"));
+    list|void db = GetCardDatabase(); 
     if (is (db, void)) 
     {
 	UI(`DisplayMessage ("The Sound card database cannot be found!!!"));

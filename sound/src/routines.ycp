@@ -813,5 +813,30 @@
 
         return ret;
     }
-    
+ 
+  /**
+   * "sformates" list from sound database, where are localized messages, with 
+   * optional formating information
+   * @return string
+   * @example mysformat(["Message %1 %2 %3", "A", "B", "C"])  ->  "Message A B C"
+   */
+    define mysformat (list msg)
+    ``{
+        if (size (msg) == 0)
+        {
+            return "";
+        }
+
+        integer i = 1;
+        term format = ``(sformat (select(msg, 0)));
+
+        while (i < size (msg))
+        {
+            format = add (format, select (msg, i));
+            i = i + 1;
+        }
+        return eval (format);
+    }
+
+   
 }

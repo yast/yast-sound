@@ -158,7 +158,7 @@
 
     if (!haskey(card, "module"))
     {
-	void | list db=SCR(`Read (.target.yast2, "sndcards.ycp"));
+	void | list db=GetCardDatabase(); //SCR(`Read (.target.yast2, "sndcards.ycp"));
 	card = add(card, "module", get_module (card));
     }
 
