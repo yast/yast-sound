@@ -29,5 +29,5 @@
 .sysconfig.sound
 
 `ag_ini(
-  SysConfigFile("/etc/sysconfig/sound")
+  `SysConfigFile("/etc/sysconfig/sound")
 )
