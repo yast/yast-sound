@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Sep  9 14:49:20 CEST 2002 - lslezak@suse.cz
+
+- restart sound system after sound font installation (#19197)
+- version 2.6.21
+
+-------------------------------------------------------------------
 Fri Sep  6 16:41:06 CEST 2002 - lslezak@suse.cz
 
 - fixed OSS mode starting
