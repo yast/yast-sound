@@ -56,14 +56,14 @@ global define _options()
 
 global define _quick()
 ``{
-    map res = CallFunction (`sound_volume(save_entry, card_id, finish, true, save_info));
+    map res = sound_volume(save_entry, card_id, finish, true, save_info);
     symbol ui = lookup(res, "ui", nil);
     return ui;
 }
 
 global define _volume()
 ``{
-    map res = CallFunction (`sound_volume(save_entry, card_id, finish, false, save_info));
+    map res = sound_volume(save_entry, card_id, finish, false, save_info);
     symbol ui = lookup(res, "ui", nil);
     return ui;
 }

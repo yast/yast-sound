@@ -118,6 +118,8 @@
 
 
     // show the dialog
+    
+global define mixerDialog(integer card_id) ``{
 
     integer card_id	= Args(0);
     path pth		= topath(sformat(".audio.alsa.cards.%1.channels", card_id));
@@ -229,5 +231,7 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
 
 
     return $["ui": ui];
+
+}
 
 }
