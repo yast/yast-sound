@@ -9,8 +9,8 @@ Summary:	Yast2 - Sound configuration
 
 Provides:	yast2-config-sound yast2-agent-audio yast2-agent-audio-devel yast2-db-sound
 Obsoletes:	yast2-config-sound yast2-agent-audio yast2-agent-audio-devel yast2-db-sound
-Provides:	yast2-trans-sound yast2-trans-soundb
-Obsoletes:	yast2-trans-sound yast2-trans-soundb
+Provides:	yast2-trans-sound yast2-trans-soundd y2c_snd y2t_snd y2t_sndd y2c_sparc y2d_snd
+Obsoletes:	yast2-trans-sound yast2-trans-soundd y2c_snd y2t_snd y2t_sndd y2c_sparc y2d_snd
 
 %description
 This package is a part of YaST2. It contains the necessary scripts to
