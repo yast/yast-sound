@@ -63,11 +63,6 @@
     }
 
     
-    y2error(sformat("'%1'", removeBlanks("Ahojky")));
-    y2error(sformat("'%1'", removeBlanks("\n   \t Ahojky")));
-    y2error(sformat("'%1'", removeBlanks("\n \t \t Ahojky\n\n\n")));
-
-    
     list cards=get_audio(false, false);
     list keys=read_unique_keys();
     
