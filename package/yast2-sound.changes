@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Jan 17 15:49:12 CET 2003 - jsuchome@suse.de
+
+- added ncurses f-keys shortcuts
+
+-------------------------------------------------------------------
 Fri Jan 10 16:59:13 CET 2003 - jsuchome@suse.de
 
 - fixed testsuite (imported module Arch has some SCR calls)

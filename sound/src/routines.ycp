@@ -30,7 +30,7 @@
         string sub_vendor = "";
         string sub_device = "";
 
-	y2milestone("hardware_entry: %1", hardware_entry);
+	y2debug("hardware_entry: %1", hardware_entry);
 
         sub_vendor = lookup (hardware_entry, "sub_vendor", "");
         sub_device = lookup (hardware_entry, "sub_device", "");
@@ -123,7 +123,7 @@
     ``{
         list lab = splitstring(hardware_name(card),"\n");
 
-	y2milestone("Card label: %1", lab);
+	y2debug("Card label: %1", lab);
 
 	if (size(lab) == 0 )
 	{
