@@ -23,6 +23,7 @@ yinclude_DATA = \
 	complex.ycp \
 	select.ycp \
 	manual.ycp \
+	joy_dialog.ycp\
 	joysticks.ycp
 
 

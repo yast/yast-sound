@@ -50,17 +50,12 @@
     include "sound/manual.ycp";
 
     boolean autoinstall = false;
-    boolean askjoystick = true;
 
 //    if (size(Args()) > 0 && Args(0)==.oss)
 //    {
 //	use_alsa=false;
 //    }
 
-    if (size(Args()) > 0)
-    {
-	foreach(path p, Args(), ``{if (p == .nojoy) {askjoystick = false;}});
-    }
 
     if (Sound::use_alsa)
     {
@@ -600,15 +595,6 @@
 		))
 	{
 	    Sound::Write(``{}, ``{});
-
-	    // ask to configure joystick if it is possible
-	    if (size(Sound::GetSoundCardListWithJoy()) > 0 && askjoystick)
-	    {
-		if (UI::YesNoPopup(_("Do you want to configure joystick?")) == true)
-		{
-		    CallModule("joystick", []);
-		}
-	    }
 	}
     }
 

@@ -53,7 +53,7 @@
 
     global define map DisplayName (string name, string cname, integer cpos, integer flags, boolean has_joy) ``{
 	string helptext = lookup(STRINGS, "DisplayName", "");
-	term con = AutoconfDlg(name, cname, cpos);
+	term con = AutoconfDlg(name, cname, cpos, has_joy);
 	Wizard::SetContents (_("Sound card configuration"), con, helptext, true, true);
 		// dialog title
 	integer flagc = 1;
@@ -84,20 +84,16 @@
 	symbol input = `quick;
 
 	do {
-	    if (contains([`quick, `normal, `options], input))
-	    {
-		boolean state = has_joy && UI::QueryWidget(`id(`joystick), `Value) && (input != `quick);
-		UI::ChangeWidget(`id(`joystick), `Value, state);
-		UI::ChangeWidget(`id(`joystick), `Enabled, has_joy && (input != `quick));
-	    }
-	    else if (input == `cancel || input == `abort)
+	    if (input == `cancel || input == `abort)
 	    {
 		if (ReallyAbort())
 		{
 		    return $["ui" : `abort];
 		}
 	    }
+
 	    input = UI::UserInput();
+
 	} while (input != `next && input !=`back);
 
 	symbol output = input;
@@ -109,7 +105,14 @@
 		output = `next;
 	    }
 	    // global variable conf_joystick
-	    conf_joystick = UI::QueryWidget(`id(`joystick), `Value);
+	    if (has_joy == true)
+	    {
+		conf_joystick = UI::QueryWidget(`id(`joystick), `Value);
+	    }
+	    else
+	    {
+		conf_joystick = false;
+	    }
 	}
 	return $["ui" : output];
     }
@@ -125,7 +128,7 @@
 
     global define map quickConfig(string name, string cname, integer cpos, boolean has_joy) ``{
         string helptext = lookup(STRINGS, "quickConfig", "");
-        term con = QuickconfDlg(name, cname, cpos);
+        term con = QuickconfDlg(name, cname, cpos, has_joy);
         Wizard::SetContents (_("Sound card configuration"), con, helptext, true, true);
                 // dialog title
                 // Next button label
@@ -134,13 +137,7 @@
 	symbol input = `quick;
 
         do {
-	    if (contains([`quick, `normal, `intro], input))
-            {
-                boolean state = has_joy && UI::QueryWidget(`id(`joystick), `Value) && (input == `normal);
-                UI::ChangeWidget(`id(`joystick), `Value, state);
-                UI::ChangeWidget(`id(`joystick), `Enabled, has_joy && (input == `normal));
-            }
-	    else if (input == `cancel || input == `abort)
+	    if (input == `cancel || input == `abort)
             {
                 if (ReallyAbort())
                 {
@@ -148,12 +145,21 @@
                 }
             }
             input = UI::UserInput();
+
         } while (input != `next && input != `back);
 
         symbol output = input;
         if (input == `next)
         {
-	    conf_joystick = UI::QueryWidget(`id(`joystick), `Value);
+	    if (has_joy == true)
+	    {
+		conf_joystick = UI::QueryWidget(`id(`joystick), `Value);
+	    }
+	    else
+	    {
+		conf_joystick = false;
+	    }
+
             output = UI::QueryWidget(`id(`action), `CurrentButton);
         }
         return $["ui" : output];
@@ -395,7 +401,7 @@
      * @return term with widget
      */
 
-    global define term AutoconfDlg(string name, string cname, integer cpos) ``{
+    global define term AutoconfDlg(string name, string cname, integer cpos, boolean has_joy) ``{
 	string clab = "";
 
 	if (cpos < 3)
@@ -406,6 +412,8 @@
 	{
 	    clab = "\n" + sformat(select(lookup(STRINGS, "soundCount", ""), 3, ""), cname, cpos + 1, "");
 	}
+
+	term jcheckbox = (has_joy == true) ? `Left(`CheckBox(`id(`joystick), _("&Configure joystick"))) : `Empty();
 
 	term con =
             `VBox (
@@ -424,7 +432,7 @@
                         `VSpacing (0.3),
                         `RadioButton (`id (`options), `opt (`hstretch, `notify), _("Advanced setup with possibility to change &options")),
 			`VSpacing (3),
-			`Left(`CheckBox(`id(`joystick), _("&Configure joystick")))
+			jcheckbox
                         )
                     )),
                 `VStretch ()
@@ -441,7 +449,7 @@
      *
      */
 
-        global define term QuickconfDlg(string name, string cname, integer cpos) ``{
+        global define term QuickconfDlg(string name, string cname, integer cpos, boolean has_joy) ``{
         string clab = "";
 
         if (cpos < 3)
@@ -452,6 +460,8 @@
         {
             clab = "\n" + sformat(select(lookup(STRINGS, "soundCount", ""), 3, ""), cname, cpos + 1, "");
         }
+
+	term jcheckbox = (has_joy == true) ? `Left(`CheckBox(`id(`joystick), _("&Configure joystick"))) : `Empty();
 
         term con =
             `VBox (
@@ -470,7 +480,7 @@
                         `VSpacing (0.3),
                         `RadioButton (`id (`intro), `opt (`hstretch, `notify), _("&More detailed installation of sound cards")),
 			`VSpacing(3),
-			`Left(`CheckBox(`id(`joystick), _("&Configure joystick")))
+			jcheckbox
                         )
                     )),
                 `VStretch ()

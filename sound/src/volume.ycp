@@ -31,6 +31,8 @@
     textdomain "sound";
     import "Wizard";
 
+    include "sound/joy_dialog.ycp";
+
 
     /**
      * This dialog sipmply reads user input and calls apropriate set funtion
@@ -102,7 +104,7 @@
 	    }
 	    else if (ui == `next && conf_joystick)
 	    {
-		symbol ret = joy_dialog(card_id);
+		symbol ret = joy_dialog(card_id, `next);
 		if (ret == `back)
 		{
 		    con = VolumeCon(save_entry, vol);
@@ -340,7 +342,7 @@ its parameters using the 'Advanced setup'.");
 		{
 		    break;
 		}
-		symbol s = joy_dialog();
+		symbol s = joy_dialog(card_id, `next);
 		if (s == `abort || s == `cancel)
 		{
 		    ui = `abort;
@@ -354,6 +356,12 @@ its parameters using the 'Advanced setup'.");
 		"main_volume", "Master");
 
 	    setVolume (master_elem, card_id, 75);
+
+	    if (conf_joystick == true)
+	    {
+		joy_dialog(card_id, `next);
+	    }
+
 	    ui = SuccessDialog(save_entry);
 	}
 	storeVolume(card_id);

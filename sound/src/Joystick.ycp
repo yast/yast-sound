@@ -160,6 +160,9 @@
 	map j = $[];
 	string start = "disable";
 
+	// stop joystick service
+	SCR::Execute(.target.bash, "/etc/init.d/joystick stop", $[]);
+
 	while (pos < 4)
 	{
 	    // first remove old settings
@@ -219,8 +222,8 @@
 	// flush config to file
 	SCR::Write(.sysconfig.joystick, nil);
 
-	// restart joystick service
-	SCR::Execute(.target.bash, "/etc/init.d/joystick restart", $[]);
+	// start joystick service
+	SCR::Execute(.target.bash, "/etc/init.d/joystick start", $[]);
 
 	// enable/disable service
         Runlevel::ServiceAdjust("joystick", start);
