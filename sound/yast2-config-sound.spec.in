@@ -26,7 +26,7 @@ configure sound.
 %dir @YAST2DIR@/include/sound
 @YAST2DIR@/include/sound/*.ycp
 @YAST2DIR@/clients/sound*.ycp
-@YAST2DIR@/menuentries/menu*.ycp
+@YAST2DIR@/menuentries/menu*.y2cc
 @YAST2DIR@/bin/copyfonts
 @YAST2DIR@/modules/Sound.ycp
 %doc @DOCDIR@
