@@ -201,17 +201,17 @@ YCPValue alsaGetCards()
 
 YCPValue alsaStore(int card=-1)
 {
-    string cmd="/usr/sbin/alsactl";
-    string arg="store";
+    string cmd="/usr/sbin/alsactl store";
     if(card>=0)
     {
 	// add card id
-	arg+=" ";
+	cmd+=" ";
 	char tmp[32];
 	sprintf(tmp, "%d", card);
-	arg+=tmp;
+	cmd+=tmp;
     }
-    if(execl(cmd.c_str(), arg.c_str())!=-1)
+    cmd+=" > /dev/null";
+    if(system(cmd.c_str())!=-1)
     {
 	return YCPBoolean(true);
     }
@@ -220,17 +220,18 @@ YCPValue alsaStore(int card=-1)
 
 YCPValue alsaRestore(int card=-1)
 {
-    string cmd="/usr/sbin/alsactl";
-    string arg="restore";
+    string cmd="/usr/sbin/alsactl restore";
     if(card>=0)
     {
         // add card id
-        arg+=" ";
+        cmd+=" ";
 	char tmp[32];
 	sprintf(tmp, "%d", card);
-	arg+=tmp;
+	cmd+=tmp;
     }
-    if(execl(cmd.c_str(), arg.c_str())!=-1)
+    cmd+=" > /dev/null";
+    y2error("executing '%s'", cmd.c_str());
+    if(system(cmd.c_str()))
     {
         return YCPBoolean(true);
     }
