@@ -22,6 +22,7 @@
     textdomain "sound";
 
     import "Arch";
+    import "Runlevel";
 
     include "wizard/sequencer.ycp";
     import  "Wizard_hw";

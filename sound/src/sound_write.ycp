@@ -34,8 +34,8 @@
  *
  *	   2nd ... rc_values
  *	   $[
- *		"START_ALSA" : "yes",
- *		"START_SEQUENCER" : "yes"
+ *		"LOAD_ALSA" : "yes",
+ *		"LOAD_SEQUENCER" : "yes"
  *         ]
  *
  *	   3rd ... use_alsa - boolean
