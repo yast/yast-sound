@@ -53,7 +53,7 @@
 	`helptext     : _("Configure your sound card"),
    
       ////////////////////////////////////////////////////////////////////////////////
-      // leaf nil, experts only ;-)
+      // leave nil, experts only ;-)
 	`codefragment : nil 
    
     ]
