@@ -28,24 +28,6 @@
     import "Label";
 
     /**
-     *	InitializingDialog
-     *
-     *
-     * @return symbol next dialog
-     */
-
-    global define symbol InitializingDialog () ``{
-	  // label message
-	term con = `Label (sformat(_("Initializing ...")));
-	string helptext = "";
-	 // dialog title message
-	Wizard::SetContents (_("YaST2\nInitializing ..."), con, helptext, false, false);
-
-	return `next;
-    };
-
-
-    /**
      *  DisplayName
      *
      * @param name card model
