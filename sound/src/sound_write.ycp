@@ -66,6 +66,8 @@
     boolean test_mode = false;
     map sound_info = Args (0);
 
+y2error(sformat("%1", sound_info));
+
     string helptext = "";
     string err_msg = "";
 

@@ -64,15 +64,19 @@
    * optional formating information
    * @return string
    */
-    define mysformat (list msg, string lang) 
+    define mysformat (list msg) 
     ``{
+//	y2error(sformat("%1", msg));
+//	return msg;
+
 	if (size (msg) == 0) 
 	{
 	    return "";
 	}
 
 	integer i = 1;
-	term format = ``(sformat (Trans (select (msg, 0), lang)));
+//	term format = ``(sformat (Trans (select (msg, 0), lang)));
+	term format = ``(sformat (select(msg, 0)));
 
 	while (i < size (msg)) 
 	{
@@ -107,7 +111,7 @@
      * recognized
      * @return list
      */
-    define parse_values (string des) ``{
+  /*  define parse_values (string des) ``{
 	list ret = [];
 	integer pos = 0;
 	integer len = size (des);
@@ -164,7 +168,7 @@
 		
 	return ret;
     }
-
+*/
     /**
      * @param 1st checks if value is type,
      * @param 2nd if poss is nonempty, checks if value is one of them
@@ -257,7 +261,7 @@
 				    // still omit these options -- they are assigned dynamicly
 	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_id"));
 	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_index"));
-	options = maplist (`e, options, ``($["description" : mysformat (lookup (e, "description"), language),
+	options = maplist (`e, options, ``($["description" : mysformat (lookup (e, "description")),
 						// if no option name is available
 						"name"         : lookup (e, "name", _("No name available")),
 						"value"        : lookup (e, "default", lookup (e, "value", "")),

@@ -19,6 +19,17 @@
 {
 
     textdomain "sound";
+    include "misc_defines.ycp";
+
+    /**
+     *  Converts hex num to integer keeps decimal number as is. Hexadecimal
+     *  number assumes to have prefix ``0x''. Doesn't  check the syntax.
+     *
+     */
+
+    define hextoi(string num) ``{
+	return tointeger(num);
+    }
 
     /**
      *  writes unique keys of the configured cards to /var/lib/YaST/unique.inf
@@ -69,7 +80,11 @@
      */
 
     define GetCardDatabase() ``{
-	return SCR(`Read (.target.yast2, "sndcards.ycp"));
+	any database=SCR(`Read (.target.yast2, "sndcards.ycp"));
+	textdomain "sound_db";
+	database = UI (database);
+	textdomain "sound";
+	return database;
     }
 
     /**
@@ -98,6 +113,7 @@
      * creates "libhd entry" from db info
      * @return map
      */
+    /* !!! variable db is inherited from module sound.ycp*/
     define get_card (string module_name, string card_name) ``{
         map ret = $[];
         map db_entry = $[];
@@ -732,5 +748,70 @@
         return itemized_list;
     };
 
+    /* 
+     * tries to extract list of values from description
+     * these values are generated from alsa modules
+     * and can be in form
+     * [list=value,value,..] or
+     * [range=1-19] or something not recognized
+     * @return list
+     */
+    define parse_values (string des) ``{
+        list ret = [];
+        integer pos = 0;
+        integer len = size (des);
+        while ((pos < len) && (substring (des, pos, 1) != "["))
+        {
+            pos = pos + 1;
+        }
+        pos = pos + 1;
+
+        if (pos < len)          // found "["
+        {
+            if (tolower(substring (des, pos, 5)) == "list=")
+            {
+                pos = pos + 5;
+                integer s = pos;
+                while ((pos < len) && substring (des, pos, 1) != "]")
+                {
+                    if (substring (des, pos, 1) == ",")
+                    {
+                        ret = add (ret, hextoi (substring (des, s, pos - s)));
+                        s = pos + 1;
+                    }
+                    pos = pos + 1;
+                }
+                ret = add (ret, hextoi (substring (des, s, pos - s)));
+            }
+            else if (tolower(substring (des, pos, 6)) == "range=")
+            {
+                pos = pos + 6;
+                integer s = pos;
+                integer range_start = 0;
+                while ((pos < len) && substring (des, pos, 1) != "]")
+                {
+                    if (substring (des, pos, 1) == "-")
+                    {
+                        range_start = tointeger(substring (des, s, pos - s));
+                        s = pos + 1;
+                    }
+                    pos = pos + 1;
+                }
+                integer range_stop = tointeger(substring (des, s, pos - s));
+                                        // now create the range list
+                while (range_start <= range_stop)
+                {
+                    ret = add (ret, range_start);
+                    range_start = range_start + 1;
+                }
+            }
+	    else if (tolower(substring (des, pos, 4)) == "bool")
+            {
+                ret = [0, 1];
+            }
+        }
+
+        return ret;
+    }
     
 }
