@@ -235,7 +235,10 @@
 			 lookup (select (options, current_option), "value", "")),
 		    `VBox(
 			`Label(""),
-			`PushButton (`id (`reset), _("&Reset all"))
+			`HBox(
+			    `PushButton (`id (`set), _("&Set")),
+			    `PushButton (`id (`reset), _("&Reset all"))
+			)
 		    )
 
 		  ),
@@ -453,8 +456,8 @@
      * @return void
      */
 
-    global define selectHardware(list newHw, list confHw) ``{
-        list titles=[];
+    global define selectHardware(list newHw, string confHw) ``{
+/*        list titles=[];
 
 	integer index=-1;
 	newHw=maplist(`e, newHw, ``{
@@ -555,7 +558,9 @@
                     )),
                 `VStretch ()
                 );
-        UI(`SetWizardContents (_("Sound card configuration"), con, "", true, true));
+	string helptext=_("<P>Hardware detection found new soundcard. Check the <B>Activate new found device</B> or <B>Edit already installed device</B> respectively.</P>");
+    
+        UI(`SetWizardContents (_("Sound card configuration"), con, helptext, true, true));
         if(!enab1)
         {
             UI(`ChangeWidget (`id(`action), `CurrentButton, 1));
@@ -580,8 +585,46 @@
 	{
 	    UI(`ChangeWidget (`id(`ch), `CurrentItem, 0));
 	}
+*/
+
+	integer index=-1;
+        newHw=maplist(`e, newHw, ``{
+            index=index+1;              // select first item
+            return `item(`id(index), e, index==0);
+            });
+	
+	    // to translators: the full meaning of message is: "Add other not detected soundcard"
+	newHw=add(newHw, `item(`id(-1), _("Other (not detected)"), size(newHw)==0));
+
+	any widget=`HBox(`HSpacing(1.5),
+              `VBox(
+                  `VSpacing(0.4),
+                  `Frame("Soundcards to configure",
+                         `HBox(`HSpacing(0.5),
+                               `VBox(//`VSpacing(0.2),
+                                     `VBox(`SelectionBox(`id(`nh), _("Available are:"), newHw),
+                                           `HBox(
+                                                 `HStretch(),
+                                                 `PushButton(`id(`configure),_("&Configure..."))
+                                           )
+                                     )//,
+                                     //`VSpacing(0.1)
+                               ),
+                               `HSpacing(0.5)
+                         )
+                  ),
+                  `VSpacing(0.3),
+                  `RichText(_("<P><B>Already configured soundcards:</B>")+confHw),
+                  `Right(`PushButton(`id(`detail), _("&Edit..."))),
+                  `VSpacing(0.4)
+              ),
+              `HSpacing(1.5)
+        );
+
+	string helptext=lookup(STRINGS, "selectHardware");
 
 
+	UI(`SetWizardContents (_("Sound card configuration"), widget, helptext, true, true));
 
     }
 

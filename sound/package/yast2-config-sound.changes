@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Wed Jul 25 10:52:02 CEST 2001 - dmeszar@suse.cz
+
+- first dialog unified with printconf and tvconf modules
+
+-------------------------------------------------------------------
+Mon Jul 23 12:59:27 CEST 2001 - dmeszar@suse.cz
+
+- fixed 'requires' in rpm, workflow changes, option dialog improvements
+
+-------------------------------------------------------------------
 Tue May 15 15:17:09 CEST 2001 - dmeszar@suse.cz
 
 - doubled text fixed. when a new card is manually added, module description is

@@ -19,6 +19,7 @@
     textdomain "sound";
     include "misc_defines.ycp";
     include "lan/lan_routines.ycp";
+    include "ui/summary.ycp";
 
     /**
      *
@@ -685,7 +686,9 @@
         {
 
                 // To translators: label to error popup
-            return sformat (UI(_("The kernel module %1 for sound support\ncould not be loaded.")), mod_name);
+            return sformat (UI(_("The kernel module %1 for sound support
+could not be loaded. This can be caused by incorrect
+module parameters, including invalid IO or IRQ parameters.")), mod_name);
         }
         return "";
 
@@ -1176,5 +1179,32 @@
         }
 	return true;
     }
+    
+    /**
+     * creates hardware-summary-like list of configured cards
+     *
+     * @return richtext
+     * @param seva_info
+     */
+
+    global define ConfCardsRT(list save_info) ``{
+	list retlist=[];
+	list conflist=[];
+	foreach(`entry, save_info,
+	``{
+	    conflist=add(conflist, lookup(entry, "model", ""));
+	});
+	integer i=0;
+	foreach(`card, conflist,
+	``{
+	    // to translators: '(sound card is) Configured as snd-card-1'
+	    retlist=add(retlist, summaryDevice(card, sformat(UI(_("Configured as snd-card-%1.")), i)));
+	    i=i+1;
+	});
+
+	return summaryDevicesList(retlist);
+
+    }
 
 }
+

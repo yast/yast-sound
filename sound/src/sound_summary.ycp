@@ -13,7 +13,8 @@
  * $Id$
  *
  * Soud installation summary. returns list of already configured and not configured sound cards
- *                   
+ *             
+ * @param skipNotConfigured if set to true, list of notconfigured cards will be excluded      
  *
  */
 
@@ -24,6 +25,13 @@
     include "misc_defines.ycp";
     include "sound/routines.ycp";
     include "sound/read_routines.ycp";
+
+    boolean skipNotConfigured=false;
+
+    if(Args()>=1)
+    {
+	skipNotConfigured=Args(0);
+    }
 
     list cards=get_audio();
     list keys=read_unique_keys();
@@ -58,11 +66,14 @@
 	retlist=add(retlist, summaryDevice(card, sformat(UI(_("Configured as snd-card-%1.")), i)));
 	i=i+1;
     });
-    
-    foreach(`card, notlist,
-    ``{
-        retlist=add(retlist, summaryDevice(card, summaryNotConfigured()));
-    });
+
+    if(!skipNotConfigured)
+    {  
+	foreach(`card, notlist,
+	``{
+	    retlist=add(retlist, summaryDevice(card, summaryNotConfigured()));
+	});
+    }
 
     return summaryDevicesList(retlist);
 

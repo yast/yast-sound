@@ -165,9 +165,9 @@
 	    list nh=maplist(`e, sound_cards, ``(lookup(e, "model", "")));
 	    list ch=maplist(`e, save_info, ``(lookup(e, "model", "")));
 	    y2error(nh);
-	    res=CallFunction(`sound_select(nh, ch));
+	    res=CallFunction(`sound_select(nh, save_info));
 	    symbol ui=lookup(res, "ui", nil);
-	    if(ui==`next)
+	    if(ui==`configure)
 	    {
 		if(lookup(res, "type", nil)==`new)
 		{
@@ -192,6 +192,10 @@
 	    else if(ui==`back || ui==`abort)
 	    {
 		state=`abort;
+	    }
+	    else if(ui==`next)
+	    {
+		state=`save;
 	    }
 	}
 	else if(state==`card_wizard)

@@ -22,23 +22,25 @@
     textdomain "sound";
 
     include "sound/ui.ycp";
+    include "sound/routines.ycp";
 
     list sound_cards=Args(0);
     list save_info=Args(1);
 
     // show the dialog
 
+    string confhw= ConfCardsRT(save_info);
 
     selectHardware( sound_cards, //maplist(`e, sound_cards, ``(lookup(e, "model", ""))),
-                    save_info); //maplist(`e, save_info, ``(lookup(e, "model", ""))));
+                    confhw); //maplist(`e, save_info, ``(lookup(e, "model", ""))));
 
-    UI(`ChangeWidget(`id(`next), `Label, UI(`NextButtonLabel())));
+    UI(`ChangeWidget(`id(`next), `Label, UI(`FinishButtonLabel())));
 
     any ui=nil;
     repeat
     {
 	ui=UI(`UserInput());
-	if(ui==`nh)
+/*	if(ui==`nh)
 	{
 	    UI(`ChangeWidget(`id(`action), `CurrentButton, `new));
 	}
@@ -50,23 +52,22 @@
 	{
 	    return $["ui": `abort];
 	}
-
-    } until(ui==`back || ui==`next ||  ui==`detail);
+*/
+    } until(ui==`back || ui==`next ||  ui==`detail || ui==`configure);
 
     symbol type=nil;
     integer index=0;
-    type=UI(`QueryWidget(`id(`action), `CurrentButton));
+//    type=UI(`QueryWidget(`id(`action), `CurrentButton));
 
-    if(type==`new)
+    if(ui==`configure)
     {
+	type=`new;
 	index=UI(`QueryWidget(`id(`nh), `CurrentItem));
     }
-    else if(type==`configured)
+
+    if(ui==`configure && index<0)
     {
-	index=UI(`QueryWidget(`id(`ch), `CurrentItem));
-    }
-    else 
-    {
+	type=`manual;
 	index=-1;
     }
 

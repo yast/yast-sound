@@ -121,7 +121,12 @@
 	    UI(_("Would you like to change the CD and retry ?")),
 
 	    "opl3sa_nm256_warn":
-	    UI(_("'%1' and '%2' sound cards were autodetected on your system. For proper functionality, please skip the '%1' soundcard and configure only the '%2'."))
+	    UI(_("'%1' and '%2' sound cards were autodetected on your system. For proper functionality, please skip the '%1' soundcard and configure only the '%2'.")),
+
+	    "selectHardware":
+	    UI(_("<P>Hardware detection found new sound card. To configure it, select the appropraite 
+item in list and press the <B>Configure<B> button.</P><P>Press the <B>Edit</B> button to configure already 
+installed cards</P><P>To save current configuration, press the <B>Finish</B> button.</P>"))
 	    ];
     }
 
