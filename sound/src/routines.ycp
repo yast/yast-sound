@@ -94,23 +94,6 @@
 	]));
     }
 
-    /** ALSA only
-     * Checks if name of parameter is in correct form (has 'snd_' prefix)
-     * and updates it if necessary
-     * @param parname original name of parameter
-     * @return correct name
-     */
-    define string check_parameter_name (string parname) ``{
-
-	boolean prefix_used = Sound::snd_prefix_used ();
-	if (substring (parname, 0, 4) == "snd_" && !prefix_used)
-	    parname = substring (parname, 4);
-	else if (prefix_used && substring (parname, 0, 4) != "snd_")
-	    parname = sformat ("snd_%1", parname);
-
-	return parname;
-    }
-
     /**
      * returns the 'params' section from sndcards.ycp of the given module
      * @param modname module name
@@ -135,13 +118,7 @@
 	}
 
 	Sound::LoadDatabase(true);
-	map<string,map<any,any> > params = Sound::db_modules[modname, "params"]:$[];
-
-	// change the names of parameters if necessary
-	return mapmap (string parname, map parsettings, params, ``{
-	    parname = check_parameter_name (parname);
-	    return $[ parname : parsettings ];
-	});
+	return Sound::db_modules[modname, "params"]:$[];
     }
 
     /**
@@ -187,11 +164,11 @@
 	foreach (string key, string value, (map<string,string>) SCR::Read (
 	    topath (sformat(".modinfo.kernel.drivers.sound.%1", modname))), ``{
 
-	    if (key == Sound::snd_prefix() + "enable")
+	    if (key == "enable")
 	    {
 		opts [key] = "1";
 	    }
-	    if (key == Sound::snd_prefix() + "index")
+	    if (key == "index")
 	    {
 		opts [key] = sformat ("%1",card_id);
 	    }
