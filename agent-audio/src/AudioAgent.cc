@@ -119,6 +119,7 @@ YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCP
 
     /* OSS Write handling */
     if(args[0]=="oss") {
+	y2debug("oss: (%ld) %s", path->length(), path->toString().c_str());
 	switch(path->length()) {
 	    case 1:
 		return ossSetVolume("", "", volume);
@@ -164,8 +165,7 @@ YCPValue AudioAgent::Dir(const YCPPath& path) {
     for(int i=0; i<path->length(); i++)
         args.push_back(path->component_str(i));
 
-    switch(path->length())
-    {
+    switch(path->length()) {
 	case 0:
 	    list->add(YCPString("alsa"));
 	    list->add(YCPString("oss"));
@@ -173,65 +173,48 @@ YCPValue AudioAgent::Dir(const YCPPath& path) {
 	    return list;
 	case 1:
 	    list->add(YCPString("cards"));
-	    list->add(YCPString("restore"));
-	    list->add(YCPString("store"));
+	    if(args[0]=="alsa") {
+		list->add(YCPString("store"));
+		list->add(YCPString("restore"));
+	    }
 	    return list;
 	case 2:
 	    if(args[0]=="alsa" && args[1]=="cards")
-	    {
 		return alsaGetCards();
-	    }
-	    else if(args[0]=="oss" || args[0]=="common")
-	    {
-		
-		// TODO
-		return list;
-	    }
 	    break;
 	case 3:
-	    if(args[1]=="cards")
-	    {
+	    if(args[1]=="cards") {
+		if(args[0]=="alsa") {
+		    list->add(YCPString("name"));
+		    list->add(YCPString("store"));
+		    list->add(YCPString("restore"));
+		}
 		list->add(YCPString("channels"));
-		list->add(YCPString("name"));
-		list->add(YCPString("store"));
-		list->add(YCPString("restore"));
 		return list;
 	    }
 	    break;
-
 	case 4:
-	    if(args[0]=="alsa")
-	    {
+	    if(args[0]=="alsa") {
 		if(args[1]=="cards" && args[3]=="channels")
-		{
 		    return alsaGetChannels(atoi(args[2].c_str()));  
+	    }
+	    else if(args[0]=="oss") {
+		if(args[1]=="cards" && args[3]=="channels") {
+		    y2debug("sc=%d",ossChannels_num);
+		    for(int cur = 0; cur < ossChannels_num; cur++)
+			list->add(YCPString(ossChannels[cur]));
+		    return list;
 		}
 	    }
 	    break;
 	case 5:
-	    if(args[0]=="alsa")
-	    {
-		if(args[1]=="cards" && args[3]=="channels")
-                {   
-		    list->add(YCPString("volume"));
+	    if(args[0]=="alsa") {
+		if(args[1]=="cards" && args[3]=="channels") {   
 		    list->add(YCPString("mute"));
 		    return list;
                 }
 	    }
-	    /*
-	    else if(s_system=="oss" || s_system=="common")
-	    {
-		// TODO
-	    }
-	    */
-	    /*
-	    else if(s_system=="oss" || s_system=="common")
-	    {
-		list->add(YCPString("volume"));
-		return list;
-	    }
-	    */
-	    
+	    break;
     }
 
     y2error("Wrong path '%s' in Dir().", path->toString().c_str());
