@@ -23,7 +23,13 @@ ycp_files = \
 	../../src/mixer.ycp \
 	../../src/oss_routines.ycp \
 	../../src/alsa_routines.ycp \
-	../../src/read_routines.ycp
+	../../src/read_routines.ycp \
+	../../src/select.ycp \
+	../../src/joystick.ycp \
+	../../src/Sound.ycp \
+	../../src/Joystick.ycp \
+	../../src/proposal_sound.ycp \
+	../../src/sound_auto.ycp
 
 html_DATA = index.html $(wildcard *.html)
 
