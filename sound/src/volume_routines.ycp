@@ -37,7 +37,7 @@
 
 	if (!Sound::use_alsa)
 	{
-	    if (Arch::sparc)
+	    if (Arch::sparc ())
 	    {
 		string cmd =
 		 sformat("/usr/bin/aumix -d /dev/mixer%1 -w %2", cardid, value);
