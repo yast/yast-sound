@@ -67,7 +67,6 @@
 
 
     textdomain "sound";
-//    include "sound/texts.ycp";
 
 
     include "sound/write_routines.ycp";
@@ -104,22 +103,6 @@
 	y2debug("empty proposal. exiting.");
 	return true;
     }
-/*
-    if (size (WFM::Args ()) > 1)
-    {
-	rc_values = WFM::Args (1);
-    }
-    
-    if (size(WFM::Args ()) > 2)
-    {
-	alsa = WFM::Args(2);
-    }
-
-    if (size(WFM::Args ()) > 3)
-    {
-	autoinstall = WFM::Args(3);
-    }
-*/
     if (autoinstall)
     {
 //	UI::Wizard::CreateDialog();

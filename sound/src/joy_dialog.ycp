@@ -15,6 +15,7 @@
     import  "Wizard";
     import  "Joystick";
     import  "Sound";
+    import  "Require";
 
     include "sound/joysticks.ycp";
     include "sound/ui.ycp";
@@ -32,7 +33,7 @@
 
 	if (card_id == nil)
 	{
-	    return `back; /*FIXME: return value */
+	    return `back;
 	}
 
 	list jcards = Sound::GetSoundCardListWithJoy();
@@ -47,7 +48,8 @@
 	string helptext =
 	// help text for joystick configuration 1/4
 _("<P>In this dialog, specify your joystick type. If your
-joystick type is not in the list, select <B>Generic analog joystick</B>.</P>
+joystick type is not in the list, select <B>Generic analog joystick</B>.</p>
+<p>You will not find any USB joystick here. If you have an USB device, just plug it in and start using.</P>
 ") +
 
 	// help text for joystick configuration 2/4
@@ -174,22 +176,10 @@ before pressing Next.
 	    string joymod = select(select(joylist, idx, ["", _("No joystick")]), 0, "");
 	    if (joymod == "")
 		    UI::MessagePopup(_("Select the joystick to test."));
-	    else
-        {
-            boolean test = true;
-            if (SCR::Execute(.target.bash, "rpm -q joystick")!=0)
-            {
-                if (UI::YesNoPopup(_("To test your joystick, the \"joystick\" package is required.
-It is currently not installed. Install it now?
-")))
-                {
-                    include "require.ycp";
-                    DoInstallAndRemove(["joystick"], []);
-                }
-                else test = false;
-            }
-            if (test) joy_test_popup(card_id, idx, joymod);
-        }
+        // popup: %1 is required application
+	    else if (Require::RequireAndConflict(["joystick"],[], _("To test your joystick, the <b>%1</b> package is required.
+It is currently not installed. Install it now?")))
+            joy_test_popup(card_id, idx, joymod);
         }
 
 	} while (!contains([`next, `back, `abort, `cancel], s));

@@ -175,28 +175,6 @@
 
     }
 
-
-    /**
-     *  writes unique keys of the configured cards to /var/lib/YaST/unique.inf
-     *  this function should not be used
-     *  @param keys list with uniq keys
-     *  @return boolean success/failure
-     *
-     *
-     */
-
-//    global define boolean save_unique_keys (list keys) ``{
-//        list orig = SCR::Read(.var.lib.yast.unique);
-//        if (orig == nil)
-//        {
-//            orig = [];
-//       }
-//        list keys = maplist (`e, keys, ``($["unique" : e, "state" : "configured"]));
-//        orig = filter (`e, orig, ``(lookup(e, "section", "") != "sound"));
-//	list final = add (orig, $["contents" : keys, "section" : "sound"]);
-//        return SCR::Write(.var.lib.yast.unique, final);
-//    }
-
     /**
      * saves uniq keys to .probe.status
      * @param configured list of strings of configured cards uniq keys
@@ -267,36 +245,8 @@
      */
 
     global define list read_unique_keys () ``{
-	list already = [];
-	if (SCR::Read(.target.size, "/var/lib/YaST/unique.inf") > 0)
-	{
-        // FIXME: no such agent!!
-	    already = [];//SCR::Read(.var.lib.yast.unique);
-	}
-	else
-	{
-	    already = [];
-	}
-	// select the sound section
-
-	list output = [];
-
-	already = filter(`e, already, ``(lookup(e, "section", "") == "sound"));
-	if (size(already) == 0) return [];
-	already = lookup(select(already, 0, ""), "contents", []);
-	already = maplist(`e, already,
-	``{
-	    if (lookup(e, "state", "") == "configured")
-	    {
-		output = add(output, lookup(e, "unique", ""));
-	    }
-	}
-
-	);
-
-	already = output;
-
-	return already;
+    // actually, we do not have agent for reading /var/lib/YaST/unique.inf !
+    return [];
     }
 
     /**
