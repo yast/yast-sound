@@ -217,6 +217,10 @@
 	save_info=remove(save_info, select(obs, obs_pos));
 	obs_pos=obs_pos-1;
     }   
+
+    // TODO: save modules.conf now if changed
+
+    CreateTmpModulesConf();
  
     map rc_vars       = $[];
     integer card_id   = 0;

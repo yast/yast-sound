@@ -274,9 +274,28 @@
 	{
 	    already = [];
 	}
-	already = maplist (`k, lookup (select (filter (`e, already, ``(lookup (e, "section") == "sound")), 0, $[]), "contents", []),
-                           ``(lookup (k, "unique")));	
-	
+	// select the sound section
+
+	list output=[];
+
+	already = filter(`e, already, ``(lookup(e, "section", "")=="sound"));
+	if(size(already)==0) return [];
+	already = lookup(select(already, 0), "contents", []);
+	already = maplist(`e, already, 
+	``{
+	    if(lookup(e, "state", "")=="configured")
+	    {
+		output=add(output, lookup(e, "unique"));
+	    }
+	}
+
+	);
+
+	already=output;
+
+//	already = maplist (`k, lookup (select (filter (`e, already, ``(lookup (e, "section") == "sound")), 0, $[]), "contents", []),
+//                           ``(lookup (k, "unique")));	
+	y2error(sformat("%1", already));	
 	return already;
     }
 
@@ -1138,5 +1157,10 @@
 
 	return card;
     }
-   
+  
+    global define CreateTmpModulesConf() ``{
+	string tmpdir=SCR (`Read (.target.tmpdir));
+	string cmd=sformat("grep '^[^#].*snd-card-' /etc/modules.conf > %1/modules.conf.tmp", tmpdir);
+	SCR(`Execute(.target.bash, cmd, $[]));
+    }
 }
