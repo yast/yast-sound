@@ -853,38 +853,59 @@
       "params" : $[
         "dma1" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("1st DMA # for %1 driver."),
+            "ad1816a"
+          ],
           "dialog" : "list"
         ],
         "dma2" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("2nd DMA # for %1 driver."),
+            "ad1816a"
+          ],
           "dialog" : "list"
         ],
         "fm_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("FM port # for %1 driver."),
+            "ad1816a"
+          ]
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "ad1816a"
+          ],
           "dialog" : "list"
         ],
         "mpu_irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU-401 IRQ # for %1 driver."),
+            "ad1816a"
+          ],
           "dialog" : "list"
         ],
         "mpu_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("MPU-401 port # for %1 driver."),
+            "ad1816a"
+          ]
         ],
         "port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("Port # for %1 driver."),
+            "ad1816a"
+          ]
         ]
       ]
     ],
@@ -893,23 +914,32 @@
       "params" : $[
         "dma1" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA1 # for %1 driver."),
+            "AD1848"
+          ],
           "dialog" : "list"
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "AD1848"
+          ],
           "dialog" : "list"
         ],
         "port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("Port # for %1 driver."),
+            "AD1848"
+          ]
         ],
         "thinkpad" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Enable only for the onboard CS4248 of IBM Thinkpad 360/750/755 series."),
           "dialog" : "check"
         ]
       ]
@@ -920,12 +950,12 @@
         "pcm_channels" : $[
           "allows" : "{{1,32}}",
           "default" : "32",
-          "descr" : _(" ")
+          "descr" : _("PCM Channels")
         ],
         "spdif" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Support SPDIF I/O"),
           "dialog" : "check"
         ]
       ]
@@ -938,38 +968,59 @@
       "params" : $[
         "dma16" : $[
           "allows" : "{{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("16-bit DMA # for %1 driver."),
+            "als100"
+          ],
           "dialog" : "list"
         ],
         "dma8" : $[
           "allows" : "{{0,1},{3}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("8-bit DMA # for %1 driver."),
+            "als100"
+          ],
           "dialog" : "list"
         ],
         "fm_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("FM port # for %1 driver."),
+            "als100"
+          ]
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "als100"
+          ],
           "dialog" : "list"
         ],
         "mpu_irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU-401 IRQ # for %1 driver."),
+            "als100"
+          ],
           "dialog" : "list"
         ],
         "mpu_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("MPU-401 port # for %1 driver."),
+            "als100"
+          ]
         ],
         "port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("Port # for %1 driver."),
+            "als100"
+          ]
         ]
       ]
     ],
@@ -980,7 +1031,10 @@
       ],
       "params" : $[
         "joystick_port" : $[
-          "descr" : _(" ")
+          "descr" : [
+            _("Joystick port address for %1 soundcard."),
+            "ALS4000"
+          ]
         ]
       ]
     ],
@@ -990,7 +1044,10 @@
         "pcifix" : $[
           "allows" : "{{0,Disabled},{1,Latency},{2,Bridge},{3,Both},{255,Auto}}",
           "default" : "4",
-          "descr" : _(" "),
+          "descr" : [
+            _("Enable VIA-workaround for %1 soundcard."),
+            "Aureal Advantage 3D Sound Processor"
+          ],
           "dialog" : "check"
         ]
       ]
@@ -1001,7 +1058,10 @@
         "pcifix" : $[
           "allows" : "{{0,Disabled},{1,Latency},{2,Bridge},{3,Both},{255,Auto}}",
           "default" : "4",
-          "descr" : _(" "),
+          "descr" : [
+            _("Enable VIA-workaround for %1 soundcard."),
+            "Aureal Vortex 3D Sound Processor"
+          ],
           "dialog" : "check"
         ]
       ]
@@ -1012,7 +1072,10 @@
         "pcifix" : $[
           "allows" : "{{0,Disabled},{1,Latency},{2,Bridge},{3,Both},{255,Auto}}",
           "default" : "4",
-          "descr" : _(" "),
+          "descr" : [
+            _("Enable VIA-workaround for %1 soundcard."),
+            "Aureal Vortex 2 3D Sound Processor"
+          ],
           "dialog" : "check"
         ]
       ]
@@ -1025,43 +1088,67 @@
       "params" : $[
         "dma1" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("1st DMA # for %1 driver."),
+            "azt2320"
+          ],
           "dialog" : "list"
         ],
         "dma2" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("2nd DMA # for %1 driver."),
+            "azt2320"
+          ],
           "dialog" : "list"
         ],
         "fm_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("FM port # for %1 driver."),
+            "azt2320"
+          ]
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "azt2320"
+          ],
           "dialog" : "list"
         ],
         "mpu_irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU-401 IRQ # for %1 driver."),
+            "azt2320"
+          ],
           "dialog" : "list"
         ],
         "mpu_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("MPU-401 port # for %1 driver."),
+            "azt2320"
+          ]
         ],
         "port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("Port # for %1 driver."),
+            "azt2320"
+          ]
         ],
         "wss_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("WSS Port # for %1 driver."),
+            "azt2320"
+          ]
         ]
       ]
     ],
@@ -1074,7 +1161,7 @@
       "description" : "Brooktree Bt87x audio driver",
       "params" : $[
         "digital_rate" : $[
-          "descr" : _(" ")
+          "descr" : _("Digital input rate for Bt87x soundcard")
         ]
       ]
     ],
@@ -1087,50 +1174,74 @@
         "isapnp" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : [
+            _("PnP detection for %1 soundcard."),
+            "C-Media CMI8330"
+          ],
           "dialog" : "check"
         ],
         "sbdma16" : $[
           "allows" : "{{5},{7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA16 for %1 driver."),
+            "CMI8330 SB"
+          ],
           "dialog" : "list",
           "prefers" : "{5}"
         ],
         "sbdma8" : $[
           "allows" : "{{0,1},{3}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA8 for %1 driver."),
+            "CMI8330 SB"
+          ],
           "dialog" : "list",
           "prefers" : "{1}"
         ],
         "sbirq" : $[
           "allows" : "{{5},{7},{9},{10},{11},{12}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "CMI8330 SB"
+          ],
           "dialog" : "list",
           "prefers" : "{5}"
         ],
         "sbport" : $[
           "allows" : "{{0x220,0x280,0x20}}",
           "base" : "16",
-          "descr" : _(" "),
+          "descr" : [
+            _("Port # for %1 driver."),
+            "CMI8330 SB"
+          ],
           "dialog" : "list",
           "prefers" : "{0x220}"
         ],
         "wssdma" : $[
           "allows" : "{{0,1},{3}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA for %1 driver."),
+            "CMI8330 WSS"
+          ],
           "dialog" : "list",
           "prefers" : "{0}"
         ],
         "wssirq" : $[
           "allows" : "{{5},{7},{9},{10},{11},{12}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "CMI8330 WSS"
+          ],
           "dialog" : "list",
           "prefers" : "{11}"
         ],
         "wssport" : $[
           "allows" : "{{0x530},{0xe80,0xf40,0xc0}}",
           "base" : "16",
-          "descr" : _(" "),
+          "descr" : [
+            _("Port # for %1 driver."),
+            "CMI8330 WSS"
+          ],
           "dialog" : "list",
           "prefers" : "{0x530}"
         ]
@@ -1145,23 +1256,23 @@
       "params" : $[
         "fm_port" : $[
           "allows" : "{{0},{0x388},{0x3c8},{0x3e0},{0x3e8}}",
-          "descr" : _(" "),
+          "descr" : _("FM port."),
           "dialog" : "list"
         ],
         "joystick_port" : $[
           "allows" : "{{0},{1},{0x200},{0x201}}",
-          "descr" : _(" "),
+          "descr" : _("Joystick port address."),
           "dialog" : "list"
         ],
         "mpu_port" : $[
           "allows" : "{{0},{0x330},{0x320},{0x310},{0x300}}",
-          "descr" : _(" "),
+          "descr" : _("MPU-401 port."),
           "dialog" : "list"
         ],
         "soft_ac3" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : _("Sofware-conversion of raw SPDIF packets (model 033 only)."),
           "dialog" : "check"
         ]
       ]
@@ -1174,33 +1285,51 @@
       "params" : $[
         "dma1" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA1 # for %1 driver."),
+            "CS4231"
+          ],
           "dialog" : "list"
         ],
         "dma2" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA2 # for %1 driver."),
+            "CS4231"
+          ],
           "dialog" : "list"
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "CS4231"
+          ],
           "dialog" : "list"
         ],
         "mpu_irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU-401 IRQ # for %1 driver."),
+            "CS4231"
+          ],
           "dialog" : "list"
         ],
         "mpu_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("MPU-401 port # for %1 driver."),
+            "CS4231"
+          ]
         ],
         "port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("Port # for %1 driver."),
+            "CS4231"
+          ]
         ]
       ]
     ],
@@ -1213,53 +1342,83 @@
         "cport" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("Control port # for %1 driver."),
+            "CS4232"
+          ]
         ],
         "dma1" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA1 # for %1 driver."),
+            "CS4232"
+          ],
           "dialog" : "list"
         ],
         "dma2" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA2 # for %1 driver."),
+            "CS4232"
+          ],
           "dialog" : "list"
         ],
         "fm_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("FM port # for %1 driver."),
+            "CS4232"
+          ]
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "CS4232"
+          ],
           "dialog" : "list"
         ],
         "isapnp" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : [
+            _("ISA PnP detection for %1 soundcard."),
+            "Cirrus Logic CS4232"
+          ],
           "dialog" : "check"
         ],
         "mpu_irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU-401 IRQ # for %1 driver."),
+            "CS4232"
+          ],
           "dialog" : "list"
         ],
         "mpu_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("MPU-401 port # for %1 driver."),
+            "CS4232"
+          ]
         ],
         "port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("Port # for %1 driver."),
+            "CS4232"
+          ]
         ],
         "sb_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("SB port # for %1 driver "),
+            "CS4232"
+          ]
         ]
       ]
     ],
@@ -1272,53 +1431,83 @@
         "cport" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("Control port # for %1 driver."),
+            "CS4236+"
+          ]
         ],
         "dma1" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA1 # for %1 driver."),
+            "CS4236+"
+          ],
           "dialog" : "list"
         ],
         "dma2" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA2 # for %1 driver."),
+            "CS4236+"
+          ],
           "dialog" : "list"
         ],
         "fm_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("FM port # for %1 driver."),
+            "CS4236+"
+          ]
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "CS4236+"
+          ],
           "dialog" : "list"
         ],
         "isapnp" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : [
+            _("ISA PnP detection for %1 soundcard."),
+            "Cirrus Logic CS4235-9"
+          ],
           "dialog" : "check"
         ],
         "mpu_irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU-401 IRQ # for %1 driver."),
+            "CS4236+"
+          ],
           "dialog" : "list"
         ],
         "mpu_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("MPU-401 port # for %1 driver."),
+            "CS4236+"
+          ]
         ],
         "port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("Port # for %1 driver."),
+            "CS4236+"
+          ]
         ],
         "sb_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("SB port # for %1 driver "),
+            "CS4236+"
+          ]
         ]
       ]
     ],
@@ -1330,7 +1519,7 @@
       "params" : $[
         "dual_codec" : $[
           "allows" : "{{0,3}}",
-          "descr" : _(" ")
+          "descr" : _("Secondary Codec ID (0 = disabled).")
         ]
       ]
     ],
@@ -1343,19 +1532,19 @@
         "external_amp" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Force to enable external amplifer."),
           "dialog" : "check"
         ],
         "mmap_valid" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Support OSS mmap."),
           "dialog" : "check"
         ],
         "thinkpad" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Force to enable Thinkpad's CLKRUN control."),
           "dialog" : "check"
         ]
       ]
@@ -1365,33 +1554,51 @@
       "params" : $[
         "dma8" : $[
           "allows" : "{{0,1},{3}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("8-bit DMA # for %1 driver."),
+            "dt019x"
+          ],
           "dialog" : "list"
         ],
         "fm_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("FM port # for %1 driver."),
+            "dt019x"
+          ]
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "dt019x"
+          ],
           "dialog" : "list"
         ],
         "mpu_irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU-401 IRQ # for %1 driver."),
+            "dt019x"
+          ],
           "dialog" : "list"
         ],
         "mpu_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("MPU-401 port # for %1 driver."),
+            "dt019x"
+          ]
         ],
         "port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("Port # for %1 driver."),
+            "dt019x"
+          ]
         ]
       ]
     ],
@@ -1401,13 +1608,19 @@
         "pcm_devs" : $[
           "allows" : "{{0,4}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : [
+            _("PCM devices # (0-4) for %1 driver."),
+            "dummy"
+          ],
           "dialog" : "list"
         ],
         "pcm_substreams" : $[
           "allows" : "{{1,16}}",
           "default" : "8",
-          "descr" : _(" "),
+          "descr" : [
+            _("PCM substreams # (1-16) for %1 driver."),
+            "dummy"
+          ],
           "dialog" : "list"
         ]
       ]
@@ -1429,22 +1642,22 @@
         "extin" : $[
           "allows" : "{{0,0x0ffff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : _("Available external inputs for FX8010. Zero=default.")
         ],
         "extout" : $[
           "allows" : "{{0,0x0ffff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : _("Available external outputs for FX8010. Zero=default.")
         ],
         "max_buffer_size" : $[
-          "descr" : _(" ")
+          "descr" : _("Maximum sample buffer size in MB.")
         ],
         "max_synth_voices" : $[
-          "descr" : _(" ")
+          "descr" : _("Maximum number of voices for WaveTable.")
         ],
         "seq_ports" : $[
           "allows" : "{{0,32}}",
-          "descr" : _(" ")
+          "descr" : _("Allocated sequencer ports for internal synthesizer.")
         ]
       ]
     ],
@@ -1458,7 +1671,7 @@
         "joystick" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Enable joystick."),
           "dialog" : "check"
         ]
       ]
@@ -1473,7 +1686,7 @@
       "params" : $[
         "joystick_port" : $[
           "allows" : "{{0},{1},{0x200},{0x208},{0x210},{0x218}}",
-          "descr" : _(" "),
+          "descr" : _("Joystick port address."),
           "dialog" : "list"
         ]
       ]
@@ -1486,28 +1699,43 @@
       "params" : $[
         "dma8" : $[
           "allows" : "{{0,1},{3}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("8-bit DMA # for %1 driver."),
+            "ESx688"
+          ],
           "dialog" : "list"
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "ESx688"
+          ],
           "dialog" : "list"
         ],
         "mpu_irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU-401 IRQ # for %1 driver."),
+            "ESx688"
+          ],
           "dialog" : "list"
         ],
         "mpu_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("MPU-401 port # for %1 driver."),
+            "ESx688"
+          ]
         ],
         "port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("Port # for %1 driver."),
+            "ESx688"
+          ]
         ]
       ]
     ],
@@ -1519,46 +1747,67 @@
       "params" : $[
         "dma1" : $[
           "allows" : "{{0,1},{3}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA 1 # for %1 driver."),
+            "ES18xx"
+          ],
           "dialog" : "list",
           "prefers" : "{1}"
         ],
         "dma2" : $[
           "allows" : "{{0},{1},{3},{5}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA 2 # for %1 driver."),
+            "ES18xx"
+          ],
           "dialog" : "list",
           "prefers" : "{0}"
         ],
         "fm_port" : $[
           "allows" : "{{0x388},{0x800,0xffc,0x4}}",
           "base" : "16",
-          "descr" : _(" "),
+          "descr" : [
+            _("FM port # for %1 driver."),
+            "ES18xx"
+          ],
           "dialog" : "combo",
           "prefers" : "{0x388}"
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "ES18xx"
+          ],
           "dialog" : "list",
           "prefers" : "{5}"
         ],
         "isapnp" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : [
+            _("PnP detection for %1 soundcard."),
+            "ESS ES18xx AudioDrive"
+          ],
           "dialog" : "check"
         ],
         "mpu_port" : $[
           "allows" : "{{0x300,0x330,0x30},{0x800,0xffe,0x2}}",
           "base" : "16",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU-401 port # for %1 driver."),
+            "ES18xx"
+          ],
           "dialog" : "combo",
           "prefers" : "{0x330,0x300}"
         ],
         "port" : $[
           "allows" : "{{0x220,0x280,0x20}}",
           "base" : "16",
-          "descr" : _(" "),
+          "descr" : [
+            _("Port # for %1 driver."),
+            "ES18xx"
+          ],
           "dialog" : "list",
           "prefers" : "{0x220}"
         ]
@@ -1580,36 +1829,42 @@
       ],
       "params" : $[
         "clock" : $[
-          "descr" : _(" ")
+          "descr" : _("Clock on ESS Maestro1/2 soundcard.  (0 = auto-detect)")
         ],
         "enable_mpu" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : _("Enable MPU401.  (0 = off, 1 = on, 2 = auto)"),
           "dialog" : "check"
         ],
         "joystick" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Enable joystick."),
           "dialog" : "check"
         ],
         "pcm_substreams_c" : $[
           "allows" : "{{0,8}}",
-          "descr" : _(" ")
+          "descr" : [
+            _("PCM Capture substreams for %1 soundcard."),
+            "ESS Maestro1/2"
+          ]
         ],
         "pcm_substreams_p" : $[
           "allows" : "{{1,8}}",
-          "descr" : _(" ")
+          "descr" : [
+            _("PCM Playback substreams for %1 soundcard."),
+            "ESS Maestro1/2"
+          ]
         ],
         "total_bufsize" : $[
           "allows" : "{{1,4096}}",
-          "descr" : _(" "),
+          "descr" : _("Total buffer size in kB."),
           "skill" : "advanced"
         ],
         "use_pm" : $[
           "allows" : "{{0,1,2}}",
-          "descr" : _(" "),
+          "descr" : _("Toggle power-management.  (0 = off, 1 = on, 2 = auto)"),
           "skill" : "advanced"
         ]
       ]
@@ -1619,18 +1874,27 @@
       "params" : $[
         "dma8" : $[
           "allows" : "{{0,1},{3}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("8-bit DMA # for %1 driver."),
+            "es968"
+          ],
           "dialog" : "list"
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "es968"
+          ],
           "dialog" : "list"
         ],
         "port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("Port # for %1 driver."),
+            "es968"
+          ]
         ]
       ]
     ],
@@ -1650,34 +1914,55 @@
       "params" : $[
         "channels" : $[
           "allows" : "{{14,32}}",
-          "descr" : _(" ")
+          "descr" : [
+            _("GF1 channels for %1 driver."),
+            "GUS Classic"
+          ]
         ],
         "dma1" : $[
           "allows" : "{{1},{3},{5},{6},{7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA1 # for %1 driver."),
+            "GUS Classic"
+          ],
           "dialog" : "list"
         ],
         "dma2" : $[
           "allows" : "{{1},{3},{5},{6},{7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA2 # for %1 driver."),
+            "GUS Classic"
+          ],
           "dialog" : "list"
         ],
         "irq" : $[
           "allows" : "{{3},{5},{9},{11},{12},{15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "GUS Classic"
+          ],
           "dialog" : "list"
         ],
         "joystick_dac" : $[
           "allows" : "{{0,31}}",
-          "descr" : _(" ")
+          "descr" : [
+            _("Joystick DAC level 0.59V-4.52V or 0.389V-2.98V for %1 driver."),
+            "GUS Classic"
+          ]
         ],
         "pcm_channels" : $[
           "allows" : "{{2,16}}",
-          "descr" : _(" ")
+          "descr" : [
+            _("Reserved PCM channels for %1 driver."),
+            "GUS Classic"
+          ]
         ],
         "port" : $[
           "allows" : "{{0x220,0x260,0x10}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("Port # for %1 driver."),
+            "GUS Classic"
+          ],
           "dialog" : "list"
         ]
       ]
@@ -1690,54 +1975,87 @@
       "params" : $[
         "channels" : $[
           "allows" : "{{14,32}}",
-          "descr" : _(" ")
+          "descr" : [
+            _("GF1 channels for %1 driver."),
+            "GUS Extreme"
+          ]
         ],
         "dma1" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("GF1 DMA # for %1 driver."),
+            "GUS Extreme"
+          ],
           "dialog" : "list"
         ],
         "dma8" : $[
           "allows" : "{{0,1},{3}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("8-bit DMA # for %1 driver."),
+            "GUS Extreme"
+          ],
           "dialog" : "list"
         ],
         "gf1_irq" : $[
           "allows" : "{{2},{3},{5},{9},{11},{12},{15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("GF1 IRQ # for %1 driver."),
+            "GUS Extreme"
+          ],
           "dialog" : "list"
         ],
         "gf1_port" : $[
           "allows" : "{{0x210,0x270,0x10}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("GF1 port # for %1 driver "),
+            "GUS Extreme"
+          ],
           "dialog" : "list"
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "GUS Extreme"
+          ],
           "dialog" : "list"
         ],
         "joystick_dac" : $[
           "allows" : "{{0,31}}",
-          "descr" : _(" ")
+          "descr" : [
+            _("Joystick DAC level 0.59V-4.52V or 0.389V-2.98V for %1 driver."),
+            "GUS Extreme"
+          ]
         ],
         "mpu_irq" : $[
           "allows" : "{{5},{7},{9},{10}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU-401 IRQ # for %1 driver."),
+            "GUS Extreme"
+          ],
           "dialog" : "list"
         ],
         "mpu_port" : $[
           "allows" : "{{0x300,0x320,0x10}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU-401 port # for %1 driver."),
+            "GUS Extreme"
+          ],
           "dialog" : "list"
         ],
         "pcm_channels" : $[
           "allows" : "{{2,16}}",
-          "descr" : _(" ")
+          "descr" : [
+            _("Reserved PCM channels for %1 driver."),
+            "GUS Extreme"
+          ]
         ],
         "port" : $[
           "allows" : "{{0x220,0x260,0x20}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("Port # for %1 driver."),
+            "GUS Extreme"
+          ],
           "dialog" : "list"
         ]
       ]
@@ -1750,34 +2068,55 @@
       "params" : $[
         "channels" : $[
           "allows" : "{{14,32}}",
-          "descr" : _(" ")
+          "descr" : [
+            _("Used GF1 channels for %1 driver."),
+            "GUS MAX"
+          ]
         ],
         "dma1" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA1 # for %1 driver."),
+            "GUS MAX"
+          ],
           "dialog" : "list"
         ],
         "dma2" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA2 # for %1 driver."),
+            "GUS MAX"
+          ],
           "dialog" : "list"
         ],
         "irq" : $[
           "allows" : "{{3},{5},{9},{11},{12},{15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "GUS MAX"
+          ],
           "dialog" : "list"
         ],
         "joystick_dac" : $[
           "allows" : "{{0,31}}",
-          "descr" : _(" ")
+          "descr" : [
+            _("Joystick DAC level 0.59V-4.52V or 0.389V-2.98V for %1 driver."),
+            "GUS MAX"
+          ]
         ],
         "pcm_channels" : $[
           "allows" : "{{2,16}}",
-          "descr" : _(" ")
+          "descr" : [
+            _("Reserved PCM channels for %1 driver."),
+            "GUS MAX"
+          ]
         ],
         "port" : $[
           "allows" : "{{0x220},{0x230},{0x240},{0x250},{0x260}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("Port # for %1 driver."),
+            "GUS MAX"
+          ],
           "dialog" : "list"
         ]
       ]
@@ -1788,13 +2127,13 @@
         "line_outs_monitor" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Send all input and playback streams to line outs by default."),
           "dialog" : "check"
         ],
         "precise_ptr" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Enable precise pointer (doesn't work reliably)."),
           "dialog" : "check"
         ]
       ]
@@ -1805,19 +2144,19 @@
         "enable_monitor" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Enable Analog Out on Channel 63/64 by default."),
           "dialog" : "check"
         ],
         "line_outs_monitor" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Send playback streams to analog outs by default."),
           "dialog" : "check"
         ],
         "precise_ptr" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : _("Enable precise pointer, or disable."),
           "dialog" : "check"
         ]
       ]
@@ -1828,7 +2167,7 @@
         "omni" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Enable Midiman M-Audio Delta Omni I/O support."),
           "dialog" : "check"
         ]
       ]
@@ -1846,23 +2185,29 @@
       "params" : $[
         "ac97_clock" : $[
           "default" : "0",
-          "descr" : _(" ")
+          "descr" : _("AC'97 codec clock (0 = auto-detect).")
         ],
         "ac97_quirk" : $[
           "allows" : "{{-1,3}}",
           "default" : "-1",
-          "descr" : _(" "),
+          "descr" : _("AC'97 workaround for strange hardware."),
           "dialog" : "list"
         ],
         "joystick" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : [
+            _("Enable joystick for %1 soundcard."),
+            "Intel i8x0"
+          ],
           "dialog" : "check"
         ],
         "mpu_port" : $[
           "allows" : "{{0},{0x330},{0x300}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU401 port # for %1 driver."),
+            "Intel i8x0"
+          ],
           "dialog" : "list"
         ]
       ]
@@ -1872,7 +2217,7 @@
       "params" : $[
         "ac97_clock" : $[
           "default" : "0",
-          "descr" : _(" ")
+          "descr" : _("AC'97 codec clock (0 = auto-detect).")
         ]
       ]
     ],
@@ -1884,48 +2229,75 @@
       "params" : $[
         "dma1" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA1 # for %1 driver."),
+            "InterWave"
+          ],
           "dialog" : "list"
         ],
         "dma2" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA2 # for %1 driver."),
+            "InterWave"
+          ],
           "dialog" : "list"
         ],
         "effect" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : [
+            _("Effects enable for %1 driver."),
+            "InterWave"
+          ],
           "dialog" : "check"
         ],
         "irq" : $[
           "allows" : "{{3},{5},{9},{11},{12},{15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "InterWave"
+          ],
           "dialog" : "list"
         ],
         "isapnp" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : [
+            _("ISA PnP detection for %1 soundcard."),
+            "AMD InterWave"
+          ],
           "dialog" : "check"
         ],
         "joystick_dac" : $[
           "allows" : "{{0,31}}",
-          "descr" : _(" ")
+          "descr" : [
+            _("Joystick DAC level 0.59V-4.52V or 0.389V-2.98V for %1 driver."),
+            "InterWave"
+          ]
         ],
         "midi" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : [
+            _("MIDI UART enable for %1 driver."),
+            "InterWave"
+          ],
           "dialog" : "check"
         ],
         "pcm_channels" : $[
           "allows" : "{{2,16}}",
-          "descr" : _(" ")
+          "descr" : [
+            _("Reserved PCM channels for %1 driver."),
+            "InterWave"
+          ]
         ],
         "port" : $[
           "allows" : "{{0x210,0x260,0x10}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("Port # for %1 driver."),
+            "InterWave"
+          ],
           "dialog" : "list"
         ]
       ]
@@ -1938,53 +2310,83 @@
       "params" : $[
         "dma1" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA1 # for %1 driver."),
+            "InterWave"
+          ],
           "dialog" : "list"
         ],
         "dma2" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA2 # for %1 driver."),
+            "InterWave"
+          ],
           "dialog" : "list"
         ],
         "effect" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : [
+            _("Effects enable for %1 driver."),
+            "InterWave"
+          ],
           "dialog" : "check"
         ],
         "irq" : $[
           "allows" : "{{3},{5},{9},{11},{12},{15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "InterWave"
+          ],
           "dialog" : "list"
         ],
         "isapnp" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : [
+            _("ISA PnP detection for %1 soundcard."),
+            "AMD InterWave STB with TEA6330T"
+          ],
           "dialog" : "check"
         ],
         "joystick_dac" : $[
           "allows" : "{{0,31}}",
-          "descr" : _(" ")
+          "descr" : [
+            _("Joystick DAC level 0.59V-4.52V or 0.389V-2.98V for %1 driver."),
+            "InterWave"
+          ]
         ],
         "midi" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : [
+            _("MIDI UART enable for %1 driver."),
+            "InterWave"
+          ],
           "dialog" : "check"
         ],
         "pcm_channels" : $[
           "allows" : "{{2,16}}",
-          "descr" : _(" ")
+          "descr" : [
+            _("Reserved PCM channels for %1 driver."),
+            "InterWave"
+          ]
         ],
         "port" : $[
           "allows" : "{{0x210,0x260,0x10}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("Port # for %1 driver."),
+            "InterWave"
+          ],
           "dialog" : "list"
         ],
         "port_tc" : $[
           "allows" : "{{0x350,0x380,0x10}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("Tone control (TEA6330T - i2c bus) port # for %1 driver."),
+            "InterWave"
+          ],
           "dialog" : "list"
         ]
       ]
@@ -1998,12 +2400,15 @@
       "description" : "ESS Maestro3 PCI",
       "params" : $[
         "amp_gpio" : $[
-          "descr" : _(" ")
+          "descr" : _("GPIO pin number for external amp. (default = -1)")
         ],
         "external_amp" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : [
+            _("Enable external amp for %1 soundcard."),
+            "ESS Maestro3/Allegro/Canyon3D-2"
+          ],
           "dialog" : "check"
         ]
       ]
@@ -2018,13 +2423,13 @@
       "params" : $[
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : _("IRQ # for MPU-401 device."),
           "dialog" : "list"
         ],
         "port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : _("Port # for MPU-401 device.")
         ]
       ]
     ],
@@ -2033,17 +2438,26 @@
       "params" : $[
         "hwports" : $[
           "allows" : "{{1,8}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("Hardware ports # for %1 MIDI."),
+            "MotuMTPAV"
+          ],
           "dialog" : "list"
         ],
         "irq" : $[
           "allows" : "{{7},{5}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("Parallel IRQ # for %1 MIDI."),
+            "MotuMTPAV"
+          ],
           "dialog" : "list"
         ],
         "port" : $[
           "allows" : "{{0x378},{0x278}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("Parallel port # for %1 MIDI."),
+            "MotuMTPAV"
+          ],
           "dialog" : "list"
         ]
       ]
@@ -2052,30 +2466,42 @@
       "description" : "NeoMagic NM256AV/ZX",
       "params" : $[
         "buffer_top" : $[
-          "descr" : _(" ")
+          "descr" : [
+            _("Set the top address of audio buffer for %1 soundcard."),
+            "NeoMagic 256AV/ZX"
+          ]
         ],
         "capture_bufsize" : $[
-          "descr" : _(" ")
+          "descr" : [
+            _("ADC frame size in kB for %1 soundcard."),
+            "NeoMagic 256AV/ZX"
+          ]
         ],
         "force_ac97" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : [
+            _("Force to use AC97 codec for %1 soundcard."),
+            "NeoMagic 256AV/ZX"
+          ],
           "dialog" : "check"
         ],
         "playback_bufsize" : $[
-          "descr" : _(" ")
+          "descr" : [
+            _("DAC frame size in kB for %1 soundcard."),
+            "NeoMagic 256AV/ZX"
+          ]
         ],
         "use_cache" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Enable the cache for coefficient table access."),
           "dialog" : "check"
         ],
         "vaio_hack" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Enable workaround for Sony VAIO notebooks."),
           "dialog" : "check"
         ]
       ]
@@ -2088,53 +2514,80 @@
       "params" : $[
         "dma1" : $[
           "allows" : "{{1},{3},{5},{6},{7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA1 # for %1 driver."),
+            "OPL3-SA"
+          ],
           "dialog" : "list"
         ],
         "dma2" : $[
           "allows" : "{{1},{3},{5},{6},{7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA2 # for %1 driver."),
+            "OPL3-SA"
+          ],
           "dialog" : "list"
         ],
         "fm_port" : $[
           "allows" : "{{0x388}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("FM port # for %1 driver."),
+            "OPL3-SA"
+          ],
           "dialog" : "list"
         ],
         "irq" : $[
           "allows" : "{{0},{1},{3},{5},{9},{11},{12},{15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "OPL3-SA"
+          ],
           "dialog" : "list"
         ],
         "isapnp" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : [
+            _("PnP detection for %1 soundcard."),
+            "Yamaha OPL3SA2+"
+          ],
           "dialog" : "check"
         ],
         "midi_port" : $[
           "allows" : "{{0x330},{0x300}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MIDI port # for %1 driver."),
+            "OPL3-SA"
+          ],
           "dialog" : "list"
         ],
         "opl3sa3_ymode" : $[
           "allows" : "{{0,3}}",
-          "descr" : _(" "),
+          "descr" : _("Speaker size selection for 3D Enhancement mode: Desktop/Large Notebook/Small Notebook/HiFi."),
           "dialog" : "list"
         ],
         "port" : $[
           "allows" : "{{0xf86},{0x370},{0x100}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("Port # for %1 driver."),
+            "OPL3-SA"
+          ],
           "dialog" : "list"
         ],
         "sb_port" : $[
           "allows" : "{{0x220},{0x240},{0x260}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("SB port # for %1 driver."),
+            "OPL3-SA"
+          ],
           "dialog" : "list"
         ],
         "wss_port" : $[
           "allows" : "{{0x530},{0xe80},{0xf40},{0x604}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("WSS port # for %1 driver."),
+            "OPL3-SA"
+          ],
           "dialog" : "list"
         ]
       ]
@@ -2147,39 +2600,60 @@
       "params" : $[
         "dma1" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("1st dma # for %1 driver."),
+            "opti9xx"
+          ],
           "dialog" : "list"
         ],
         "fm_port" : $[
           "allows" : "{{0,0xffff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("FM port # for %1 driver."),
+            "opti9xx"
+          ]
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("WSS irq # for %1 driver."),
+            "opti9xx"
+          ],
           "dialog" : "list"
         ],
         "isapnp" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : [
+            _("Enable ISA PnP detection for %1 soundcard."),
+            "OPTi92X - AD1848"
+          ],
           "dialog" : "check"
         ],
         "mpu_irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU-401 irq # for %1 driver."),
+            "opti9xx"
+          ],
           "dialog" : "list"
         ],
         "mpu_port" : $[
           "allows" : "{{0,0xffff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("MPU-401 port # for %1 driver."),
+            "opti9xx"
+          ]
         ],
         "port" : $[
           "allows" : "{{0,0xffff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("WSS port # for %1 driver."),
+            "opti9xx"
+          ]
         ]
       ]
     ],
@@ -2191,44 +2665,68 @@
       "params" : $[
         "dma1" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("1st dma # for %1 driver."),
+            "opti9xx"
+          ],
           "dialog" : "list"
         ],
         "dma2" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("2nd dma # for %1 driver."),
+            "opti9xx"
+          ],
           "dialog" : "list"
         ],
         "fm_port" : $[
           "allows" : "{{0,0xffff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("FM port # for %1 driver."),
+            "opti9xx"
+          ]
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("WSS irq # for %1 driver."),
+            "opti9xx"
+          ],
           "dialog" : "list"
         ],
         "isapnp" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : [
+            _("Enable ISA PnP detection for %1 soundcard."),
+            "OPTi92X - CS4231"
+          ],
           "dialog" : "check"
         ],
         "mpu_irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU-401 irq # for %1 driver."),
+            "opti9xx"
+          ],
           "dialog" : "list"
         ],
         "mpu_port" : $[
           "allows" : "{{0,0xffff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("MPU-401 port # for %1 driver."),
+            "opti9xx"
+          ]
         ],
         "port" : $[
           "allows" : "{{0,0xffff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("WSS port # for %1 driver."),
+            "opti9xx"
+          ]
         ]
       ]
     ],
@@ -2240,44 +2738,68 @@
       "params" : $[
         "dma1" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("1st dma # for %1 driver."),
+            "opti9xx"
+          ],
           "dialog" : "list"
         ],
         "dma2" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("2nd dma # for %1 driver."),
+            "opti9xx"
+          ],
           "dialog" : "list"
         ],
         "fm_port" : $[
           "allows" : "{{0,0xffff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("FM port # for %1 driver."),
+            "opti9xx"
+          ]
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("WSS irq # for %1 driver."),
+            "opti9xx"
+          ],
           "dialog" : "list"
         ],
         "isapnp" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : [
+            _("Enable ISA PnP detection for %1 soundcard."),
+            "OPTi93X"
+          ],
           "dialog" : "check"
         ],
         "mpu_irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU-401 irq # for %1 driver."),
+            "opti9xx"
+          ],
           "dialog" : "list"
         ],
         "mpu_port" : $[
           "allows" : "{{0,0xffff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("MPU-401 port # for %1 driver."),
+            "opti9xx"
+          ]
         ],
         "port" : $[
           "allows" : "{{0,0xffff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("WSS port # for %1 driver."),
+            "opti9xx"
+          ]
         ]
       ]
     ],
@@ -2289,7 +2811,7 @@
     "snd-powermac" : $[
       "description" : "PowerMac on-board",
       "params" : $[
-        "enable_beep" : $[
+        "snd_enable_beep" : $[
           "allows" : "{{0},{1}}",
           "descr" : _("Enable beep using PCM.")
         ]
@@ -2311,7 +2833,7 @@
         "precise_ptr" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Enable precise pointer (doesn't work reliably)."),
           "dialog" : "check"
         ]
       ]
@@ -2325,49 +2847,70 @@
         "csp" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("ASP/CSP chip support."),
           "dialog" : "check"
         ],
         "dma16" : $[
           "allows" : "{{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("16-bit DMA # for %1 driver."),
+            "SB16"
+          ],
           "dialog" : "list"
         ],
         "dma8" : $[
           "allows" : "{{0,1},{3}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("8-bit DMA # for %1 driver."),
+            "SB16"
+          ],
           "dialog" : "list"
         ],
         "fm_port" : $[
           "allows" : "{{0x388},{0x38c},{0x390},{0x394}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("FM port # for %1 driver."),
+            "SB16 PnP"
+          ],
           "dialog" : "list"
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "SB16"
+          ],
           "dialog" : "list"
         ],
         "isapnp" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : [
+            _("PnP detection for %1 soundcard."),
+            "Sound Blaster 16"
+          ],
           "dialog" : "check"
         ],
         "mic_agc" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : _("Mic Auto-Gain-Control switch."),
           "dialog" : "check"
         ],
         "mpu_port" : $[
           "allows" : "{{0x330},{0x300}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU-401 port # for %1 driver."),
+            "SB16"
+          ],
           "dialog" : "list"
         ],
         "port" : $[
           "allows" : "{{0x220},{0x240},{0x260},{0x280}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("Port # for %1 driver."),
+            "SB16"
+          ],
           "dialog" : "list"
         ]
       ]
@@ -2380,18 +2923,27 @@
       "params" : $[
         "dma8" : $[
           "allows" : "{{0,1},{3}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("8-bit DMA # for %1 driver."),
+            "SB8"
+          ],
           "dialog" : "list"
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "SB8"
+          ],
           "dialog" : "list"
         ],
         "port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("Port # for %1 driver."),
+            "SB8"
+          ]
         ]
       ]
     ],
@@ -2403,60 +2955,84 @@
       "params" : $[
         "awe_port" : $[
           "allows" : "{{0x620},{0x640},{0x660},{0x680}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("AWE port # for %1 driver."),
+            "SB16 PnP"
+          ],
           "dialog" : "list"
         ],
         "csp" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("ASP/CSP chip support."),
           "dialog" : "check"
         ],
         "dma16" : $[
           "allows" : "{{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("16-bit DMA # for %1 driver."),
+            "SB16"
+          ],
           "dialog" : "list"
         ],
         "dma8" : $[
           "allows" : "{{0,1},{3}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("8-bit DMA # for %1 driver."),
+            "SB16"
+          ],
           "dialog" : "list"
         ],
         "fm_port" : $[
           "allows" : "{{0x388},{0x38c},{0x390},{0x394}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("FM port # for %1 driver."),
+            "SB16 PnP"
+          ],
           "dialog" : "list"
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "SB16"
+          ],
           "dialog" : "list"
         ],
         "isapnp" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : [
+            _("PnP detection for %1 soundcard."),
+            "Sound Blaster AWE"
+          ],
           "dialog" : "check"
         ],
         "mic_agc" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : _("Mic Auto-Gain-Control switch."),
           "dialog" : "check"
         ],
         "mpu_port" : $[
           "allows" : "{{0x330},{0x300}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU-401 port # for %1 driver."),
+            "SB16"
+          ],
           "dialog" : "list"
         ],
         "port" : $[
           "allows" : "{{0x220},{0x240},{0x260},{0x280}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("Port # for %1 driver."),
+            "SB16"
+          ],
           "dialog" : "list"
         ],
         "seq_ports" : $[
           "allows" : "{{0,8}}",
-          "descr" : _(" "),
+          "descr" : _("Number of sequencer ports for WaveTable synth."),
           "skill" : "advanced"
         ]
       ]
@@ -2466,43 +3042,43 @@
       "params" : $[
         "adaptor" : $[
           "allows" : "{{0=Soundcanvas,1=MS-124T,2=MS-124W S/A,3=MS-124W M/B,4=Generic}}",
-          "descr" : _(" "),
+          "descr" : _("Type of adaptor."),
           "dialog" : "list"
         ],
         "base" : $[
           "allows" : "{57600,115200,230400,460800}",
-          "descr" : _(" "),
+          "descr" : _("Base for divisor in bauds."),
           "dialog" : "list"
         ],
         "droponfull" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Flag to enable drop-on-full buffer mode"),
           "dialog" : "check"
         ],
         "ins" : $[
           "allows" : "{{1,16}}",
-          "descr" : _(" "),
+          "descr" : _("Number of MIDI inputs."),
           "dialog" : "list"
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : _("IRQ # for UART16550A chip."),
           "dialog" : "list"
         ],
         "outs" : $[
           "allows" : "{{1,16}}",
-          "descr" : _(" "),
+          "descr" : _("Number of MIDI outputs."),
           "dialog" : "list"
         ],
         "port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : _("Port # for UART16550A chip.")
         ],
         "speed" : $[
           "allows" : "{9600,19200,38400,57600,115200}",
-          "descr" : _(" "),
+          "descr" : _("Speed in bauds."),
           "dialog" : "list"
         ]
       ]
@@ -2515,22 +3091,34 @@
       "params" : $[
         "dma1" : $[
           "allows" : "{{0,1},{3}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA1 # for %1 driver."),
+            "Sound Galaxy"
+          ],
           "dialog" : "list"
         ],
         "irq" : $[
           "allows" : "{{7},{9},{10},{11}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "Sound Galaxy"
+          ],
           "dialog" : "list"
         ],
         "sbport" : $[
           "allows" : "{{0x220},{0x240}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("Port # for %1 driver."),
+            "Sound Galaxy SB"
+          ],
           "dialog" : "list"
         ],
         "wssport" : $[
           "allows" : "{{0x530},{0xe80},{0xf40},{0x604}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("Port # for %1 driver."),
+            "Sound Galaxy WSS"
+          ],
           "dialog" : "list"
         ]
       ]
@@ -2544,13 +3132,19 @@
         "mge" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : [
+            _("MIC Gain Enable for %1 soundcard."),
+            "S3 SonicVibes"
+          ],
           "dialog" : "check"
         ],
         "reverb" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : [
+            _("Enable reverb (SRAM is present) for %1 soundcard."),
+            "S3 SonicVibes"
+          ],
           "dialog" : "check"
         ]
       ]
@@ -2560,21 +3154,33 @@
       "params" : $[
         "dma" : $[
           "allows" : "{{0,1},{3}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA # for %1 driver."),
+            "SoundScape"
+          ],
           "dialog" : "list"
         ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 driver."),
+            "SoundScape"
+          ],
           "dialog" : "list"
         ],
         "mpu_irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("MPU401 IRQ # for %1 driver."),
+            "SoundScape"
+          ],
           "dialog" : "list"
         ],
         "port" : $[
-          "descr" : _(" ")
+          "descr" : [
+            _("Port # for %1 driver."),
+            "SoundScape"
+          ]
         ]
       ]
     ],
@@ -2595,11 +3201,11 @@
         "pcm_channels" : $[
           "allows" : "{{1,32}}",
           "default" : "32",
-          "descr" : _(" ")
+          "descr" : _("Number of hardware channels assigned for PCM.")
         ],
         "wavetable_size" : $[
           "default" : "8192",
-          "descr" : _(" "),
+          "descr" : _("Maximum memory size in kB for wavetable synth."),
           "skill" : "advanced"
         ]
       ]
@@ -2609,17 +3215,17 @@
       "params" : $[
         "nrpacks" : $[
           "allows" : "{{2,10}}",
-          "descr" : _(" ")
+          "descr" : _("Max. number of packets per URB.")
         ],
         "pid" : $[
           "allows" : "{{-1,0xffff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : _("Product ID for the USB audio device.")
         ],
         "vid" : $[
           "allows" : "{{-1,0xffff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : _("Vendor ID for the USB audio device.")
         ]
       ]
     ],
@@ -2628,23 +3234,23 @@
       "params" : $[
         "ac97_clock" : $[
           "default" : "48000",
-          "descr" : _(" ")
+          "descr" : _("AC'97 codec clock (default 48000Hz).")
         ],
         "ac97_quirk" : $[
           "allows" : "{{-1,3}}",
           "default" : "-1",
-          "descr" : _(" "),
+          "descr" : _("AC'97 workaround for strange hardware."),
           "dialog" : "list"
         ],
         "dxs_support" : $[
           "allows" : "{{0,4}}",
-          "descr" : _(" "),
+          "descr" : _("Support for DXS channels (0 = auto, 1 = enable, 2 = disable, 3 = 48k only, 4 = no VRA)"),
           "dialog" : "list"
         ],
         "mpu_port" : $[
           "allows" : "{{0,0xffff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : _("MPU-401 port. (VT82C686x only)")
         ]
       ]
     ],
@@ -2653,7 +3259,7 @@
       "params" : $[
         "midi_devs" : $[
           "allows" : "{{1,8}}",
-          "descr" : _(" ")
+          "descr" : _("MIDI devices # (1-8)")
         ]
       ]
     ],
@@ -2661,12 +3267,12 @@
       "description" : "Digigram VX222 V2/Mic",
       "params" : $[
         "ibl" : $[
-          "descr" : _(" ")
+          "descr" : _("Capture IBL size.")
         ],
         "mic" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Enable Microphone."),
           "dialog" : "check"
         ]
       ]
@@ -2675,7 +3281,10 @@
       "description" : "Digigram VXPocket440",
       "params" : $[
         "ibl" : $[
-          "descr" : _(" ")
+          "descr" : [
+            _("Capture IBL size for %1 soundcard."),
+            "VXPocket440"
+          ]
         ]
       ]
     ],
@@ -2683,7 +3292,10 @@
       "description" : "Digigram VXPocket",
       "params" : $[
         "ibl" : $[
-          "descr" : _(" ")
+          "descr" : [
+            _("Capture IBL size for %1 soundcard."),
+            "VXPocket"
+          ]
         ]
       ]
     ],
@@ -2695,59 +3307,80 @@
       "params" : $[
         "cs4232_mpu_irq" : $[
           "allows" : "{{9},{11},{12},{15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 interface."),
+            "CS4232 MPU-401"
+          ],
           "dialog" : "list"
         ],
         "cs4232_mpu_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("port # for %1 interface."),
+            "CS4232 MPU-401"
+          ]
         ],
         "cs4232_pcm_irq" : $[
           "allows" : "{{5},{7},{9},{11},{12},{15}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("IRQ # for %1 interface."),
+            "CS4232 PCM"
+          ],
           "dialog" : "list"
         ],
         "cs4232_pcm_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : [
+            _("Port # for %1 interface."),
+            "CS4232 PCM"
+          ]
         ],
         "dma1" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA1 # for %1 interface."),
+            "CS4232 PCM"
+          ],
           "dialog" : "list"
         ],
         "dma2" : $[
           "allows" : "{{0,1},{3},{5,7}}",
-          "descr" : _(" "),
+          "descr" : [
+            _("DMA2 # for %1 interface."),
+            "CS4232 PCM"
+          ],
           "dialog" : "list"
         ],
         "fm_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : _("FM port #.")
         ],
         "ics2115_irq" : $[
           "allows" : "{{9},{11},{12},{15}}",
-          "descr" : _(" "),
+          "descr" : _("IRQ # for ICS2115."),
           "dialog" : "list"
         ],
         "ics2115_port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" : _(" ")
+          "descr" : _("Port # for ICS2115.")
         ],
         "isapnp" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _(" "),
+          "descr" : [
+            _("ISA PnP detection for %1 soundcards"),
+            "WaveFront"
+          ],
           "dialog" : "check"
         ],
         "use_cs4232_midi" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Use CS4232 MPU-401 interface (inaccessibly located inside your computer)"),
           "dialog" : "check"
         ]
       ]
@@ -2769,18 +3402,18 @@
       ],
       "params" : $[
         "fm_port" : $[
-          "descr" : _(" ")
+          "descr" : _("FM OPL-3 Port.")
         ],
         "joystick_port" : $[
-          "descr" : _(" ")
+          "descr" : _("Joystick port address")
         ],
         "mpu_port" : $[
-          "descr" : _(" ")
+          "descr" : _("MPU-401 Port.")
         ],
         "rear_switch" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _(" "),
+          "descr" : _("Enable shared rear/line-in switch"),
           "dialog" : "check"
         ]
       ]
