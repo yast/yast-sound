@@ -240,23 +240,12 @@ its parameters using the 'Advanced setup'.");
 
 //    boolean quick = false;
 
-    UI::DisableWizardAbortButton();
+    if (autoinstall)
+    {
+	quick = true;
+    }
 
-//    if (size (Args ()) > 2)
-//    {
-//	finish = Args (2);
-//    }
-    
-//    if (size (Args ()) >3)
-//    {
-//	quick= Args (3);
-//    }
-    
-//    list save_info = [];
-//    if (size (Args()) > 4)
-//    {
-//	save_info=Args(4);
-//    }
+    UI::DisableWizardAbortButton();
 
     string err_msg = "";
 
@@ -281,10 +270,13 @@ its parameters using the 'Advanced setup'.");
 	    });
 	}
 
-	sound_stop();
-	SaveModulesEntry (new_save, [], true);
-	sound_start_tmp(true);
-	err_msg = check_module(save_entry, card_id);
+	if (!autoinstall)
+	{
+	    sound_stop();
+	    SaveModulesEntry (new_save, [], true);
+	    sound_start_tmp(true);
+	    err_msg = check_module(save_entry, card_id);
+	}
     }
 // #################################
     symbol ui = nil;
@@ -312,9 +304,12 @@ its parameters using the 'Advanced setup'.");
     }
 
     if (ui == `back || ui == `cancel || ui == `abort)
-    {
-	SaveModulesEntry(save_info, [], true);
-	sound_start_tmp(true);	
+    {	
+	if (!autoinstall)
+	{
+	    SaveModulesEntry(save_info, [], true);
+	    sound_start_tmp(true);	
+	}
     }
     
     SCR::Execute(.audio.alsa.restore, 0 ,0);
