@@ -599,4 +599,5 @@
     }
 
     UI::CloseDialog ();
+    return ui;
 }

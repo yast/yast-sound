@@ -276,13 +276,19 @@
 	    y2error("Import error: 'modules_conf' key is missing");
 	    return false;
 	}
-	modules_conf = lookup(settings, "modules_conf", []);
-
-	rc_vars = lookup(settings, "rc_vars", $[]);
-
-	volume_settings = lookup(settings, "volume_settings", []);
+	Set(settings);
 
 	return true;
+    }
+    
+    /**
+     * Just Set module data
+     * @return: void
+     */
+    global define void Set(map settings)  ``{
+	modules_conf = lookup(settings, "modules_conf", []);
+	rc_vars = lookup(settings, "rc_vars", $[]);
+	volume_settings = lookup(settings, "volume_settings", []);	
     }
 
     /**
