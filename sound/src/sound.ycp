@@ -63,14 +63,11 @@
 
 	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id), card_id, flags)),
 		    ``(CallModule ("sound_volume", [card, card_id, finish, quick] ))]; 
-//	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id), card_id, flags)),
-//		    ``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id), card_id, flags))]; 
 	integer id = 0;
 	if (ui == `back)
 	{
 	    id = size (dialog) - 1;
 	}
-//	map result = $[];
 	any result = $[];
 	any ui = nil;
 
@@ -204,6 +201,7 @@
 	arg_n = arg_n - 1;
     }
     list sound_cards  = get_audio (test_mode, config_mode);
+
     list save_info    = read_save_info ();
    
     // filter out save_info of non-present hardware
@@ -214,9 +212,7 @@
     {
 	// first remove alias
 	pth=sformat("snd-card-%1", obs_pos);
-//	y2error("removing alias", pth);
 	SCR(`Write(.modules.alias, nil, pth));	
-//	pth=sformat(".modules.
     
 	save_info=remove(save_info, select(obs, obs_pos));
 	obs_pos=obs_pos-1;
@@ -241,6 +237,10 @@
 
     // get all the apropriate information from the database
     sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
+
+    // filter out modules with unspecified module name (sound card not supported by alsa)
+    sound_cards = filter(`e, sound_cards, ``(lookup(e, "module", $[])!=$[]));
+
     integer all_cards_num=size(sound_cards);
 
   //  list already=read_unique_keys();
