@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Mar 23 16:36:45 CET 2005 - lslezak@suse.cz
+
+- hwcfg-static file (for ISA cards) search fixed - don't overwrite
+  already existing config for another device (#74266)
+- really skip sound card detection in manual mode (#74361)
+- 2.11.10
+
+-------------------------------------------------------------------
 Wed Mar 16 16:36:09 CET 2005 - lslezak@suse.cz
 
 - adjust also volume of "Front" channel (#72971)

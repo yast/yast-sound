@@ -614,6 +614,13 @@
         if ((!haskey (pm, modname) && !haskey (pm, mod_name)) ||
 	    size(get_running_cards()) <= card_id)
         {
+	    // add debug info to the y2log
+	    y2milestone("modules: %1", pm);
+	    y2milestone("modname: %1", modname);
+	    y2milestone("mod_name: %1", mod_name);
+	    y2milestone("get_running_cards: %1", get_running_cards());
+	    y2milestone("card_id: %1", card_id);
+
             // label to error popup, %1 is module name
             return sformat (_("The kernel module %1 for sound support
 could not be loaded. This can be caused by incorrect
