@@ -59,7 +59,7 @@ joystick type is not in the list, select <B>Generic analog joystick</B>.</P>
 ") +
 
 	// help text for joystick configuration 2/3
-_("<P>To remove the configured joystick from system
+_("<P>To remove the configured joystick from the system
 or if you do not have a joystick, select <B>No joystick</B>.</P>
 ") +
 
