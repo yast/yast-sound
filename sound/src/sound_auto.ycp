@@ -72,6 +72,9 @@
 	else if (func == "Result") {
 		ret = Sound::Export();
 	}
+	else if (func == "Read") {
+		ret = Sound::Read(``{});
+	}
 	/* Write givven settings */
 	else if (func == "Write") {
 		import "Progress";
