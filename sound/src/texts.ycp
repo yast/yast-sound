@@ -141,10 +141,11 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 
 	    "soundCount":
 	    [
-		UI(_("will be configured as a first sound card (%1)")),
-		UI(_("will be configured as a second sound card (%1)")),
-		UI(_("will be configured as a third sound card (%1)")),
-		UI(_("will be configured as a %2th sound card (%1)"))
+		// this is the second part of message "The sound card 'sbLive' will be configured as the first card"
+		UI(_("will be configured as the first sound card (%1)")),
+		UI(_("will be configured as the second sound card (%1)")),
+		UI(_("will be configured as the third sound card (%1)")),
+		UI(_("will be configured as the %2th sound card (%1)"))
 	    ]
 
 

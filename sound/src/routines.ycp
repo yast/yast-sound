@@ -52,7 +52,7 @@
 
     global define save_unique_keys (list cards, list configured_unique) ``{
         list orig = SCR(`Read(.var.lib.yast.unique));
-        if (isnil(orig))
+        if (orig==nil)
         {
             orig = [];
         }
@@ -276,7 +276,75 @@
 	}
 	already = maplist (`k, lookup (select (filter (`e, already, ``(lookup (e, "section") == "sound")), 0, $[]), "contents", []),
                            ``(lookup (k, "unique")));	
+	
 	return already;
+    }
+
+    /**
+     * difflist 
+     * @return list with positions of members from a that are not present in b
+     *
+     */
+
+    global define difflist(list a, list b) ``{
+	integer i=0;
+	list ret=[];
+	while(i<size(a))
+	{
+	    if(!contains(b, select(a, i)))
+	    {
+		ret=add(ret, i);
+	    }
+	    i=i+1;
+	}   
+	return ret;
+    }
+
+    /**
+     * get_obsoletes
+     * @return list with obsolete indices of unique keys
+     * e.g. if in /var/lib/YaST/unique.inf in sound section are keys ["a", "b", "c"]
+     * and card with id "b" is not present in computer, then [1] is returned;
+     */
+
+    global define get_obsoletes() ``{
+	list keys=read_unique_keys();
+        list cards=get_audio(false, false);
+	
+	list audio_keys=[];
+        integer i=0;
+        integer bound=size(cards);
+
+	while(i<bound)
+        {
+            audio_keys=add(audio_keys, lookup(select(cards, i), "unique_key"));
+            i=i+1;
+	    
+        }
+   
+        return difflist(keys, audio_keys);
+    }
+
+    /**
+     * get_present_unique_keys
+     * @return list with unique keys. keys of removed hardware are removed
+     *
+     *
+     */
+
+    global define get_present_unique_keys () ``{
+	list keys=read_unique_keys();
+	list obs=get_obsoletes();
+	integer i=size(obs)-1;
+
+	y2error(sformat("all keys: %1", keys));
+	y2error(sformat("keys for removal: %1", obs));
+	while(i>=0)
+	{
+	    keys=remove(keys, select(obs, i));
+	    i=i-1;
+	}		
+	return keys;
     }
 
     /**
@@ -389,7 +457,7 @@
 	if (!test_mode && !config_mode) 
 	{
 	    list ret = SCR(`Read(.probe.sound));
-	    if (isnil (ret)) ret = [];
+	    if (ret==nil) ret = [];
 	    return ret;
 	}
 	return [$["baseclass"    : "Multimedia controller", 
@@ -486,7 +554,7 @@
 							 (lookup (c, "device_id") == device_id - offset))) != []));
 	}
 
-	if (!isnil(fc))
+	if (fc!=nil)
 	{
 	    if (size (fc) > 0) return select (fc, 0);
 	}
@@ -732,7 +800,8 @@
             }
             else
             {
-                Shell(sformat("%1 -c %2 %3 &", play_cmd, card_id, audio_file), $[]);
+		SCR(`Execute (.target.bash_background, sformat("%1 -c %2 %3 ", play_cmd, card_id, audio_file)));
+//                Shell(sformat("%1 -c %2 %3 &", play_cmd, card_id, audio_file), $[]);
             }
         }
         return "";
@@ -757,17 +826,30 @@
             return UI(_("Invalid module name."));
         }
 
-        SCR(`Execute (.target.bash, "/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`", $[]));
+	SCR(`Execute (.target.bash, "/etc/init.d/alsasound stop"));
+	
+	// create a dummy modules.conf file
+	string dumbconf=SCR (`Read (.target.tmpdir));
+	dumbconf=dumbconf+"/modules.dumb";
+	SCR(`Execute (.target.bash, sformat("/bin/touch %1", dumbconf), $[]));	
+
+	
+
+        SCR(`Execute (.target.bash, sformat("/sbin/depmod -C %1 -a -F /boot/System.map-`uname -r` `uname -r`", dumbconf), $[]));
 
         if (!mod_active)
         {
             if (!probe)
             {
-                SCR (`Execute (.target.insmod, module_name, module_options));
+		SCR (`Execute (.target.bash, sformat("/sbin/insmod -C %1 %2 %3", dumbconf, module_name, module_options), $[]));
+//                SCR (`Execute (.target.insmod, module_name, module_options));
+		y2error(sformat("insmod  %1 %2", module_name, module_options));
             }
             else
             {
-                SCR(`Execute (.target.modprobe, module_name, module_options));
+		SCR(`Execute(.target.bash, sformat("/sbin/modprobe -C %1 %2 %3", dumbconf, module_name, module_options), $[]));
+//                SCR(`Execute (.target.modprobe, module_name, module_options));
+		y2error(sformat("modprobe -C %3 %1 %2", module_name, module_options, dumbconf));
             }
         }
 

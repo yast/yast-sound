@@ -27,6 +27,7 @@
     include "sound/routines.ycp";
     include "sound/ui.ycp";
     include "sound/texts.ycp";	
+    include "browser.ycp";
 //    include "lan/lan_routines.ycp";
 
     map STRINGS=STRINGS_();
@@ -135,14 +136,15 @@
         string helptext=lookup(STRINGS, "ComplexDialog");
 
 	list conf_cards = get_running_cards ();
-	list uniq_keys = read_unique_keys ();
+	list uniq_keys = get_present_unique_keys ();
 
 	if(size(conf_cards) < size(uniq_keys))
 	{
 	    if(UI(`YesNoPopup(_("There is configured sound card, but is not functional at
  the moment, because the kernel modules are not present. Try to load them?"))))
 	    {
-		SCR(`Execute (.target.bash, "/etc/init.d/alsasound start", $[]));
+		SCR(`Execute (.target.bash, "/etc/init.d/alsasound restart", $[]));
+		y2error("alsa restarted");
 		conf_cards = get_running_cards ();
 	    }
 	}
@@ -178,7 +180,7 @@
 	repeat 
 	{
 	    ui = UI (`UserInput ());
-	    if (ui == `b_delete) 
+	    if (ui == `b_delete && UI(`YesNoPopup(_("Really delete this entry?")))) 
 	    {
 		integer fuser = SCR(`Execute (.target.bash, "/bin/fuser /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]));
 
@@ -205,6 +207,8 @@
 		    string mod = SCR(`Read(.modules.alias, sformat ("snd-card-%1", card_id)));
 		    SCR(`Execute(.target.modprobe, sformat ("-r %1", mod), ""));
 		    to_delete = add (to_delete, mod);
+		    
+		    configured_unique=remove(configured_unique, card_id);
 		}
 		else if (size (conf_cards) > card_id) 
 		{
@@ -223,6 +227,7 @@
 			SCR(`Execute(.target.modprobe, sformat ("-r %1", mod), ""));
 			to_delete = add (to_delete, mod);
 		    }
+		    configured_unique=remove(configured_unique, card_id);
 		}
 		else 
 		{
@@ -315,7 +320,7 @@
 		    
 			    if (size (card) > 0) 
 			    {
-				map result = OneCardWizard (card, size (save_info), ui, 6);
+				map result = OneCardWizard (card, size (save_info), ui, 6, false);
 				any ui     = lookup (result, "ui", `cancel); 
 				if (ui == `next) 
 				{

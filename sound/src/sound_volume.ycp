@@ -209,7 +209,7 @@
        *        2. on succes unmute and volume dialog
        *        3. on fail display error message
        */
-
+boolean need_restart=true;
     map card = Args (0);
     integer card_id = Args (1);
     boolean finish = false;
@@ -244,7 +244,9 @@
     boolean no_alsa = lookup (lookup (module_map, "module", $[]), "no_alsa", false);
     if (!test_mode)
     {
+	SCR(`Execute(.target.bash, "/etc/init.d/rcalsasound stop", $[]));
 	err_msg = probe_module (module_map, user_settings);
+        SCR(`Execute(.target.bash, "/etc/init.d/rcalsasound start", $[]));
     }
     any ui = nil;
 
@@ -254,6 +256,11 @@
     }
     else
     {
+//	if(need_restart)
+//	{
+//	    y2error("alsa restarted");
+//	    SCR(`Execute(.target.bash, "/etc/init.d/rcalsasound restart", $[]));
+//	}
 	if(!quick)
 	{
 	    ui = VolumeDialog ();
@@ -270,7 +277,12 @@
 	SCR(`Execute (.target.modprobe, sformat ("-r %1", lookup (lookup (module_map, "module", $[]), "name", "")), ""));
     }
 
+
     UI(`ChangeWidget (`id(`next), `Label, _("&Next")));
+
+    y2error("Leaving volume");
+
+    
     return $["ui" : ui, "return" : size (err_msg) == 0];
 
 }

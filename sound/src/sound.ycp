@@ -55,19 +55,23 @@
      * @param	car_id index of configured car
      * @param	ui 
      * @param	flags defines which radioboxes has to be enabled (0x1 - first, 0x2 second, 0x4 third...)
+     * @param	finish true if no complex dialog is to be called (then the popup "Config will be saved.." will appear)
      * @return  list with save info, as required by sound_write for one cards
      */
-    global define OneCardWizard (map card, integer card_id, any ui, integer flags) ``{
+    global define OneCardWizard (map card, integer card_id, any ui, integer flags, boolean finish) ``{
 	    // 3rd param for "sound_module" will be defined later
-	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id), card_id, flags)),
-		    ``(CallModule ("sound_volume", [card, card_id, (size (sound_cards) == 1), quick] ))];
 
+	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id), card_id, flags)),
+		    ``(CallModule ("sound_volume", [card, card_id, finish, quick] ))]; 
+//	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id), card_id, flags)),
+//		    ``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id), card_id, flags))]; 
 	integer id = 0;
 	if (ui == `back)
 	{
 	    id = size (dialog) - 1;
 	}
-	map result = $[];
+//	map result = $[];
+	any result = $[];
 	any ui = nil;
 
 	boolean success = false;
@@ -87,12 +91,15 @@
 		    id = 0;
 		    continue;
 		}
-	    }    
-	    result = eval(act_dialog);
+	    }
+
+ 
+	    result=eval(act_dialog);
+
 	    ui = lookup(result, "ui", `cancel);
-	   
+
 	    if (ui == `skip)
-	    {
+	    {	
 		break;
 	    }
 	      // case: next
@@ -142,13 +149,11 @@
 	    }
 	    else if (ui == `abort || ui == `cancel)
 	    {
-//		if(ReallyAbort())
 		{
 		    return $["ui": `abort];
 		}
 	    }
 	}
-
 	map ret = $[];
 
 	if (((ui == `next) && success) || (ui == `back)) 
@@ -168,7 +173,6 @@
     }
 
     // ========== MAIN ==========
-
     OpenMainDialog();
     InitializingDialog ();
 
@@ -200,10 +204,24 @@
 	arg_n = arg_n - 1;
     }
     list sound_cards  = get_audio (test_mode, config_mode);
-//    list sound_cards = [$["baseclass":"Multimedia controller", "bus":"SBUS", "dev_name":"/dev/audio", "device":"CS4231 APC DMA", "device_id":270339, "module":[$["active":false, "modprobe":true, "name":"cs4232"]], "subclass":"Multimedia audio controller", "unique_key":"MM5G.9F/+i0wcq25", "vendor":"Sun Microsystems", "vendor_id":278529]];
-
     list save_info    = read_save_info ();
+   
+    // filter out save_info of non-present hardware
+    list obs=get_obsoletes();
+    integer obs_pos=size(obs)-1;
+    string pth="";
+    while(obs_pos>=0)
+    {
+	// first remove alias
+	pth=sformat("snd-card-%1", obs_pos);
+	y2error("removing alias", pth);
+	SCR(`Write(.modules.alias, nil, pth));	
+//	pth=sformat(".modules.
     
+	save_info=remove(save_info, select(obs, obs_pos));
+	obs_pos=obs_pos-1;
+    }   
+ 
     map rc_vars       = $[];
     integer card_id   = 0;
     integer n_cards   = 0;
@@ -215,26 +233,24 @@
 
     boolean exit = false;
     list db = GetCardDatabase(); 
-    if (isnil (db)) 
+    if (db==nil)) 
     {
-	UI(`MessagePopup ("The Sound card database cannot be found!!!"));
+	UI(`MessagePopup (_("The Sound card database cannot be found.\nPlease check your installation")));
 	exit = true;
     }
 
     // get all the apropriate information from the database
     sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
+    integer all_cards_num=size(sound_cards);
 
-    // all configured cards
-/*    list|void already = nil;
-    if (SCR(`Read(.target.size, "/var/lib/YaST/unique.inf")) > 0)
-    {
-	already = SCR (`Read(.var.lib.yast.unique));
-    }
-*/
-    list already=read_unique_keys();
+  //  list already=read_unique_keys();
+    list already=get_present_unique_keys();
+    
+    y2error(sformat("alredy configured: %1", already));
     configured_unique=already;
 	// filter out cards that had been already configured
     sound_cards = filter (`e, sound_cards, ``(!contains (already, lookup (e, "unique_key"))));
+    integer new_cards_num=size(sound_cards);
 
     if(exit)
     {	// no sound cards database present, shutting down
@@ -244,14 +260,25 @@
 
 
     boolean skipped = false;
-    call_complex_dialog = ( size (sound_cards) != 1 );	
+//    call_complex_dialog = ( size (sound_cards) != 1 );	
+    if(all_cards_num == new_cards_num && all_cards_num == 1)
+    {
+	call_complex_dialog=false;
+    }
+    else
+    {
+	call_complex_dialog=true;
+    }
+
     while (cont) 
     {
 		    // wizards ...
 	while ((card_id >= 0) && (card_id < size (sound_cards))) 
 	{
 
-	    result = OneCardWizard (select (sound_cards, card_id), size (save_info), condition (skipped, `next, ui), 15);
+	    result = OneCardWizard (select (sound_cards, card_id), size (save_info), 
+				    condition (skipped, `next, ui), 15, !call_complex_dialog);
+
 
 	    ui       = lookup (result, "ui", `cancel);
 	    use_alsa = lookup (result, "use_alsa", true);
@@ -297,6 +324,7 @@
 	if (call_complex_dialog) 
 	{
 	    result = CallModule ("sound_complex", [sound_cards, save_info, configured_unique]);
+	    BrowseTree(["result from complex", result]);
 	}
 	else
 	{
@@ -309,7 +337,7 @@
 	    return;
 	}
 
-	if (ui == `next && (size (sound_cards) != 1)) 
+	if ((ui == `next) && (size (sound_cards) != 1)) 
 	{
 	
       // confirmation popup message
@@ -352,10 +380,18 @@
 	}
 	if ((size (sound_cards) == 1)) 
 	{
+// !!!!!!!!
+	    if (call_complex_dialog)
+            {
+                save_info = lookup (result, "save_info");
+                rc_vars   = lookup (result, "rc", $[]);
+                configured_unique = lookup (result, "configured_unique", []);
+            }
+// !!!!!!!
 	    cont = false;
 	}
     }
-
+BrowseTree(["save_info in sound #1", save_info]);
 			    // filter out empty enries
     save_info = filter (`e, save_info, ``(size (e) > 0));
     n_cards = size (save_info);
@@ -396,6 +432,8 @@
 
     //UI(`DebugDialog (save_info));
 
+	BrowseTree(save_map);
+
 	CallModule ("sound_write", [save_map, test_mode]);
 
     
@@ -408,7 +446,12 @@
 
 	if (lookup (rc_vars, "START_ALSA") == "no")
 	{
-	    SCR(`Execute (.bin.bash, "/etc/init.d/alsasound stop", $[]));
+	    SCR(`Execute (.target.bash, "/etc/init.d/alsasound stop", $[]));
+	}
+	else
+	{
+	    SCR(`Execute (.target.bash, "/sbin/depmod", $[]));
+	    SCR(`Execute (.target.bash, "/etc/init.d/alsasound restart", $[]));
 	}
     }
 

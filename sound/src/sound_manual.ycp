@@ -140,7 +140,7 @@
 
     list db = GetCardDatabase(); 
     
-    if (isnil(db)) 
+    if (db==nil) 
     {
 	UI(`MessagePopup(_("The Sound card database cannot be found!!!")));
 	return $["ui" : `back];

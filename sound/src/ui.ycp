@@ -60,7 +60,7 @@
 		// dialog title
 	integer flagc=1;
 	integer flagp=0;
-	integer selected=false;
+	boolean selected=false;
 	while(flagp<4)
 	{
 	    if((flagc & flags) ==0)
@@ -90,7 +90,7 @@
 	    {
 		if(ReallyAbort())
 		{
-		    return `abort;
+		    return $["ui": `abort];
 		}
 	    }
 	} 
@@ -350,6 +350,7 @@
 	term con=
             `VBox (
                 `VSpacing (1),
+		// this is the first part of message "The sound card 'cardname' will be configured as the first snd card"
                 `Label (`opt (`hstretch), _("The sound card\n")),
                 `HBox (`HSpacing (5), `Label (`opt (`hstretch), name)),
                 `Label (`opt (`hstretch), clab),
