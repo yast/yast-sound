@@ -26,6 +26,69 @@
     include "sound/ui.ycp"; // only ReallyAbort?
     include "sound/volume_routines.ycp"; // setVolume, PlayTest
 
+    // translation map of channel names
+    map channel_trans = $[
+	// channel name - label for IntField widget in mixer dialog
+	"Master"	: _("Master"),
+	// channel name - label for IntField widget in mixer dialog
+	"PCM"		: _("PCM"),
+	// channel name - label for IntField widget in mixer dialog
+	"Master Mono"	: _("Master Mono"),
+	// channel name - label for IntField widget in mixer dialog
+	"Headphone"	: _("Headphone"),
+	// channel name - label for IntField widget in mixer dialog
+	"Line"		: _("Line"),
+	// channel name - label for IntField widget in mixer dialog
+	"CD"		: _("CD"),
+	// channel name - label for IntField widget in mixer dialog
+	"Mic"		: _("Mic"),
+	// channel name - label for IntField widget in mixer dialog
+	"Video"		: _("Video"),
+	// channel name - label for IntField widget in mixer dialog
+	"Phone"		: _("Phone"),
+	// channel name - label for IntField widget in mixer dialog
+	"Aux"		: _("Aux"),
+	// channel name - label for IntField widget in mixer dialog
+	"PC Speaker"	: _("PC Speaker"),
+	// channel name - label for IntField widget in mixer dialog
+	"Bass"		: _("Bass"),
+	// channel name - label for IntField widget in mixer dialog
+	"Treble"	: _("Treble"),
+	// channel name - label for IntField widget in mixer dialog
+	"Surround"	: _("Surround"),
+	// channel name - label for IntField widget in mixer dialog
+	"LFE"		: _("LFE"),
+	// channel name - label for IntField widget in mixer dialog
+	"Center"	: _("Center"),
+	// channel name - label for IntField widget in mixer dialog
+	"Wave"		: _("Wave"),
+	// channel name - label for IntField widget in mixer dialog
+	"Wave Center"	: _("Wave Center"),
+	// channel name - label for IntField widget in mixer dialog
+	"Wave Surround"	: _("Wave Surround"),
+	// channel name - label for IntField widget in mixer dialog
+	"AC97"		: _("AC97"),
+	// channel name - label for IntField widget in mixer dialog
+	"Music"		: _("Music")
+    ];
+
+    /**
+     * Translate channel name
+     * @param name untranslated channel name
+     * @return string translated name
+     */
+    define string translateChannelName(string name) {
+	if (name == nil || name == "")
+	{
+	    return "";
+	}
+
+	string ret = channel_trans[name]:name;
+	y2debug("translated channel name: %1", ret);
+
+	return ret;
+    }
+
     /**
      * returns intfield (if we are running in ncurses) or
      * slider (for qt)
@@ -37,11 +100,11 @@
     define term volElement(string label, integer value, boolean spec) ``{
 	if (spec)
 	{
-	    return `Slider(`id(label), `opt(`notify), label, 0, 100, value);
+	    return `Slider(`id(label), `opt(`notify), translateChannelName(label), 0, 100, value);
 	}
 	else
 	{
-	    return `IntField(`id(label), `opt(`notify), label, 0, 100, value);
+	    return `IntField(`id(label), `opt(`notify), translateChannelName(label), 0, 100, value);
 	}
     }
 

@@ -127,6 +127,8 @@
         setVolume (master_elem, card_id, vol);
 	// some cards use Headphone instead of Master (bug #26539):
 	setVolume ("Headphone", card_id, vol);
+	// some systems have only one speaker (#46555)
+	setVolume ("Master Mono", card_id, vol);
 
 	symbol ui = nil;
 	do
@@ -138,6 +140,7 @@
 		vol = (integer) UI::QueryWidget(`id(`volume), `Value );
 		setVolume (master_elem, card_id, vol);
 		setVolume ("Headphone", card_id, vol);
+		setVolume ("Master Mono", card_id, vol);
 	    }
 	    else if (ui == `test)
 	    {
@@ -338,6 +341,10 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
 	    if (haskey (devs, "PCM"))
 	    {
 		setVolume ("PCM", card_id, Sound::default_volume);
+	    }
+	    if (haskey (devs, "Master Mono"))
+	    {
+		setVolume ("Master Mono", card_id, Sound::default_volume);
 	    }
 
 	    if (Sound::conf_joystick == true && Sound::use_ui)
