@@ -192,7 +192,7 @@
 	opts = add (opts, Sound::snd_prefix() + "index",sformat ("%1",card_id));
 	opts = add (opts, Sound::snd_prefix() + "enable", "1");
 
-	entry = add(entry, "options", opts);
+	entry["options"]	= opts;
 	return entry;
     }
 
@@ -619,13 +619,13 @@
     define string check_module(map save_entry, integer card_id) ``{
 	map pm		= (map) SCR::Read(.proc.modules);
 	string modname	= save_entry["module"]:"off";
-	string mod_name = regexpsub (modname, "snd-(.*)", "snd_\\1");
+	list<string> l	= splitstring (modname, "-");
+	string mod_name = mergestring (l, "_");
 
         if ((!haskey (pm, modname) && !haskey (pm, mod_name)) ||
 	    size(get_running_cards()) <= card_id)
         {
-
-                // To translators: label to error popup
+            // label to error popup, %1 is module name
             return sformat (_("The kernel module %1 for sound support
 could not be loaded. This can be caused by incorrect
 module parameters, including invalid IO or IRQ parameters."), modname);
@@ -778,6 +778,58 @@ module parameters, including invalid IO or IRQ parameters."), modname);
 	}
     }
 
+    /**
+     * Hack for Thinkpad 600E notebook - it need cs4236 module instead of cs4610
+     * @param card_id card number
+     */
+    define void Thinkpad600E_cs4236_hack (integer card_id) ``{
+
+	map card	= Sound::save_entry;
+	string modname	= "snd-cs4236";
+
+	foreach (map c, Sound::detected_cards, ``{
+	    if (c["unique_key"]:"" == card["unique_key"]:"") {
+
+		// 1. is it right card? -> check subsystem + subvendor id
+		if (c["sub_device_id"]:0 == 69648 &&
+		    c["sub_vendor_id"]:0 == 69652 &&
+		    card["module"]:"" != modname)
+		{
+		    // popup question: different module has to be choosed
+		    if (!Popup::YesNo (_("Looks like you have a Thinkpad 600E notebook.
+On this notebook, CS4236 driver should be used
+although CS46xx chip is detected.
+Attempt to probe the configuration of CS4236 driver?
+
+Warning: The probe procedure can take some time and
+could make your system unstable.
+")))
+			return;
+
+		    string ret = Sound::ProbeOldChip ("cs4236");
+		    if (ret != "")
+		    {
+			list returned = splitstring (ret, "\n");
+			ret = returned[0]:"";
+
+			map options = $[];
+			foreach (string o, splitstring (ret, " "), ``{
+			    list op = splitstring (o, "=");
+			    if (size (op) == 2)
+			    {
+				options = add (options, op[0]:"", op[1]:"");
+			    }
+			});
+			card["options"]	= options;
+			card["module"]	= modname;
+			Sound::save_entry   = (map) eval (card);
+			// TODO save the card to unconfigured cards???
+		    }
+		}
+	    }
+	});
+    }
+
 
     /**
      * removes entries from save_info listed by indices in id_list
@@ -786,14 +838,13 @@ module parameters, including invalid IO or IRQ parameters."), modname);
      */
     define list<map> recalc_save_entries(list<map> save_info) ``{
 	integer pos = 0;
-	save_info = maplist(map card, save_info, ``{
+	return maplist(map card, save_info, ``{
 	    map opts	= card["options"]:$[];
 	    card	= add_alias (card, pos);
 	    card	= add_common_options (card, pos);
 	    pos		= pos + 1;
 	    return card;
 	});
-	return save_info;
     }
 
 }//EOF

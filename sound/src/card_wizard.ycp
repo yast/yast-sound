@@ -45,6 +45,10 @@ define symbol _showName (integer card_id, integer flags) ``{
 	modelname, Sound::save_entry["alias"]:"", card_id, flags, has_joy);
 
     symbol ui	= res["ui"]:`back;
+
+    if (ui != `back && ui != `abort)
+	Thinkpad600E_cs4236_hack (card_id);
+
     return ui;
 }
 
@@ -136,9 +140,7 @@ define map OneCardWizard (map card_entry, integer card_id, integer flags,
 		`abort: `abort
 	    ]
 	];
-
     Sound::save_entry	= (map) eval (card_entry);
-    map opts		= Sound::save_entry["options"]:$[];
     Sound::save_entry	= add_common_options (Sound::save_entry, card_id);
     Sound::save_entry	= add_alias (Sound::save_entry, card_id);
 
