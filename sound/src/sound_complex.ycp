@@ -298,7 +298,7 @@ Try to restart sound system?"))))
 
 		map entry=select(save_info, card_id);    
 	
-		map res=CallModule("sound_options", [entry]);
+		map res=CallFunction(`sound_options(entry));
 		if(lookup(res, "ui")==`next)
 		{
 		    entry=lookup(res, "return", $[]);
@@ -332,7 +332,7 @@ Try to restart sound system?"))))
 	    else if (ui == `b_volume)
 	    {
 		integer card_id = UI(`QueryWidget (`id(`configured_table), `CurrentItem));	
-		map res=CallModule("sound_mixer", [card_id]);
+		map res=CallFunction(`sound_mixer(card_id));
 		if(lookup(res, "ui") == `abort || lookup(res, "ui") == `cancel)
                 {       
                     return $["ui": `abort];

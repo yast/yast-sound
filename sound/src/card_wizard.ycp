@@ -44,7 +44,7 @@ global define _showName()
 
 global define _options()
 ``{
-    res=CallModule ("sound_options", [save_entry]);
+    res=CallFunction (`sound_options(save_entry));
     symbol ui=lookup(res, "ui", nil);
     if(ui == `next)
     {
@@ -56,14 +56,14 @@ global define _options()
 
 global define _quick()
 ``{
-    res=CallModule ("sound_volume", [save_entry, card_id, finish, true, save_info]);
+    res=CallFunction (`sound_volume(save_entry, card_id, finish, true, save_info));
     symbol ui=lookup(res, "ui", nil);
     return ui;
 }
 
 global define _volume()
 ``{
-    res=CallModule ("sound_volume", [save_entry, card_id, finish, false, save_info]);
+    res=CallFunction (`sound_volume(save_entry, card_id, finish, false, save_info));
     symbol ui=lookup(res, "ui", nil);
     return ui;
 }
