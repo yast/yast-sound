@@ -20,7 +20,7 @@
 	if (size(guess) >= 1)
 	{
 	    list l = select (guess, 0, []);
-	    y2error("translating %1...", descr);
+	    y2milestone ("translating %1...", descr);
 	    string s = sformat("%1 %%1 %2", l[0]:"", l[2]:"");
 	    any a	= s;
 	    locale loc	= (locale) a;
@@ -63,9 +63,9 @@
     map mod_data		= $[];
 
     foreach (string e, mods, {
-	mod_name = e;
-	mod_descr = lookup(lookup(modopts, mod_name, $[]), "module_description", "");
-	mod_params = $[];
+	mod_name	= e;
+	mod_descr	= modopts[mod_name, "module_description"]:"";
+	mod_params	= $[];
 
 	mod_data = $["description" : mod_descr,
                      "params" : mod_params
@@ -76,17 +76,14 @@
 	});
 
 	database = add(database, mod_name, mod_data);
-//			$[
-//			    "description" : mod_descr,
-//			    "params" : mod_params
-//			]);
     });
 
     map out	= (map) SCR::Execute (.target.bash_output, "uname -r", $[]);
     string kernel_ver = out["stdout"]:"";
     kernel_ver = select(splitstring(kernel_ver, "\n"), 0, "");
 
-    string generic_string = (string) SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.generic_string");
+//    string generic_string = (string) SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.generic_string");
+    string generic_string = (string) SCR::Read(.target.string, "./alsa-module-syntax");
     if (generic_string == nil)
 	generic_string	= "";
 
@@ -94,7 +91,20 @@
     list<string> gs	= splitstring(generic_string, "\n");
 
 //    string pattern = "(snd-[^ \t]*)[\t ]*info_parm_(snd_[^=]*)=enable:\\(snd_enable\\)(.*)";
-    string pattern = "(snd-[^ \t]*)[\t ]*info_parm_([^=]*)=enable:\\(enable\\)(.*)";
+//    string pattern = "(snd-[^ \t]*)[\t ]*info_parm_([^=]*)=enable:\\(enable\\)(.*)";
+
+    /*
+	pattern for current alsa-module-syntax (big #45646)
+	example:
+
+snd-sb8 index   enable:(enable),allows:{{0,7}},unique,skill:required,dialog:list
+snd-sb8 id      enable:(enable),unique
+snd-sb8 enable  allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
+snd-sb8 port    enable:(enable),allows:{{0,0x3fff}},base:16
+snd-sb8 irq     enable:(enable),allows:{{5},{7},{9},{10,12},{14,15}},dialog:list
+snd-sb8 dma8    enable:(enable),allows:{{0,1},{3}},dialog:list
+    */
+    string pattern = "(snd-[^ \t]*)[\t ]*([^ \t]*)[\t ]*enable:\\(enable\\)(.*)";
 
     list ltmp = [];
     list lx = [];
@@ -148,7 +158,7 @@
 //	    {
 //		oldmap = add(oldmap, "joystick", lookup(joy_mods, modname, $[]));
 //	    }
-	    database = add(database, modname, oldmap);
+	    database[modname]	= oldmap;
 	}
     });
 
@@ -179,9 +189,9 @@
     foreach (string k, map v, database, {
 	if (haskey(joy_mods, k))
 	{
-	    v = add(v, "joystick", lookup(joy_mods, k, $[]));
+	    v["joystick"]	= joy_mods[k]:$[];
 	}
-	outdb = add(outdb, k, v);
+	outdb [k]		= v;
     });
 
     SCR::Write(.target.ycp, "./modlist.ycp", outdb);
