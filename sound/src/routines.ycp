@@ -23,11 +23,10 @@
     include "lan/lan_routines.ycp";
     include "browser.ycp";
 
-// !!!!!!!!!!!!!!!Hack!!!!!!!!!!!!!!!!!!!!
-
+/*
 define isnil(any a)
 ``{ return false; }
-
+*/
   /**
    * reads variables listed in 'vars' from rc.config
    * @return list
@@ -396,8 +395,11 @@ define isnil(any a)
     global define get_audio (boolean test_mode, boolean config_mode) ``{
 	if (!test_mode && !config_mode) 
 	{
+	    y2error("checkpoint 0.01");
 	    list ret = SCR(`Read(.probe.sound));
+	    y2error("checkpoint 0.02");
 	    if (isnil (ret)) ret = [];
+	    y2error("checkpoint 0.03");
 	    return ret;
 	}
 	return [$["baseclass"    : "Multimedia controller", 
