@@ -40,6 +40,37 @@
     global string generic_joystick_translated = _("Generic Analog Joystick");
 
     /**
+     * Get list of all required joystick kernel modules
+     * @return list list of modules
+     */
+    global define list<string> RequiredKernelModules() {
+	list<string> ret = [];
+
+	foreach(map j, (list<map>)joystick, {
+		string gport = j["GAMEPORT_MODULE"]:"";
+		string jmod = j["JOYSTICK_MODULE"]:"";
+
+		if (gport != nil && gport != "")
+		{
+		    ret = add(ret, gport);
+		}
+
+		if (jmod != nil && jmod != "")
+		{
+		    ret = add(ret, jmod);
+		}
+	    }
+	);
+
+	// remove duplicates
+	ret = toset(ret);
+
+	y2milestone("Required joystick modules: %1", ret);
+
+	return ret;
+    }
+
+    /**
      * Read all joystick settings from the SCR
      * @param abort A block that can be called by Read to find
      *	      out whether abort is requested. Returns true if abort

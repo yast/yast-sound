@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Sep 10 14:37:40 CEST 2004 - lslezak@suse.cz
+
+- check also kernel joystick modules (#44394)
+- version 2.10.4
+
+-------------------------------------------------------------------
 Thu Sep  9 11:23:54 CEST 2004 - lslezak@suse.cz
 
 - install all required kernel modules/packages (#44394)
