@@ -34,8 +34,6 @@ import "Report";
 import "CommandLine";
 import "RichText";
 
-include "wizard/sequencer.ycp";
-
 include "sound/wizards.ycp";
 
 integer arg_n = size (WFM::Args ()) - 1;
@@ -48,16 +46,14 @@ while (arg_n >= 0)
     arg_n = arg_n - 1;
 }
 
-/* check for database existence
+/* check for database existence */
 if (Sound::use_alsa &&
     SCR::Read(.target.size, Directory::datadir + "/sndcards.ycp") == -1)
 {
     // popup error message
-    Popup::Message(_("Sound card database not found. Please check your installation."));
-    UI::CloseDialog();
+    Report::Error (_("Sound card database not found. Please check your installation."));
     return nil;
-}FIXME
-*/
+}
 
 // --------------------------------------------------------------------------
 // --------------------------------- cmd-line handlers

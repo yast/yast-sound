@@ -16,6 +16,7 @@
  */
 {
 
+import "Sequencer";
 import "Sound";
 
 
@@ -23,8 +24,6 @@ include "sound/ui.ycp";
 include "sound/options.ycp"; // sound_options
 include "sound/volume.ycp"; // sound_volume
 include "sound/routines.ycp"; // add_common_options, add_alias
-
-include "wizard/sequencer.ycp";
 
 /**
  * wrapper function for running first card config dialog (There will be shown
@@ -144,7 +143,7 @@ define map OneCardWizard (map card_entry, integer card_id, integer flags,
     Sound::save_entry	= add_common_options (Sound::save_entry, card_id);
     Sound::save_entry	= add_alias (Sound::save_entry, card_id);
 
-    symbol ui	= WizardSequencer (aliases, sequence);
+    symbol ui	= Sequencer::Run (aliases, sequence);
     return $["ui": ui, "return": Sound::save_entry];
 }
 

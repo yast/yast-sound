@@ -744,7 +744,7 @@ could make your system unstable.
 	list keys = maplist (map card, modules_conf, ``(
 	    card["unique_key"]:"..."));
 
-	list retlist = maplist (map card, modules_conf, ``(
+	list<string> retlist = maplist (map card, modules_conf, ``(
 	    Summary::Device (card["model"]:"Sound card",
 		// summary text: '(sound card is) Configured as snd-card-1'
 		sformat(_("Configured as %1."), card["alias"]:"snd-card-0"))
@@ -757,7 +757,7 @@ could make your system unstable.
 		    get_card_label(card), Summary::NotConfigured()));
 	    }
 	});
-	return Summary::DevicesList(retlist);
+	return Summary::DevicesList (retlist);
     }
 
     /**

@@ -763,8 +763,9 @@ module parameters, including invalid IO or IRQ parameters."), modname);
      * @return void
      */
     define void nm256_opl3sa2_warn(list sound_cards) ``{
-	list s1 = filter(map e, (list<map<string,string> >) sound_cards, ``(e["module"]:"" == "snd-nm256"));
-	list s2 = filter(map e, (list<map<string,string> >)sound_cards, ``(e["module"]:""=="snd-opl3sa2"));
+
+	list s1 = filter(map e, (list<map<string,any> >) sound_cards, ``(e["module"]:"" == "snd-nm256"));
+	list s2 = filter(map e, (list<map<string,any> >)sound_cards, ``(e["module"]:""=="snd-opl3sa2"));
 
 	if (size(s1) > 0 && size(s2) > 0)
 	{
