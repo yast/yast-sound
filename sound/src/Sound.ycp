@@ -1137,7 +1137,10 @@ could make your system unstable.
 	// now let's merge settings from volume_settings list
 	if (is (volume_settings[c_id]:nil, list))
 	{
+	    y2debug("volume_settings[c_id]:nil: %1", volume_settings[c_id]:nil);
 	    foreach (list channel, volume_settings[c_id]:[], ``{
+		y2debug("devs: %1", devs);
+		y2debug("channel: %1", channel);
 		devs = add (devs, channel[0]:"Master", channel[1]:70);
 	    });
 	}
