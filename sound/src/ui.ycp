@@ -398,6 +398,7 @@
      * @param name card model
      * @param cname alias for modules conf
      * @param cpos position of the card
+     * @param has_joy If true checkbox for joystick configuration is added
      * @return term with widget
      */
 
@@ -445,6 +446,7 @@
      * @param name card model
      * @param cname card alias for module.conf
      * @param cpos card position
+     * @param has_joy If true checkbox for joystick configuration is added
      * @return term widget
      *
      */

@@ -1,4 +1,21 @@
 -------------------------------------------------------------------
+Mon Apr 29 11:44:00 CEST 2002 - lslezak@suse.cz
+
+- allow joystick configuration even in quick mode
+- removed unused code (.tmp.modules)
+- fixed most of ycpdoc comments
+- use /etc/init.d/* instead /usr/sbin/rc*
+- write joystick model to sysconfig comment
+- joystick.ycp - new YaST2 client
+- removing joystick configuration is possible
+- Sound:: added joystick related functions
+- removed Start ALSA option in UI
+- use LOAD_SEQUENCER in /etc/sysconfig/sound
+- added joystick documentation
+- test mode in joystick
+- version 2.6.3
+
+-------------------------------------------------------------------
 Mon Apr 15 17:54:55 CEST 2002 - lslezak@suse.cz
 
 - update to automake 1.6.1
