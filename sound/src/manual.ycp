@@ -196,7 +196,7 @@
 	if (Sound::curr_model == "")
 	    Sound::curr_model = card_names[0]:"";
 	if (curr_key == "")
-	    curr_key = (string) select (keys_names[0]:`Empty(), 1, "");
+	    curr_key = (string) keys_names[0,1]:"";
 
 	if (keys == "vendors")
 	    Sound::curr_vendor = curr_key;

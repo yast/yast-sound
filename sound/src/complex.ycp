@@ -185,7 +185,7 @@ Try to restart sound system?")))
 		map entry = Sound::modules_conf[Sound::card_id]:$[];
 
 		map res = sound_options(entry);
-		if (lookup(res, "ui", nil) == `next)
+		if (res["ui"]:nil == `next)
 		{
 		    map oldentry = entry;
 
@@ -236,7 +236,7 @@ Restart sound system now?
 		Sound::card_id = (integer)
 		    UI::QueryWidget (`id(`configured_table), `CurrentItem);
 		map res = mixerDialog(Sound::card_id);
-		if (lookup(res, "ui", nil) == `abort || lookup(res, "ui", nil) == `cancel)
+		if (res["ui"]:nil == `abort || res["ui"]:nil == `cancel)
                 {
                     return $["ui": `abort];
                 }

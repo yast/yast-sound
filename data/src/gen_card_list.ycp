@@ -1,5 +1,6 @@
 {
     include "./include/gen_routines.ycp";
+    import "String";
 
     define list<string> get_card_list(string str) {
 
@@ -51,7 +52,7 @@
     // let's open input file...
     map out	= (map) SCR::Execute (.target.bash_output, "uname -r", $[]);
     string kernel_ver = out["stdout"]:"";
-    kernel_ver = select(splitstring(kernel_ver, "\n"), 0, "");
+    kernel_ver = String::FirstChunk(kernel_ver, "\n");
 
 //    string s	= (string) SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.generic_string");
     string s = (string) SCR::Read(.target.string, "./alsa-module-syntax");

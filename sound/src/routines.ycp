@@ -224,7 +224,7 @@
 		});
 
 		mods = sort(term a, term b, mods, ``{
-		    return select(a, 1, "") < select(b, 1, "");
+		    return a[1]:"" < b[1]:"";
 		});
 
 		// item for all sound card models in sound card driver list
@@ -245,7 +245,7 @@
 		    `item(`id(e), (descr != "" && descr != "<none>")? descr: e);
 		});
 		ret_t = sort(term a, term b, ret_t,
-		    ``(select(a, 1, "") < select(b, 1, "")));
+		    ``(a[1]:"" < b[1]:""));
 		all_module_items = ret_t;
 	    }
 	}
@@ -508,7 +508,7 @@
         while (i < s)
         {
             itemized_list = add (itemized_list,
-		`item (`id(i), select (l, i, ""), (i == default)));
+		`item (`id(i), l[i]:"", (i == default)));
             i = i + 1;
         }
         return itemized_list;
@@ -709,7 +709,7 @@ module parameters, including invalid IO or IRQ parameters."), modname);
 		Directory::ybindir + "/copyfonts", $[] );
 
 	    y2debug ("copyfonts output: %1", res);
-	    integer cnt = tointeger(lookup(res, "stdout", "0"));
+	    integer cnt = tointeger(res["stdout"]:"0");
 
 	    // restart ALSA after sound font copy
 	    y2milestone("Restarting ALSA: %1",

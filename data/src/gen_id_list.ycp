@@ -1,11 +1,12 @@
 {
     include "./include/gen_routines.ycp";
+    import "String";
 
     string pattern = "(snd-[^ \t]*)[\t ]*(0x[0-9a-f]*)[\t ]*(0x[0-9a-f]*).*";
 
     map out	= (map) SCR::Execute (.target.bash_output, "uname -r", $[]);
     string kernel_ver = out["stdout"]:"";
-    kernel_ver = select(splitstring(kernel_ver, "\n"), 0, "");
+    kernel_ver = String::FirstChunk(kernel_ver, "\n");
 
     string s	= (string) SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.pcimap");
 

@@ -459,8 +459,8 @@ define boolean ListModulesHandler (map options) ``{
 	+ _("Description"));
     */
     foreach (term it, (list<term>) get_module_names(), ``{
-	string id	= (string) select (select (it, 0, `Empty()), 0, "all");
-	string name	= select (it, 1, id);
+	string id	= (string) it[0, 0]:"all";
+	string name	= it[1]:id;
 	if (id == "all")
 	    return;
 	string space = "\t";

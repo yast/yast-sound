@@ -337,7 +337,7 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
 	    setVolume (master_elem, card_id, Sound::default_volume);
 	    setVolume ("Headphone", card_id, Sound::default_volume);
 
-	    map devs = lookup (Sound::db_modules[modname]:$[], "mixer", $[]);
+	    map devs = Sound::db_modules[modname, "mixer"]:$[];
 	    if (haskey (devs, "PCM"))
 	    {
 		setVolume ("PCM", card_id, Sound::default_volume);
