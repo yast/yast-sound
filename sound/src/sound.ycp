@@ -283,13 +283,18 @@
 				// not istalled
 	    define NotInstalled () ``{
 				// Help text when Alsa-drivers are not installed 1/1
-		string help_text = UI(_("Sound support requires the <b>ALSA</b> package. You can find it in the <b>SuSE</b> distribution (series 'snd1') or you can download it from <i>http://www.alsa-project.org</i> and than install it."));
+		string help_text = UI(_("Sound support requires the
+ <b>ALSA</b> package. You can find it in the <b>SuSE</b> distribution
+ (series 'snd1') or you can download it from
+ <i>http://www.alsa-project.org</i> and than install it."));
 		
 		UI(`SetContents (_("Sound cards"),
 				 `HVCenter (
 				// This label is displayed when no alsa package is not installed
 				// To translators: label message
-				     `Label (_("Please install the package ALSA (Advanced Linux Sound Architecture)\n before you proceed with the configuration of your sound system."))
+				     `Label (_("Please install the
+ package ALSA (Advanced Linux Sound Architecture)\n before you proceed
+ with the configuration of your sound system."))
 				     ), help_text, true, false));
 		
 		return UI(`UserInput ());
@@ -303,7 +308,9 @@
 
 	    define DBNotFound () ``{
 				// Help text when sndcards database not found 1/1
-		string help_text = UI(_("An internal <b>YaST2</b> file is missing or corrupted. Please try to reinstall <b>YaST2</b>. You will find it in <b>SuSE</b> distribution, series 'a1'."));
+		string help_text = UI(_("An internal <b>YaST2</b> file
+ is missing or corrupted. Please try to reinstall <b>YaST2</b>. You
+ will find it in <b>SuSE</b> distribution, series 'a1'."));
 		
 		UI(`SetContents (_("Sound cards"),
 				 `HVCenter (
@@ -372,7 +379,10 @@
 				// Help text 1/2 (autodetection failed)
 		help_text = UI (_("<p>The autodetection for a sound card were unsuccessful.</p>"));
 				// Help text 2/2 (autodetection failed)
-		help_text = help_text + UI(_("<p>If you still want to configure your sound card, press the <i>Manual</i> button. Otherwise simply quit by pressing the <i>Back</i> button.</p>"));
+		help_text = help_text + UI(_("<p>If you still want to
+ configure your sound card, press the <i>Manual</i> button. Otherwise
+ simply quit by pressing the <i>Back</i> button.</p>"));
+		
 		
 		message = UI (_("No sound cards were found on your system.\n Try manual setup."));
 		con = add (con, `HVCenter(`ReplacePoint(`id(`rp), `Label(message))));
@@ -404,7 +414,9 @@
 			    // Help text 1/2 (driver not available)
 			help_text = UI(_("<p>This means that appropriate driver for your your sound card is not available.<p>"));
 			    // Help text 2/2 (driver not available)			
-			help_text = help_text + UI(_("<p>You may try to use one of available drivers that can fit to your sound card by pressing the <i>Let me choose</i> button.</p>"));
+			help_text = help_text + UI(_("<p>You may try
+ to use one of available drivers that can fit to your sound card by
+ pressing the <i>Let me choose</i> button.</p>"));
 			
 			next = false;
 		    }
@@ -422,9 +434,15 @@
 			con = add (con, `Bottom(`PushButton(`id (`options), _("&Options"))));
 			
 			    // Help text 1/2 (one sound card found)
-			help_text = UI (_("<p>The sound card was found. If you want to configure this sound card press <i>Next</i> otherwise quit by pressing <i>Back</i><p/>"));
+			help_text = UI (_("<p>The sound card was
+ found. If you want to configure this sound card press <i>Next</i>
+ otherwise quit by pressing <i>Back</i><p/>"));
+			
 			    // Help text 2/2 (one sound card found)
-			help_text = help_text + UI (_("<p>You can change option values that are passed to the module by pressing the <i>Options</i> button.</p>"));
+			help_text = help_text + UI (_("<p>You can
+ change option values that are passed to the module by pressing the
+ <i>Options</i> button.</p>"));
+			
 
 			ret = add (ret, "module", module);
 		    }
@@ -443,7 +461,10 @@
 		    con = add (con, `PushButton(`id (`options), `opt(`disabled), _("&Options")));
 
 		    			    // Help text 1/1 (more sound cards detected)
-			help_text = UI(_("<p>There were found more sound cards. Please select <b>the one</b> you want to configure.</p>"));
+			help_text = UI(_("<p>There were found more
+ sound cards. Please select <b>the one</b> you want to
+ configure.</p>"));
+			
 
 		    next = false;
 		}
@@ -502,9 +523,14 @@
 				con = `VBox ();
 
 				// help text 1/1
-				help_text = UI (_("<p>By pressing the <i>Next</i> button you should get your sound card working.</p>"));
+				help_text = UI (_("<p>By pressing the
+ <i>Next</i> button you should get your sound card working.</p>"));
+				
 				    // help text 2/2
-				help_text = help_text + UI (_("<p>You can change option values that are passed to the module by pressing the <i>Options</i> button.</p>"));
+				help_text = help_text + UI (_("<p>You
+ can change option values that are passed to the module by pressing
+ the <i>Options</i> button.</p>"));
+				
 				
 				//message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
 
@@ -597,7 +623,10 @@
 			    // help text 1/2
 			help_text = UI (_("<p>By pressing the <i>Next</i> button you should get your sound card working.</p>"));
 			    // help text 2/2
-			help_text = help_text + UI (_("<p>You can change option values that are passed to the module by pressing the <i>Options</i> button.</p>"));
+			help_text = help_text + UI (_("<p>You can
+ change option values that are passed to the module by pressing the
+ <i>Options</i> button.</p>"));
+			
 			
 			    //message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
 

@@ -198,9 +198,12 @@
 	list itemized_models = itemize_list (models, Args(2));
 
 	    // Help text - manual configuration 1/2
-	help_text = UI(_("<p>Please <b>manually</b> choose the sound card, you want to configure. You can search for a particular sound card by entering the name in the search box.</p>"));
+	help_text = UI(_("<p>Please <b>manually</b> choose the sound
+ card, you want to configure. You can search for a particular sound
+ card by entering the name in the search box.</p>"));
 	    // Help text - manual configuration 2/2
-	help_text = help_text + UI(_("<p>Select <b>All</b> if you want to see the whole list of supported sound card models.</p>"));
+	help_text = help_text + UI(_("<p>Select <b>All</b> if you want
+ to see the whole list of supported sound card models.</p>"));
 	
 	con = `VBox ();
 	con = add (con, `HBox (
