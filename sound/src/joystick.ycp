@@ -147,8 +147,7 @@
 	        _("Configured sound cards with joystick support"),
 	        dialog, helptext, true, true);
 
-	    Wizard::ReplaceNextButton (`PushButton(`id(`next), `opt(`default),
-		Label::FinishButton()));
+	    Wizard::SetNextButton(`next, Label::FinishButton() );
 
 	    // preselect first card
 	    UI::ChangeWidget (`id(`cards),`CurrentItem,filtered[0,"card_no"]:0);

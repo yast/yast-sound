@@ -449,10 +449,9 @@ before pressing <B>Test</B> or <B>Next</B>.</P>");
 	    `ok		: Label::OKButton(),
 	    `next	: Label::NextButton()
 	];
-	Wizard::ReplaceNextButton (`PushButton(`id(`next), `opt(`default),
-	    nextbutton[button]:Label::NextButton()));
 
 	Wizard::SetContents (caption, contents, helptext, true, true);
+	Wizard::SetNextButton(`next, nextbutton[button]:Label::NextButton() );
 
 	symbol s = nil;
 	do
