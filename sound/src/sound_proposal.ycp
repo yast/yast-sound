@@ -18,8 +18,8 @@
 
     Sound::installation = true;
 
-    string func  = Args(0);
-    map    param = Args(1);
+    string func  = WFM::Args(0);
+    map    param = WFM::Args(1);
     map    ret   = $[];
 
     // Make proposal for installation/configuration...
@@ -54,7 +54,7 @@
 
 	Sound::installation = true;
 
-	any sequence = CallFunction ( `sound () );
+	any sequence = WFM::CallFunction ( `sound () );
 
 	// Fill return map
 	ret =

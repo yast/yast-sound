@@ -22,7 +22,7 @@
  * @param first a map of x settings
  * @return boolean success of operation
  * @example map mm = $[ "FAIL_DELAY" : "77" ];
- * @example map ret = CallModule ("x_auto", [ mm ]);
+ * @example map ret = WFM::CallModule ("x_auto", [ mm ]);
  */
 
 {
@@ -35,15 +35,15 @@
     Mode::config = true;
     Sound::autoinstallation = true;
 
-    list args = Args ();
+    list args = WFM::Args ();
     if ( size (args) <= 0 )
     {
 	y2error ("Did not get the settings, probably some mistake...");
 	return false;
     }
-    if ( !is ( Args (0), map ) )
+    if ( !is ( WFM::Args (0), map ) )
     {
-	y2error ("Bad argument for sound_auto: %1", Args (0));
+	y2error ("Bad argument for sound_auto: %1", WFM::Args (0));
 	return false;
     }
 
@@ -51,9 +51,9 @@
     map settings = $[];
     {
 	integer i = 0;
-	while (i < size (Args()))
+	while (i < size (WFM::Args()))
 	{
-	    if (is (Args (i), map) && nil != Args (i))	settings = Args (i);
+	    if (is (WFM::Args (i), map) && nil != WFM::Args (i))	settings = WFM::Args (i);
 	    i = i + 1;
 	}
     }
@@ -89,7 +89,7 @@
 	ret = UI::UserInput();
 	if (ret == `configure)
 	{
-	    result =  CallFunction(`sound());
+	    result =  WFM::CallFunction(`sound());
 	    y2milestone("result: %1", result);
 	    if (result == `next || result == `finish)
 	    {

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Jul 12 15:44:19 CEST 2002 - arvin@suse.de
+
+- use proper namespace for Args and CallFunction (#16776)
+
+-------------------------------------------------------------------
 Mon Jul  8 16:56:09 CEST 2002 - mvidner@suse.cz
 
 - Provides/Obsoletes also the devel subpackage

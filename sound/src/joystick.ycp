@@ -99,7 +99,7 @@
 		{
 		    // start sound module - joystick can be configured there
 		    // so after sound config abort this module
-		    CallModule("sound", []);
+		    WFM::CallModule("sound", []);
 		}
 
 		return `abort;		// nothing to configure

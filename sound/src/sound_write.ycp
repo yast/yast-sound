@@ -89,11 +89,11 @@
     string helptext	= "";
     string err_msg	= "";
 
-    list save_info	= []; //Args (0);
+    list save_info	= []; //WFM::Args (0);
     boolean use_alsa	= Sound::use_alsa;
     boolean autoinstall = false;
 
-    map settings = Args(0);
+    map settings = WFM::Args(0);
     save_info = lookup(settings, "modules_conf", []);
     rc_vars = lookup(settings, "rc_vars", []);
     volume_settings = lookup(settings, "volume_settings", []);
@@ -106,19 +106,19 @@
 	return true;
     }
 /*
-    if (size (Args ()) > 1)
+    if (size (WFM::Args ()) > 1)
     {
-	rc_vars = Args (1);
+	rc_vars = WFM::Args (1);
     }
     
-    if (size(Args ()) > 2)
+    if (size(WFM::Args ()) > 2)
     {
-	use_alsa = Args(2);
+	use_alsa = WFM::Args(2);
     }
 
-    if (size(Args ()) > 3)
+    if (size(WFM::Args ()) > 3)
     {
-	autoinstall = Args(3);
+	autoinstall = WFM::Args(3);
     }
 */
     if (autoinstall)
@@ -181,7 +181,7 @@
     }
 
     if (!autoinstall) { Progress::NextStage(); }
-    if (size(Args()) >= 4)
+    if (size(WFM::Args()) >= 4)
     {
 	set_vol_settings(volume_settings);
     }

@@ -113,7 +113,7 @@
 	    use_alsa = false;
 	}
 
-	maplist(`e, Args(), ``{
+	maplist(`e, WFM::Args(), ``{
 	    if (is(e, path) && (e == .oss))
 	    {
 		use_alsa = false;
@@ -305,7 +305,7 @@
 	{
 	    map settings = Export();
 	    settings = add (settings, "autoinstall", false);
-	    CallFunction (`sound_write(settings));
+	    WFM::CallFunction (`sound_write(settings));
 	}
 
 	return true;
