@@ -7,11 +7,16 @@
  * $Id$
  *
  *
- * parameters: 1st: module, Map, map of complete info about module (i.e. name, options, etc ...)
+ * parameters: 1st: module, Map, map of card
  *
  */
 
 {
+
+    include "misc_defines.ycp";
+    include "sound/sound_routines.ycp";
+
+
 
 
 				// here the test sound is played, by
@@ -21,135 +26,89 @@
 				// if the test file cannot be found,
 				// the message is displayed
 
-	define PlayTest () ``{
+    define PlayTest () ``{
 	
-	    if ((Shell ("test -f $FILE", $["FILE" : lookup (user_settings, "audio_file")]) != 0)) {
-		string file = lookup (user_settings, "audio_file");
+	if (!fileexist(lookup (user_settings, "audio_file"))) {
+	    string file = lookup (user_settings, "audio_file");
 
-		    // To translators: just one file will be displayed
-		    // To translators: if the test audio file can not be found this message is displayed
-		    // To translators: This is just popup message, shouldn't be too long
-		string msg = sformat (UI (_("Cannot find file:\n %1\n\n(test audio file)")), file);
+	    // To translators: just one file will be displayed
+	    // To translators: if the test audio file can not be found this message is displayed
+	    // To translators: This is just popup message, shouldn't be too long
+	    string msg = sformat (UI (_("Cannot find file:\n %1\n\n(test audio file)")), file);
 
-		UI (`DisplayMessage (msg));
-	    }
-	    else {
-		string play_cmd = lookup (user_settings, "play_cmd", "");
-		string audio_file = lookup (user_settings, "audio_file", "");
-		Shell ("" + play_cmd + " " + audio_file + " &");
+	    UI (`DisplayMessage (msg));
+	}
+	else {
 
-	    }
-	};
+	    
+	    
+	    string play_cmd = lookup (user_settings, "play_cmd", "");
+	    string audio_file = lookup (user_settings, "audio_file", "");
+	    UI (`DisplayMessage (sformat("%1 %2 &", play_cmd, audio_file)));
+	    SCR(`Execute (.target.bash, sformat("%1 %2 &", play_cmd, audio_file), $[]));
 
-
-
-	
-				// sets the volume, with amixer check
-				// if an error occurs popup error is displayed
-	define set_volume (string device, integer v) ``{
-	    integer ret = Shell ("/usr/bin/amixer set \"$DEV\" $VOL% unmute 2>/dev/null", $["DEV" : device, "VOL" : v]);
-	    if (ret == 127){
-				// To translators: This is just popup message, shouldn't be too long
-		UI (`DisplayMessage (_("Cannot find program 'amixer'.\nPlease install the 'ALSA' package from the 'snd' series")));
-	    }
-	    return ret;
-	};
-
-
-				// unmute all devices to vol
-	define unmute_all (integer vol, list devices) ``{
-	    list|void existing_devices = SCR(`Read(.usr.bin.amixer));
-
-	    if (existing_devices != nil) {
-		
-		list ud = filter (`v, devices, ``(contains (maplist(`e, existing_devices, ``(lookup (e, "device", ""))), v)));
-		foreach (`d, ud, ``{
-		    set_volume (d, vol);
-		});
-		
-		// always set "Master" device
-		set_volume ("Master", vol);
-	    }
-	
-	};
+	}
+    };
 
 
 
 				// tries to insert module with options (if any)
 				// return string with error message (empty string if ok)
-	define probe_module (map snd_info) ``{
-	    string module_name = lookup (lookup (lookup (snd_info, "module", $[]), "module", $[]), "name", "");
-	    string cmd = module_name;
-	    boolean probe = lookup (lookup (lookup (snd_info, "module", $[]), "module", $[]), "modprobe", true);
-	    boolean mod_active = lookup (lookup (lookup (snd_info, "module", $[]), "module", $[]), "active", false);
-	    boolean is_dmasound = false;
-	    if (module_name == "dmasound")
-		is_dmasound = true;
+    define probe_module (map card) ``{
 
-	    list module_exept = ["snd-card-sb16",
-				"snd-card-es18xx",
-				"snd-card-interwave",
-				"snd-card-interwave-stb"];
+	string module_name    = lookup (lookup (card, "module", $[]), "name", "");
+	list params           = filter (`e, lookup (lookup (card, "module", $[]), "params", []), ``(size (lookup (e, "value")) > 0));
+	string module_options = mergestring (maplist (`e, params, ``(sformat("%1=%2", lookup (e, "name", ""), lookup (e, "value", "")))), " ");
+	boolean probe         = lookup (lookup (card, "module", $[]), "modprobe", true);
+	boolean mod_active    = lookup (lookup (card, "module", $[]), "active", false);
+	boolean no_alsa       = lookup (lookup (card, "module", $[]), "no_alsa", false);
 
-	    if (size (cmd) == 0)
-		    // To translators: error message
-		return _("Invalid module name.");
-
-		//  tried to load with just snd_isapnp=0
-		// if this fails the user has to provide the ISA legacy resources
-	    if (contains (module_exept, module_name) &&
-		(size (lookup (snd_info, "args", "")) == 0)) {
-		snd_info = add (snd_info, "snd_isapnp=0");
-	    }
-
-	    if (!is_dmasound)
-	        cmd = cmd + condition ((size (lookup (snd_info, "args", "")) > 0), ``(" " + lookup (snd_info, "args", "")), "");
-
-	    Shell("/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`");
-
-
-	    if (mod_active == false) {
-		if (!probe)
-		    Shell("/sbin/insmod " + cmd);
-		else
-		    Shell("/sbin/modprobe " + cmd);
-	    }
-
-	    if (!is_dmasound)
-	        Shell("/sbin/modprobe snd-pcm-oss"); // backwards OSS compatibility
-
-	    map pm = SCR(`Read(.proc.modules));
-
-	    if (!haskey (pm, module_name)) {
-
-		if (module_name == "snd-card-cs4210") {	// hack For the IBM Thinkpad 600E
-		    module_name = "snd-card-4236";
-		    string ibm_options = "snd_port=0x530 snd_cport=0x538 snd_irq=5 snd_dma1=1 snd_dma2=0 snd_isapnp=0";
-		
-		    cmd = module_name + " " + ibm_options;
-		    snd_info = add (snd_info, "args", ibm_options);
-		    snd_info = add (snd_info, "conf", ibm_options);
-		    Shell("/sbin/modprobe " + cmd);
-		    Shell("/sbin/modprobe snd-pcm-oss"); // backwards OSS compatibility
-		    if (!haskey (pm, module_name))
-			    // To translators: label to error popup
-			return sformat (UI(_("The kernel module %1 for sound support\ncould not be loaded.")), module_name);
-		}
-
-		    // To translators: label to error popup
-		return sformat (UI(_("The kernel module %1 for sound support\ncould not be loaded.")), module_name);
-	    }
-
-	    return "";
+	if (size (module_name) == 0)
+	    // To translators: error message
+	    return UI(_("Invalid module name."));
 	
-	};
+	SCR(`Execute (.target.bash, "/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`", $[]));
 
 
+	if (!mod_active) {
+	    if (!probe)
+		SCR (`Execute (.target.insmod, module_name, module_options));
+	    else
+		SCR(`Execute (.target.modprobe, module_name, module_options));
+	}
 
-	    // ===== main =====
+
+	if (no_alsa) {
+	    user_settings = add (user_settings, "play_cmd", "/usr/bin/play");
+	    user_settings = add (user_settings, "mixer", "/usr/bin/aumix \"$CHANNEL\" $VOLUME");
+	}
+	else
+	    SCR(`Execute (.target.modprobe, "snd-pcm-oss", "")); // backwards OSS compatibility
+
+	map pm = SCR(`Read(.proc.modules));
+
+	if (!haskey (pm, module_name)) {
+
+	    // To translators: label to error popup
+	    return sformat (UI(_("The kernel module %1 for sound support\ncould not be loaded.")), module_name);
+	}
+	
+	return "";
+	
+    };
 
 
-				// Help text - adjusting volume 1/4
+/*
+ * This dialog sipmply reads user input and call apropriate set funtion
+ */
+    define VolumeDialog () ``{
+
+	//unmute these devices
+	if (use_alsa)
+	    maplist (`dev, ["PCM", "PCM,1", "Wave", "Master Digital", "Synth"], 
+		     ``(SetVolume (lookup (user_settings, "mixer"), dev, sformat ("%1", 70))));
+	    
+	// Help text - adjusting volume 1/4
 	string help_text = UI(_("<p>Please adjust the volume.</p>"));
 				// Help text - adjusting volume 2/4
 	help_text = help_text + UI(_("<p>You can test your sound card by pressing the <i>Test</i> button.</p>"));
@@ -158,159 +117,118 @@
  done you can use <b>amixer</b> (or any program of your choice) for\
  adjusting the volume.</p>"));
 
-	    // Help text - adjusting volume 4/4
+	// Help text - adjusting volume 4/4
 	help_text = help_text + UI(_("<p><b>WARNING/SPECIAL\
  NOTE:</b>Please start testing your sound card with <b>very</b> low\
  volume settings to prevent an accident with too much loud\
  noise.</p>"));
 
 
-	map snd_info = Args (0);
+	integer vol = 10;
+				// TODO: add some other device ajusting here (stereo, other devices like CD, etc ...)???
+	term con = `VBox (
+	    `VBox (
+		`Top (
+		    `Label (hardware_name (card))
+		    ),
+		`Slider (`id(`volume), `opt(`notify), _("Volume"), 0, 100, vol)
+		),
+	    `VStretch (),
+				// To translators: this label is just above the Test button
+	    `Label (_("To test the sound card press the button")),
+				// To translators: Test button label
+	    `PushButton (`id (`test), _("&Test"))
+	    );
 
-	term con = `VBox ();
+	UI(`SetWizardContents (_("Sound cards"), con, help_text, true, true));
+	SetVolume (lookup (user_settings, "mixer"), "Master", sformat ("%1", vol));
 
-	integer vol = 10;		// let's start with 10% volume for Master
-	integer step = 3;
+	repeat {
 
-	string err = "";
+	    ui =  UI (`UserInput ());
 
-	    // possible string for SB Live!
-	    //list sb_live_exception = ["SB Live!",
-	    //"Sound Blaster Live!"];
-	    //boolean use_emu10k1_package = false;
+	    if (ui == `volume) {
+		vol = UI(`QueryWidget(`id(`volume), `Value ));
 
-	    //if (contains(sb_live_exception, hardware_name (snd_info)))
-	    //use_emu10k1_package = YesOrNo (_("Do you want to enable joystick support\n(and therefore use another than ALSA driver)?"), _("&Yes"), _("&No"));
+		SetVolume (lookup (user_settings, "mixer"), "Master", sformat ("%1", vol));
+	    }
+	    else if (ui == `test)
+		if (!test_mode)
+		    PlayTest ();
+		
+	} until ((ui == `back) || (ui == `next) || ui == `cancel);
 
-	    //if (use_emu10k1_package)
-	    //if (emu10k1_package_not_installed) {
-	    //UI(`DisplayMessage (_("This requires 'emu10k1' package.\nYou can find it in the <b>SuSE</b> distribution (series 'snd2').\nALSA driver will be used instead.")));
-	    //use_emu10k1_package = false;
-	    //}
-
-
-	if (!test_mode)
-	    err = probe_module (snd_info);
-
-	boolean back = true;
-	boolean next = false;
+	return ui;
+    }
 
 
-	if (size (err) > 0) {
-		// error
-
-				// Help text - intenal YaST2 error 1/3
-	    help_text = UI(_("<p>An error has occured. </p>"));
+    define ErrorDialog (map card, string err) ``{
+					// Help text - intenal YaST2 error 1/3
+	string help_text = UI(_("<p>An error has occured. </p>"));
 				// Help text - intenal YaST2 error 2/3
-	    help_text = help_text + UI(_("<p>You should check that you have\
+	help_text = help_text + UI(_("<p>You should check that you have\
  correctly installed the <b>ALSA</b> package (from the series 'snd') and that\
  you are running this as a root.</p>"));
 	
 				// Help text - intenal YaST2 error 3/3
-	    help_text = help_text + UI (_("<p>If the the problem\
+	help_text = help_text + UI (_("<p>If the the problem\
  persists, you can try to pass some <b>options</b> to the ALSA module.\
  If you still can't get your sound card working, you can try\
  <i>OSS/Free</i> or another module.</p>\
  <p>However, <b>YaST2</b>\
  sound configuration currently only supports ALSA.</p>"));
+
 	
-	
-	    con = `VBox(`Top (`Label (hardware_name (snd_info))),
-			`HVCenter(`Label (err)));
+	term con = `VBox(`Top (`Label (hardware_name (card))),
+			 `HVCenter(`Label (err)));
 
-	}
+	UI(`SetWizardContents (_("Sound cards"), con, help_text, true, false));
 
-	else {
-
-	    next = true;
-				// let's unmute all listed devices to 90%
-	    if (!test_mode) {
-		unmute_all (90, ["PCM", "PCM,1", "Wave", "Master Digital", "Synth"]);
-		set_volume ("Master", vol);
-	    }
-	
-	
-				// TODO: add some other device ajusting here (stereo, other devices like CD, etc ...)???
-	    con = `VBox (
-		`VBox (
-		    `Top (
-			`Label (hardware_name (snd_info))
-			),
-		    `ReplacePoint (`id(`rprog),
-				// To translators: progress bar title
-				   `ProgressBar(`id(`pb), _("Volume"), 100, vol)),
-		    `HBox (
-			`PushButton (`id(`minus), "-"),
-			`PushButton (`id(`plus), "+")
-			)
-		    ),
-		`VStretch (),
-				// To translators: this label is just above the Test button
-		`Label (_("To test the sound card press the button")),
-				// To translators: Test button label
-		`PushButton (`id (`test), _("&Test"))
-		);
-	}
-
-	    // dialog title
-	UI(`SetContents (_("Sound cards"), con, help_text, back, next));
-	    // "Finish" button: Proceed to finish the configuration
-	UI(`ChangeWidget (`id(`next), `Label, _("&Finish")));
-
-	any ui = nil;
-
-	boolean volume_continue = false;
-
-	while (!volume_continue) {
-	
-	    repeat {
-	
-		ui =  UI (`UserInput ());
-	
-		if (ui == `minus) {
-		    if (vol > step) {
-			vol = vol - step;
-			if (!test_mode)
-			    set_volume ("Master", vol);
-		    }
-		    else {
-			vol = 0;
-		    }
-		}
-		else if (ui == `plus) {
-		    if (vol + step < 100) {
-			vol = vol + step;
-			if (!test_mode)
-			    set_volume ("Master", vol);
-		    }
-		    else {
-			vol = 100;
-		    }
-		}
-		else if (ui == `test)
-		    if (!test_mode)
-			PlayTest ();
-	
-		UI (`ChangeWidget(`id(`pb), `Value, vol));
-	
-	    } until ((ui == `back) || (ui == `next) || ui == `cancel);
-
-	    if (ui == `next) {
-		    // To translators: popup message to confirm saving configuration
-		volume_continue = UI(`YesOrNo (_("Sound volume and the configuration\nfor the sound card will be saved now."), _("&Yes"), _("&No")));
-	    }
-	    else
-		volume_continue = true;
-
-	}
+	repeat {
+	    
+	    ui =  UI (`UserInput ());
 
 
-	if (ui == `back) {
-	    UI(`ChangeWidget (`id(`next), `Label, _("&Next")));
-	    Shell ("/etc/rc.d/alsasound stop");
-	}
+	} until ((ui == `back) || ui == `cancel);
 
 	return ui;
+    }
+
+
+// ===== main =====
+    /*
+     * Steps:
+     *        1. try to insert kernel module
+     *        2. on succes unmute and volume dialog
+     *        3. on fail display error message
+     */
+
+    map card = Args (0);
+    map module_map = lookup (card, "module", $[]);
+
+    map user_settings = $["audio_file" : "/usr/share/sounds/alsa/test.wav",
+			 "play_cmd"    : "/usr/bin/aplay",
+			 "mixer"       : "/usr/bin/amixer set \"$CHANNEL\" $VOLUME% unmute"];
+    
+
+
+    string err_msg = "";
+
+    if (!test_mode)
+	err_msg = probe_module (module_map);
+
+    any ui = nil;
+
+    if (size (err_msg) > 0)
+	ui = ErrorDialog (card, err_msg);
+    else
+	ui = VolumeDialog ();
+
+    if (ui == `back)
+	SCR(`Execute (.target.modprobe, sformat ("-r %1", lookup (lookup (module_map, "module", $[]), "name", "")), ""));
+
+    
+    return $["ui" : ui, "return" : size (err_msg) == 0];
 
 }
 
