@@ -26,11 +26,10 @@
     include "sound/routines.ycp";
     include "sound/read_routines.ycp";
 
-    boolean skipNotConfigured=false;
-
-    if(Args()>=1)
-    {
-	skipNotConfigured=Args(0);
+    integer id=0;
+    global define cid() ``{
+	id=id+1;
+	return id-1;
     }
 
     list cards=get_audio();
@@ -58,22 +57,16 @@
         }
     });
 
-    integer i=0;
-
-    foreach(`card, conflist, 
-    ``{
+    retlist=maplist(`card, save_info,
+    ``(
 	// to translators: '(sound card is) Configured as snd-card-1'
-	retlist=add(retlist, summaryDevice(card, sformat(_("Configured as snd-card-%1."), i)));
-	i=i+1;
-    });
+	summaryDevice(lookup(card, "model", "Sound card"), sformat(_("Configured as snd-card-%1."), cid()))
+    ));
 
-    if(!skipNotConfigured)
-    {  
-	foreach(`card, notlist,
-	``{
-	    retlist=add(retlist, summaryDevice(card, summaryNotConfigured()));
-	});
-    }
+    foreach(`card, notlist,
+    ``{
+        retlist=add(retlist, summaryDevice(card, summaryNotConfigured()));
+    });
 
     return summaryDevicesList(retlist);
 

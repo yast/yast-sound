@@ -472,7 +472,7 @@
 	return UI::ReallyAbortPopup(false);
     }
 
-        /**
+    /**
      * ui that displays two listbox with new and configured harwdare
      *
      * @param newHw list with new hardware
@@ -500,5 +500,84 @@
 
     }
 
+    global define WhichDialog (list cards)       ``{
+    // help text 
+
+        string helptext=lookup(STRINGS, "WhichDialog");
+
+        list nc = [];
+        integer i = 0;
+
+//        list sound_cards  = get_audio ();
+
+//        sound_cards = maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
+//        sound_cards = filter(`e, sound_cards, ``(lookup(e, "module", $[])!=$[]));
+//        sound_cards = filter_configured(save_info, sound_cards);
+//        sound_cards = convert_to_save_info(sound_cards);
+
+
+        maplist (`e, cards,
+        ``{
+            nc = add (nc, `item(`id(i), e));
+                  i = i + 1;
+        });
+
+        term con = WhichDlgCon(nc);
+
+	        // dialog title
+        UI::SetWizardContents (_("Configure a sound card"), con, helptext, true, true);
+        // Next - button label
+        UI::ChangeWidget(`id(`next), `Label, UI(`NextButtonLabel()));
+
+        if (size (nc) == 0)
+        {
+            UI::ChangeWidget (`id(`sel), `Enabled, false);
+            UI::ChangeWidget (`id(`auto), `Enabled, false);
+        }
+        else
+        {
+            UI::ChangeWidget(`id(`sel), `CurrentItem, 0);
+        }
+
+        any ui = nil;
+
+        repeat
+        {
+            ui = UI::UserInput ();
+
+            if (ui == `manual)
+            {
+                UI::ChangeWidget (`id(`sel), `Enabled, false);
+            }
+            else if (ui == `auto)
+            {
+                UI::ChangeWidget (`id(`sel), `Enabled, true);
+            }
+            else if (ui == `abort || ui == `cancel)
+            {
+                if(ReallyAbort())
+                {
+                    break;
+                }
+            }
+        } until ((((ui == `back) || (ui == `next) || ui == `cancel)));
+
+        integer cid=0;
+
+        symbol way=UI::QueryWidget (`id(`rg), `CurrentButton);
+        if(way == `auto)
+        {
+            cid = UI::QueryWidget(`id(`sel), `CurrentItem);
+        }
+        else if(way == `manual)
+        {
+	    cid = -1;
+	}
+
+
+        return $["ui" : ui,
+                "card_id"  : cid];
+
+    }
 
 }

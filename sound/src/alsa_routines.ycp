@@ -134,6 +134,17 @@
 	map opts=lookup(entry, "options", $[]);
 	opts=add(opts, "snd_index", card_id);
         opts=add(opts, "snd_id", sformat("card%1", card_id+1));
+
+	list parms=get_module_params(lookup(entry, "module", ""));
+	if (size(parms)!=0)
+	{
+	    list enab=filter(`e, parms, ``(lookup(e, "name", "") == "snd_enable"));
+	    if (size(enab)!=0)
+	    {
+		opts = add(opts, "snd_enable", "1");
+	    }
+	}
+
 	entry=add(entry, "options", opts);
 	return entry;
     }

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Aug 20 13:47:44 CEST 2001 - dmeszar@suse.cz
+
+- bug #8335 fixed, options restoring when deleting card fixed
+
+-------------------------------------------------------------------
 Wed Aug 15 17:16:32 CEST 2001 - dmeszar@suse.cz
 
 - installation of one card much simplified

@@ -269,7 +269,7 @@ its parameters using the 'Advanced setup'.");
 	y2error("storing save info:%1", new_save);
 	SaveModulesEntry (new_save, [], true);
 	alsasound_start_tmp(true);
-	err_msg = check_module(save_entry);
+	err_msg = check_module(save_entry, card_id);
     }
     any ui = nil;
 
