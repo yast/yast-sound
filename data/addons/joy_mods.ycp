@@ -21,60 +21,167 @@
 
 
 $[
-#    "snd-als4000":
-#    $[
-#	"control": "Joystick"
-#    ],
+
+# FIXME: snd-als4000 and snd-intel8x0 need snd_joystick option to enable joystick.
+    "snd-als4000":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
     "snd-cmipci":
     $[
-	"control": "Joystick"
+	"GAMEPORT_MODULE": "ns558",
+	"JOYSTICK_CONTROL": "Joystick"
     ],
     "snd-cs4281":
     $[
-	"module": "off"
+	"GAMEPORT_MODULE": "off"
     ],
     "snd-cs46xx":
     $[
-	"module": "cs461x"
+	"GAMEPORT_MODULE": "cs461x"
     ],
     "snd-emu10k1":
     $[
-	"module": "emu10k1-gp"
+	"GAMEPORT_MODULE": "emu10k1-gp"
     ],
     "snd-ens1370":
     $[
-	"control": "Joystick Enable"
+	"GAMEPORT_MODULE": "ns558",
+	"JOYSTICK_CONTROL": "Joystick Enable"
     ],
     "snd-ens1371":
     $[
-	"control": "Joystick Enable"
+	"GAMEPORT_MODULE": "ns558",
+	"JOYSTICK_CONTROL": "Joystick Enable",
+	"JOYSTICK_CONTROL_PORT": "0x200"
     ],
     "snd-es1938":
     $[
-	"module": "off"
+	"GAMEPORT_MODULE": "off"
     ],
     "snd-es1968":
     $[
-	"control": "Joystick"
+	"GAMEPORT_MODULE": "ns558",
+	"JOYSTICK_CONTROL": "Joystick"
     ],
     "snd-fm801":
     $[
-	"module": "fm801-gp"
+	"GAMEPORT_MODULE": "fm801-gp"
+    ],
+    "snd-intel8x0":
+    $[
+	"GAMEPORT_MODULE": "ns558"
     ],
     "snd-sonicvibes":
     $[
-	"module": "off"
+	"GAMEPORT_MODULE": "off"
     ],
     "snd-trident":
     $[
-	"module": "pcigame"
+	"GAMEPORT_MODULE": "pcigame"
     ],
     "snd-via686":
     $[
-	"control": "Joystick"
+	"GAMEPORT_MODULE": "ns558",
+	"JOYSTICK_CONTROL": "Joystick"
     ],
     "snd-ymfpci":
     $[
-	"control": "Joystick"
+	"GAMEPORT_MODULE": "ns558",
+	"JOYSTICK_CONTROL": "Joystick",
+	"JOYSTICK_CONTROL_PORT": "0x201"
+    ],
+    "snd-es1688":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-es18xx":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-cs4231":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-cs4232":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-cs4236":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-gusclassic":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-gusextreme":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-gusmax":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-interwave":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-interwave-stb":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-sb8":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-sb16":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-sbawe":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-opl3sa2":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-ad1816a":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-als100":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-azt2320":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-cmi8330":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-sgalaxy":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-opti92x-ad1848":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-opti92x-cs4231":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-opti93x":
+    $[
+	"GAMEPORT_MODULE": "ns558"
+    ],
+    "snd-wavefront":
+    $[
+	"GAMEPORT_MODULE": "ns558"
     ]
+
 ]
