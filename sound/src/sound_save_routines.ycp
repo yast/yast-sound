@@ -1,0 +1,154 @@
+/**
+ *
+ * $Id$
+ *
+ * File:              
+ *   sound_save_routines.ycp        
+ *
+ * Module:
+ *   Sound
+ *
+ * Summary:
+ *   API for writings sound configuration
+ *
+ * Authors:
+ *   Dan Veselý <dan@suse.cz> , Dan Meszaros <dmeszar@suse.cz>
+ *
+ *                   
+ * Global variables:	STRINGS
+ */
+
+{
+    textdomain "sound";
+
+    include "misc_defines.ycp";
+    include "sound/sound_routines.ycp";
+
+      /**
+       * Saves one '/etc/modules.conf' entry
+       * @return boolean
+       */
+    define SaveOneModulesEntry (string entry_name, map entry) ``{
+        boolean ret = true;
+        if (haskey (entry, "alias")) 
+        {
+            ret = ret && SCR(`Write(.modules.alias, entry_name, lookup(entry, "alias")));
+            if (haskey (entry, "options"))
+            {
+                ret = ret && SCR(`Write(.modules.options, lookup(entry, "options"), entry_name));
+            }
+        }
+        return ret;
+    }
+
+    
+      /**
+       * Saves all '/etc/modules.conf' entries
+       * @return map return struct: $["return": boolean, "err_msg": string]
+       */
+    define SaveModulesEntry (list cards, list system) ``{
+        string err_msg="";
+    
+        if ((contains(maplist (`e, cards, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) 
+        {
+                                      // Error message
+            err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry"); 
+            return $["return": false, "err_msg": err_msg];
+        }
+
+        if (size (cards) > 0)
+        {
+            SCR(`Write(.modules.alias.comment, "\n#\n# YaST2: sound cards support\n#\n", 
+                      lookup (lookup (select (cards, 0), "modules", $[]), "alias")));
+        }
+
+        if ((contains(maplist (`e, system, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) 
+        {
+                                      // Error message      
+            err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry");
+            return $["return": false, "err_msg": err_msg];
+        }
+
+        if (size (system) > 0)
+        {
+            SCR(`Write(.modules.alias.comment, "\n#\n# YaST2: sound system dependent part\n#\n", 
+                lookup (lookup (select (system, 0), "modules", $[]), "alias")));
+        }
+
+        if (!SCR(`Write(.modules, nil))) 
+        {
+                                      // Error message
+            err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry");
+            return $["return": false, "err_msg": err_msg];
+        }
+            
+        return $["return": true, "err_msg": ""];
+    }
+
+      /**
+       * Sets volume for all channels
+       * @return map return struct: $["return": boolean, "err_msg": string]
+       */
+    define SetAllChannels (list cards, string command) ``{
+	string err_msg="";
+        if (contains (maplist (`e, cards, ``(maplist(`ch, `v, lookup (e, "volume", $[]), ``(SetVolume (command, ch, v,
+                           tointeger(lookup(lookup(lookup (e, "modules", $[]), "options", $[]), "snd_index", 0))))))), false))
+        {
+                                      // Error message
+            err_msg = lookup(STRINGS, "SetAllChannels");
+            return $["return": false, "err_msg": err_msg];
+        }
+        return $["return": true, "err_msg": ""];
+    }
+
+      /**
+       * Save volume (for alsa it's alsactl store
+       * @return map return struct: $["return": integer, "err_msg": string]
+       */
+    define SaveVolume (string function, string mixer_command, list cards) ``{
+        string err_msg="";
+        map res=SetAllChannels (cards, mixer_command);
+        err_msg=lookup(res, "err_msg", "");
+
+        return $["return": SCR(`Execute(.target.bash, function, $[])), "err_msg": err_msg];
+    }
+
+      /**
+       * Additional hack to enable ALSA joystick support
+       * @return boolean
+       */
+    define EnableJoystick () ``{
+        string tmpdir = SCR(`Read(.target.tmpdir));
+        return SCR(`Execute(.target.bash, "/usr/sbin/alsactl -f "+tmpdir+"/asound.conf store;\
+                /usr/bin/sed '/\"Joystick\"/s/false/true/' "+tmpdir+"/asound.conf >/etc/asound.conf;\
+                /bin/rm -f "+tmpdir+"/asound.conf;\
+                /usr/sbin/alsactl restore", $[]));
+    }
+
+      /**
+       * function to finish ALSA instalation
+       * @return void
+       */
+    define AlsaFinish () ``{
+        EnableJoystick ();
+    }
+      /**
+       *
+       * @return string error string
+       */
+
+    define SaveRCValues (map rc) ``{
+        string err_msg="";
+	if (contains (maplist (`k, `v, rc, ``(SCR(`Write(topath(sformat(".rc.system.%1", k)), v)))), false) ||
+                !SCR(`Write(.rc.system, nil)))
+        {
+                                    // Error message
+            err_msg = sformat (lookup(STRINGS, "saveRCValues"), UI(_("/etc/rc.config")));
+        }
+	return err_msg;
+    }
+
+
+
+
+}

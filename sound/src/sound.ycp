@@ -43,25 +43,6 @@
 	];
     }
 
- 
-
-    /**
-     *	@return void
-     *  
-     *
-     */   
-
-    define save_unique_keys (list cards) ``{
-	list|void orig = SCR(`Read(.var.lib.yast.unique));
-	if (is (orig, void))
-	{
-	    orig = [];
-	}
-	list sound_unique = maplist (`e, configured_unique, ``($["unique" : e, "state" : "configured"]));
-	orig = filter (`e, orig, ``(lookup(e, "section", "") != "sound"));
-	SCR(`Write(.var.lib.yast.unique, add (orig, $["contents" : sound_unique, "section" : "sound"])));
-    }
-
     
     /**
      * Wizard steps: 1. displayname 
@@ -71,7 +52,6 @@
      * @return  list with save info, as required by sound_save for one cards
      */
     define OneCardWizard (map card, integer card_id, any ui) ``{
-	y2error("OneCard card_id=%1", card_id);
 	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id))),
 		    ``(CallModule ("sound_volume", [card, card_id, (size (sound_cards) == 1)] ))];
 
@@ -261,7 +241,6 @@
 		    // wizards ...
 	while ((card_id >= 0) && (card_id < size (sound_cards))) 
 	{
-	    y2error(sformat("#1: card_id=%1", card_id));
 
 	    result = OneCardWizard (select (sound_cards, card_id), size (save_info), condition (skipped, `next, ui));
 
@@ -406,7 +385,7 @@
     if (ui == `next) 
     {
     // always save unique keys 
-	save_unique_keys (get_audio (test_mode, config_mode));
+	save_unique_keys (get_audio (test_mode, config_mode), configured_unique);
 
 	if (lookup (rc_vars, "START_ALSA") == "no")
 	{

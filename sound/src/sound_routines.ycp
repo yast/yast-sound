@@ -21,6 +21,26 @@
     textdomain "sound";
 
     /**
+     *  writes unique keys of the configured cards to /var/lib/YaST/unique.inf
+     *  @param list of maps
+     *  @return void
+     *  
+     *
+     */
+
+    define save_unique_keys (list cards, list configured_unique) ``{
+        list|void orig = SCR(`Read(.var.lib.yast.unique));
+        if (is (orig, void))
+        {
+            orig = [];
+        }
+        list sound_unique = maplist (`e, configured_unique, ``($["unique" : e, "state" : "configured"]));
+        orig = filter (`e, orig, ``(lookup(e, "section", "") != "sound"));
+        SCR(`Write(.var.lib.yast.unique, add (orig, $["contents" : sound_unique, "section" : "sound"])));
+    }
+
+
+    /**
      * Reads /proc/asound/cards and removes entries form save_info with no corresponding entry in /proc/asound/cards
      *
      * @param list save_info

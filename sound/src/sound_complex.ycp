@@ -91,44 +91,7 @@
 	 	  i = i + 1;
 	});
     
-
-	term con = `HBox(
-	    `HSpacing (3),
-	// frame label
-	    `Frame
-	    (`id(`frame), _("Select"), 
-		`HBox 
-		(
-		    `HSpacing (1),
-		    `VBox 
-		    (
-			`RadioButtonGroup 
-			(`id(`rg), 
-			    `VBox 
-			    (
-				`VSpacing (1),
-				`Left(`VBox
-				(
-		      // label of radiobutton
-				    `Left(`RadioButton(`id(`auto), `opt (`notify), _("&Autodetected"), (size (nc) > 0))),
-			   // label of list with autodetected cards
-				    `VSquash(`SelectionBox(`id(`sel), _("List of autodetected"), nc))
-		
-				)),
-				`VSpacing (1),
-		       // label of radio button
-				`Left(`RadioButton (`id(`manual), `opt(`notify), _("&Manual selection"), (size (nc) == 0))),
-				`VSpacing (1)
-			    )
-			)
-		    ),
-		    `HSpacing (1)
-		)
-	    ),
-	    `HSpacing (3)
-	);
-
-
+	term con = WhichDlgCon(nc);
 
 	// dialog title
 	UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
@@ -187,40 +150,9 @@
 	list cc = maplist (`e, conf_cards, 
 	    ``(`item(`id(lookup (e, "number", 0)), sformat ("   [%1]", lookup (e, "number", 0)), lookup (e, "line1")))); 
     
-	term con = `HBox
-	    (
-		`HSpacing (3),
-		`VBox 
-		(
-		    `Table (`id(`configured_table), `opt (`notify, `immediate), 
-		    // table header labels
-			`header(_("Number"), _("Card name")), cc),
-		    `VSpacing (0.5),
-	    // Delete - button label
-		    `HBox
-		    (
-			`PushButton (`id(`b_delete), _("Delete")),
-			`HStretch (),
-		  // Add soundcard ... - button label
-			`PushButton (`id(`b_conf2), _("Add soundcard ..."))
-		    ),
-		    `VSpacing (0.5),
-		    `HBox
-		    (
-			`HStretch (),
-		  // check button label
-			`VBox 
-			(
-			    `Left(`CheckBox(`id(`b_alsa), `opt(`notify), _("Start ALSA"), (lookup (rc_vars, "START_ALSA", "no") == "yes"))),
-			 // check button label
-			    `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("Start sequencer"), (lookup (rc_vars, "START_ALSA_SEQ", "no") == "yes")))
-			)
-		    ),
-		    `VSpacing (0.5)
-		),
-		`HSpacing (3)
-	    );
-
+	term con = ComplexDlgCon(cc, 
+			(lookup (rc_vars, "START_ALSA", "no") == "yes"), 
+			(lookup (rc_vars, "START_ALSA_SEQ", "no") == "yes"));
 
         // dialog title
 	UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));

@@ -27,8 +27,8 @@
 
 
     /** creates itemized table entries,
-     * params: 1st: list of maps to take keys from
-     * 2nd: list of keys to look for in 1st param
+     * @param lm list of maps to take keys from
+     * @param lk list of keys to look for in 1st param
      * 
      * @return list
      */
@@ -191,8 +191,8 @@
     }
 
     /**
-     * 1st: checks if value is type,
-     * 2nd: if poss is nonempty, checks if value is one of them
+     * @param 1st checks if value is type,
+     * @param 2nd if poss is nonempty, checks if value is one of them
      * returns error message, empty string if ok
      * @return string
      */
@@ -265,7 +265,7 @@
   }
 
     /**
-     *
+     * displays dialog with card options
      *
      * @return map
      *
@@ -296,35 +296,7 @@
 
 	if (size (itemized_descriptions) > 0) 
 	{
-	    con = `HBox
-	      (
-		`HSpacing (3),
-		`VBox 
-		(
-		  `VSquash(`Top(`Label (`opt(`outputField), hardware_name (card)))),
-		  `VSpacing (),
-		      // To translators: Table headers "description" -- option description, "option" -- option name, "value" -- value of an option
-		  `Table (`id(`table), `opt (`notify, `immediate), `header(_("Description"), _("Option"),
-											     `Right(_("Value"))), itemized_descriptions),
-		  `VSpacing (0.5),
-		  `VBox 
-		  (
-		    `TextEntry (`id (`des), current_option_name,
-				      lookup (select (options, current_option), "value", "")),
-		    `VSpacing (0.5),
-		    `HBox 
-		    (
-			      // "set" button: Sets the option value
-		      `PushButton (`id (`set), `opt(`default), _("&Set")),
-			      // "reset" button: Resets all values
-		      `PushButton (`id (`reset), _("&Reset"))
-		    )
-		  ),
-		  `VSpacing (0.5)
-		),
-		`HSpacing (3)
-	      );
-       
+	    con=OptionsCon(card, itemized_descriptions, current_option, current_option_name);     
 	}
 	else 			// there are no options
 	{
@@ -389,7 +361,7 @@
 				  else
 				      tmp = add (tmp, e);
 			      });
-			      itemized_descriptions = tmp;
+		    itemized_descriptions = tmp;
 		}
 			
 	    }
@@ -408,7 +380,6 @@
 		
 		
 	} until (((ui == `back) || (ui == `next) || ui == `cancel));
-
 	    
 	    //UI(`DebugDialog(itemized_descriptions));
 

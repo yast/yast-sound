@@ -130,15 +130,15 @@
 	));
     }
 
+
+    UI(
+    ``{
     /**
      *  
      *  SetWizardContents 
      * 
      * @return void
      */
-
-    UI(
-    ``{
 	define SetWizardContents(string title, term contents, string helptext,
 				       boolean has_back, boolean has_next) 
 	    ``{
@@ -151,15 +151,15 @@
 	}
     );
 
-    /*
-     *  
-     *  DisplayMessage 
-     *
-     * @return void
-     */
 
     UI(
     ``{
+    /**
+     *  
+     *  displays a popup message with OK button. 
+     *
+     * @return void
+     */
 	define DisplayMessage(string message) 
 	``{
 		    // ok pushbutton: confirm the dialog
@@ -182,16 +182,17 @@
     }
     );		
 
-    /*  =========================================================================================
-     *  
-     *  Dysplays YesOrNo dialog
-     *  @param message message
-     *  @param 'yes' button message
-     *  @param 'no' button message
-     */
 
     UI(
     ``{
+    /**
+     *  
+     *  Dysplays YesOrNo dialog
+     *  @param message message
+     *  @param yes_button_message 'yes' button message
+     *  @param no_button_message 'no' button message
+     *  @return boolean true/false
+     */
 	define YesOrNo(any message, string yes_button_message, string no_button_message) 
 	``{
 	    OpenDialog(`opt(`decorated),
@@ -220,15 +221,15 @@
     }
     );	
 
+
+    UI(
+    ``{
     /* 
      *  
      *  DebugDialog 
      *
      * @return void
      */
-
-    UI(
-    ``{
 	define DebugDialog(any str) 
 	``{
 	      // OK button user confirmation
@@ -239,15 +240,15 @@
     }
     );
 
+
+    UI(
+    ``{
     /* 
      *  
      *  WarnDialog 
      *
      * @return boolean
      */
-
-    UI(
-    ``{
 	define WarnDialog(string message) 
 	``{
 	    OpenDialog(`opt(`decorated, `warncolor),
@@ -277,5 +278,189 @@
 	}            
     }
     );
+
+    /**
+     *	UI controls for volume setting dialog
+     *
+     *  @param card map with card info
+     *  @param vol initial volume (0-100)
+     *  @return term 
+     */
+
+    define VolumeCon(map card , integer vol) ``{
+	term slider = `IntField(`id(`volume), `opt(`notify), _("Volume"), 0, 100, vol);
+
+	if (UI(`HasSpecialWidget(`Slider)))
+	{
+	          // slider label
+	    slider = `Slider (`id(`volume), `opt(`notify), _("Volume"), 0, 100, vol);
+	}
+
+	term con = `HBox
+	  (
+	    `HSpacing (3),
+	    `VBox 
+	    (
+	      `VSpacing (),
+	      `Top 
+	      (`VBox
+		(
+			// dialog title
+		  `Left(`Label(_("Settings for sound card"))),
+		  `Label (`opt(`outputField), hardware_name (card))
+			)),
+		    // To translators keep backlash here
+		  `Frame 
+		  (_("Volume adjust and test"), 
+		    `HBox
+		    (
+		      `HSpacing (),
+		      `VBox
+		      (
+			`VSpacing (0.5),
+			slider,
+			`VSpacing (),
+			    // Test - button label
+			`PushButton (`id (`test), _("&Test")),
+			`VSpacing (0.5),
+			    // message label
+			`Label (_("Press 'Test' to start playing sound sample")),
+			`VSpacing (0.5)
+		      ),
+		      `HSpacing ()
+		    )
+		  ),
+		  `VStretch ()
+	      ),
+	      `HSpacing (3));
+
+	return con;
+    }
+	    
+    /**
+     *	UI controls for options setting dialog
+     *
+     *  @param card card info
+     *  @param itemized_descriptions option list (preformated using 'create_table' with tripples: description, name, value
+     *  @param current_option index of initially selected item
+     *  @param current_option_name initially selected item name
+     *  @return term 
+     *  @see sound_options#create_table
+     */
+
+    define OptionsCon(map card, list itemized_descriptions, integer current_option, string current_option_name) ``{
+	con = `HBox
+              (
+                `HSpacing (3),
+                `VBox
+                (
+                  `VSquash(`Top(`Label (`opt(`outputField), hardware_name (card)))),
+                  `VSpacing (),
+                      // To translators: Table headers "description" -- option description, "option" -- option name, "value" -- value of an option
+                  `Table (`id(`table), `opt (`notify, `immediate), `header(_("Description"), _("Option"),
+                                                                                             `Right(_("Value"))), itemized_descriptions),
+                  `VSpacing (0.5),
+                  `VBox
+                  (
+                    `TextEntry (`id (`des), current_option_name,
+                                      lookup (select (options, current_option), "value", "")),
+                    `VSpacing (0.5),
+                    `HBox
+                    (
+                              // "set" button: Sets the option value
+                      `PushButton (`id (`set), `opt(`default), _("&Set")),
+                              // "reset" button: Resets all values
+                      `PushButton (`id (`reset), _("&Reset"))
+                    )
+                  ),
+                  `VSpacing (0.5)
+                ),
+                `HSpacing (3)
+              );
+	return con;
+    }
+
+    /**
+     * dialog to be displayed in WhichDialog function
+     *
+     * @param nc list of not configured cards
+     * @see WhichDialog
+     */
+
+    define WhichDlgCon(list nc) ``{
+	term con = `HBox(
+            `HSpacing (3),
+        // frame label
+            `Frame
+            (`id(`frame), _("Select"),
+                `HBox
+                (
+                    `HSpacing (1),
+                    `VBox
+                    (
+                        `RadioButtonGroup
+                        (`id(`rg),
+                            `VBox
+                            (
+                                `VSpacing (1),
+                                `Left(`VBox
+                                (
+                      // label of radiobutton
+                                    `Left(`RadioButton(`id(`auto), `opt (`notify), _("&Autodetected"), (size (nc) > 0))),
+                           // label of list with autodetected cards
+                                    `VSquash(`SelectionBox(`id(`sel), _("List of autodetected"), nc))
+
+                                )),
+                                `VSpacing (1),
+                       // label of radio button
+                                `Left(`RadioButton (`id(`manual), `opt(`notify), _("&Manual selection"), (size (nc) == 0))),
+                                `VSpacing (1)
+                            )
+                        )
+                    ),
+                    `HSpacing (1)
+                )
+            ),
+            `HSpacing (3)
+        );
+	return con;
+    }
+
+    define ComplexDlgCon(list cc, boolean start_alsa, boolean start_alsa_seq) ``{
+	term con = `HBox
+            (
+                `HSpacing (3),
+                `VBox
+                (
+                    `Table (`id(`configured_table), `opt (`notify, `immediate),
+                    // table header labels
+                        `header(_("Number"), _("Card name")), cc),
+                    `VSpacing (0.5),
+            // Delete - button label
+                    `HBox
+                    (
+                        `PushButton (`id(`b_delete), _("Delete")),
+                        `HStretch (),
+                  // Add soundcard ... - button label
+                        `PushButton (`id(`b_conf2), _("Add soundcard ..."))
+                    ),
+                    `VSpacing (0.5),
+                    `HBox
+                    (
+                        `HStretch (),
+                  // check button label
+                        `VBox
+                        (
+                            `Left(`CheckBox(`id(`b_alsa), `opt(`notify), _("Start ALSA"), start_alsa)),
+                         // check button label
+                            `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("Start sequencer"), start_alsa_seq))
+                        )
+                    ),
+                    `VSpacing (0.5)
+                ),
+                `HSpacing (3)
+            );
+	return con;
+    }
 
 }

@@ -146,53 +146,7 @@
 
 	integer vol = 10;
 
-	    // slider label
-	term slider = `IntField(`id(`volume), `opt(`notify), _("Volume"), 0, 100, vol);
-
-	if (UI(`HasSpecialWidget(`Slider)))
-	{
-		      // slider label
-	    slider = `Slider (`id(`volume), `opt(`notify), _("Volume"), 0, 100, vol);
-	}
-
-	term con = `HBox
-	  (
-	    `HSpacing (3),
-	    `VBox 
-	    (
-	      `VSpacing (),
-	      `Top 
-	      (`VBox
-		(
-			// dialog title
-		  `Left(`Label(_("Settings for sound card"))),
-		  `Label (`opt(`outputField), hardware_name (card))
-			)),
-		    // To translators keep backlash here
-		  `Frame 
-		  (_("Volume adjust and test"), 
-		    `HBox
-		    (
-		      `HSpacing (),
-		      `VBox
-		      (
-			`VSpacing (0.5),
-			slider,
-			`VSpacing (),
-			    // Test - button label
-			`PushButton (`id (`test), _("&Test")),
-			`VSpacing (0.5),
-			    // message label
-			`Label (_("Press 'Test' to start playing sound sample")),
-			`VSpacing (0.5)
-		      ),
-		      `HSpacing ()
-		    )
-		  ),
-		  `VStretch ()
-	      ),
-	      `HSpacing (3));
-
+	term con=VolumeCon(card, vol);
 	    // dialog title
 	UI(`SetWizardContents (_("Sound cards"), con, help_text, true, true));
 	if (finish)
