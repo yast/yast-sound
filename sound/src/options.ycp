@@ -254,12 +254,10 @@
 	    UI::ChangeWidget(`id(`table), `CurrentItem, 0);
 	}
 
-	symbol ui = nil;
+	symbol ui = `table;
 
 	repeat
 	{
-	    ui = UI::UserInput ();
-
 	    if (ui == `table)
 	    {
 		current_option = UI::QueryWidget (`id(`table), `CurrentItem);
@@ -351,6 +349,7 @@
 		    break;
 		}
 	    }
+	    ui = UI::UserInput();
 	} until (((ui == `back) || (ui == `next) || ui == `cancel));
 
 	return $["ui" : ui, "return" : itemized_descriptions];
