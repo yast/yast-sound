@@ -347,7 +347,11 @@
 
 
     map card    = Args(0);
-    list params = lookup(lookup (card, "module", $[]), "params", []);
+    list params = [];
+    if (haskey (card, "params"))
+	params = lookup (card, "params", []);
+    else
+	params = lookup(lookup (card, "module", $[]), "params", []);
     map mod     = lookup (card, "module", $[]);
     map result  = OptionsDialog (params);
 
