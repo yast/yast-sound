@@ -25,7 +25,7 @@
     include "misc_defines.ycp";
 
     include "wizard/sequencer.ycp";
-    include "ui/wizard_hw.ycp";
+    import  "Wizard_hw";
     include "ui/common_popups.ycp";
     import  "Wizard";
 
@@ -297,7 +297,7 @@
     OpenMainDialog();
     InitializingDialog ();
 
-    UI::Wizard::DisableAbortButton();
+    Wizard::DisableAbortButton();
 
     if (whoami() != "root")
     {

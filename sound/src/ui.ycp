@@ -36,7 +36,7 @@
 	term con = `Label (sformat(_("Initializing ...")));
 	string helptext = "";
 	 // dialog title message
-	UI::Wizard::SetContents (_("YaST2\nInitializing ..."), con, helptext, false, false);
+	Wizard::SetContents (_("YaST2\nInitializing ..."), con, helptext, false, false);
 
 	return `next;
     };
@@ -56,7 +56,7 @@
     global define DisplayName (string name, string cname, integer cpos, integer flags) ``{
 	string helptext = lookup(STRINGS, "DisplayName", "");
 	term con = AutoconfDlg(name, cname, cpos);
-	UI::Wizard::SetContents (_("Sound card configuration"), con, helptext, true, true);
+	Wizard::SetContents (_("Sound card configuration"), con, helptext, true, true);
 		// dialog title
 	integer flagc = 1;
 	integer flagp = 0;
@@ -119,7 +119,7 @@
     global define quickConfig(string name, string cname, integer cpos, integer flags) ``{
         string helptext = lookup(STRINGS, "quickConfig", "");
         term con = QuickconfDlg(name, cname, cpos);
-        UI::Wizard::SetContents (_("Sound card configuration"), con, helptext, true, true);
+        Wizard::SetContents (_("Sound card configuration"), con, helptext, true, true);
                 // dialog title
         integer flagc = 1;
         integer flagp = 0;
@@ -175,7 +175,7 @@
      */
 
     global define OpenMainDialog() ``{
-	UI::Wizard::CreateDialog();
+	Wizard::CreateDialog();
     }
 
 
@@ -521,13 +521,13 @@
 	    // to translators: the full meaning of message is: "Add other not detected soundcard"
 	newHw = add(newHw, `item(`id(-1), _("Other (not detected)"), size(newHw) == 0));
 
-	term widget=HwCreateDetectedContent(_("&Sound cards to configure"), newHw, false, 
+	term widget=Wizard_hw::DetectedContent(_("&Sound cards to configure"), newHw, false, 
 					sformat(_("<P><B>Already configured sound cards:</B>%1</P>"), confHw));
 	
 	string helptext = lookup(STRINGS, "selectHardware", "");
 
 
-	UI::Wizard::SetContents (_("Sound card configuration"), widget, helptext, true, true);
+	Wizard::SetContents (_("Sound card configuration"), widget, helptext, true, true);
 
     }
 
@@ -554,7 +554,7 @@
         term con = WhichDlgCon(nc);
 
 	        // dialog title
-        UI::Wizard::SetContents (_("Configure a sound card"), con, helptext, true, true);
+        Wizard::SetContents (_("Configure a sound card"), con, helptext, true, true);
         // Next - button label
         UI::ChangeWidget(`id(`next), `Label, UI(`NextButtonLabel()));
 

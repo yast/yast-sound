@@ -200,7 +200,7 @@ global define mixerDialog(integer card_id) ``{
 Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the original settings.</P>");
 
     term con = mixerWidget(channels);
-    UI::Wizard::SetContents (sformat(_("Volume settings for card '%1'"), card_name),con, help, true, true);
+    Wizard::SetContents (sformat(_("Volume settings for card '%1'"), card_name),con, help, true, true);
     UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
 
     path    pth = nil;
