@@ -1,5 +1,4 @@
 {
-    include "browser.ycp";
     include "gen_routines.ycp";
 
     global define translate_descr(string descr) ``{
@@ -108,14 +107,14 @@
 		return;
 	    }
 	    parmname = select(lx, 1, "");
-	    descr = lookup(lookup(modopts, modname, $[]), parmname, $[]);
+	    descr = lookup(lookup(modopts, modname, $[]), parmname, " ");
 
 	    // these two declaration must be here
 	    any anydescr = translate_descr(descr);
 
 	    if (is(anydescr, list) && size(anydescr) > 1)
 	    {
-		if (select(anydescr, 1) == "specified")
+		if (select(anydescr, 1, "") == "specified")
 		{
 		    anydescr[1] = lookup(lookup(database, modname, $[]), "description", "");
 		}

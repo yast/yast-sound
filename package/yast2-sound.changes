@@ -1,4 +1,25 @@
 -------------------------------------------------------------------
+Wed Oct  9 16:07:39 CEST 2002 - lslezak@suse.cz
+
+- enable/disable alsasound service depending on number of
+  configured sound cards (#20464)
+- version 2.6.25
+
+-------------------------------------------------------------------
+Tue Oct  1 09:37:12 CEST 2002 - lslezak@suse.cz
+
+- added missing textdomain in Sound module
+- version 2.6.24
+
+-------------------------------------------------------------------
+Tue Sep 17 13:56:35 CEST 2002 - lslezak@suse.de
+
+- updated sound card DB - module snd-dt0197h renamed to snd-dt019x,
+  added PPC integrated card ids (#19647), regenerated for 2.4.19 kernel
+- fixed DB generator (add extra ids, default values)
+- version 2.6.23
+
+-------------------------------------------------------------------
 Tue Sep 10 17:34:21 CEST 2002 - lslezak@suse.cz
 
 - provide/obsolete package y2c_sprc

@@ -1,6 +1,5 @@
 {
     include "gen_routines.ycp";
-    include "browser.ycp";
 
     string pattern = "(snd-[^ \t]*)[\t ]*(0x[0-9a-f]*)[\t ]*(0x[0-9a-f]*).*";
 
@@ -55,9 +54,9 @@
 
     list addons = [];
 
-    if (SCR::Read(.target.size, "./id_addons.ycp") > 0)
+    if (SCR::Read(.target.size, "./addons/id_addons.ycp") > 0)
     {
-	addons = SCR::Read(.target.ycp, "id_addons.ycp");
+	addons = SCR::Read(.target.ycp, "./addons/id_addons.ycp");
     }
 
     list l = flatten([lpci, lpnp, addons]);

@@ -29,6 +29,8 @@
     include "sound/read_routines.ycp";
     include "sound/routines.ycp";
 
+    textdomain "sound";
+
     /**
      * what sound system we're using (true=alsa, false=oss)
      */

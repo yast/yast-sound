@@ -77,6 +77,7 @@
 //    include "ui/progress.ycp";
     import  "Progress";
     import  "Wizard";
+    import  "Runlevel";
 
     import "Sound";
     import "Joystick";
@@ -185,13 +186,19 @@
     if (!autoinstall) { sleep(100); Progress::NextStage(); }
     step = step + 1;
 
+    list configuredcards = Sound::GetSoundCardList();
+y2milestone("------------ karty: %1", configuredcards);
+
     if (!autoinstall)
     {
 	// stop joystick before restarting ALSA
 	SCR::Execute(.target.bash, "/etc/init.d/joystick stop", $[]);
 
 	// restart ALSA
-	SCR::Execute(.target.bash, "/etc/init.d/alsasound start", nil);
+	if (size(configuredcards) > 0)
+	{
+	    SCR::Execute(.target.bash, "/etc/init.d/alsasound start", nil);
+	}
     }
 
     if (!autoinstall) { Progress::NextStage(); }
@@ -216,6 +223,17 @@
     // write joystick configuration and restart service
     Joystick::Write(nil);
     SCR::Execute(.target.bash, "/etc/init.d/joystick restart", $[]);
+
+    if (size(configuredcards) > 0)
+    {
+	// enable alsasound service in runlevels 2,3,5
+	Runlevel::ServiceFinetune("alsasound", ["2", "3", "5"]);
+    }
+    else
+    {
+	// disable sound service - it's not needed, no soundcard is present
+	Runlevel::ServiceAdjust("alsasound", "disable");
+    }
 
     return (size (err_msg) == 0);
 }
