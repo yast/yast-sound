@@ -249,8 +249,9 @@
 	    current_option_name = lookup (select (options, current_option), "name", "unknown option");
 	
 	    string language = UI(`GetLanguage());
+
 	    descriptions = maplist (`p, options, ``(sformat (Trans(select (lookup (p, "description"), 0), language),
-							     select (lookup (p, "description"), 1)))); // spaces, because table looks nicer
+							     condition ((size (lookup (p, "description", [])) > 1), select (lookup (p, "description"), 1), "")))); // spaces, because table looks nicer
 	    table_rows = add_keys ([], maplist (`p, options, ``(lookup (p, "name"))), "name");
 	    table_rows = add_keys (table_rows, descriptions, "description");
 
