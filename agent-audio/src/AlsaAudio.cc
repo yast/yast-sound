@@ -138,9 +138,6 @@ YCPValue alsaSetVolume(int card_id, const string& channel, int value)
     INIT_MIXER
 
     long from, to, val;
-    long left;
-
-    snd_mixer_selem_channel_id_t chn;
 
 
     for (elem = snd_mixer_first_elem(handle); elem; elem = snd_mixer_elem_next(elem))
@@ -170,7 +167,6 @@ YCPValue alsaSetMute(int card_id, const string& channel, bool value)
 {
     INIT_MIXER
 
-    snd_mixer_selem_channel_id_t chn;
 
     for (elem = snd_mixer_first_elem(handle); elem; elem = snd_mixer_elem_next(elem))
     {

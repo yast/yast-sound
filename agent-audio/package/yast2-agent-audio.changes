@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Jan 28 16:24:12 CET 2002 - dmeszar@suse.cz
+
+- debug logging supressed
+
+-------------------------------------------------------------------
 Thu Dec 20 20:36:01 CET 2001 - dmeszar@suse.cz
 
 - adapted for new alsa-lib version
