@@ -13,7 +13,9 @@ include_DATA = \
 	read_routines.ycp \
 	alsa_routines.ycp \
 	ui.ycp \
-	texts.ycp
+	texts.ycp \
+	card_wizard.ycp 
+
 
 modules_DATA = 	\
 	sound.ycp 		\

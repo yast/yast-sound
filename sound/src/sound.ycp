@@ -27,6 +27,7 @@
     include "sound/texts.ycp";
     include "sound/read_routines.ycp";
     include "sound/alsa_routines.ycp";
+    include "sound/card_wizard.ycp";
 
     include "browser.ycp";
 
@@ -49,103 +50,6 @@
     }
 
     
-    /**
-     * Wizard steps: 1. displayname 
-     * <br>
-     * 2. modprobe and volume settings
-     * @param   card_info as returned by libhd
-     * @param	car_id index of configured car
-     * @param	ui 
-     * @param	flags defines which radioboxes has to be enabled (0x1 - first, 0x2 second, 0x4 third...)
-     * @param	finish true if no complex dialog is to be called (then the popup "Config will be saved.." will appear)
-     * @return  list with save info, as required by sound_write for one cards
-     */
-    global define OneCardWizard (map save_entry, integer card_id, any ui, integer flags, boolean finish, list save_info) ``{
-	    // 3rd param for "sound_module" will be defined later
-	    // TODO: add nm256hack
-	integer state=1;
-
-	if(ui == `back)
-	{
-	    state=3;
-	}	
-
-	map opts=lookup(save_entry, "options", $[]);
-	save_entry=add_common_options(save_entry, card_id);
-	save_entry=add_alias(save_entry, card_id);
-	
-	integer state=1;
-	map res=$[];
-
-	string modelname=lookup(save_entry, "model", "");
-   
-	boolean show_opts=false;
-
-	nm256hack(lookup(save_entry, "module", ""));
- 
-	while(state>0)
-	{
-	    if(state==1)
-	    // display_name dialog
-	    {
-		res=DisplayName(modelname, lookup(save_entry, "alias"), card_id, flags);
-		symbol ui=lookup(res, "ui", nil);
-		
-		show_opts=(ui==`options);
-
-		map nextstate=$[`back: -1, `next: 3, `options: 2, `quick: 4, `skip: -2, `abort: -3];
-		state=lookup(nextstate, ui, 0);
-	    }
-	    else if(state==2)
-	    // options dialog
-	    {
-		res=CallModule ("sound_options", [save_entry]);
-		symbol ui=lookup(res, "ui", nil);
-		if(ui == `next)
-		{
-		    save_entry=lookup(res, "return", $[]);
-		    save_entry=add_common_options(save_entry, card_id);
-		}
-		
-		map nextstate=$[`next: 3, `back: 1, `abort: -3];
-		state=lookup(nextstate, ui, 0);
-	    }
-	    else if(state==3)
-	    // volume dialog
-	    {
-		res=CallModule ("sound_volume", [save_entry, card_id, finish, false, save_info] );
-		map nextstate=$[`next: -13, `abort: -3, `back: 1];
-		symbol ui=lookup(res, "ui", nil);
-		if(ui==`back && show_opts)
-		{
-		    state=2;
-		}
-		else
-		{
-		    state=lookup(nextstate, ui, 0);
-		}
-	    }
-	    else if(state==4)
-	    // quick config
-	    {
-		res=CallModule ("sound_volume", [save_entry, card_id, finish, true, save_info]);
-		map nextstate=$[`next: -13, `abort: -3, `back: 1];
-		symbol ui=lookup(res, "ui", nil);
-		if(ui==`back && show_opts)
-                {
-                    state=2;
-                }
-                else
-                {
-                    state=lookup(nextstate, ui, 0);
-                }
-	    }
-	}
-
-	map nextstate=$[-13: `next, -3: `abort, -2: `skip, -1: `back];
-	return $["ui": lookup(nextstate, state, `abort), "return": save_entry];
-    }
-
     // ========== MAIN ==========
     OpenMainDialog();
     InitializingDialog ();
@@ -224,7 +128,7 @@
 
 
     boolean skipped = false;
-    if(all_cards_num == new_cards_num && all_cards_num == 1)
+    if(all_cards_num == 1)
     {
 	call_complex_dialog=false;
     }

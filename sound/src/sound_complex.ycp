@@ -29,6 +29,7 @@
     include "sound/texts.ycp";	
     include "sound/alsa_routines.ycp";
     include "sound/write_routines.ycp";
+    include "sound/card_wizard.ycp";
 
     include "browser.ycp";
 
@@ -94,7 +95,7 @@
 	// dialog title
 	UI(`SetWizardContents (_("Configure a sound card"), con, helptext, true, true));
 	// Next - button label
-	UI(`ChangeWidget(`id(`next), `Label, NextButtonLabel()));
+	UI(`ChangeWidget(`id(`next), `Label, UI(`NextButtonLabel())));
 
 	if (size (nc) == 0) 
 	{
@@ -201,12 +202,17 @@
 
     define ComplexDialog () ``{
 	// help text 
+	any ui=nil;
         string helptext=lookup(STRINGS, "ComplexDialog");
 
-	if(size(save_info) < size(get_running_cards()))
+	if(size(save_info) != size(get_running_cards()))
 	{
-	    if(UI(`YesNoPopup(_("There is configured sound card, but is not functional at
- the moment, because the kernel modules are not present. Try to load them?"))))
+//	    if(UI(`YesNoPopup(_("There is configured sound card, but is not functional at
+// the moment, because the kernel modules are not present. Try to load them?"))))
+	    if(UI(`YesNoPopup(_("Number of currently running cards doesn't match 
+the number of configured cards in configureation files. 
+Try to restart sound system?"))))
+ 
 	    {
 		SCR(`Execute (.target.bash, "/etc/init.d/alsasound restart", $[]));
 		y2error("alsa restarted");
@@ -225,7 +231,7 @@
         // dialog title
 	UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
 	// Finish - button label
-	UI(`ChangeWidget(`id(`next), `Label, FinishButtonLabel()));
+	UI(`ChangeWidget(`id(`next), `Label, UI(`FinishButtonLabel())));
     
 	if (size (cc) == 0) 
 	{
@@ -309,7 +315,7 @@
 		{
 		    return $["ui": `abort];
 		}
-		UI(`ChangeWidget(`id(`next), `Label, FinishButtonLabel()));
+		UI(`ChangeWidget(`id(`next), `Label, UI(`FinishButtonLabel())));
 
 		UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
 		cc=createTable(save_info);
@@ -406,7 +412,7 @@
 		UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
 		UI(`ChangeWidget(`id(`configured_table), `Items, cc));
 		// Finish - button label
-		UI(`ChangeWidget(`id(`next), `Label, FinishButtonLabel()));
+		UI(`ChangeWidget(`id(`next), `Label, UI(`FinishButtonLabel())));
 	    
 		if (size (cc) == 0) 
 		{
