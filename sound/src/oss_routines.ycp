@@ -26,7 +26,7 @@
      * @param value volume 0-100
      * @return boolean success/failure
      */
-    global define boolean SetVolume (string group, integer cardid, integer value) ``{
+    global define boolean setVolume (string group, integer cardid, integer value) ``{
 	if (Arch::sparc)
 	{
 	    string cmd = sformat("/usr/bin/aumix -d /dev/mixer%1 -w %2", cardid, value);

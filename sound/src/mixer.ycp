@@ -163,7 +163,7 @@ global define map mixerDialog(integer card_id) ``{
 
     if (use_alsa)
     {
-	modname = lookup(select(Sound::modules_conf, card_id, $[]), "module", "snd-card-dummy");
+	modname = lookup(select(Sound::modules_conf, card_id, $[]), "module", "snd-dummy");
 	channels = lookup(lookup(Sound::db_modules, modname, $[]), "mixer_elements", SCR::Dir(pth));
     }
     else
@@ -256,7 +256,7 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
 	    }
 	    else
 	    {
-		SetVolume("Master", card_id, UI::QueryWidget(`id(ui), `Value));
+		setVolume("Master", card_id, UI::QueryWidget(`id(ui), `Value));
 	    }
 	}
 	else if (ui == `test)

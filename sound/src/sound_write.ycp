@@ -20,14 +20,14 @@
  *		    "model"	: "sb live!",
  *		    "alias"	: "snd-card-0",
  *		    "options"	: $["snd_id":"0" ...],
- *		    "module"	: "snd-card-emu10k1",
+ *		    "module"	: "snd-emu10k1",
  *		    "unique_key": "abcd.efghijklmn"
  *		],
  *              $[
  *                  "model"     : "avi onboard!",
  *                  "alias"     : "snd-card-1",
  *                  "options"   : $["snd_id":"1" ...],
- *                  "module"    : "snd-card-asf",
+ *                  "module"    : "snd-asf",
  *                  "unique_key": "abcd.abcdefghij"
  *              ]
  *         ]
@@ -78,6 +78,9 @@
     import  "Progress";
     import  "Wizard";
 
+    import "Sound";
+    import "Joystick";
+
       // ==== MAIN ====
 
     boolean test_mode	= false;
@@ -95,6 +98,13 @@
     rc_vars = lookup(settings, "rc_vars", []);
     volume_settings = lookup(settings, "volume_settings", []);
     autoinstall = lookup(settings, "autoinstall", false);
+
+    // do nothing when proposal is empty (Sound::installation is set to true in proposal mode)
+    if (Sound::installation && size(save_info) == 0)
+    {
+	y2debug("empty proposal. exiting.");
+	return true;
+    }
 /*
     if (size (Args ()) > 1)
     {
@@ -117,19 +127,20 @@
     }
 
     list stones = [
-	    _("Save modules configuration"),
+	    _("Save module configuration"),
             _("Save sound card information"),
 	    _("Save RC value"),
 	    _("Start sound card"),
-	    _("Store volume")];
+	    _("Store volume"),
+	    _("Store joystick settings")];
 
     list stones2 = [
 	    _("Saving sound card settings."),
 	    _("Saving card information..."),
 	    _("Saving RC values..."),
 	    _("Starting sound card..."),
-	    _("Storing volume settings")];
-
+	    _("Storing volume settings"),
+	    _("Storing joystick settings...")];
 
 
     if (!autoinstall)
@@ -148,7 +159,10 @@
 
     if (!autoinstall) { sleep(100); Progress::NextStage(); }
     step = step + 1;
-    save_unique_keys (maplist(`e, save_info, ``(lookup(e, "unique_key", ""))));
+    if (!autoinstall)
+    {
+	Sound::StoreUniqueKeys();
+    }
 
     if (!autoinstall) { sleep(100); Progress::NextStage(); }
     step = step + 1;
@@ -167,8 +181,21 @@
     {
 	set_vol_settings(volume_settings);
     }
+    if (SCR::Read(.target.size, "/etc/asound.state") == -1)
+    {
+	integer i = 0;
+	maplist(`e, save_info, ``{
+	    Sound::InitMixer(i, lookup(e, "module", ""));
+	    i = i + 1;
+	});
+    }
+
     SaveVolume();
     if (!autoinstall) sleep(100);
+
+    if (!autoinstall) { sleep(100); Progress::NextStage(); }
+    Joystick::Write(nil);
+    SCR::Execute(.target.bash_output, "/usr/sbin/rcjoystick restart", $[]);
 
     return (size (err_msg) == 0);
 }

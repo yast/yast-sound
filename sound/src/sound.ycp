@@ -18,6 +18,12 @@
  */
 
 {
+    import "Mode";
+
+    if (size(Args()) > 0 && Args(0) == .test)
+    {
+	Mode::test = true;
+    }
 
     textdomain "sound";
 
@@ -82,6 +88,7 @@
     //	  card_id
     //    sound_cards
 
+    boolean conf_joystick = true;
 
     map save_entry = $[];
     boolean was_complex = false;
@@ -98,6 +105,7 @@
 	{
 	    return `detail;
 	}
+
 	list nh	    = maplist(`e, Sound::unconfigured_cards, ``(lookup(e, "model", "")));
 
         list ch	    = maplist(`e, Sound::modules_conf, ``(lookup(e, "model", "")));
@@ -120,8 +128,15 @@
     global define symbol _snd_quick() ``{
 	save_entry = select(Sound::unconfigured_cards, 0, $[]);
 	card_id = 0;
+	boolean has_joy = false;
+	string modname = lookup(save_entry, "module", "");
+	if (lookup(lookup(Sound::db_modules, modname, $[]), "joystick", $[]) != $[])
+	{
+	    has_joy = true;
+	}
+
 	string modelname    = lookup(save_entry, "model", "");
-	map res		    = quickConfig(modelname, "snd-card-0", card_id, 15);
+	map res		    = quickConfig(modelname, "snd-card-0", card_id, has_joy);
 	symbol ui	    = lookup(res, "ui", nil);
 	return ui;
     }
@@ -236,6 +251,14 @@
             }
             string modname = lookup(select(Sound::modules_conf, card_id, $[]), "module", "");
 
+	    // remove joystick settings
+	    if (card_id < 4)
+	    {
+		Joystick::joystick = remove(Joystick::joystick, card_id);
+		Joystick::joystick[3] = $[];
+	    }
+
+
             // we have to rember volume/mute settings because after a card removal
             // everything is muted and set to 0.
             list vol_settings = get_vol_settings();
@@ -326,14 +349,14 @@
 
     Wizard::DisableAbortButton();
 
-    if (whoami() != "root")
-    {
-	UI::MessagePopup(_("You need to be logged in as root 
-to configure sound cards.
-"));
-	UI::CloseDialog();
-	return;
-    }
+//    if (whoami() != "root")
+//    {
+//	UI::MessagePopup(_("You need to be logged in as root 
+//to configure sound cards.
+//"));
+//	UI::CloseDialog();
+//	return;
+//    }
 
 
     boolean test_mode     = false;
@@ -367,6 +390,8 @@ to configure sound cards.
     if (!Sound::autoinstallation && !Sound::installation)
     {
 	Sound::Read(``{});
+	Joystick::Read(``{});
+	Sound::StoreSettings();
     }
 
     if (Sound::installation)
@@ -375,20 +400,18 @@ to configure sound cards.
 	Sound::UpdateUnconfiguredCards();
 	sound_stop();
 	sound_start_tmp(true);
+	// init mixer for all soundcards
+	integer index = 0;
+	maplist(`e, Sound::modules_conf,
+	``{
+	    Sound::InitMixer(index, lookup(e, "module", ""));
+	    i = i + 1;
+	}
+	);
     }
 
     Sound::use_ui = true;
 
-    /*
-     * this variable will not be touched.
-     * it's purpose is for checking whether
-     * changes were done to config.
-     */
-    list save_info_backup = Sound::modules_conf;
-
-
-//#    map rc_vars       = read_rc_vars (["START_ALSA", "START_ALSA_SEQ"]);
-    map rc_vars_backup = Sound::rc_vars;
     integer card_id   = 0;
     integer n_cards   = 0;
     map result        = $[];
@@ -412,6 +435,16 @@ to configure sound cards.
     }
 
     nm256_opl3sa2_warn(flatten(add([Sound::modules_conf], Sound::unconfigured_cards)));
+    if ( size(flatten(add([Sound::modules_conf], Sound::unconfigured_cards))) == 1)
+    {
+	boolean nm256out = nm256hack(lookup(select(Sound::unconfigured_cards, 0, $[]), "module", ""));
+	y2error("%1", nm256out);
+	if (!nm256out)
+	{
+	    UI::CloseDialog();
+	    return `back;
+	}
+    }
 
     symbol state = `card_select;
 
@@ -540,7 +573,7 @@ to configure sound cards.
 	    Sound::RestoreSettings();
 	}
 	UI::CloseDialog();
-	return;
+	return `back;
     }
 
     n_cards = size (Sound::modules_conf);
@@ -557,7 +590,10 @@ to configure sound cards.
 
     if (ui == `finish && !Sound::autoinstallation)
     {
-	if (!Sound::installation && (Sound::modules_conf != save_info_backup || Sound::rc_vars != rc_vars_backup))
+	if (!Sound::installation &&
+		(
+		    Sound::Changed() || Joystick::Changed()
+		))
 	{
 	    Sound::Write(``{}, ``{});
 	}

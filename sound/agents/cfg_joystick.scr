@@ -13,11 +13,11 @@
  *   libscr
  * Example:
  *   Dir(.joystick)
- *   (["JS_GAMEPORT_MODULE_0", "JD_DEVICE_MODULE_0", ... ]) **
- *   Read(.joystick.JS_GAMEPORT_MODULE_0)
+ *   (["GAMEPORT_MODULE_0", "JOYSTICK_MODULE_0", ... ]) **
+ *   Read(.joystick.GAMEPORT_MODULE_0)
  *   ("emu10k1-gp")
  **
- *   Write(.joystick.JS_GAMEPORT_MODULE_0, "emu10k1-gp")
+ *   Write(.joystick.GAMEPORT_MODULE_0, "emu10k1-gp")
  *   (true)
  *
  * $Id$

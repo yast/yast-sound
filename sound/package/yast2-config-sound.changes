@@ -1,4 +1,48 @@
 -------------------------------------------------------------------
+Thu Mar 21 14:44:57 CET 2002 - mvidner@suse.cz
+
+- Fixed rcjoystick invocation. (#14957)
+- 2.5.18
+
+-------------------------------------------------------------------
+Fri Mar 15 14:27:17 CET 2002 - dmeszar@suse.cz
+
+- fixed #14590 (Sound re-configuration broken after update in some cases)
+
+-------------------------------------------------------------------
+Tue Mar 12 15:13:27 CET 2002 - dmeszar@suse.cz
+
+- fixed #14876 (channels are not unmuted when configured via tv module
+  on running system)
+- fixed #14725 (abort confirmation when no changes were made)
+
+-------------------------------------------------------------------
+Wed Mar  6 16:21:35 CET 2002 - dmeszar@suse.cz
+
+- fixed #14539 (infinite loop when setting option value to '')
+- return empty map when aborted in autoyast (#14526)
+
+-------------------------------------------------------------------
+Wed Feb 27 14:44:59 CET 2002 - dmeszar@suse.cz
+
+- fixed #13981 (exit the sound_write module when the proposal
+  is empty (this applies only to proposal mode))
+
+-------------------------------------------------------------------
+Fri Feb 22 14:58:31 CET 2002 - dmeszar@suse.cz
+
+- fixed #13601 (all volumes at zero after installation)
+- screenshot mode implemented
+- fixed proposing of nm256 soundcards
+
+-------------------------------------------------------------------
+Mon Feb 18 19:06:00 CET 2002 - dmeszar@suse.cz
+
+- implemented joystick configuration
+- adaptation for sound db changes (option description can be both
+  string and list of strings)
+
+-------------------------------------------------------------------
 Mon Feb 11 14:29:33 CET 2002 - dmeszar@suse.cz
 
 - speed improvements, proposal implemented
