@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jan 10 16:15:41 CET 2001 - dan@suse.cz
+
+- don't call complex dialog when just one sound card is beeing installed
+- log fixes
+
+-------------------------------------------------------------------
 Tue Jan  9 10:05:13 CET 2001 - dan@suse.cz
 
 - fix playing sound sample on background (bug #5263)
