@@ -1861,8 +1861,8 @@
           "descr" : _("Clock on ESS Maestro1/2 soundcard.  (0 = auto-detect)")
         ],
         "enable_mpu" : $[
-          "allows" : "{{0,Disabled},{1,Enabled}}",
-          "default" : "1",
+          "allows" : "{{0,1,2}}",
+          "default" : "2",
           "descr" : _("Enable MPU401.  (0 = off, 1 = on, 2 = auto)"),
           "dialog" : "check"
         ],
@@ -1893,6 +1893,7 @@
         ],
         "use_pm" : $[
           "allows" : "{{0,1,2}}",
+          "default" : "2",
           "descr" : _("Toggle power-management.  (0 = off, 1 = on, 2 = auto)"),
           "skill" : "advanced"
         ]
