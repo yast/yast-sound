@@ -288,7 +288,7 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
     any	ui = nil; // value can be `next `abort... or string (channel name)
     integer value = 0;
 
-    UI::ChangeWidget (`id(`test), `Enabled, !Mode::config);
+    UI::ChangeWidget (`id(`test), `Enabled, !Mode::config());
 
     repeat
     {

@@ -80,7 +80,7 @@
 	y2milestone("Configured sound cards: %1", cards);
 	y2milestone("Cards with joystick support: %1", filtered);
 
-	if (Mode::test == true)
+	if (Mode::test() == true)
 	{
 	    cards = [
 		$["card_no":0, "name":"VIA 82C686A/B"],

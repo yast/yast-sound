@@ -419,7 +419,7 @@ could make your system unstable.
      */
     global define boolean DetectHardware() ``{
 
-	if (Mode::test)
+	if (Mode::test())
 	{
 	    detected_cards = [$[
 		    "bus"	: "PCI",
@@ -475,7 +475,7 @@ could make your system unstable.
 	    return true;
 	}
 
-	if (Mode::config)
+	if (Mode::config())
 	{
 	    detected_cards = [];
 	}
@@ -668,7 +668,7 @@ could make your system unstable.
 	    ],
 	    ""
 	);
-	if (Mode::test)
+	if (Mode::test())
 	{
 	    DetectHardware();
 	    modules_conf = [];
@@ -797,7 +797,7 @@ could make your system unstable.
      */
     global define boolean Write () ``{
 
-	if (Mode::test == false)
+	if (Mode::test() == false)
 	{
 	    map settings = Export();
 	    WFM::CallFunction ("sound_write", [ settings ]);
@@ -1019,7 +1019,7 @@ could make your system unstable.
      * @return list of maps: [$["name": "ASDASD", "card_no": 0]...]
      */
     global define list GetSoundCardList() ``{
-	if (installation || Mode::autoinst)
+	if (installation || Mode::autoinst())
 	{
 	    integer pos = -1;
 	    return maplist(map card, modules_conf, ``{
@@ -1107,7 +1107,7 @@ could make your system unstable.
     global define boolean SetVolume (integer c_id, string channel,
 				     integer value) ``{
 	// two cases: we have sound system already running:
-	if (!Mode::config && size(SCR::Dir(.audio.alsa.cards)) > c_id)
+	if (!Mode::config() && size(SCR::Dir(.audio.alsa.cards)) > c_id)
 	{
             string p = sformat(".audio.alsa.cards.%1.channels.%2.volume", c_id, channel);
 	    string p2 = sformat(".audio.alsa.cards.%1.channels.%2.mute", c_id, channel);

@@ -53,10 +53,10 @@
 	}
 
 	// rest is for ALSA
-	// In Mode::autoinst, we need to update volume_settings from
+	// In Mode::autoinst(), we need to update volume_settings from
 	// UpdateCardsToTargetSystem functions; volume will be saved later
 	// in set_vol_settings ().
-	if (!Mode::config && !Mode::autoinst)
+	if (!Mode::config() && !Mode::autoinst())
 	{
 	    string p = sformat(".audio.alsa.cards.%1.channels.%2.volume",
 		cardid, group);
@@ -189,7 +189,7 @@
      * @return boolean true if nothing's using sound, false otherwise
      */
     define boolean stop_programs() ``{
-	if (Mode::config || Mode::autoinst)
+	if (Mode::config() || Mode::autoinst())
 	{
 	    return true;
 	}

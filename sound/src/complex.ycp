@@ -124,7 +124,7 @@
 
 	y2debug(" save_info %1, agent %2", size(Sound::modules_conf), size(SCR::Dir(.audio.alsa.cards)));
 
-	if (!Mode::config && Sound::use_alsa &&
+	if (!Mode::config() && Sound::use_alsa &&
 	    (size(Sound::modules_conf) != size(get_running_cards())))
 	{
 	    // marning popup message text
@@ -164,7 +164,7 @@ Try to restart sound system?")))
 
 	do
 	{
-	    if (!Mode::config)
+	    if (!Mode::config())
 	    {
 		SCR::Execute(.audio.alsa.restore, 0, 0);
 	    }
