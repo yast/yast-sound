@@ -2,6 +2,7 @@
 Wed Aug 29 10:10:05 CEST 2001 - dmeszar@suse.cz
 
 - fixed typos
+- removed debug logging
 
 -------------------------------------------------------------------
 Mon Aug 27 15:48:05 CEST 2001 - dmeszar@suse.cz
