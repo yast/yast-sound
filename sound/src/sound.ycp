@@ -366,6 +366,14 @@ configure an other card than the one that is displayed on the right.</p>"));
     boolean call_complex_dialog = false;	
     list configured_unique = []; // list of unique keys, that was configured
 
+    boolean exit = false;
+    list|void db = SCR(`Read (.target.yast2, "sndcards.ycp"));
+    
+    if (is (db, void)) {
+	UI(`DisplayMessage ("The Sound card database cannot be found!!!"));
+	exit = true;
+    }
+
     // get all the apropriate information from the database
     sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
 
@@ -376,6 +384,7 @@ configure an other card than the one that is displayed on the right.</p>"));
 	sound_cards = filter (`e, sound_cards, ``(!contains (already, lookup (e, "unique_key"))));
     }
 
+    if (!exit) {
 
     boolean skipped = false;
     call_complex_dialog = size (sound_cards) != 1;	
@@ -495,7 +504,7 @@ configure an other card than the one that is displayed on the right.</p>"));
 	    SCR(`Execute (.bin.bash, "/etc/init.d/alsasound stop", $[]));
     }
 
-
+    }
     UI(`CloseDialog ());
     
 }
