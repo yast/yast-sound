@@ -28,7 +28,7 @@
      * @return symbol
      */
 
-    global define InitializingDialog () ``{
+    global define symbol InitializingDialog () ``{
 	  // label message
 	term con = `Label (sformat(_("Initializing ...")));
 	string helptext = "";
@@ -50,7 +50,7 @@
      * @return map
      */
 
-    global define DisplayName (string name, string cname, integer cpos, integer flags) ``{
+    global define map DisplayName (string name, string cname, integer cpos, integer flags) ``{
 	string helptext = lookup(STRINGS, "DisplayName", "");
 	term con = AutoconfDlg(name, cname, cpos);
 	Wizard::SetContents (_("Sound card configuration"), con, helptext, true, true);
@@ -113,7 +113,7 @@
      * @return symbol of pressed button
      */
 
-    global define quickConfig(string name, string cname, integer cpos, integer flags) ``{
+    global define map quickConfig(string name, string cname, integer cpos, integer flags) ``{
         string helptext = lookup(STRINGS, "quickConfig", "");
         term con = QuickconfDlg(name, cname, cpos);
         Wizard::SetContents (_("Sound card configuration"), con, helptext, true, true);
@@ -171,7 +171,7 @@
      * @return void
      */
 
-    global define OpenMainDialog() ``{
+    global define void OpenMainDialog() ``{
 	Wizard::CreateDialog();
     }
 
@@ -184,7 +184,7 @@
      *  @return term
      */
 
-    global define VolumeCon(map save_entry , integer vol) ``{
+    global define term VolumeCon(map save_entry , integer vol) ``{
 	term slider = `IntField(`id(`volume), `opt(`notify), _("&Volume"), 0, 100, vol);
 
 	if (UI::HasSpecialWidget(`Slider))
@@ -245,7 +245,7 @@
      *  @see sound_options#create_table
      */
 
-    global define OptionsCon(string cardlabel, list itemized_descriptions, integer current_option, string current_option_name) ``{
+    global define term OptionsCon(string cardlabel, list itemized_descriptions, integer current_option, string current_option_name) ``{
 	con = `HBox
               (
                 `HSpacing (3),
@@ -285,7 +285,7 @@
      * @see WhichDialog
      */
 
-    global define WhichDlgCon(list nc) ``{
+    global define term WhichDlgCon(list nc) ``{
 	term con = `HBox(
             `HSpacing (3),
         // frame label
@@ -334,7 +334,7 @@
      *
      */
 
-    global define ComplexDlgCon(list cc, boolean start_alsa, boolean start_alsa_seq, boolean show_font_but) ``{
+    global define term ComplexDlgCon(list cc, boolean start_alsa, boolean start_alsa_seq, boolean show_font_but) ``{
 	term butts = nil;
 	term alsabuts = `Empty();
 	if  (use_alsa)
@@ -400,7 +400,7 @@
      * @return term with widget
      */
 
-    global define AutoconfDlg(string name, string cname, integer cpos) ``{
+    global define term AutoconfDlg(string name, string cname, integer cpos) ``{
 	string clab = "";
 
 	if (cpos < 3)
@@ -444,7 +444,7 @@
      *
      */
 
-        global define QuickconfDlg(string name, string cname, integer cpos) ``{
+        global define term QuickconfDlg(string name, string cname, integer cpos) ``{
         string clab = "";
 
         if (cpos < 3)
@@ -485,7 +485,7 @@
      *	@return boolean
      */
 
-    global define ReallyAbort()
+    global define boolean ReallyAbort()
     ``{
 	return UI::ReallyAbortPopup(false);
     }
@@ -498,7 +498,7 @@
      * @return void
      */
 
-    global define selectHardware(list newHw, string confHw) ``{
+    global define void selectHardware(list newHw, string confHw) ``{
 	integer index = -1;
         newHw = maplist(`e, newHw, ``{
             index = index + 1;              // select first item
@@ -524,7 +524,7 @@
      * @return `auto/`manual
      */
 
-    global define WhichDialog (list cards)       ``{
+    global define map WhichDialog (list cards)       ``{
     // help text
 
         string helptext = lookup(STRINGS, "WhichDialog", "");

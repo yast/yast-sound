@@ -35,7 +35,7 @@
      * @return table contents
      */
 
-    global define createTable(list save_info) ``{
+    global define list createTable(list save_info) ``{
 	list runn   = get_running_cards();
 	integer pos = 0;
 	list ret    = maplist(`e, save_info,
@@ -95,7 +95,7 @@
      * @param val boolean enable/disable
      */
 
-    global define enableButtons(boolean val) ``{
+    global define void enableButtons(boolean val) ``{
 	UI::ChangeWidget(`id(`b_delete),    `Enabled, val);
         UI::ChangeWidget(`id(`b_options),   `Enabled, val);
 	UI::ChangeWidget(`id(`b_volume),    `Enabled, val);
@@ -108,7 +108,7 @@
      * @return map
      */
 
-    global define ComplexDialog () ``{
+    global define map ComplexDialog () ``{
 	// help text
 	symbol ui = nil;
         string helptext = lookup(STRINGS, "ComplexDialog", "");
@@ -192,7 +192,6 @@ Try to restart sound system?")))
 			    return entry;
 			}
 		    });
-//		    CallFunction(`sound_volume(entry, card_id, false, false, save_info));
 		}
 		else if (lookup(res, "ui", nil) == `abort || lookup(res, "ui", nil) == `cancel)
 		{
@@ -285,7 +284,7 @@ Try to restart sound system?")))
      * @param save_info list
      */
 
-    global define sound_complex(list save_info) ``{
+    global define map sound_complex(list save_info) ``{
 
 //    list save_info	= Args(0);
     list to_delete	= [];

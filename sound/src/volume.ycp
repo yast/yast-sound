@@ -37,7 +37,7 @@
      * @return symbol
      */
 
-    global define VolumeDialog () ``{
+    global define symbol VolumeDialog () ``{
 
 	    //unmute these devices
 	/* help text: adjusting volume */
@@ -110,7 +110,7 @@
     * @return symbol `back | `cancel
     */
 
-    global define ErrorDialog (map save_entry, string err) ``{
+    global define symbol ErrorDialog (map save_entry, string err) ``{
 				    // Help text - intenal YaST2 error
 
 	y2debug("%1", save_entry);
@@ -168,7 +168,7 @@ its parameters using the 'Advanced setup'.");
     * @return symbol `back | `cancel
     */
 
-    global define SuccessDialog (map save_entry) ``{
+    global define symbol SuccessDialog (map save_entry) ``{
                                     // Help text - intenal YaST2 error
 
         string help_text = lookup(STRINGS, "SuccessDialog", "");
@@ -230,7 +230,8 @@ its parameters using the 'Advanced setup'.");
      * @return symbol
      */
 
-    global define sound_volume(map save_entry, integer card_id, boolean finish,	boolean quick, list save_info) ``{
+    global define map sound_volume(map save_entry, integer card_id, boolean finish,
+				    boolean quick, list save_info) ``{
 
     boolean need_restart    = true;
     boolean test_mode	    = false;

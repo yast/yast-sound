@@ -29,7 +29,7 @@
      */
 
 
-    global define ManualDialog () ``{
+    global define map ManualDialog () ``{
 	string helptext	    = lookup(STRINGS, "ManualDialog", "");
 	list module_names   = get_module_names();
 
@@ -133,7 +133,7 @@
      *
      */
 
-    global define sound_manual() ``{
+    global define map sound_manual() ``{
     // ==== main ====
 
 	return ManualDialog ();

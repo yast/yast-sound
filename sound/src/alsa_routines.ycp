@@ -28,7 +28,7 @@
      * @return boolean success/failure
      */
 
-    global define SetVolume (string group, integer cardid, integer value) ``{
+    global define boolean SetVolume (string group, integer cardid, integer value) ``{
         string p = sformat(".audio.alsa.cards.%1.channels.%2.volume", cardid, group);
 
         return SCR::Write(topath(p), value);
@@ -40,9 +40,7 @@
      *
      */
 
-
-
-    global define PlayTest (integer card_id) ``{
+    global define string PlayTest (integer card_id) ``{
 
 	string fname = "/usr/share/sounds/alsa/test.wav";
         if (SCR::Read(.target.size, fname) == -1)
@@ -70,7 +68,7 @@
      *
      */
 
-    global define sound_start_tmp(boolean restore, integer count) ``{
+    global define void sound_start_tmp(boolean restore, integer count) ``{
 
 	string pattern = "options (snd-card-.*)";
 
@@ -134,7 +132,7 @@
      */
 
 
-    global define sound_stop() ``{
+    global define map sound_stop() ``{
 	SCR::Execute (.target.bash, "/etc/init.d/alsasound stop > /dev/null 2>&1", $[]);
     }
     
@@ -146,7 +144,7 @@
      *
      */
 
-    global define get_card_names(string modname) ``{
+    global define list get_card_names(string modname) ``{
 	// we need module index :(
 
 
@@ -182,7 +180,7 @@
      *
      */
 
-    global define get_module_by_cardname(string cardname) ``{
+    global define string get_module_by_cardname(string cardname) ``{
 	integer i = -1;
 	foreach(`e, `f, Sound::db_cards, 
 	``{
@@ -202,7 +200,7 @@
      * @return list with params and their descriptions
      */
 
-    global define get_module_params(string modname) ``{
+    global define map get_module_params(string modname) ``{
 	map mod = lookup(Sound::db_modules, modname, $[]);
 	return lookup(mod, "params", $[]);
     }
@@ -212,7 +210,7 @@
      * creates a list of sound modules for selection box
      * @return list of items: [`item(`id(module_name), "module label")]
      */
-    global define get_module_names() ``{
+    global define list get_module_names() ``{
 	list mods = maplist(`k, `v, Sound::db_modules,
 	    ``(`item(`id(k), lookup(v, "description", k))));
 
@@ -234,7 +232,7 @@
      *
      */
 
-    global define get_vol_settings() ``{
+    global define list get_vol_settings() ``{
 	integer bound	= size(SCR::Dir(.audio.alsa.cards));
 	integer i	= 0;
 	list retlist	= [];
@@ -260,7 +258,7 @@
      */
 
 
-    global define set_vol_settings(list vol_settings) ``{
+    global define boolean set_vol_settings(list vol_settings) ``{
 	integer i = 0;
 	foreach(`e, vol_settings,
 	``{
@@ -283,7 +281,7 @@
      *
      */
 
-    global define get_running_cards () ``{
+    global define list get_running_cards () ``{
         if (SCR::Read(.target.size, "/proc/asound/cards") != -1)
         {
             list asound = SCR::Read(.proc.asound.cards);
@@ -302,8 +300,8 @@
      * @param cards autodetected cards
      * @return list of entries of not configured cards
      */
-    
-    global define filter_configured(list save_info, list cards) ``{
+
+    global define list filter_configured(list save_info, list cards) ``{
 	cards = filter(`e, cards,
 	``{
 	    string uniq	    = lookup(e, "unique_key", "");
@@ -329,7 +327,7 @@
      */
 
 
-    global define add_alias(map entry, integer card_id) ``{
+    global define map add_alias(map entry, integer card_id) ``{
 	return add(entry, "alias", sformat("snd-card-%1", card_id));
     }
 
@@ -340,7 +338,7 @@
      *  noop for oss
      */ 
 
-    global define add_common_options(map entry, integer card_id) ``{
+    global define map add_common_options(map entry, integer card_id) ``{
 	map opts = lookup(entry, "options", $[]);
 	opts = add(opts, "snd_index", card_id);
         opts = add(opts, "snd_id", sformat("card%1", card_id+1));
@@ -356,7 +354,7 @@
      * @param number number of sound cards
      * @return list
      */
-    global define alsa_oss (integer number) ``{
+    global define list alsa_oss (integer number) ``{
         list modules = [];
         integer i = 0;
         // map with minor as a key and module as value
@@ -388,7 +386,7 @@
      * @param save_info list of already configured cards
      */
 
-    global define getConfigurableCards(list save_info) ``{
+    global define list getConfigurableCards(list save_info) ``{
         list snd = Sound::detected_cards;
         snd = filter_configured(save_info, snd);
         if (size(snd) > 0)
@@ -397,7 +395,6 @@
             snd =  maplist(`e, snd, ``(add (e, "module", get_module (e))));
 
             // filter out modules with unspecified module name (sound card not supported by alsa / no module found)
-//            snd = filter(`e, snd, ``(lookup(e, "module", $[])!=$[]));
             // create save_info entries
 
 	    snd = maplist(`c, snd, ``{

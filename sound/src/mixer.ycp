@@ -32,7 +32,7 @@
      *
      */
 
-    global define volElement(string label, integer value, boolean spec) ``{
+    global define term volElement(string label, integer value, boolean spec) ``{
 	if (spec)
 	{
 	    return `Slider(`id(label), `opt(`notify), label, 0, 100, value);
@@ -49,7 +49,7 @@
      * @return term widget
      */
 
-    global define mixerWidget(list channels) ``{
+    global define term mixerWidget(list channels) ``{
         term widget = `VBox();
 
 
@@ -141,7 +141,7 @@
  *
  */
 
-global define mixerDialog(integer card_id) ``{
+global define map mixerDialog(integer card_id) ``{
 
     integer card_id	= Args(0);
     path pth		= topath(sformat(".audio.alsa.cards.%1.channels", card_id));

@@ -31,7 +31,7 @@
      * @return term widget
      */
 
-    global define defWidget() ``{
+    global define term defWidget() ``{
 	return `Label(_("Possible value:\nnot known"));
     }
 
@@ -42,7 +42,7 @@
      * @return term combobox widget
      */
 
-    global define gen_list(string tail, string default) ``{
+    global define term gen_list(string tail, string default) ``{
 	list vals = splitstring(tail, ",");
 	vals = maplist(`e, vals, ``(`item(`id(e), sformat("%1", e))));
 
@@ -56,7 +56,7 @@
      * @return intfield widget
      */
 
-    global define gen_intfield(string tail, string default) ``{
+    global define term gen_intfield(string tail, string default) ``{
 	list rng = splitstring(tail, "-");
 	if (size(rng) < 2)
 	{
@@ -75,7 +75,7 @@
      * return combobox widget
      */
 
-    global define gen_bool(string default) ``{
+    global define term gen_bool(string default) ``{
 	return `ComboBox(`id(`poss), `opt(`notify), _("&Possible value:"), [`item(`id("0"), "0", default == "0"),
 	    `item(`id("1"), "1", default == "1")]);
     }
@@ -86,7 +86,7 @@
      * @return combo wodget
      */
 
-    global define gen_irq(string default) ``{
+    global define term gen_irq(string default) ``{
 	list irqs = ["3", "5", "7", "9", "10", "11", "12", "15"];
 	irqs = maplist(`e, irqs, ``(`item(`id(e), e, default == e)));
 	return `ComboBox(`id(`poss), `opt(`notify), _("&Possible value:"), irqs);
@@ -98,7 +98,7 @@
      * @return combo widget
      */
 
-    global define gen_dma(string default) ``{
+    global define term gen_dma(string default) ``{
 	list dmas = ["-1", "0", "1", "3", "5", "6", "7"];
 	dmas = maplist(`e, dmas, ``(`item(`id(e), e, default==e)));
         return `ComboBox(`id(`poss), `opt(`notify), _("&Possible value:"), dmas);
@@ -109,7 +109,7 @@
      * @param default string
      */
 
-    global define gen_dma_size(string default) ``{
+    global define term gen_dma_size(string default) ``{
 	return gen_intfield("4-64", default);
     }
 
@@ -119,7 +119,7 @@
      * @param default string
      */
 
-    global define updatePossibleValues(string values, string default) ``{
+    global define void updatePossibleValues(string values, string default) ``{
 	if (values == "")
 	{
 	    UI::ReplaceWidget(`id(`reppoint), defWidget());
@@ -175,7 +175,7 @@
      *
      */
 
-    global define OptionsDialog (string cardlabel, map opts) ``{
+    global define map OptionsDialog (string cardlabel, map opts) ``{
 
 
 	string help_text = lookup(STRINGS, "OptionsDialog", "");
@@ -330,7 +330,7 @@
      * @return symbol
      */
 
-    global define sound_options(map save_entry) ``{
+    global define map sound_options(map save_entry) ``{
 
 
 //    map save_entry	= Args(0);

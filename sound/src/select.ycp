@@ -22,7 +22,7 @@
     textdomain "sound";
     include "ui/summary.ycp";
 
-    global define sound_select(list sound_cards, list save_info) ``{
+    global define map sound_select(list sound_cards, list save_info) ``{
 
     // show the dialog
     string confhw = ConfCardsRT(save_info);

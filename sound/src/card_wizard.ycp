@@ -34,7 +34,7 @@ symbol  ui	= nil;
 list save_info	= [];
 boolean finish	= false;
 
-global define _showName()
+global define symbol _showName()
 ``{
     string modelname = lookup(save_entry, "model", "");
     map res = DisplayName(modelname, lookup(save_entry, "alias", ""), card_id, flags);
@@ -42,7 +42,7 @@ global define _showName()
     return ui;
 }
 
-global define _options()
+global define symbol _options()
 ``{
     map res = sound_options(save_entry);
     symbol ui = lookup(res, "ui", nil);
@@ -54,21 +54,21 @@ global define _options()
     return ui;
 }
 
-global define _quick()
+global define symbol _quick()
 ``{
     map res = sound_volume(save_entry, card_id, finish, true, save_info);
     symbol ui = lookup(res, "ui", nil);
     return ui;
 }
 
-global define _volume()
+global define symbol _volume()
 ``{
     map res = sound_volume(save_entry, card_id, finish, false, save_info);
     symbol ui = lookup(res, "ui", nil);
     return ui;
 }
 
-global define _optVolume()
+global define symbol _optVolume()
 ``{
     return _volume();
 }
@@ -84,7 +84,7 @@ global define _optVolume()
      * @param   finish true if no complex dialog is to be called (then the popup "Config will be saved.." will appear)
      * @return  list with save info, as required by sound_write for one cards
      */
-global define OneCardWizard (map save_entry, integer card_id,  
+global define map OneCardWizard (map save_entry, integer card_id,  
 			     integer flags, boolean finish, list save_info) ``{
             // 3rd param for "sound_module" will be defined later
             // TODO: add nm256hack

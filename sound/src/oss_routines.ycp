@@ -26,7 +26,7 @@
      * @param value
      * @return boolean success/failure
      */
-    global define SetVolume (string group, integer cardid, integer value) ``{
+    global define boolean SetVolume (string group, integer cardid, integer value) ``{
 	if (Arch::sparc)
 	{
 	    string cmd = sformat("/usr/bin/aumix -d /dev/mixer%1 -w %2", cardid, value);
@@ -47,7 +47,7 @@
      * @param card_id
      *
      */
-    global define PlayTest (integer card_id) ``{
+    global define string PlayTest (integer card_id) ``{
 
 	string fname="/usr/share/sounds/test.mp3";
         if (SCR::Read(.target.size, fname) == -1)
@@ -73,7 +73,7 @@
      *
      */
 
-    global define sound_stop() ``{
+    global define void sound_stop() ``{
 	// TODO:
 	list mods=SCR::Dir(.modinfo.kernel.drivers.sound);
 	mods = add(mods, "emu10k1");
@@ -95,7 +95,7 @@
      *
      */
 
-    global define sound_start_tmp(boolean restore, integer unused) ``{
+    global define void sound_start_tmp(boolean restore, integer unused) ``{
         string cmd = "/sbin/depmod -C " + get_tmp_modules_conf() + " /dev/null 2>&1";
         SCR::Execute(.target.bash, cmd, $[]);
 
@@ -128,7 +128,7 @@
      *
      */ 
 
-    global define get_card_names(string modname) ``{
+    global define list get_card_names(string modname) ``{
 	return [sformat("Sound card (%1)", modname)];
     }
 
@@ -139,7 +139,7 @@
      * @return string module name
      */
 
-    global define get_module_by_cardname(string cardname) ``{
+    global define string get_module_by_cardname(string cardname) ``{
 	return "";
     }
 
@@ -150,7 +150,7 @@
      *
      */
 
-    global define get_module_params(string modname) ``{
+    global define map get_module_params(string modname) ``{
 	map params = SCR::Read(topath(sformat(".modinfo.kernel.drivers.sound.%1", modname)));
 	params = filter(`k, `v, params, 
 	    ``(!contains(["module_author", "module_description", "module_filename"], k)));
@@ -171,7 +171,7 @@
      *
      */
 
-    global define get_module_names() ``{
+    global define list get_module_names() ``{
 	list ret = SCR::Dir(.modinfo.kernel.drivers.sound);
 	ret = filter(`e, ret, ``(e != "sound"));
 	ret = add(ret, "emu10k1");
@@ -196,7 +196,7 @@
      * 
      */
 
-    global define get_running_cards() ``{
+    global define list get_running_cards() ``{
 	return [1,2,3,4,5]; //size(save_info);
     }
 
@@ -211,7 +211,7 @@
      * noop for oss
      */
 
-    global define get_vol_settings() ``{
+    global define list get_vol_settings() ``{
 	return [];
 
     }
@@ -232,7 +232,8 @@
      * noop for oss
      */
 
-    global define set_vol_settings(list vol_settings) ``{
+    global define boolean set_vol_settings(list vol_settings) ``{
+	return true;
     }
 
 
@@ -241,7 +242,7 @@
      * @param cards detected cards
      */
 
-    global define convert_to_save_info(list cards) ``{
+    global define list convert_to_save_info(list cards) ``{
 	cards = maplist(`e, cards,
 	``{
 	    list options = lookup(e, "options", []);
@@ -283,7 +284,7 @@
      * @return modified card entry with filled alias value
      */
 
-    global define add_alias(map entry, integer card_id) ``{
+    global define map add_alias(map entry, integer card_id) ``{
 	return add(entry, "alias", sformat("sound-slot-%1", card_id));
     }
 
@@ -294,10 +295,8 @@
      *  noop for oss
      */
 
-    global define add_common_options(map entry, integer card_id) ``{
+    global define map add_common_options(map entry, integer card_id) ``{
 	map opts = lookup(entry, "options", $[]);
-//	opts = add(opts, "snd_index", card_id);
-//        opts = add(opts, "snd_id", sformat("card%1", card_id+1));
 
 	list parms = get_module_params(lookup(entry, "module", ""));
 	if (size(parms) != 0)
@@ -319,7 +318,7 @@
      * @return list
      * noop for oss
      */
-    global define alsa_oss (integer number) ``{
+    global define list alsa_oss (integer number) ``{
 	return [];
     }
 
@@ -330,7 +329,7 @@
 
     
 
-    global define getConfigurableCards(list save_info) ``{
+    global define list getConfigurableCards(list save_info) ``{
         list snd = Sound::detected_cards;
         snd = filter_configured(save_info, snd);
         if (size(snd) > 0)

@@ -24,7 +24,7 @@
      *  @return map
      */
 
-    global define STRINGS_() ``{
+    global define map STRINGS_() ``{
 	// sound-system independent part
 	map ret = $["DisplayName":
 _("<p>

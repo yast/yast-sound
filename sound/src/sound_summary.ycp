@@ -39,7 +39,7 @@ else
 
 
     integer id = -1;
-    global define cid() ``{
+    global define integer cid() ``{
 	id = id + 1;
 	return id;
     }
