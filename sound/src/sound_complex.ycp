@@ -220,7 +220,7 @@ the number of configured cards in your configuration files.
 Try to restart sound system?")))
  
 	    {
-		SCR::Execute(.target.bash, "/etc/init.d/alsasound stop", $[]);
+		SCR::Execute(.target.bash, "/etc/init.d/alsasound stop > /dev/null 2>&1", $[]);
 		alsasound_start_tmp(true);
 		// TODO revise
 	    }
@@ -280,7 +280,7 @@ Try to restart sound system?")))
 
 		SaveModulesEntry (save_info, [], true);
 
-		SCR::Execute (.target.bash, "/etc/init.d/alsasound stop ", $[]);
+		SCR::Execute (.target.bash, "/etc/init.d/alsasound stop > /dev/null 2>&1", $[]);
 		alsasound_start_tmp(true);
 		y2error(sformat("%1", vol_settings));
 		set_vol_settings(vol_settings);
@@ -290,7 +290,7 @@ Try to restart sound system?")))
 		UI::ChangeWidget (`id(`configured_table), `Items, cc);
 		if (size (cc) == 0) 
 		{
-		    SCR::Execute (.target.bash, "/etc/init.d/alsasound stop", $[]);
+		    SCR::Execute (.target.bash, "/etc/init.d/alsasound stop > /dev/null 2>&1", $[]);
 		    enableButtons(false);
 		}
 		else

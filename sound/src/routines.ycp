@@ -633,7 +633,7 @@
         {
             string audio_file = lookup (user_settings, "audio_file", "");
                   // more cards
-	    SCR::Execute (.target.bash_background, sformat("aplay -c %1 %2 ", card_id, audio_file));
+	    SCR::Execute (.target.bash_background, sformat("aplay -c %1 %2 > /dev/null 2>&1", card_id, audio_file));
         }
         return "";
     };
@@ -886,7 +886,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      */
 
     global define alsasound_start_tmp(boolean restore) ``{
-	string cmd="/sbin/depmod -C "+get_tmp_modules_conf();
+	string cmd="/sbin/depmod -C "+get_tmp_modules_conf()+" /dev/null 2>&1";
 	SCR::Execute(.target.bash, cmd, $[]);
 
 	list als=SCR::Read(.tmp.modules.alias);
@@ -898,7 +898,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	while(contains(als, sformat("snd-card-%1", pos)))
 	{
 	    modname=SCR::Read(.tmp.modules.alias, sformat("snd-card-%1", pos));
-	    cmd=sformat("/sbin/modprobe -C %1 %2", get_tmp_modules_conf(), modname);
+	    cmd=sformat("/sbin/modprobe -C %1 %2 ", get_tmp_modules_conf(), modname);
 	    res=SCR::Execute(.target.bash_output, cmd, $[]);
 	    if(lookup(res, "stderr", "")!="")
 	    {
@@ -974,7 +974,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	    }
 
 	    // step3: do something 
-	    map res=SCR::Execute (.target.bash_output, "/usr/lib/YaST2/bin/copyfonts", $[] );
+	    map res=SCR::Execute (.target.bash_output, "/usr/lib/YaST2/bin/copyfonts > /dev/null 2>&1", $[] );
 	    integer cnt=tointeger(lookup(res, "stdout", 0));
 	    
 	    // step4: 

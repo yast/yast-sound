@@ -124,8 +124,17 @@
 
     define ErrorDialog (map save_entry, string err) ``{
 				    // Help text - intenal YaST2 error 
-
+    
+	y2error("%1", save_entry);
 	string help_text=lookup(STRINGS, "ErrorDialog");
+	string additional="";
+	if(lookup(save_entry, "module", "") == "snd-card-cs461x")
+	{
+	    additional="\n\n"+_("Please try to configure this sound card manually 
+using the \"Cirrus Logic CS4232\" or \"Cirrus 
+Logic CS4236\" driver and configure 
+its parameters using the 'Advanced setup'.");
+	}
 	    
 	term con = `HVCenter
 	  (
@@ -136,7 +145,7 @@
 	      `VSpacing (),
 	      `Label (`opt(`outputField), lookup(save_entry, "model", "")),
 	      `VSpacing (),
-	      `Label (err)
+	      `Label (err+additional)
 	    )
 	  );
 	    
@@ -255,7 +264,7 @@
 
     if (!test_mode)
     {
-	SCR::Execute(.target.bash, "/etc/init.d/alsasound stop", $[]);
+	SCR::Execute(.target.bash, "/etc/init.d/alsasound stop > /dev/null 2>&1", $[]);
 	list new_save=add(save_info, save_entry);
 	SaveModulesEntry (new_save, [], true);
 	alsasound_start_tmp(true);

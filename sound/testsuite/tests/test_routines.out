@@ -1,10 +1,8 @@
-Return  [`item(`id(0), "item1", false), `item(`id(1), "item2", true), `item(`id(2), "item3", false)]
-Return  [`item(`id(0), "item1", false), `item(`id(1), "item2", false), `item(`id(2), "item3", false)]
-Read .probe.system [$["system":"MacRISC"]]
-Return  true
-Read .probe.system [$["system":"MR"]]
-Return  false
-Read .probe.system [$[]]
-Return  false
-Execute .target.bash "mixer" $["CARD_NUM":1, "CHANNEL":"1", "VOLUME":"14"]
-Return  true
+Return	false
+Return	false
+Return	false
+Return	false
+Return	true
+Return	true
+Return	[`item (`id (0), "item1", false), `item (`id (1), "item2", true), `item (`id (2), "item3", false)]
+Return	[`item (`id (0), "item1", false), `item (`id (1), "item2", false), `item (`id (2), "item3", false)]

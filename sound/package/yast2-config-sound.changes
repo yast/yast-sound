@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Aug 10 13:03:41 CEST 2001 - dmeszar@suse.cz
+
+- bug #5838 fixed
+- minor code changes  UI(`fn()) -> UI::fn() SCR resp.
+
+-------------------------------------------------------------------
 Mon Jul 30 16:40:33 CEST 2001 - dmeszar@suse.cz
 
 - speed improvements
