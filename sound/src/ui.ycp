@@ -229,19 +229,6 @@
                   `Table (`id(`table), `opt (`notify, `immediate), `header(_("Description"), _("Option"),
                                                                                              `Right(_("Value"))), itemized_descriptions),
                   `VSpacing (0.5),
-//                  `VBox
-//                  (
-//                    `TextEntry (`id (`des), current_option_name,
-//                                      lookup (select (options, current_option), "value", "")),
-//                    `VSpacing (0.5),
-//                    `HBox
-//                    (
-//                              // "set" button: Sets the option value
-//                      `PushButton (`id (`set), `opt(`default), _("&Set")),
-//                              // "reset" button: Resets all values
-//                      `PushButton (`id (`reset), _("&Reset"))
-//                    )
-//                  ),
 		  `HBox
 		  (
 		    `TextEntry (`id (`des), `opt(`notify), current_option_name,
@@ -347,8 +334,9 @@
                     `HBox
                     (
                         `PushButton (`id(`b_delete), _("&Delete")),
-                        `HStretch (),
+//                        `HStretch (),
 			`PushButton (`id(`b_options), _("&Options")),
+			`PushButton (`id(`b_volume), _("&Volume")),
 			`HStretch (),
                   // Add soundcard ... - button label
                         `PushButton (`id(`b_conf2), _("Add sound&card ..."))
@@ -385,7 +373,6 @@
                 `Label (`opt (`hstretch), _("The sound card\n")),
                 `HBox (`HSpacing (5), `Label (`opt (`hstretch), name)),
                 `Label (`opt (`hstretch), clab),
-//                `HBox (`HSpacing (5), `Label (`opt (`hstretch), cname)),
                 `VSpacing (1),
                 `HBox (`HSpacing (5), `RadioButtonGroup (
                     `id (`action),
@@ -395,14 +382,57 @@
                         `RadioButton (`id (1), `opt (`hstretch), _("&Normal setup")),
                         `VSpacing (0.3),
                         `RadioButton (`id (2), `opt (`hstretch), _("&Advanced setup with possibility to change options"))
-//,
-//                        `VSpacing (0.3),
-//                        `RadioButton (`id (3), `opt (`hstretch), _("Skip sound card"))
                         )
                     )),
                 `VStretch ()
                 );
 	return con;
+    }
+
+    /**
+     * mixer widget
+     * @param list of pairs: [["Master", `symbol1], ["PCM", `symbol2], ["Sequencer", `symbol3]...]
+     */    
+
+    global define mixerWidget(list channels) ``{
+	any widget=`HBox();
+	
+	any col=`VBox();
+	integer counter=0;	
+
+	boolean spec=UI(`HasSpecialWidget(`Slider));
+
+	foreach(`e, channels,
+	``{
+	    if(counter==7)
+	    {
+		widget=add(widget, `Top(col));
+		if(spec)
+		{
+		    widget=add(widget, `HSpacing(2));
+		}
+		else
+		{
+		    widget=add(widget, `HStretch());
+		}
+
+		col=`VBox();
+		counter=0;
+	    }
+	    if(spec)
+	    {
+		col=add(col, `Slider(`id(select(e, 0)), `opt(`notify), select(e, 0), 0, 100, select(e, 1)));
+	    }
+	    else
+	    {
+		col=add(col, `IntField(`id(select(e, 0)), `opt(`notify), select(e, 0), 0, 100, select(e, 1)));
+	    }
+
+	    counter=counter+1;
+	});
+	widget=add(widget, `Top(col));
+
+	return widget;
     }
 
     /**

@@ -103,7 +103,7 @@
     boolean exit = false;
     list db = nil;
 
-    if(!fileexist("/usr/lib/YaST2/sndcards.ycp")))
+    if(!fileexist("/usr/lib/YaST2/sndcards.ycp"))
     {
 	UI(`MessagePopup(UI(_("Sound card database not found. Please check your installation."))));
 	UI(`CloseDialog());
@@ -164,6 +164,7 @@
 	    }
 	    list nh=maplist(`e, sound_cards, ``(lookup(e, "model", "")));
 	    list ch=maplist(`e, save_info, ``(lookup(e, "model", "")));
+	    y2error(nh);
 	    res=CallModule("sound_select", [nh, ch]);
 	    symbol ui=lookup(res, "ui", nil);
 	    if(ui==`next)

@@ -1,0 +1,128 @@
+/**
+ * File:
+ *   sound_select
+ *
+ * Module:
+ *   Sound
+ *
+ * Summary:
+ *   sound card selection dialog
+ *
+ * Authors: 
+ * Dan Meszaros <dmeszar@suse.cz>
+ * 
+ * 
+ * $Id$
+ * 
+ * Params: 1st ... list of strings of new hardware
+ *         2nd ... list of strings of configured hardware
+ */
+
+{
+    textdomain "sound";
+
+    include "sound/ui.ycp";
+
+    integer card_id=Args(0);
+
+    // show the dialog
+
+    path pth=topath(sformat(".audio.alsa.cards.%1.channels", card_id));
+    list channels=SCR(`Dir(pth));
+
+    // get list of muted channels
+    list muted=[];
+    foreach(`e, channels, 
+    ``{
+	path pth2=topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, e));
+	if(SCR(`Read(pth2)))
+	{
+	    muted=add(muted, e);
+	}
+    });
+
+    y2error(sformat("%1", muted));
+
+    // put 'Master', 'PCM' to list head
+    if(contains(channels, "PCM"))
+    {
+	channels=filter(`e, channels, ``(e!="PCM"));
+	channels=prepend(channels, "PCM");
+    }
+
+    if(contains(channels, "Master"))
+    {
+        channels=filter(`e, channels, ``(e!="Master"));
+        channels=prepend(channels, "Master");
+    }
+
+    channels=maplist(`e, channels, 
+    ``{
+	if(contains(muted, e))
+	{
+	    return [e, 0];
+	}
+	else
+	{
+	   return [e, SCR(`Read(topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", card_id, e))))];
+	}
+    });
+
+    string help=UI(_("<P>With this dialog you can set volume for each channel of selected sound card. 
+Press <B>Next</B> button to store volume settings, press <B>Back</B> to restore original settings.</P>"));
+
+    term con=mixerWidget(channels);
+    UI(`SetWizardContents (_("Volume settings"), con, help, true, true));
+    UI(`ChangeWidget(`id(`next), `Label, UI(`NextButtonLabel())));
+
+    path pth=nil;
+    any ui=nil;
+    repeat
+    {
+	ui=UI(`UserInput());
+
+	if(is(ui, string))
+	{
+	    // unmute if neccessary
+	    if(contains(muted, ui))
+	    {
+		path pth3=topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, ui));
+		SCR(`Write(pth3, false));
+	    }
+	    // set volume
+	    pth=topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", card_id, ui));
+	    integer value=UI(`QueryWidget(`id(ui), `Value));
+	    SCR(`Write(pth, value));
+	}
+	else if(ui==`nh)
+	{
+	    UI(`ChangeWidget(`id(`action), `CurrentButton, `new));
+	}
+	else if(ui==`ch)
+	{
+	    UI(`ChangeWidget(`id(`action), `CurrentButton, `configured));
+	}
+	else if(ui==`abort && ReallyAbort())
+	{
+	    return $["ui": `abort];
+	}
+
+    } until(ui==`back || ui==`next ||  ui==`detail);
+
+    if(ui==`next)
+    {
+	// store volume settings
+	path pth=topath(sformat(".audio.alsa.cards.%1.store", card_id));
+	SCR(`Execute(pth, nil));
+    }
+    else
+    {
+	// restore volume settings
+        path pth=topath(sformat(".audio.alsa.cards.%1.restore", card_id));
+        SCR(`Execute(pth, nil));
+    }
+
+
+    return $["ui": ui];
+
+}

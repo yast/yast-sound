@@ -27,8 +27,10 @@
     list save_info=Args(1);
 
     // show the dialog
-    selectHardware( maplist(`e, sound_cards, ``(lookup(e, "model", ""))),
-                    maplist(`e, save_info, ``(lookup(e, "model", ""))));
+
+
+    selectHardware( sound_cards, //maplist(`e, sound_cards, ``(lookup(e, "model", ""))),
+                    save_info); //maplist(`e, save_info, ``(lookup(e, "model", ""))));
 
     UI(`ChangeWidget(`id(`next), `Label, UI(`NextButtonLabel())));
 

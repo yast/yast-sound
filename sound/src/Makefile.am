@@ -25,6 +25,7 @@ modules_DATA = 	\
 	sound_options.ycp	\
 	sound_volume.ycp     	\
 	sound_select.ycp	\
+	sound_mixer.ycp         \
 	sound_summary.ycp
 
 menu_DATA = menuentry_sound.ycp
