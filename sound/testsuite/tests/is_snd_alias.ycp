@@ -1,7 +1,15 @@
 {
     include "testsuite.ycp";
     include "sound/routines.ycp";
-//    include "misc_defines.ycp";
+
+    // initialization is needed because module Sound imports the module Arch
+    // and Arch module does a SCR call .probe.system
+    map READ = $[
+    "probe" : $[
+	    "system" : [],
+    ]];
+
+    TESTSUITE_INIT([READ], nil);
 
     import "Sound";
 
