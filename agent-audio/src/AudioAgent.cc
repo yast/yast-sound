@@ -110,15 +110,15 @@ YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCP
     for(int i=0; i<path->length(); i++)
         args.push_back(path->component_str(i));
 
-    if(!value->isInteger()) {
+    if(!value->isInteger() && !value->isBoolean()) {
 	y2error("bad argument to Write: %s", value->toString().c_str());
 	return YCPBoolean(false);
     }
 
-    int volume = value->asInteger()->value();
 
     /* OSS Write handling */
     if(args[0]=="oss") {
+	int volume = value->asInteger()->value();
 	y2debug("oss: (%ld) %s", path->length(), path->toString().c_str());
 	switch(path->length()) {
 	    case 1:
