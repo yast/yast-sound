@@ -31,7 +31,7 @@
 				// To translators: label message
 		msg = msg + UI (_("To reset the configuration these programs will be terminated. Proceed?"));
 		
-		boolean terminate = UI(`DisplayYesNo (msg, false));
+		boolean terminate = UI(`YesOrNo (msg, _("&Yes"), _("&No")));
 		if (terminate) {
 		    Shell ("/bin/fuser -k /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*");
 		}

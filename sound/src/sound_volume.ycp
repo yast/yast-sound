@@ -66,6 +66,19 @@
 	    
 	};
 
+
+	define EnableJoystick () ``{
+
+	    Shell ("/usr/sbin/alsactl -f /tmp/asound.conf store;\
+	    /usr/bin/sed '/\"Joystick\"/s/false/true/' /tmp/asound.conf >/tmp/asound.conf.2;\
+            /usr/bin/alsactl -f /tmp/asound.conf.2 restore;\
+            /bin/rm -f /tmp/asound.conf /tmp/asound.conf.2");
+
+	    
+
+	};
+	
+	
 				// tries to insert module with options (if any)
 				// return string with error message (empty string if ok)
 	define probe_module (map snd_info) ``{
@@ -122,6 +135,10 @@
 		
 		return sformat (UI(_("The kernel module %1 for sound support\ncannot be loaded.")), module_name);
 	    }
+
+
+	    EnableJoystick ();
+
 	    
 	    return "";
 	    
@@ -149,6 +166,14 @@
 	integer step = 3;
 
 	string err = "";
+
+	    // possible string for SB Live!
+	list sb_live_exception = ["SB Live!",
+				 "Sound Blaster Live!"];
+	boolean use_emu10k1_package = false;
+	
+	    //if (contains(sb_live_exception, soundcard_name (snd_info)))
+	    //use_emu10k1_package = YesOrNo (_("Do you want to enable joystick support?"), _("&Yes"), _("&No"));
 	
 	if (!test_mode)
 	    err = probe_module (snd_info);
