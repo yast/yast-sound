@@ -29,4 +29,5 @@ configure sound.
 @YAST2DIR@/menuentries/menu*.y2cc
 @YAST2DIR@/bin/copyfonts
 @YAST2DIR@/modules/Sound.ycp
+@YAST2DIR@/modules/Joystick.ycp
 %doc @DOCDIR@
