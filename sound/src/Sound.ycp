@@ -146,7 +146,7 @@
 	// TODO: check return value
 	map settings = Export();
 	settings = add (settings, "autoinstall", false);
-	CallFunction (`sound_write(modules_conf, rc_vars));
+	CallFunction (`sound_write(settings));
 	return true;
     }
 
