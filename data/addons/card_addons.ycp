@@ -72,5 +72,9 @@
     ["snd-cs4236",	    "Malibu, Turtle Beach"],
     ["snd-cs46xx",	    "Santa Cruz, Turtle Beach"],
     ["snd-cs46xx",	    "SonicFury, VideoLogic"],
-    ["snd-cmipci",	    "Nightingale, Zoltrix"]
+    ["snd-cmipci",	    "Nightingale, Zoltrix"],
+    ["snd-ali5451",         "M1535(D), ALI"],
+    ["snd-ice1712",         "Delta 410, MidiMan M Audio"],
+    ["snd-intel8x0",        "NForce3 Audio, NVidia"],
+    ["snd-via8233",         "VT8235, VIA"],
 ]
