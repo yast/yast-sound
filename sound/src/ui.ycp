@@ -400,6 +400,6 @@
 
     global define ReallyAbort()
     ``{
-	return UI(`YesNoPopup(_("The installation will be aborted.")));
+	return UI(`ReallyAbortPopup(false));
     }
 }
