@@ -210,8 +210,8 @@
     ];
 
     // create wizard dialog
-    Wizard::SetDesktopIcon("joystick");
     Wizard::CreateDialog();
+    Wizard::SetDesktopIcon("joystick");
 
     // read sound card configuration
     Progress::off();
