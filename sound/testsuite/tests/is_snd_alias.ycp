@@ -5,6 +5,8 @@
     // initialization is needed because module Sound imports the module Arch
     // and Arch module does a SCR call .probe.system
     map READ = $[
+    "target": $[
+        "size": -1],
     "probe" : $[
 	    "system" : [],
     ]];
