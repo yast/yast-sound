@@ -4,10 +4,9 @@
 
 SUBDIRS = autodocs  #implementation
 
-docdir = @DOCDIR@
 htmldir = $(docdir)
 
-html_DATA = index.html	
+html_DATA = index.html
 #	others.html	\
 #	others-1.html	\
 #	others-2.html	\
