@@ -442,7 +442,9 @@
                     `HBox
                     (
                         `PushButton (`id(`b_delete), _("Delete")),
-                        `HStretch (),
+//                        `HStretch (),
+//			`PushButton (`id(`b_edit), _("Edit")),
+			`HStretch (),
                   // Add soundcard ... - button label
                         `PushButton (`id(`b_conf2), _("Add soundcard ..."))
                     ),

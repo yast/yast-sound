@@ -20,6 +20,17 @@
 
     textdomain "sound";
     include "misc_defines.ycp";
+    include "lan/lan_routines.ycp";
+
+  /**
+   * reads variables listed in 'vars' from rc.config
+   * @return list
+   */
+    define read_rc_vars (list vars) ``{
+        return listmap (`k, vars, ``([k, SCR(`Read(topath(sformat (".rc.system.%1", k))))]));
+    }
+
+
 
     /**
      *  Converts hex num to integer keeps decimal number as is. Hexadecimal
@@ -41,13 +52,16 @@
 
     define save_unique_keys (list cards, list configured_unique) ``{
         list|void orig = SCR(`Read(.var.lib.yast.unique));
+	y2error(sformat("uniques   %1", orig));
         if (is (orig, void))
         {
             orig = [];
         }
         list sound_unique = maplist (`e, configured_unique, ``($["unique" : e, "state" : "configured"]));
         orig = filter (`e, orig, ``(lookup(e, "section", "") != "sound"));
-        SCR(`Write(.var.lib.yast.unique, add (orig, $["contents" : sound_unique, "section" : "sound"])));
+	list final=add (orig, $["contents" : sound_unique, "section" : "sound"]);
+	y2error(sformat("uniques    %1", final));
+        SCR(`Write(.var.lib.yast.unique, final));
     }
 
 
@@ -237,6 +251,34 @@
             }
         }
         return [];
+    }
+
+/*    define get_configured_cards () ``{
+	list keys = read_unique_keys ();
+	list res  = maplist(`l, keys, ``$);
+
+	return res;
+    }
+*/
+
+    /**
+     * Returns list of keys read from /var/lib/YaST/unique.inf
+     * @return list with unique keys
+     */
+
+    define read_unique_keys () ``{
+	list|void already = nil;
+	if (SCR(`Read(.target.size, "/var/lib/YaST/unique.inf")) > 0)
+	{
+	    already = SCR (`Read(.var.lib.yast.unique));
+	}
+	else
+	{
+	    already = [];
+	}
+	already = maplist (`k, lookup (select (filter (`e, already, ``(lookup (e, "section") == "sound")), 0, $[]), "contents", []),
+                           ``(lookup (k, "unique")));	
+	return already;
     }
 
     /**
@@ -836,6 +878,94 @@
             i = i + 1;
         }
         return eval (format);
+    }
+
+    /**
+     * checks whether param #1 is if type of param #2
+     * @param 1st value
+     * @param 2nd expected type. one of {int, string}
+     * @param 3nd if poss is nonempty, checks if value is one of them
+     * returns error message, empty string if ok
+     * @return string
+     */
+    define check_value (string value, string type, list poss) ``{
+        if (type == "int")
+        {
+            if (tolower(substring (value, 0, 2)) == "0x")               // hex number
+            {
+                string rest = tolower(substring (value, 2));
+                if (filterchars(rest, "0123456789abcdef") != rest)
+                {
+                      // To translators: popup message, wrong value
+                      return sformat (UI(_("The value: %1 must be a number")), value);
+                }
+            }
+            else                // decimal number
+            {
+                string rest = value;
+                if (substring (value, 0, 1) == "-")      // negative number
+                {
+                    rest = substring (value, 1);
+                }
+                if (filterchars(rest, "0123456789") != rest)
+                {
+                            // To translators: popup message, wrong value
+                    return sformat (UI(_("The value: %1 must be a number")), value);
+                }
+            }
+        }
+        else if (type == "string")
+        {
+            if (filterchars (tolower (value), "abcdefghijklmnopqrstuvwxyz_0123456789") != value)
+            {
+
+                integer wrong_pos = findfirstnotof (tolower (value), "abcdefghijklmnopqrstuvwxyz_0123456789");
+                string wrong_char = substring (value, wrong_pos, 1);
+                if (wrong_char == " ")
+                {
+                                        // To translators: "space" means blank character
+                    wrong_char = wrong_char + " " + UI(_("(space)"));
+                }
+                        // To translators: popup message, wrong value
+                return  sformat (UI(_("String cannot contain: %1")), wrong_char);
+            }
+        }
+
+                                    // now check for poss list
+        if (size (poss) > 0)
+        {
+            list poss_list = [];
+
+            if (type == "int")
+            {
+                poss_list = maplist (`v, poss, ``(hextoi (value) == v));
+            }
+            else
+            {
+                poss_list = maplist (`v, poss, ``(value == v));
+            }
+
+            if (!contains (poss_list, true))
+            {
+                      // To translators: popup message, wrong value
+                return sformat (UI(_("The value must be one of %1")), poss);
+            }
+        }
+
+        return "";              // ok :-)
+
+    }
+
+   /**
+   * Detected, but not configured cards
+   *
+   * @return list
+   */
+    define get_not_yet () ``{
+        list all = get_audio (test_mode, config_mode);
+        list not_yet = get_unique_not (all, ["configured"], "sound", false, config_mode);
+
+        return not_yet;
     }
 
    

@@ -27,30 +27,10 @@
     include "sound/routines.ycp";
     include "sound/ui.ycp";
     include "sound/texts.ycp";
-    include "lan/lan_routines.ycp";
+//    include "lan/lan_routines.ycp";
 
     map STRINGS=STRINGS_();
 
-  /**
-   * Detected, but not configured cards
-   *
-   * @return list
-   */
-    define get_not_yet () ``{
-	list all = get_audio (test_mode, config_mode);
-	list not_yet = get_unique_not (all, ["configured"], "sound", false, config_mode);
-
-	return not_yet;
-    }
-
-
-  /**
-   * reads variables listed in 'vars' from rc.config
-   * @return list
-   */
-    define read_rc_vars (list vars) ``{
-	return listmap (`k, vars, ``([k, SCR(`Read(topath(sformat (".rc.system.%1", k))))]));
-    }
 
   /**
    * marks cards in save_info to "off"
@@ -151,6 +131,20 @@
         string helptext=lookup(STRINGS, "ComplexDialog");
 
 	list conf_cards = get_running_cards ();
+	list uniq_keys = read_unique_keys ();
+
+	if(size(conf_cards) < size(uniq_keys))
+	{
+	    if(UI(`YesOrNo(_("There are configured sound cards, but is not functional at
+ the moment, because the kernel modules are not present. Try to load them?"), _("&Yes"), _("&No"))))
+	    {
+		SCR(`Execute (.target.bash, "/etc/init.d/alsasound start", $[]));
+		conf_cards = get_running_cards ();
+	    }
+	    
+
+	}
+
 	list cc = maplist (`e, conf_cards, 
 	    ``(`item(`id(lookup (e, "number", 0)), sformat ("   [%1]", lookup (e, "number", 0)), lookup (e, "line1")))); 
     

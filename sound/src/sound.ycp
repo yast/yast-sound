@@ -187,8 +187,6 @@
     list sound_cards  = get_audio (test_mode, config_mode);
     list save_info    = read_save_info ();
     
-    y2error(sformat("SaveInfo:%1",save_info ));
-
     map rc_vars       = $[];
     integer card_id   = 0;
     integer n_cards   = 0;
@@ -210,23 +208,16 @@
     sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
 
     // all configured cards
-    list|void already = nil;
+/*    list|void already = nil;
     if (SCR(`Read(.target.size, "/var/lib/YaST/unique.inf")) > 0)
     {
 	already = SCR (`Read(.var.lib.yast.unique));
     }
-
-    if (!is(already, void)) 
-    {
-	already = maplist (`k, lookup (select (filter (`e, already, ``(lookup (e, "section") == "sound")), 0, $[]), "contents", []),
-			   ``(lookup (k, "unique")));
+*/
+    list already=read_unique_keys();
+    configured_unique=already;
 	// filter out cards that had been already configured
-	sound_cards = filter (`e, sound_cards, ``(!contains (already, lookup (e, "unique_key"))));
-    }
-
-    // TODO: delete entries from save_info that have no corresponding record in /proc/asound/cards 
-
-    save_info=remove_invalid_save_info(save_info);
+    sound_cards = filter (`e, sound_cards, ``(!contains (already, lookup (e, "unique_key"))));
 
     if(exit)
     {	// no sound cards database present, shutting down
