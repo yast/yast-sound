@@ -319,7 +319,7 @@
 	define GetAudio () ``{
 
 	    if (!test_mode)
-		return remove_duplicates (SCR(`Read(.probe.byclass.multimedia.audio)));
+		return remove_duplicates (SCR(`Read(.probe.sound)));
 
 
 	    list simulation = [
