@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Jul 13 09:21:50 MEST 2000 - dan@suse.de
+
+- minor fixes ('\n' added, etc.) 
+
+-------------------------------------------------------------------
 Tue Jul 11 11:14:06 MEST 2000 - dan@suse.de
 
 - fixed writing of modules.conf (last line) 
