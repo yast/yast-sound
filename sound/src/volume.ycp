@@ -47,7 +47,7 @@
      *  @param vol initial volume (0-100)
      *  @return term volume dialog contents
      */
-    global define term VolumeCon (map save_entry , integer vol) ``{
+    define term VolumeCon (map save_entry , integer vol) ``{
 
 	term slider = `IntField(`id(`volume), `opt(`notify),
 	    // volume slider label
@@ -98,7 +98,7 @@
      * @param finish show 'finish' button instead of 'next'
      * @return symbol next dialog
      */
-    global define symbol VolumeDialog (map save_entry, boolean finish,
+    define symbol VolumeDialog (map save_entry, boolean finish,
 				       integer card_id) ``{
 
 	string help_text	= Sound::STRINGS["VolumeDialog"]:"";
@@ -188,7 +188,7 @@
      * @param finish show 'finish' button instead of 'next'
      * @return symbol `back | `cancel
      */
-    global define symbol ErrorDialog (map save_entry, string err, boolean finish) ``{
+    define symbol ErrorDialog (map save_entry, string err, boolean finish) ``{
 
 	y2debug("%1", save_entry);
 
@@ -256,7 +256,7 @@ its parameters using the 'Advanced setup'.");
  * @param save_info config of previuosly configured cards
  * @return map result and next dialog
  */
-global define map sound_volume (map save_entry, integer card_id, boolean finish,
+define map sound_volume (map save_entry, integer card_id, boolean finish,
 				boolean quick, list save_info) ``{
 
     Sound::LoadDatabase (true);

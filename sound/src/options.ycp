@@ -42,7 +42,7 @@
      * returns error message, empty string if ok
      * @return string error message
      */
-    global define string check_value (string value, string type, list<string> poss) ``{
+    define string check_value (string value, string type, list<string> poss) ``{
         if (type == "int")
         {
             if (tolower(substring (value, 0, 2)) == "0x")	// hex number
@@ -116,7 +116,7 @@
      *  @param lk list of keys to look for in 1st param
      *  @return list of items
      */
-    global define list create_table (list lm, list lk) ``{
+    define list create_table (list lm, list lk) ``{
 	list res = [];
 	integer pos = 0;
 	foreach (map m, lm, ``{
@@ -136,7 +136,7 @@
      * @param input input string
      * @return list of possible values
      */
-    global define list parse_bracket(string input) ``{
+    define list parse_bracket(string input) ``{
 
         string inner	= input; // substring(input, 1, size(input)-2);
         integer siz	= size(inner);
@@ -188,7 +188,7 @@
      * @param input string
      * @return list of values
      */
-    global define list<string> string2vallist(string input) ``{
+    define list<string> string2vallist(string input) ``{
 	boolean parse_error	= false;
 	list l			= flatten ((list<list>)parse_bracket(input));
 
@@ -273,7 +273,7 @@
      * default widget when there are no known values
      * @return term widget
      */
-    global define term defWidget() ``{
+    define term defWidget() ``{
 	// label text
 	return `Label(_("Possible value:\nnot known"));
     }
@@ -284,7 +284,7 @@
      * @param default string default value (preselected in combo)
      * @return term combobox widget
      */
-    global define term gen_list(list vals, string default) ``{
+    define term gen_list(list vals, string default) ``{
 	vals = maplist (string e, vals, ``(`item(`id(e), e, default == e)));
 	// combo box label
 	return `ComboBox(`id(`poss),`opt(`notify), _("&Possible value:"), vals);
@@ -297,7 +297,7 @@
      * @param default item
      * @return void
      */
-    global define void updatePossibleValues(string values, string default) ``{
+    define void updatePossibleValues(string values, string default) ``{
 	list l = string2vallist(values);
 	if (l == [])
 	{
@@ -314,7 +314,7 @@
      * @param arg type of arg can be string or list
      * @return string description
      */
-    global define string getDescr(any arg) ``{
+    define string getDescr(any arg) ``{
 	if (is(arg, string))
 	{
 	    return (string) arg;
@@ -338,7 +338,7 @@
      *  @return term options dialog contents
      *  @see options#OptionsDialog
      */
-    global define term OptionsCon (string cardlabel, list itemized_descriptions,
+    define term OptionsCon (string cardlabel, list itemized_descriptions,
 		    string current_option_name, string current_option_value) ``{
 
 	return `HBox (
@@ -383,7 +383,7 @@
      *	      values in map are strings
      * @return map result
      */
-    global define map OptionsDialog (string cardlabel, map opts) ``{
+    define map OptionsDialog (string cardlabel, map opts) ``{
 
 	string help_text = Sound::STRINGS["OptionsDialog"]:"";
 
@@ -547,7 +547,7 @@
      * @param save_entry map with card configuration
      * @return map result
      */
-    global define map sound_options(map save_entry) ``{
+    define map sound_options(map save_entry) ``{
 
 	string modname	= save_entry["module"]:"";
 	string label	= save_entry["model"]:"";

@@ -29,7 +29,7 @@
      *  dialog to be displayed when user presses 'Abort' button
      *	@return boolean yes/no
      */
-    global define boolean ReallyAbort() ``{
+    define boolean ReallyAbort() ``{
 	return Popup::ReallyAbort (Sound::Changed() || Joystick::Changed());
     }
 
@@ -41,7 +41,7 @@
      * @param has_joy If true checkbox for joystick configuration is added
      * @return term with widget
      */
-    global define term AutoconfDlg (string name, string cname, integer cpos,
+    define term AutoconfDlg (string name, string cname, integer cpos,
 				    boolean has_joy) ``{
 	string clab = "";
 	if (cpos < 3)
@@ -98,7 +98,7 @@
      * @param has_joy sound card supports joystick
      * @return map symbol of next dialog
      */
-    global define map DisplayName (string name, string cname, integer cpos,
+    define map DisplayName (string name, string cname, integer cpos,
 				   integer flags, boolean has_joy) ``{
 
 	string helptext	= Sound::STRINGS["DisplayName"]:"";
@@ -177,7 +177,7 @@
      * @param has_joy If true checkbox for joystick configuration is added
      * @return term widget
      */
-    global define term QuickconfDlg (string name, string cname, integer cpos,
+    define term QuickconfDlg (string name, string cname, integer cpos,
 				     boolean has_joy) ``{
         string clab = "";
         if (cpos < 3)
@@ -232,7 +232,7 @@
      * @param has_joy set to true if configured card supports joystick
      * @return map symbol for next dialog
      */
-    global define map quickConfig(string name, string cname, integer cpos,
+    define map quickConfig(string name, string cname, integer cpos,
 				  boolean has_joy) ``{
 
         string helptext = Sound::STRINGS["quickConfig"]:"";
@@ -280,7 +280,7 @@
      * @return term card type selection dialog contents
      * @see WhichDialog
      */
-    global define term WhichDlgCon (list nc) ``{
+    define term WhichDlgCon (list nc) ``{
 
 	return `HBox(
             `HSpacing (3),
@@ -321,7 +321,7 @@
      * @param show_font_but show button for sound fonts installation
      * @return widget
      */
-    global define term ComplexDlgCon (list cc, boolean start_alsa_seq,
+    define term ComplexDlgCon (list cc, boolean start_alsa_seq,
 				      boolean show_font_but) ``{
 	term butts = nil;
 	term alsabuts = `Empty();
@@ -388,7 +388,7 @@
      * @param cards detected cards
      * @return `auto/`manual
      */
-    global define map WhichDialog (list cards) ``{
+    define map WhichDialog (list cards) ``{
 
         string helptext = Sound::STRINGS["WhichDialog"]:"";
         list nc		= [];

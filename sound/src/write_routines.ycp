@@ -32,7 +32,7 @@
      * @return string comment for the alias
      */
 
-    global define string createAliasComment(string model, string uniq_key) ``{
+    define string createAliasComment(string model, string uniq_key) ``{
 	string comment = "# " + uniq_key + ":" + model + "\n";
 	return comment;
     }
@@ -42,7 +42,7 @@
      * @param entry card config
      * @return boolean success/failure
      */
-    global define boolean SaveOneModulesEntry (map entry) ``{
+    define boolean SaveOneModulesEntry (map entry) ``{
         path mod_alias		= add (.modules.alias, entry ["alias"]:"off");
         path mod_alias_comment	=
             add ( add (.modules.alias, entry ["alias"]:"off"), "comment");
@@ -65,7 +65,7 @@
      * @return void
      */
 
-    global define void SaveModulesOptions(list save_info) ``{
+    define void SaveModulesOptions(list save_info) ``{
 
 	path mod_options = .modules.options;
 
@@ -85,7 +85,7 @@
      *
      */
 
-    global define void removeOldEntries(list als) ``{
+    define void removeOldEntries(list als) ``{
 	maplist(string e, als, ``{
 	    if (is_snd_alias(e) ||
 		issubstring(e, "sound-service-") ||
@@ -112,7 +112,7 @@
      * @param system sytem dependent part
      * @return map return struct: $["return": boolean, "err_msg": string]
      */
-    global define map SaveModulesEntry (list save_info, list system) ``{
+    define map SaveModulesEntry (list save_info, list system) ``{
 	path mod		= .modules;
 	path mod_alias		= .modules.alias;
 	path mod_options	= .modules.options;
@@ -182,7 +182,7 @@
      * Save volume (for alsa it's alsactl store
      * @return boolean success/failure
      */
-    global define boolean SaveVolume () ``{
+    define boolean SaveVolume () ``{
 	return (boolean) SCR::Execute(.audio.alsa.store, 0, 0);
     }
 
@@ -191,7 +191,7 @@
      * @param rc map "variable" : "value", ....
      * @return string error string
      */
-    global define string SaveRCValues (map rc) ``{
+    define string SaveRCValues (map rc) ``{
 	SCR::Write (.sysconfig.sound.LOAD_SEQUENCER, rc["LOAD_ALSA_SEQ"]:"no");
 	return "";
     }

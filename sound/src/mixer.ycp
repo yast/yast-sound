@@ -34,7 +34,7 @@
      * @param spec true-slider false-intfield
      * @return term widget
      */
-    global define term volElement(string label, integer value, boolean spec) ``{
+    define term volElement(string label, integer value, boolean spec) ``{
 	if (spec)
 	{
 	    return `Slider(`id(label), `opt(`notify), label, 0, 100, value);
@@ -50,7 +50,7 @@
      * @param channels channels to be shown
      * @return term widget
      */
-    global define term mixerWidget(list channels) ``{
+    define term mixerWidget(list channels) ``{
 
         term widget	= `VBox();
         boolean spec	= UI::HasSpecialWidget(`Slider);
@@ -136,7 +136,7 @@
  * @param card_id card id
  * @return map result
  */
-global define map mixerDialog (integer card_id) ``{
+define map mixerDialog (integer card_id) ``{
 
     Sound::LoadDatabase (true);
 

@@ -30,7 +30,7 @@ include "wizard/sequencer.ycp";
  * wrapper function for running first card config dialog (There will be shown
  * possibilities for next configuration steps (quick/normal/expert)
  */
-global define symbol _showName (integer card_id, integer flags) ``{
+define symbol _showName (integer card_id, integer flags) ``{
 
     string modelname	= Sound::save_entry["model"]:"";
     string modname	= Sound::save_entry["module"]:"";
@@ -51,7 +51,7 @@ global define symbol _showName (integer card_id, integer flags) ``{
 /**
  * wrapper function for running Options dialog (during expert configuration)
  */
-global define symbol _options (integer card_id) ``{
+define symbol _options (integer card_id) ``{
 
     map res	= sound_options(Sound::save_entry);
     symbol ui	= res["ui"]:`back;
@@ -66,7 +66,7 @@ global define symbol _options (integer card_id) ``{
 /**
  * wrapper function for quick configuration (just modprobe)
  */
-global define symbol _quick (integer card_id, boolean finish, list save_info)
+define symbol _quick (integer card_id, boolean finish, list save_info)
 ``{
     map res = sound_volume (Sound::save_entry, card_id, finish, true,save_info);
     symbol ui	= res["ui"]:`back;
@@ -76,7 +76,7 @@ global define symbol _quick (integer card_id, boolean finish, list save_info)
 /**
  * wrapper function for normal configuration (modprobe + volume setting)
  */
-global define symbol _volume (integer card_id, boolean finish, list save_info)
+define symbol _volume (integer card_id, boolean finish, list save_info)
 ``{
     map res = sound_volume(Sound::save_entry, card_id, finish, false,save_info);
     symbol ui	= res["ui"]:`back;
@@ -94,7 +94,7 @@ global define symbol _volume (integer card_id, boolean finish, list save_info)
  *		(then the popup "Config will be saved.." will appear)
  * @return map with save info, as required by sound_write for one cards
  */
-global define map OneCardWizard (map card_entry, integer card_id, integer flags,
+define map OneCardWizard (map card_entry, integer card_id, integer flags,
 				 boolean finish, list save_info) ``{
 
 	map aliases = $[

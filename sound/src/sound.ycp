@@ -67,7 +67,7 @@ if (Sound::use_alsa &&
  * Print summary of basic options
  * @return boolean false
  */
-global define boolean SoundSummaryHandler (map options ) ``{
+define boolean SoundSummaryHandler (map options ) ``{
 
     CommandLine::Print (RichText::Rich2Plain(Sound::Summary ()));
     return false; // do not call Write...
@@ -77,7 +77,7 @@ global define boolean SoundSummaryHandler (map options ) ``{
  * Wrapper function for reading the settings (used by cmd-line)
  * @return boolean success
  */
-global define boolean SoundRead () ``{
+define boolean SoundRead () ``{
 
     Sound::use_ui = false;
     block<boolean> abort_block = ``{return false;};
@@ -89,7 +89,7 @@ global define boolean SoundRead () ``{
  * Wrapper function for writing the settings (used by cmd-line)
  * @return boolean success
  */
-global define boolean SoundWrite () ``{
+define boolean SoundWrite () ``{
 
     return Sound::Write ();
 }
@@ -99,7 +99,7 @@ global define boolean SoundWrite () ``{
  * @param options parameters on command line
  * @return boolean success
  */
-global define boolean AddCardHandler (map options) ``{
+define boolean AddCardHandler (map options) ``{
 
     integer card_no	= tointeger (options["card"]:"-1");
     boolean all		= haskey (options, "all");
@@ -180,7 +180,7 @@ global define boolean AddCardHandler (map options) ``{
  * @param options parameters on command line
  * @return boolean success
  */
-global define boolean RemoveCardHandler (map options) ``{
+define boolean RemoveCardHandler (map options) ``{
 
     integer card_no	= tointeger (options["card"]:"-1");
     boolean all		= haskey (options, "all");
@@ -216,7 +216,7 @@ global define boolean RemoveCardHandler (map options) ``{
  * @param options parameters on command line
  * @return boolean false (no write)
  */
-global define boolean TestCardHandler (map options) ``{
+define boolean TestCardHandler (map options) ``{
 
     integer card_no = tointeger (options["card"]:"-1");
     if (card_no == -1 && size (Sound::modules_conf) > 0)
@@ -241,7 +241,7 @@ global define boolean TestCardHandler (map options) ``{
  * @param options parameters on command line
  * @return boolean false (no write)
  */
-global define boolean ShowCardHandler (map options) ``{
+define boolean ShowCardHandler (map options) ``{
 
     integer card_no = tointeger (options["card"]:"-1");
     if (card_no == -1 && size (Sound::modules_conf) > 0)
@@ -281,7 +281,7 @@ global define boolean ShowCardHandler (map options) ``{
  * @param options parameters on command line
  * @return boolean success
  */
-global define boolean SetParametersHandler (map options) ``{
+define boolean SetParametersHandler (map options) ``{
 
     integer card_no = tointeger (options["card"]:"-1");
     if (card_no == -1 && size (Sound::modules_conf) == 1)
@@ -307,7 +307,7 @@ global define boolean SetParametersHandler (map options) ``{
     return false;
 }
 
-global define boolean ListModulesHandler (map options) ``{
+define boolean ListModulesHandler (map options) ``{
 
     foreach (term it, get_module_names(), ``{
 	string id	= (string) select (select (it, 0, `Empty()), 0, "all");
@@ -370,7 +370,7 @@ map cmdline = $[
 // TODO	    "options"	: "non_strict" - for unknown parameter names
 	],
 	"modules": $[
-	    "handler"	: ``(ListModulesHandler()),
+	    "handler"	: ListModulesHandler,
 	    // translators: command line help text for modules action
 	    "help"	: _("List all available sound kernel modules.")
 	],

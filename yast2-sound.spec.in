@@ -1,5 +1,5 @@
 @HEADER-COMMENT@
-# neededforbuild alsa alsa-devel gpp libgpp yast2-devel-packages hwinfo
+# neededforbuild alsa alsa-devel gpp libgpp yast2-devel-packages
 
 @HEADER@
 Requires:	yast2 alsa

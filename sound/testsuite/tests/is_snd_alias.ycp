@@ -16,7 +16,7 @@
     import "Sound";
     include "sound/routines.ycp";
 
-    foreach(`snd, [true, false],  // check for both alsa and oss behaviour
+    foreach(boolean snd, [true, false],  // check for both alsa and oss behaviour
     ``{
 	Sound::use_alsa = snd;
 	TEST(``(is_snd_alias("")), [], nil);

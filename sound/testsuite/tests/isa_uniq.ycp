@@ -1,5 +1,13 @@
 {
     include "testsuite.ycp";
+    map READ_I = $[
+	"target" : $[
+	    "size": -1,
+	    "tmpdir" : "/tmp"
+	]
+    ];
+
+    TESTSUITE_INIT ([READ_I], nil);
     include "sound/routines.ycp";
 //    include "misc_defines.ycp";
 

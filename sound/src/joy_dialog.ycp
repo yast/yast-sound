@@ -24,7 +24,7 @@
     include "sound/joysticks.ycp";
     include "sound/ui.ycp";
 
-    global list joylist = [];
+    list joylist = [];
 
 /**
  * Dialog for joystick testing.
@@ -33,7 +33,7 @@
  * @param joymod joystick module
  * @return boolean false when Abort was pressed or some problems occured
  */
-global define boolean joy_test_popup (integer card_id, integer joymodidx,
+define boolean joy_test_popup (integer card_id, integer joymodidx,
 				      string joymod) ``{
 
     any ret = nil;
@@ -336,7 +336,7 @@ and press some of its buttons several times.
      * @param button Label for `next button: `finish, `ok or `next
      * @return symbol Id of pressed button in the dialog
      */
-    global define symbol joy_dialog (integer card_id, symbol button) ``{
+    define symbol joy_dialog (integer card_id, symbol button) ``{
 
 	// item in joystick types
 	string nonejoy = _("No joystick");

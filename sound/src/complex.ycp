@@ -41,7 +41,7 @@
      * (running/not running/dissappeared)
      * @return list table contents
      */
-    global define list createTable() ``{
+    define list createTable() ``{
 	list runn   = get_running_cards();
 	integer pos = 0;
 	list ret    = maplist(map card, Sound::modules_conf,
@@ -105,7 +105,7 @@
      * @param val boolean enable/disable
      */
 
-    global define void enableButtons(boolean val) ``{
+    define void enableButtons(boolean val) ``{
 	UI::ChangeWidget(`id(`b_delete),    `Enabled, val);
         UI::ChangeWidget(`id(`b_options),   `Enabled, val);
 	UI::ChangeWidget(`id(`b_volume),    `Enabled, val);
@@ -117,7 +117,7 @@
      * @return map result
      */
 
-    global define map ComplexDialog () ``{
+    define map ComplexDialog () ``{
 	// help text
 	symbol ui = nil;
         string helptext = Sound::STRINGS["ComplexDialog"]:"";
@@ -297,7 +297,7 @@ Restart sound system now?
  * just calls ComplexDialog
  * @return map passed from ComplexDialog
  */
-global define map sound_complex() ``{
+define map sound_complex() ``{
 
     list to_delete	= [];
     boolean config_mode = false;

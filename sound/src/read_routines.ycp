@@ -24,7 +24,7 @@
      * @param card_id card id
      * @return card name, "Sound card" on failure
      */
-    global define string read_card_name_from_alsa(integer card_id) ``{
+    define string read_card_name_from_alsa(integer card_id) ``{
 	path pth = topath(sformat(".audio.alsa.cards.%1.name", card_id));
 	string name = (string) SCR::Read(pth);
 	if (name == nil)
@@ -41,7 +41,7 @@
      * @param comment before the char-major-81-x
      * @return map example: $[ "unique_key" : string, "name" : string ] or nil
      */
-    global define map extractUniqueKey (string comment) ``{
+    define map extractUniqueKey (string comment) ``{
 	map result = nil;
 
 	// split to lines
@@ -91,7 +91,7 @@
      *	]
      * @return list
      */
-    global define list<map> read_save_info () ``{
+    define list<map> read_save_info () ``{
 
         list<map> save	= [];			// structure to save
 	list<string> aliases	= (list<string>) SCR::Read(.modules.alias);

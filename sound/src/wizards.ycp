@@ -31,13 +31,13 @@
     include "sound/manual.ycp";
 
 
-    global boolean was_complex = false;
+    boolean was_complex = false;
 
     /**
      * card selection dialog
      * @return symbol next dialog
      */
-    global define symbol _snd_select() ``{
+    define symbol _snd_select() ``{
 
 	Sound::UpdateUnconfiguredCards();
 	if ((size(Sound::unconfigured_cards) == 0) && (!was_complex))
@@ -63,7 +63,7 @@
      * quick configuration step #1 dialog
      * @return symbol next dialog
      */
-    global define symbol _snd_quick() ``{
+    define symbol _snd_quick() ``{
 	Sound::save_entry	= Sound::unconfigured_cards[0]:$[];
 	Sound::card_id	= 0;
 	boolean has_joy = false;
@@ -84,7 +84,7 @@
      * @param type boolean quick/normal config
      * @return symbol next dialog
      */
-    global define symbol _snd_quick2(boolean type) ``{
+    define symbol _snd_quick2(boolean type) ``{
 	Sound::save_entry  = add_common_options(Sound::save_entry, 0);
 	Sound::save_entry  = add_alias(Sound::save_entry, 0);
 	map res	    = sound_volume(Sound::save_entry, 0, true, type, []);
@@ -101,7 +101,7 @@
      * dialog for manual card selection
      * @return symbol next dialog
      */
-    global define symbol _snd_manual() ``{
+    define symbol _snd_manual() ``{
 
 	map res		= sound_manual();
 	symbol ui	= res["ui"]:`abort;
@@ -122,7 +122,7 @@
      * add card from complex dialog
      * @return symbol next dialog
      */
-    global define symbol _snd_add() ``{
+    define symbol _snd_add() ``{
 	list nh	= maplist (map card, Sound::unconfigured_cards, ``(
 	    card["model"]:""));
 
@@ -141,7 +141,7 @@
      * sound card deletion
      * @return symbol next dialog
      */
-    global define symbol _snd_delete() ``{
+    define symbol _snd_delete() ``{
 	if (!Sound::use_ui ||
 	    // popup question
 	    Popup::YesNo(_("Do you really want to delete this entry?")))
@@ -189,7 +189,7 @@
      * configure selected card
      * @return symbol next dialog
      */
-    global define symbol _snd_config() ``{
+    define symbol _snd_config() ``{
 	if (Sound::card_id >= 0)
 	{
 	    Sound::save_entry = Sound::unconfigured_cards [Sound::card_id]:$[];
@@ -222,7 +222,7 @@
      * complex dialog
      * @return symbol next dialog
      */
-    global define symbol _snd_complex() ``{
+    define symbol _snd_complex() ``{
 	was_complex = true;
 	map res	    = sound_complex();
         return (symbol) (res["ui"]:nil);
@@ -233,7 +233,7 @@
  * Main workflow of sound configuration (without read and write)
  * @return sequence result
  */
-global define symbol MainSequence(string initial) ``{
+define symbol MainSequence(string initial) ``{
 
     map m_aliases = $[
 	    "intro"	: ``(_snd_select()),
@@ -337,7 +337,7 @@ global define symbol MainSequence(string initial) ``{
  * Whole configuration of sound
  * @return sequence result
  */
-global define symbol SoundSequence () ``{
+define symbol SoundSequence () ``{
 
     Sound::use_ui = true;
 

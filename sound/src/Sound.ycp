@@ -995,8 +995,11 @@ could make your system unstable.
 		{
 		    p = topath (sformat(
 			".audio.alsa.cards.%1.channels.%2.volume", c, ch));
+		    /* FIXME: test the behaviour...
 		    volume_settings[tointeger(c)] = add (
 			volume_settings[tointeger(c)]:$[], ch, SCR::Read(p));
+		    */
+		    volume_settings[tointeger(c)] = [ch, SCR::Read(p), "false"];
 		}
 	    });
 	});
@@ -1024,8 +1027,7 @@ could make your system unstable.
 	    // alsa is not running. probably autoinstallation or someone wants
 	    // to change proposed volume
 	    // store volume to volume_settings datastricure in autoinstallation
-            map oldmap = volume_settings[c_id]:$[];
-            volume_settings[c_id] = add(oldmap, channel, value);
+            volume_settings [c_id] = [ channel, value ];
             return true;
 	}
     }
