@@ -371,8 +371,8 @@
 
 				// Help text 1/2 (autodetection failed)
 		help_text = UI (_("<p>The autodetection for a sound card were unsuccessful.</p>"));
-				// Help text 1/2 (autodetection failed)
-		help_text = help_text + UI(_("If you still want to configure your sound card, press the <i>Manual</i> button. Otherwise simply quit by pressing the <i>Back</i> button.</p>"));
+				// Help text 2/2 (autodetection failed)
+		help_text = help_text + UI(_("<p>If you still want to configure your sound card, press the <i>Manual</i> button. Otherwise simply quit by pressing the <i>Back</i> button.</p>"));
 		
 		message = UI (_("No sound cards were found on your system.\n Try manual setup."));
 		con = add (con, `HVCenter(`ReplacePoint(`id(`rp), `Label(message))));
