@@ -200,7 +200,6 @@ YCPValue AudioAgent::Dir(const YCPPath& path) {
 	    if(args[0]=="alsa") {
 		if(args[1]=="cards" && args[3]=="channels")
 		{
-		    printf("@ %s %s -> %d\n", path->toString().c_str(),  args[2].c_str(), atoi(args[2].c_str()));
 		    return alsaGetChannels(atoi(args[2].c_str()));  
 		}
 	    }

@@ -91,6 +91,7 @@ YCPValue alsaGetVolume(int card_id, const string& channel)
 		    return YCPInteger((long long) 0);
 		}
 		value = (long long)(100.0 * ((double)(left - from) / (double)(to - from)));
+		snd_mixer_close(handle);
 		return YCPInteger(value);
             }
 	}
@@ -122,6 +123,7 @@ YCPValue alsaGetMute(int card_id, const string& channel)
 	//	if (
                 snd_mixer_selem_get_playback_switch(elem, chn, &left);
 
+		snd_mixer_close(handle);
                 return left ? YCPBoolean(false) : YCPBoolean(true);
             }
         }
@@ -154,14 +156,6 @@ YCPValue alsaSetVolume(int card_id, const string& channel, int value)
 
 	    snd_mixer_selem_set_playback_volume_all(elem, val);
 
-//            for (chn = (snd_mixer_selem_channel_id_t)0;
-//                    chn <= SND_MIXER_SCHN_LAST;
-//                    chn=(snd_mixer_selem_channel_id_t)((int)chn+(snd_mixer_selem_channel_id_t)1))
-//            {
-//                if (!snd_mixer_selem_has_playback_channel(elem, chn))
-//                      continue;
-//                snd_mixer_selem_set_playback_volume(elem, chn, val);
-//            }
 	    snd_mixer_close(handle);
 	    return YCPBoolean(true);
         }
