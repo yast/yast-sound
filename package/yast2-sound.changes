@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Aug 26 12:17:00 CEST 2002 - lslezak@suse.cz
+
+- use new joystick icon in y2cc
+- version 2.6.17
+
+-------------------------------------------------------------------
 Fri Aug 23 16:46:03 CEST 2002 - lslezak@suse.cz
 
 - use 'model' and 'description' as card name if 'sub_vendor'

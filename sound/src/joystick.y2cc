@@ -15,7 +15,7 @@ Name = _("Joystick")
 Group = Hardware
 
 ; icon displayed in y2cc
-Icon = soundcard.png
+Icon = joystick.png
 
 ; *one* *short* descriptive line for y2cc
 Helptext = _("Configure joystick attached to sound card")
