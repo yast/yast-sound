@@ -53,7 +53,8 @@
     string kernel_ver = out["stdout"]:"";
     kernel_ver = select(splitstring(kernel_ver, "\n"), 0, "");
 
-    string s	= (string) SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.generic_string");
+//    string s	= (string) SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.generic_string");
+    string s = (string) SCR::Read(.target.string, "./alsa-module-syntax");
     if (s == nil) s = "";
 
     list<string> l	= splitstring(s, "\n");
