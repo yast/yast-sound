@@ -32,6 +32,10 @@
 #include <scr/SCRAgent.h>
 #include <scr/SCRInterpreter.h>
 
+using std::string;
+using std::vector;
+using std::map;
+
 class AudioAgent;
 
 /* An interface class between YaST2 and RcFile */

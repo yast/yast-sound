@@ -26,6 +26,10 @@
 #include <scr/SCRAgent.h>
 #include <scr/SCRInterpreter.h>
 
+using std::string;
+using std::vector;
+using std::map;
+
 /** 
  *  volume setting
  *  @param card card id
