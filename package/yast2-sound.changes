@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Oct 27 11:44:11 CET 2003 - jsuchome@suse.cz
+
+- fix: parameter names checked (for 'snd_' prefix) before writing (#32632) 
+
+-------------------------------------------------------------------
 Fri Oct 24 15:36:21 CEST 2003 - jsuchome@suse.cz
 
 - initial support for two types of module parameters naming (#32632)

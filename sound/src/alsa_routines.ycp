@@ -27,39 +27,20 @@
     global list all_card_names = [];
 
     /**
-     * Is "snd_" prefix used for sound module parameter names?
-     * Variable must be nil for first, will be initialized when needed
+     * Checks if name of parameter is in correct form (has 'snd_' prefix)
+     * and updates it if necessary
+     * @param parname original name of parameter
+     * @return correct name
      */
-    global boolean use_snd_prefix = nil;
+    global define string check_parameter_name (string parname) ``{
 
-    /**
-     * Checks (via 'modinfo snd') if "snd_" prefix is used for module parameters
-     * @return true/false
-     */
-    global define boolean snd_prefix_used () ``{
+	boolean prefix_used = Sound::snd_prefix_used ();
+	if (substring (parname, 0, 4) == "snd_" && !prefix_used)
+	    parname = substring (parname, 4);
+	else if (prefix_used && substring (parname, 0, 4) != "snd_")
+	    parname = sformat ("snd_%1", parname);
 
-	if (use_snd_prefix == nil)
-	{
-	    use_snd_prefix = false; // default for new kernels
-	    map modinfo = SCR::Read (.modinfo.kernel.kernel.sound.core.snd);
-
-	    foreach (string key, string desc, modinfo, ``{
-		// check only parameters, ignore other keys returned by modinfo
-		if (key != "module_author" && key != "module_description" &&
-		    key != "module_filename" && substring (key, 0, 4) == "snd_")
-		    use_snd_prefix = true;
-	    });
-	}
-	return use_snd_prefix;
-    }
-
-    /**
-     * Returns current prefix of module parameters
-     * @return "snd_" or empty string
-     */
-    global define string snd_prefix () ``{
-
-	return snd_prefix_used () ? "snd_" : "";
+	return parname;
     }
 
 
@@ -124,7 +105,7 @@
     global define void sound_start_tmp(boolean restore) ``{
 
 	string snd = sformat ("/sbin/modprobe snd %1cards_limit=%2 %1major=116",
-	    snd_prefix (), size(Sound::modules_conf));
+	    Sound::snd_prefix (), size(Sound::modules_conf));
 
 	// get the list of commands needed for start
 	list cmds = Sound::CreateModprobeCommands();
@@ -218,17 +199,12 @@
     global define map get_module_params(string modname) ``{
 	Sound::LoadDatabase();
 	map params = Sound::db_modules[modname, "params"]:$[];
-	boolean prefix_used = snd_prefix_used();
 
 	// change the names of parameters if necessary
-	// TODO: should be done during initial read?
 	params = mapmap (string parname, map parsettings, params, ``{
-	    if (substring (parname, 0, 4) == "snd_" && !prefix_used)
-		parname = substring (parname, 4);
-	    else if (prefix_used && substring (parname, 0, 4) != "snd_")
-		parname = sformat ("snd_%1", parname);
-	    return [ parname, parsettings ];
+	    return [ check_parameter_name (parname), parsettings ];
 	});
+
 	return params;
     }
 
@@ -365,8 +341,8 @@
     global define map add_common_options(map entry, integer card_id) ``{
 	map opts = entry["options"]:$[];
 
-	opts = add (opts, snd_prefix() + "index", sformat ("%1",card_id));
-	opts = add (opts, snd_prefix() + "enable", "1");
+	opts = add (opts, Sound::snd_prefix() + "index",sformat ("%1",card_id));
+	opts = add (opts, Sound::snd_prefix() + "enable", "1");
 
 	entry = add(entry, "options", opts);
 	return entry;
@@ -404,8 +380,10 @@
         return modules;
     }
 
+
     /**
-     * returns list of autodetected sound cards that haven't been already configured
+     * returns list of autodetected sound cards that haven't been already
+     * configured
      * @param save_info list of already configured cards
      * @return list of unconfigured cards
      */
@@ -415,7 +393,7 @@
         if (size(snd) > 0)
         {
             // create save_info entries
-	    snd = maplist(`c, snd, ``{
+	    snd = maplist(map c, snd, ``{
 		if (c["alsaconf_detected"]:false)
 		    return c;
 		// get all the apropriate information from the database
@@ -424,27 +402,27 @@
 		{
 		    return $[];
 		}
-		map options = lookup(mod, "params", $[]);
 		map opts = $[];
-		maplist(`op, `data, options,
-		``{
-		    if (lookup(data, "default", "") != "")
+		maplist(string op, map data, mod["params"]:$[],	``{
+
+		    if (data["default"]:"" != "")
 		    {
-			opts = add(opts, op, lookup(data, "default", ""));
+			string opname = check_parameter_name (op);
+			opts = add(opts, opname , data["default"]:"");
 		    }
 		});
 		map entry = $[
 		    "model"     : get_card_label(c),
-		    "module"    : lookup(mod,"name", ""),
-		    "unique_key": lookup(c, "unique_key", ""),
-		    "options"   : opts];
+		    "module"    : mod["name"]:"",
+		    "unique_key": c["unique_key"]:"",
+		    "options"   : opts
+		];
 		return entry;
 	    });
             // filter out modules with unspecified module name
 	    // (sound card not supported by alsa / no module found)
 	    snd = filter(`e, snd, ``(lookup(e, "module", "")!=""));
         }
-
         return snd;
     }
 

@@ -120,6 +120,44 @@
     global string curr_model = "";
 
     /**
+     * Is "snd_" prefix used for sound module parameter names? (ALSA only)
+     * Variable must be nil for first, will be initialized when needed
+     */
+    boolean use_snd_prefix = nil;
+
+    /**
+     * Checks (via 'modinfo snd') if "snd_" prefix is used for module parameters
+     * (ALSA only)
+     * @return true/false
+     */
+    global define boolean snd_prefix_used () ``{
+
+	if (use_snd_prefix == nil)
+	{
+	    use_snd_prefix = false; // default for new kernels
+	    map modinfo = SCR::Read (.modinfo.kernel.kernel.sound.core.snd);
+
+	    foreach (string key, string desc, modinfo, ``{
+		// check only parameters, ignore other keys returned by modinfo
+		if (key != "module_author" && key != "module_description" &&
+		    key != "module_filename" && substring (key, 0, 4) == "snd_")
+		    use_snd_prefix = true;
+	    });
+	}
+	return use_snd_prefix;
+    }
+
+    /**
+     * Returns current prefix of module parameters (ALSA only)
+     * @return "snd_" or empty string
+     */
+    global define string snd_prefix () ``{
+
+	return snd_prefix_used () ? "snd_" : "";
+    }
+
+
+    /**
      * ctor
      */
     global define void Sound() ``{
@@ -676,7 +714,6 @@ could make your system unstable.
 	    });
 	    res = add(res, opname, value);
 	});
-
 	return res;
     }
 

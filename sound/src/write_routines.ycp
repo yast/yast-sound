@@ -139,9 +139,11 @@
 		SCR::Write(add (mod_alias, "char-major-116"), "snd");
 		SCR::Write(add (add (mod_alias, "char-major-116"), "comment"), "\n# Alsa sound support. \n# Warning: please don't modify comments over " +
 		    "aliases 'snd-card-#'");
-		SCR::Write(add (mod_options, "snd"),
-            $["snd_cards_limit": sformat ("%1", size(save_info)),
-              "snd_major":"116"]);
+		string cards_limit = Sound::snd_prefix() + "cards_limit";
+		string major = Sound::snd_prefix() + "major";
+		SCR::Write (add (mod_options, "snd"),
+		    $[ cards_limit: sformat ("%1", size(save_info)),
+		       major:"116"]);
 		SCR::Write(add (mod_alias, "char-major-14"), "off");
 	    }
 	    else
