@@ -176,6 +176,7 @@
      * Checks (via 'modinfo snd') if "snd_" prefix is used for module parameters
      * (ALSA only)
      * @return true/false
+     * TODO remove this for new kernels...
      */
     global define boolean snd_prefix_used () ``{
 

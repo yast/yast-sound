@@ -65,6 +65,8 @@
 
 	list card_l	= splitstring (cardname, ",");
 	string vendor	= card_l [ size (card_l) - 1 ]:"";
+	if (size (card_l) == 1)
+	    return "other";
 	if (substring (vendor, 0,1) == " ")
 	    vendor = substring (vendor, 1);
 	if (!haskey (Sound::db_vendors, vendor))
@@ -155,7 +157,6 @@
 	    keys_names		= module_names;
 	}
 	list card_names		= get_card_names (curr_key, keys);
-
 	term contents = `VBox (
 	    `HBox (
 		`ReplacePoint (`id (`rep_keys),
@@ -214,14 +215,18 @@
 		    UI::QueryWidget (`id(`sel_keys),`CurrentItem);
 		string model	= (string)
 		    UI::QueryWidget (`id(`sel_mod), `CurrentItem);
-
 		string new_key	= key;
 		string new_model= model;
 
 		if (mods && keys == "vendors")
 		{
 		    if (key != "other" && key != "all")
-			new_model = sformat ("%1, %2", model, key);
+		    {
+			if (!issubstring (model, ", " + key))
+			{
+			    new_model = sformat ("%1, %2", model, key);
+			}
+		    }
 		    new_key	= get_module_by_cardname (new_model);
 		    keys	= "modules";
 		}
@@ -246,8 +251,9 @@
 
 		UI::ChangeWidget(`id(`sel_keys), `CurrentItem, new_key);
 		Sound::curr_model	= new_model;
+		ui = `sel_keys;// we must adapt the list of card names
 	    }
-	    else if (ui == `sel_keys)
+	    if (ui == `sel_keys)
 	    {
 		card_names = get_card_names (
 		    (string) UI::QueryWidget (`id(`sel_keys), `CurrentItem),
@@ -305,7 +311,7 @@
 		if (vendor != "all")
 		{
 		    // vendor is included in model name
-		    if (vendor != "other")
+		    if (vendor != "other" && !issubstring (model,", " + vendor))
 			longmodel = sformat ("%1, %2", model, vendor);
 		}
 		else
