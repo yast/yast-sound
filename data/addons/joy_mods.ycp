@@ -21,6 +21,10 @@
 
 
 $[
+#    "snd-als4000":
+#    $[
+#	"control": "Joystick"
+#    ],
     "snd-cmipci":
     $[
 	"control": "Joystick"
@@ -39,13 +43,25 @@ $[
     ],
     "snd-ens1370":
     $[
-	"control": "Joystick"
+	"control": "Joystick Enable"
     ],
     "snd-ens1371":
     $[
-	"control": "Joystick"
+	"control": "Joystick Enable"
     ],
     "snd-es1938":
+    $[
+	"module": "off"
+    ],
+    "snd-es1968":
+    $[
+	"control": "Joystick"
+    ],
+    "snd-fm801":
+    $[
+	"module": "fm801-gp"
+    ],
+    "snd-sonicvibes":
     $[
 	"module": "off"
     ],
@@ -53,6 +69,12 @@ $[
     $[
 	"module": "pcigame"
     ],
-    // FIXME: via686 & ymfpci modules
-    
+    "snd-via686":
+    $[
+	"control": "Joystick"
+    ],
+    "snd-ymfpci":
+    $[
+	"control": "Joystick"
+    ]
 ]
