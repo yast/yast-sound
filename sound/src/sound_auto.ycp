@@ -73,16 +73,15 @@
 		ret = Sound::Export();
 	}
 	else if (func == "Read") {
-		import "Progress";
-		Progress::off();
-		ret = Sound::Read(false);
-		Progress::on();
+		ret = Sound::Read(``{});
 	}
 	/* Write givven settings */
 	else if (func == "Write") {
 		import "Progress";
 		Progress::off();
-		ret = Sound::Write();
+	    map settings = Sound::Export();
+	    settings = add (settings, "autoinstall", true);
+	    WFM::CallFunction (`sound_write(settings));
 		Progress::on();
 		return ret;
 	}
