@@ -31,7 +31,6 @@
     include "sound/ui.ycp";
     include "sound/texts.ycp";
 
-    include "browser.ycp";
 
     map STRINGS=STRINGS_();
 
@@ -244,8 +243,6 @@ boolean need_restart=true;
 
     string err_msg = "";
     boolean no_alsa = lookup (lookup (module_map, "module", $[]), "no_alsa", false);
-
-    BrowseTree(module_map);
 
     if (!test_mode)
     {

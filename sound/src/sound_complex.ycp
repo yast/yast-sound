@@ -27,8 +27,6 @@
     include "sound/routines.ycp";
     include "sound/ui.ycp";
     include "sound/texts.ycp";	
-    include "browser.ycp";
-//    include "lan/lan_routines.ycp";
 
     map STRINGS=STRINGS_();
 
