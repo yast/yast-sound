@@ -152,7 +152,7 @@ before pressing <B>Next</B>.</P>");
 
 	    if (s == `next && UI::QueryWidget(`id(`os), `CurrentItem) == nil)
 	    {
-		UI::WarningPopup("Please select joystick type from list\nbefore pressing Next.");
+		UI::WarningPopup(_("Please select joystick type from list\nbefore pressing Next."));
 		s = `skip;
 	    }
 

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Jun 24 14:24:13 CEST 2002 - lslezak@suse.cz
+
+- fixed missing translation
+- updated to automake-1.6.2
+- version 2.6.5
+
+-------------------------------------------------------------------
 Tue May  7 09:32:13 CEST 2002 - lslezak@suse.cz
 
 - menu entries moved to config dir
