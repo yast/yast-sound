@@ -119,7 +119,7 @@
     global define symbol _snd_quick() ``{
 	save_entry = select(Sound::unconfigured_cards, 0, $[]);
 	card_id = 0;
-	string modelname    = lookup(Sound::modules_conf, "model", "");
+	string modelname    = lookup(save_entry, "model", "");
 	map res		    = quickConfig(modelname, "snd-card-0", card_id, 15);
 	symbol ui	    = lookup(res, "ui", nil);
 	return ui;
@@ -131,7 +131,7 @@
      */
 
     global define symbol _snd_quick2(boolean type) ``{
-	save_entry  = add_common_options(Sound::modules_conf, 0);
+	save_entry  = add_common_options(save_entry, 0);
 	save_entry  = add_alias(save_entry, 0);
 	map res	    = sound_volume(save_entry, 0, true, type, []);
 	symbol ui   = lookup(res, "ui", nil);

@@ -255,7 +255,7 @@
 	string start = (lookup(rc, "LOAD_ALSA", "no") == "yes") ? "enable" : "disable";
 	Runlevel::ServiceAdjust("alsasound", start);
 
-	SCR::Write(.sound.LOAD_ALSA_SEQ, lookup(rc, "LOAD_ALSA_SEQ", "no"));
+	SCR::Write(.sysconfig.sound.LOAD_ALSA_SEQ, lookup(rc, "LOAD_ALSA_SEQ", "no"));
 	/*
         string err_msg = "";
 	if (contains (maplist (`k, `v, rc, ``(SCR::Write(topath(sformat(".sysconfig.alsa.%1", k)), v))), false) ||

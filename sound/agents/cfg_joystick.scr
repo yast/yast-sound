@@ -25,8 +25,8 @@
  * Read/Sets the values defined in <tt>/etc/sysconfig/joystick</tt>
  * in an easy manner.
  */
-.joystick
+.sysconfig.joystick
 
-`ag_rcconfig(
-  RcFile("/etc/sysconfig/joystick")
+`ag_ini(
+  SysConfigFile("/etc/sysconfig/joystick")
 )
