@@ -27,12 +27,6 @@
 
 	list cards = parse_bracket(second);
 
-//	BrowseTree(cards);
-	if (select(l, 0) == "snd-card-cs4232")
-	{
-	    BrowseTree(cards);
-	}
-
 	if (size(cards) > 0)
 	{
 	    output = maplist(`e, cards, 
@@ -72,6 +66,28 @@
 	    output = add (output, lookup(index, select(toks, 0), -1), get_card_list(e));
 	}
 
+    });
+
+    // now add manual add-ons if available
+    list ladd = SCR::Read(.target.ycp, "./card_addons.ycp");
+    foreach(`e, ladd,
+    ``{
+	integer i = lookup(index, select(e, 0), -1);
+	if (i == -1)
+	{
+	    y2error("module %1 not defined in module_index.ycp file!", select(e,0));
+	}
+	string cardname = select(e, 1);
+	if (haskey(output, i))
+	{
+	    list oldlist = lookup(output, i, []);
+	    oldlist = add(oldlist, cardname);
+	    output = add(output, i, oldlist);
+	}
+	else
+	{
+	    output = add(output, i, [cardname]);
+	}
     });
 
     BrowseTree(output);
