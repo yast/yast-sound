@@ -132,7 +132,6 @@ define boolean AddCardHandler (map options) ``{
     }
 
     integer volume_b	= Sound::default_volume;
-    integer volume	= volume_b;
     if (haskey (options, "volume"))
 	Sound::default_volume = tointeger (options["volume"]:"75");
 
@@ -140,10 +139,29 @@ define boolean AddCardHandler (map options) ``{
     do
     {
 	list save_info	= Sound::modules_conf;
-	Sound::card_id		= size (Sound::modules_conf); // id of new card
+	Sound::card_id	= size (Sound::modules_conf); // id of new card
 
-	save_entry  = add_common_options (save_entry, Sound::card_id);
-	save_entry  = add_alias (save_entry, Sound::card_id);
+	save_entry	= add_common_options (save_entry, Sound::card_id);
+	save_entry	= add_alias (save_entry, Sound::card_id);
+
+	// now set the value of given kernel parameters...
+	modname		= save_entry["module"]:"";
+	map params      = get_module_params (modname);
+	params		= restore_mod_params (params,save_entry["options"]:$[]);
+	foreach (string optname, map o, (map<string,map>) params, {
+	    if (haskey (options, optname) && o["value"]:""!=options[optname]:"")
+	    {
+		list<string> possible_values = string2vallist (o["allows"]:"");
+		string err = check_value (
+		    options[optname]:"", "string", possible_values);
+		if (err != "")
+		{
+		    CommandLine::Print (err);
+		    return;
+		}
+		save_entry ["options", optname] = options[optname]:"";
+	    }
+	});
 
 	map res = sound_volume (save_entry, Sound::card_id, true, true, save_info);
 	ret = (res["ui"]:`back == `next);
@@ -258,13 +276,13 @@ define boolean ShowCardHandler (map options) ``{
 
     foreach (string optname, map option, (map<string,map>) params, ``{
 	out = out + sformat ("\n%1", optname) + "\n\t"
-	    + getDescr (option["descr"]:_("No description available"));
+	    + getDescr (option["descr"]:nil);
 	if (option["default"]:"" != "")
-	    // label (default value of parameter)
-	    out = out + sformat ("\n\tDefault value: %1", option["default"]:"");
+	    // label (default value of sound module parameter)
+	    out = out +sformat(_("\n\tDefault value: %1"),option["default"]:"");
 	if (option["value"]:"" != "")
-	    // label (current value of parameter)
-	    out = out + sformat ("\n\tCurrent value: %1", option["value"]:"");
+	    // label (current value of sound module parameter)
+	    out = out + sformat(_("\n\tCurrent value: %1"), option["value"]:"");
     });
     CommandLine::Print (out);
 
@@ -295,15 +313,151 @@ define boolean SetParametersHandler (map options) ``{
 	return false;
     }
 
-    string out = sformat (_("Sound Card '%1'"), save_entry["model"]:"");
-    CommandLine::Print (out);
-    // TODO set parameters of the card...
-    // TODO volume: setVolume + storeVolume
+    string modname	= save_entry["module"]:"";
+    map params          = get_module_params (modname);
+    params		= restore_mod_params (params,save_entry["options"]:$[]);
+    options		= remove (options, "card");
+
+    boolean modified	= false;
+
+    if (haskey (options, "volume"))
+    {
+	integer volume	= tointeger (options["volume"]:"75");
+	string master	= Sound::db_modules[modname,"main_volume"]:"Master";
+	setVolume (master, card_no, volume);
+        setVolume ("Headphone", card_no, volume);
+	map devs	= Sound::db_modules[modname,"mixer"]:$[];
+        if (haskey (devs, "PCM"))
+	    setVolume ("PCM", card_no, volume);
+
+	storeVolume (card_no);
+    }
+
+    foreach (string optname, map o, (map<string,map>) params, {
+	if (haskey (options, optname) && o["value"]:"" != options[optname]:"")
+	{
+	    list<string> possible_values = string2vallist (o["allows"]:"");
+	    string err = check_value (
+		options[optname]:"", "string", possible_values);
+	    if (err != "")
+	    {
+		CommandLine::Print (err);
+		return false;
+	    }
+	    save_entry ["options", optname] = options[optname]:"";
+	    modified	= true;
+	}
+    });
+    if (modified)
+    {
+	// save save_entry
+	integer pos = 0;
+	Sound::modules_conf = maplist (map card, Sound::modules_conf, ``{
+	    if (pos != card_no)
+	    {
+		pos = pos + 1;
+		return card;
+	    }
+	    else
+	    {
+		pos = pos + 1;
+		return save_entry;
+	    }
+	});
+    }
+    return modified;
+}
+
+/**
+ * Handler for setting the volume of sound card
+ * @param options parameters on command line
+ * @return boolean success
+ */
+define boolean SetVolumeHandler (map options) {
+
+    integer card_no = tointeger (options["card"]:"-1");
+    if (card_no == -1 && size (Sound::modules_conf) == 1)
+	card_no = 0;// choose first card only if it is the only one
+    if (card_no == -1)
+    {
+	//error message
+	Report::Error( _("You must specify the card number."));
+	return false;
+    }
+    map save_entry = Sound::modules_conf[card_no]:nil;
+    if (save_entry == nil)
+    {
+	//error message
+	Report::Error( _("There is no such sound card."));
+	return false;
+    }
+
+    string modname	= save_entry["module"]:"";
+    options		= remove (options, "card");
+    path pth    = topath(sformat(".audio.alsa.cards.%1.channels", card_no));
+    list channels = Sound::db_modules[modname, "mixer_elements"]:SCR::Dir(pth);
+    boolean modified	= false;
+
+    foreach (string channel, string val, (map<string,string>) options, {
+	if (contains (channels, channel))
+	{
+	    integer volume	= tointeger (val);
+	    setVolume (channel, card_no, volume);
+	    modified		= true;
+	}
+    });
+    if (modified)
+	storeVolume (card_no);
+    if (haskey (options, "play"))
+	PlayTest (card_no);
     return false;
 }
 
+/**
+ * Handler for listing available channels
+ */
+define boolean ListChannelsHandler (map options) ``{
+
+    integer card_no = tointeger (options["card"]:"-1");
+    if (card_no == -1 && size (Sound::modules_conf) == 1)
+	card_no = 0;// choose first card only if it is the only one
+    if (card_no == -1)
+    {
+	//error message
+	Report::Error( _("You must specify the card number."));
+	return false;
+    }
+    map save_entry = Sound::modules_conf[card_no]:nil;
+    if (save_entry == nil)
+    {
+	//error message
+	Report::Error( _("There is no such sound card."));
+	return false;
+    }
+
+    string modname	= save_entry["module"]:"";
+    path pth    = topath(sformat(".audio.alsa.cards.%1.channels", card_no));
+    list channels = Sound::db_modules[modname, "mixer_elements"]:SCR::Dir(pth);
+
+    foreach (string ch, (list<string>) channels, {
+	integer value = (integer) SCR::Read (topath (
+	    sformat(".audio.alsa.cards.%1.channels.%2.volume", card_no, ch)));
+	CommandLine::Print (sformat ("%1\t%2", ch, value));
+    });
+
+    return false;
+}
+/**
+ * Handler for listing available kernel modules for sound
+ */
 define boolean ListModulesHandler (map options) ``{
 
+    /*
+    // kernel module name
+    CommandLine::Print (_("Kernel module") + "\t"
+	// kernel module description
+	+ _("Description"));
+    */
     foreach (term it, (list<term>) get_module_names(), ``{
 	string id	= (string) select (select (it, 0, `Empty()), 0, "all");
 	string name	= select (it, 1, id);
@@ -341,7 +495,9 @@ map cmdline = $[
 	    "handler"	: AddCardHandler,
 	    // translators: command line help text for add action
 	    "help"	: _("Add sound card. Without parameters, add first one detected."),
-// TODO	    "options"	: "non_strict" - for unknown parameter names
+	    "options"	: [ "non_strict" ],
+	    // help text for unknownd parameters; do not translate 'show'
+	    "non_strict_help" : _("Value of the specific module parameter."),
 	],
 	"remove" :$[
 	    "handler"	: RemoveCardHandler,
@@ -361,13 +517,28 @@ map cmdline = $[
 	"set": $[
 	    "handler"	: SetParametersHandler,
 	    // translators: command line help text for set action
-	    "help"	: _("Set the new values for given card parameters")
-// TODO	    "options"	: "non_strict" - for unknown parameter names
+	    "help"	: _("Set the new values for given card parameters."),
+	    "options"	: [ "non_strict" ],// - for unknown parameter names
+	    // help text for unknownd parameters; do not translate 'show'
+	    "non_strict_help" : _("Value of the specific module parameter. Use the 'show' command to see a list of allowed parameters."),
+	],
+	"volume": $[
+	    "handler"	: SetVolumeHandler,
+	    // translators: command line help text for volume action
+	    "help"	: _("Set the volume of specific channels of given card."),
+	    "options"	: [ "non_strict" ],// - for unknown parameter names
+	    // help text;  do not translate 'channels' as command name
+	    "non_strict_help" : _("Value of the specific channel (0-100). Use the 'channels' command to see a list of available channels."),
 	],
 	"modules": $[
 	    "handler"	: ListModulesHandler,
 	    // translators: command line help text for modules action
 	    "help"	: _("List all available sound kernel modules.")
+	],
+	"channels": $[
+	    "handler"	: ListChannelsHandler,
+	    // translators: command line help text for channels action
+	    "help"	: _("List available volume channels of given card.")
 	],
     ],
     "options"		: $[
@@ -401,7 +572,9 @@ map cmdline = $[
 	"remove"	: [ "card", "all" ],
 	"playtest"	: [ "card" ],
 	"show"		: [ "card" ],
-	"set"		: [ "card" ],
+	"set"		: [ "card", "volume" ],
+	"channels"	: [ "card" ],
+	"volume"	: [ "card", "play" ],
 	"modules"	: [],
     ]
 ];

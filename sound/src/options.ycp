@@ -70,10 +70,10 @@
         }
         else if (type == "string")
         {
-            if (filterchars (tolower (value), "abcdefghijklmnopqrstuvwxyz_0123456789") != value)
+            if (filterchars (tolower (value), "abcdefghijklmnopqrstuvwxyz_0123456789-") != value)
             {
 
-                integer wrong_pos = findfirstnotof (tolower (value), "abcdefghijklmnopqrstuvwxyz_0123456789");
+                integer wrong_pos = findfirstnotof (tolower (value), "abcdefghijklmnopqrstuvwxyz_0123456789-");
                 string wrong_char = substring (value, wrong_pos, 1);
                 if (wrong_char == " ")
                 {
