@@ -41,6 +41,10 @@
     // joystick was configured
     boolean configured = false;
 
+
+    string gjoy = "Generic analog joystick";
+    string gjoy_trans = _("Generic analog joystick");
+
     /**
      * Joystick configuration dialog. Configuration of joystick attached to specified sound card.
      * @param card_id Sound card card_id
@@ -48,8 +52,6 @@
      */
 
     global define symbol joy_dialog(integer card_id) ``{
-
-	y2milestone("Configuration of joystick: %1", card_id);
 
 	if (card_id == nil)
 	{
@@ -67,6 +69,18 @@ _("<P><B>Note:</B> Connect your joystick to your computer
 before pressing <B>Next</B>.</P>");
 
 
+	map joy = select(Joystick::joystick, card_id, $[]);
+
+	string mod = lookup(joy, "model", "");
+
+	y2milestone("Config of joy %1: %2", card_id, joy);
+
+	// translate model from /etc/sysconfig/joystick
+	if (mod == gjoy)
+	{
+	    mod = gjoy_trans;
+	}
+
 	map joysticks = SCR::Read(.target.yast2, "include/sound/joysticks.ycp");
 
 	list joylist = [];
@@ -75,20 +89,31 @@ before pressing <B>Next</B>.</P>");
 
 	joylist = sort(`k, `v, joylist, ``(select(k, 1, "") <= select(v, 1, "")));
 
-	joylist = prepend(joylist, ["analog", _("Generic analog joystick")]);
+	joylist = prepend(joylist, ["analog", gjoy_trans]);
 
-	y2milestone("joylist: %1", joylist);
+	y2debug("joylist: %1", joylist);
 
 	integer index = 0;
 	list boxitems = [];
 
 	foreach(list l, joylist, ``{
-		boxitems = add(boxitems, `item(`id(index), select(l, 1, "")));
+		string modelname = select(l, 1, "");
+
+		if (mod == modelname)
+		{
+		    // preselect item
+		    boxitems = add(boxitems, `item(`id(index), modelname, true));
+		}
+		else
+		{
+		    boxitems = add(boxitems, `item(`id(index), modelname));
+		}
+
 		index = index + 1;
 	    }
 	);
 
-	y2milestone("for widget: %1", boxitems);
+	y2debug("for widget: %1", boxitems);
 
 	term contents =
 	    `VBox(
@@ -114,6 +139,12 @@ before pressing <B>Next</B>.</P>");
 		s = `skip_event;
 	    }
 
+	    if (s == `next && UI::QueryWidget(`id(`os), `CurrentItem) == nil)
+	    {
+		UI::WarningPopup("Please select joystick type from list\nbefore pressing Next.");
+		s = `skip;
+	    }
+
 	} while (!contains([`next, `back, `abort, `cancel], s));
 
 	if (s == `next)
@@ -127,9 +158,9 @@ before pressing <B>Next</B>.</P>");
 	    string model = select(select(joylist, joymodidx, ["none", ""]), 1, "");
 
 	    // do not translate model in /etc/sysconfig/joystick
-	    if (model == _("Generic analog joystick"))
+	    if (model == gjoy_trans)
 	    {
-		model = "Generic analog joystick";
+		model = gjoy;
 	    }
 
 	    y2milestone("selected modul: %1   model: %2", joymod, model);
@@ -168,7 +199,7 @@ before pressing <B>Next</B>.</P>");
 
 	    if (size(filtered) == 1)
 	    {
-		selected_card = (lookup(select(cards, 0, $[]), "card_no", 0));
+		selected_card = (lookup(select(filtered, 0, $[]), "card_no", 0));
 		configured = true;
 
 		// skip to configuration dialog if exactly one card was found
@@ -180,9 +211,16 @@ before pressing <B>Next</B>.</P>");
 
 		message = message + "\n" + _("Do you want to start sound card configuration?");
 
-		if (UI::YesNoHeadlinePopup(_("Start sound card configuration?"), message) == true)
+		if (UI::YesNoHeadlinePopup(_("No joystick port to configure"), message) == true)
 		{
-		    CallModule("sound", []);
+		    // start sound module without asking about joystick at the end
+		    CallModule("sound", [.nojoy]);
+
+		    // reread sound card and joystick configuration
+		    Sound::Read(``{});
+		    Joystick::Read(``{});
+
+		    // restart this dialog
 		    restart = true;
 		}
 		else

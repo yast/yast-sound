@@ -173,7 +173,11 @@
 
     if (!autoinstall)
     {
-	map out = SCR::Execute(.target.bash_output, "/usr/sbin/rcalsasound start", nil);
+	// stop joystick before restarting ALSA
+	SCR::Execute(.target.bash, "/etc/init.d/joystick stop", $[]);
+
+	// restart ALSA
+	SCR::Execute(.target.bash, "/etc/init.d/alsasound start", nil);
     }
 
     if (!autoinstall) { Progress::NextStage(); }
@@ -194,8 +198,10 @@
     if (!autoinstall) sleep(100);
 
     if (!autoinstall) { sleep(100); Progress::NextStage(); }
+
+    // write joystick configuration and restart service
     Joystick::Write(nil);
-    SCR::Execute(.target.bash_output, "/usr/sbin/rcjoystick restart", $[]);
+    SCR::Execute(.target.bash, "/etc/init.d/joystick restart", $[]);
 
     return (size (err_msg) == 0);
 }
