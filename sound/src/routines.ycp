@@ -208,15 +208,6 @@
 
         list modules = [];
         integer i = 0;
-        // map with minor as a key and module as value
-        map oss_list = $[
-            0  : "snd-mixer-oss",
-            11 : "snd-mixer-oss",
-            3  : "snd-pcm-oss",
-            12 : "snd-pcm-oss",
-            1  : "snd-seq-oss",
-            8  : "snd-seq-oss"
-            ];
 
         while (i < number)
         {
@@ -224,12 +215,6 @@
 		    "alias"	: sformat ("sound-slot-%1", i),
 		    "module"	: sformat ("snd-card-%1", i) ]
 	    );
-            foreach(integer key, string mod, oss_list, ``{
-                modules = add (modules, $[
-		    "alias"	: sformat("sound-service-%1-%2", i, key),
-		    "module"	: mod]
-		);
-            });
             i = i + 1;
         }
         return modules;
@@ -614,7 +599,7 @@
 	{
 	    avail = [];
 	}
-	foreach(`dev, devices,
+	foreach(string dev, devices,
 	``{
 	    if (contains(avail, dev))
 	    {
@@ -633,14 +618,17 @@
      */
     define string check_module(map save_entry, integer card_id) ``{
 	map pm		= (map) SCR::Read(.proc.modules);
-	string mod_name	= save_entry["module"]:"off";
-        if (!haskey (pm, mod_name) || size(get_running_cards()) <= card_id)
+	string modname	= save_entry["module"]:"off";
+	string mod_name = regexpsub (modname, "snd-(.*)", "snd_\\1");
+
+        if ((!haskey (pm, modname) && !haskey (pm, mod_name)) ||
+	    size(get_running_cards()) <= card_id)
         {
 
                 // To translators: label to error popup
             return sformat (_("The kernel module %1 for sound support
 could not be loaded. This can be caused by incorrect
-module parameters, including invalid IO or IRQ parameters."), mod_name);
+module parameters, including invalid IO or IRQ parameters."), modname);
         }
         return "";
 
