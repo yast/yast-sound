@@ -28,6 +28,7 @@
 {
 
     textdomain "sound";
+    import "Wizard";
 	
 
     /**
@@ -52,7 +53,7 @@
 
 	term con = VolumeCon(save_entry, vol);
 	    // dialog title
-	UI::SetWizardContents (_("Sound card volume"), con, help_text, true, true);
+	UI::Wizard::SetContents (_("Sound card volume"), con, help_text, true, true);
 	if (finish)
 	{
 	    UI::ChangeWidget (`id(`next), `Label, UI::FinishButtonLabel());
@@ -138,7 +139,7 @@ its parameters using the 'Advanced setup'.");
 	  );
 	    
 	    // dialog title
-	UI::SetWizardContents (ErrorMsg(), con, help_text, true, false);
+	UI::Wizard::SetContents (ErrorMsg(), con, help_text, true, false);
 	if (finish)
 	{
 	    UI::ChangeWidget (`id(`next), `Label, UI::FinishButtonLabel());
@@ -187,7 +188,7 @@ its parameters using the 'Advanced setup'.");
           );
 
             // dialog title
-        UI::SetWizardContents (_("Success"), con, help_text, true, true);
+        UI::Wizard::SetContents (_("Success"), con, help_text, true, true);
         if (finish)
         {
             UI::ChangeWidget (`id(`next), `Label, UI::FinishButtonLabel());
@@ -245,7 +246,7 @@ its parameters using the 'Advanced setup'.");
 	quick = true;
     }
 
-    UI::DisableWizardAbortButton();
+    UI::Wizard::DisableAbortButton();
 
     string err_msg = "";
 

@@ -27,7 +27,7 @@
     include "wizard/sequencer.ycp";
     include "ui/wizard_hw.ycp";
     include "ui/common_popups.ycp";
-    include "ui/wizard_dialog.ycp";
+    import  "Wizard";
 
     include "sound/card_wizard.ycp";
     include "sound/read_routines.ycp";
@@ -41,7 +41,7 @@
     include "sound/manual.ycp";
 
 
-    boolean autoinstall = true;
+    boolean autoinstall = false;
 
     boolean use_alsa = !Arch::sparc;
     if (size(Args()) > 0 && Args(0)==.oss)
@@ -297,7 +297,7 @@
     OpenMainDialog();
     InitializingDialog ();
 
-    UI::DisableWizardAbortButton();
+    UI::Wizard::DisableAbortButton();
 
     if (whoami() != "root")
     {
