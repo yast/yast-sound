@@ -25,6 +25,23 @@
     include "sound/sound_routines.ycp";
 
 
+
+// Menuentry for the YaST2 menu
+    if (Args() == [ "get_menuentry" ])
+	return [ "lan", $[
+	    `menuentry    : UI(_("Hardware/Sound")),
+	    `arguments    : [ ],
+	    `widget       : `RichText(
+		//
+		UI(_("Launch this module to configure your sound card."))
+		+
+		UI(_("<p>You need to be logged in as <i>root</i> in order to do this.</p>"))),
+	    `codefragment : nil ]
+	    ];
+
+
+
+
     // =========== UI ============
     UI(``{
     
