@@ -44,16 +44,23 @@
 
 	string help_text = lookup(STRINGS, "VolumeDialog", "");
 
-	integer vol = 10;
-
+	integer vol = 50;
+/*
 	if (find(lookup(save_entry, "model", ""), "(daca)") >= 0)
 	{
 	    vol = 75;
 	}
+*/
 
 	term con = VolumeCon(save_entry, vol);
 	    // dialog title
 	Wizard::SetContents (_("Sound card volume"), con, help_text, true, true);
+
+	if (Sound::autoinstallation)
+	{
+	    UI::ChangeWidget(`id(`test), `Enabled, false);
+	}
+
 	if (finish)
 	{
 	    UI::ChangeWidget (`id(`next), `Label, UI::FinishButtonLabel());
@@ -68,8 +75,9 @@
 /* end of sound fonts installation */
 
 
-
-	SetVolume ("Master", card_id, vol);
+	string master_elem = lookup(lookup(Sound::db_modules, modname, $[]), 
+	    "main_volume", "Master");
+        SetVolume (master_elem, card_id, vol);
 
 	do
 	{
@@ -78,7 +86,7 @@
 	    if (ui == `volume)
 	    {
 		vol = UI::QueryWidget(`id(`volume), `Value );
-		SetVolume("Master", card_id, vol);
+		SetVolume(master_elem, card_id, vol);
 	    }
 	    else if (ui == `test)
 	    {
@@ -236,16 +244,19 @@ its parameters using the 'Advanced setup'.");
     boolean need_restart    = true;
     boolean test_mode	    = false;
 
-    if (autoinstall)
-    {
-	quick = true;
-    }
+//    if (autoinstall)
+//    {
+//	quick = true;
+//   }
 
     Wizard::DisableAbortButton();
 
     string err_msg = "";
 
-    stop_programs(); 
+    if (Sound::autoinstallation)
+    {
+        stop_programs();
+    }
 
 // #################################
 
@@ -266,11 +277,11 @@ its parameters using the 'Advanced setup'.");
 	    });
 	}
 
-	if (!autoinstall)
+	if (!Sound::autoinstallation)
 	{
 	    sound_stop();
 	    SaveModulesEntry (new_save, [], true);
-	    sound_start_tmp(true, size(new_save));
+	    sound_start_tmp(true/*, size(new_save)*/);
 	    err_msg = check_module(save_entry, card_id);
 	}
     }
@@ -283,10 +294,17 @@ its parameters using the 'Advanced setup'.");
     }
     else
     {
-	list devs = ["Master", "PCM", "PCM,1", "Wave", "Master Digital", "Synth", 
-			"Speaker", "Line Out", "Wave Playback Volume", "CD"];
-        maplist (`dev, devs, ``(SetVolume (dev, card_id, 70)));
-	unmute(devs, card_id);
+
+	string modname = lookup(save_entry, "module", "snd-card-dummy");
+	map devs = lookup(lookup(Sound::db_modules, modname, $[]), "mixer",
+	    $["Master":70, "PCM":70, "CD":70, "Synth": 70]);
+
+	list devs2 = maplist(`k, `v, devs, ``(k));
+	y2error("devices to unmute: %1", devs2);
+
+        foreach (`dev, `vol, devs, ``(SetVolume (dev, card_id, vol)));
+
+	unmute(devs2, card_id);
 	if (!quick)
 	{
 	    ui = VolumeDialog ();
@@ -301,14 +319,17 @@ its parameters using the 'Advanced setup'.");
 
     if (ui == `back || ui == `cancel || ui == `abort)
     {
-	if (!autoinstall)
+	if (!Sound::autoinstallation)
 	{
 	    SaveModulesEntry(save_info, [], true);
 	    sound_start_tmp(true);
 	}
     }
 
-    SCR::Execute(.audio.alsa.restore, 0 ,0);
+    if (!Sound::autoinstallation)
+    {
+	SCR::Execute(.audio.alsa.restore, 0 ,0);
+    }
 
     UI::ChangeWidget (`id(`next), `Label, UI::NextButtonLabel());
 

@@ -29,6 +29,8 @@
 
     include "browser.ycp";
 
+
+    global boolean autoinstallation = false;
     // list for storing detected cards
     global list detected_cards = nil;
 
@@ -58,6 +60,10 @@
      */
 
     global define boolean DetectHardware() ``{
+	if (autoinstallation)
+	{
+	    detected_cards = [];
+	}
 	// do noop if cards were already detected
 	if (detected_cards != nil)
 	{
@@ -81,6 +87,10 @@
      */
 
     global define void UpdateUnconfiguredCards() ``{
+	if (autoinstallation)
+	{
+	    return;
+	}
 	unconfigured_cards = getConfigurableCards(modules_conf);
     }
 
@@ -99,6 +109,7 @@
 	rc_vars = read_rc_vars (["START_ALSA", "START_ALSA_SEQ"]);
 	// load volume settings
 	volume_settings = get_vol_settings();
+	BrowseTree(volume_settings);
 	return true;
     }
 
@@ -133,6 +144,8 @@
      */
     global define boolean Write(block _unused, block _unused2) ``{
 	// TODO: check return value
+	map settings = Export();
+	settings = add (settings, "autoinstall", false);
 	CallFunction (`sound_write(modules_conf, rc_vars));
 	return true;
     }
@@ -146,7 +159,8 @@
 	return $[
 		"modules_conf"	    : modules_conf,
 		"rc_vars"	    : rc_vars,
-		"volume_settings"   : volume_settings
+		"volume_settings"   : volume_settings,
+		"autoinstall"	    : true
 	    ];
     }
 

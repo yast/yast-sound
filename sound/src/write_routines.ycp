@@ -254,7 +254,7 @@
 
     global define string SaveRCValues (map rc) ``{
         string err_msg = "";
-	if (contains (maplist (`k, `v, rc, ``(SCR::Write(topath(sformat(".rc.system.%1", k)), v))), false) ||
+	if (contains (maplist (`k, `v, rc, ``(SCR::Write(topath(sformat(".sysconfig.alsa.%1", k)), v))), false) ||
             !SCR::Write(.rc.system, nil))
             {
                 // Error message

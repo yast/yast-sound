@@ -115,7 +115,7 @@
 
 	y2debug(" save_info %1, agent %2", size(save_info), size(SCR::Dir(.audio.alsa.cards)));
 
-	if (use_alsa && (size(save_info) != size(get_running_cards())))
+	if (!Sound::autoinstallation && use_alsa && (size(save_info) != size(get_running_cards())))
 	{
 	    if (UI::YesNoPopup(_("The number of currently running cards doesn't match 
 the number of configured cards in your configuration files. 
@@ -158,7 +158,10 @@ Try to restart sound system?")))
 
 	do
 	{
-	    SCR::Execute(.audio.alsa.restore, 0, 0);
+	    if (!Sound::autoinstallation)
+	    {
+		SCR::Execute(.audio.alsa.restore, 0, 0);
+	    }
 
 	    ui = UI::`UserInput ();
 	    if (ui == `b_delete)

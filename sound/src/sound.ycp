@@ -226,18 +226,19 @@
             Sound::modules_conf	    = remove(Sound::modules_conf, card_id);
 	    Sound::modules_conf	    = recalc_save_entries(Sound::modules_conf);
 
-	    vol_settings    = multi_remove(vol_settings, rem);
+	    vol_settings    = remove(vol_settings, card_id); //multi_remove(vol_settings, rem);
 
-            SaveModulesEntry (Sound::modules_conf, [], true);
+	    if (!Sound::autoinstallation)
+	    {
+		SaveModulesEntry (Sound::modules_conf, [], true);
 
-	    sound_stop();
-            sound_start_tmp(true, size(Sound::modules_conf));
-            y2debug(sformat("%1", vol_settings));
-            set_vol_settings(vol_settings);
+		sound_stop();
+		sound_start_tmp(true, size(Sound::modules_conf));
+		set_vol_settings(vol_settings);
+		// now we have to update the unconfigured cards list
+		Sound::UpdateUnconfiguredCards();
+	    }
 
-	    // now we have to update the unconfigured cards list
-	    Sound::UpdateUnconfiguredCards();
-//#	    sound_cards = getConfigurableCards(save_info);
 
 	}
 
@@ -353,7 +354,10 @@ in order to configure sound cards."));
     // module initialization
     Sound::LoadDatabase(); // FIXME TODO read on demand
 //    Sound::DetectHardware();
-    Sound::Read(``{});
+    if (!Sound::autoinstallation)
+    {
+	Sound::Read(``{});
+    }
 
     /*
      * this variable will not be touched.
@@ -523,10 +527,10 @@ in order to configure sound cards."));
 
     if (true)
     {
-	Sound::DumpToLog();
+//	Sound::DumpToLog();
     }
 
-    if (ui == `finish && (Sound::modules_conf != save_info_backup || Sound::rc_vars != rc_vars_backup))
+    if (ui == `finish && !Sound::autoinstallation && (Sound::modules_conf != save_info_backup || Sound::rc_vars != rc_vars_backup))
     {
 	Sound::Write(``{}, ``{}); // CallFunction (`sound_write(Sound::modules_conf, Sound::rc_vars));
     }

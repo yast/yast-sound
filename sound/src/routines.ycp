@@ -319,6 +319,12 @@
      */
 
     global define void unmute(list devices, integer card_id) ``{
+	if (Sound::autoinstallation)
+	{
+	    // TODO: store this info some elsewhere...
+	    return;
+	}
+
 	list avail = SCR::Dir(topath(sformat(".audio.alsa.cards.%1.channels", card_id)));
 	if (avail == nil || size(avail)==0)
 	{
@@ -585,6 +591,12 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      */
 
     global define boolean HasFonts(map save_entry) ``{
+	if (Sound::autoinstallation)
+	{
+	    // don't install sound fonts during autoinstallation
+	    return false;
+	}
+
 	if (contains(["snd-card-emu10k1", "snd-card-sbawe", "emu10k1"], lookup(save_entry, "module", "")))
 	{
 	    return true;
@@ -715,6 +727,10 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      */
 
     global define boolean stop_programs() ``{
+	if (Sound::autoinstallation)
+	{
+	    return true;
+	}
 	integer fuser = SCR::Execute (.target.bash, "/bin/fuser /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]);
 
 	if (fuser == 0)

@@ -29,9 +29,17 @@
      */
 
     global define boolean SetVolume (string group, integer cardid, integer value) ``{
-        string p = sformat(".audio.alsa.cards.%1.channels.%2.volume", cardid, group);
+	if (!Sound::autoinstallation)
+	{
+	    string p = sformat(".audio.alsa.cards.%1.channels.%2.volume", cardid, group);
 
-        return SCR::Write(topath(p), value);
+	    return SCR::Write(topath(p), value);
+	}
+	else
+	{
+	    // TODO: store volume somewhere...
+	    return true;
+	}
     }
 
     /**
@@ -55,7 +63,7 @@
         }
         else
         {
-            SCR::Execute (.target.bash_background, sformat("/usr/bin/aplay -c %1 %2 > /dev/null 2>&1", card_id, fname));
+            SCR::Execute (.target.bash_background, sformat("/usr/bin/aplay -D hw:card%1 %2 > /dev/null 2>&1", card_id, fname));
         }
         return "";
     }
@@ -68,8 +76,8 @@
      *
      */
 
-    global define void sound_start_tmp(boolean restore, integer count) ``{
-
+    global define void sound_start_tmp(boolean restore/*, integer count*/) ``{
+/*
 	string pattern = "options (snd-card-.*)";
 
 	string str = SCR::Read(.target.string, "/tmp/modules.conf");
@@ -95,8 +103,8 @@
         {
             SCR::Execute(.audio.alsa.restore, 0, 0);
         }
+*/
 
-/*
         string cmd = "/sbin/depmod -C " + get_tmp_modules_conf() + " /dev/null 2>&1";
         SCR::Execute(.target.bash, cmd, $[]);
 
@@ -123,7 +131,7 @@
         {
             SCR::Execute(.audio.alsa.restore, 0, 0);
         }
-*/  }
+  }
 
     /**
      * removes all sound modules from kernel
@@ -239,7 +247,15 @@
 	while (i < bound)
 	{
 	    list sublist = [];
-	    foreach(`e, SCR::Dir(topath(sformat(".audio.alsa.cards.%1.channels", i))),
+	    string modname = lookup(select(Sound::modules_conf, i, $[]), "module", "snd-card-dummy");
+	    list chans = lookup(lookup(Sound::db_modules, modname, $[]), "mixer_elements", []);
+
+	    if (chans == [])
+	    {
+		chans = SCR::Dir(topath(sformat(".audio.alsa.cards.%1.channels", i)));
+	    }
+
+	    foreach(`e, chans,
 	    ``{
 		path pth1 = topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", i, e));	
 		path pth2 = topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", i, e));
