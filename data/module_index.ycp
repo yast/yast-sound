@@ -1,0 +1,75 @@
+/**
+ *
+ *
+ * File:
+ *   module_index.ycp
+ *
+ * Module:
+ *   Sound database
+ *
+ * Authors:
+ *   Dan Meszaros <dmeszar@suse.cz>
+ *
+ * $Id$
+ *
+ * part of the sound card database
+ *
+ *
+ */
+
+$[
+    0   : "snd-card-ad1816a",
+    1	: "snd-card-ad1848",
+    2	: "snd-card-ali5451",
+    3	: "snd-card-als100",
+    4	: "snd-card-als4000",
+    5	: "snd-card-azt2320",
+    6	: "snd-card-cmi8330",
+    7	: "snd-card-cmipci",
+    8	: "snd-card-cs4231",
+    9	: "snd-card-cs4232",
+    10	: "snd-card-cs4236",
+    11	: "snd-card-cs4281",
+    12	: "snd-card-cs46xx",
+    13	: "snd-card-dt0197h",
+    14	: "snd-card-dummy",
+    15	: "snd-card-emu10k1",
+    16	: "snd-card-ens1370",
+    17	: "snd-card-ens1371",
+    18	: "snd-card-es1688",
+    19	: "snd-card-es18xx",
+    20	: "snd-card-es1938",
+    21	: "snd-card-es1968",
+    22	: "snd-card-es968",
+    23	: "snd-card-fm801",
+    24	: "snd-card-gusclassic",
+    25	: "snd-card-gusextreme",
+    26	: "snd-card-gusmax",
+    27	: "snd-card-ice1712",
+    28	: "snd-card-intel8x0",
+    29	: "snd-card-interwave-stb",
+    30	: "snd-card-interwave",
+    31	: "snd-card-maestro3",
+    32	: "snd-card-mpu401",
+    33	: "snd-card-mtpav",
+    34	: "snd-card-nm256",
+    35	: "snd-card-opl3sa2",
+    36	: "snd-card-opti92x-ad1848",
+    37	: "snd-card-opti92x-cs4231",
+    38	: "snd-card-opti93x",
+    39	: "snd-card-pdplus",
+    40	: "snd-card-rme96",
+    41	: "snd-card-rme9652",
+    42	: "snd-card-sb16",
+    43	: "snd-card-sb8",
+    44	: "snd-card-sbawe",
+    45	: "snd-card-serial",
+    46	: "snd-card-sgalaxy",
+    47	: "snd-card-sonicvibes",
+    48	: "snd-card-trident",
+    49	: "snd-card-via686a",
+    50	: "snd-card-via8233",
+    51	: "snd-card-virmidi",
+    52	: "snd-card-wavefront",
+    53	: "snd-card-ymfpci"
+]
