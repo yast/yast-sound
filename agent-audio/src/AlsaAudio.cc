@@ -8,9 +8,14 @@
 #include <scr/SCRInterpreter.h>
 
 
-#if __sparc__ || __s390__
+#ifdef __sparc__ 
     #define __HAVE_ALSA 0
-#else
+#endif
+#ifdef __s390__
+    #define __HAVE_ALSA 0
+#endif
+
+#ifndef __HAVE_ALSA
     #define __HAVE_ALSA 1
 #endif
 
@@ -36,7 +41,7 @@ YCPValue alsaGetVolume(int card, const string& channel)
 
     if(snd_mixer_group_read(handle, &group)<0)
     {
-        y2error("invalid group (channel) '%s'", channel.c_str());
+        y2debug("invalid group (channel) '%s'", channel.c_str());
         snd_mixer_close(handle);
         return YCPVoid();
     }
@@ -52,7 +57,7 @@ YCPValue alsaGetVolume(int card, const string& channel)
 	return YCPInteger((long long int)0);
     }
 
-    tmp = rint((double)(val - group.min)/(double)(range)*100.0);
+    tmp = (int)rint((double)(val - group.min)/(double)(range)*100.0);
     return YCPInteger((long long int)tmp);
 }
 
@@ -75,7 +80,7 @@ YCPValue alsaGetMute(int card, const string& channel)
 
     if(snd_mixer_group_read(handle, &group)<0)
     {
-        y2error("invalid group (channel) '%s'", channel.c_str());
+        y2debug("invalid group (channel) '%s'", channel.c_str());
         snd_mixer_close(handle);
         return YCPVoid();
     }
@@ -105,7 +110,7 @@ YCPValue alsaSetVolume(int card, const string& channel, int value)
 
     if(snd_mixer_group_read(handle, &group)<0)
     {
-        y2error("invalid group '%s'", channel.c_str());
+        y2debug("invalid group '%s'", channel.c_str());
         snd_mixer_close(handle);
         return YCPBoolean(false);
     }
@@ -119,7 +124,7 @@ YCPValue alsaSetVolume(int card, const string& channel, int value)
     }
     else
     {
-	tmp = rint((double)(value)*(double)(range)*0.01);
+	tmp = (int)rint((double)(value)*(double)(range)*0.01);
     }
 
     for(uint pos=0; pos<group.channels; pos++)
@@ -154,7 +159,7 @@ YCPValue alsaSetMute(int card, const string& channel, bool value)
 
     if(snd_mixer_group_read(handle, &group)<0)
     {
-        y2error("invalid group '%s'", channel.c_str());
+        y2debug("invalid group '%s'", channel.c_str());
         snd_mixer_close(handle);
         return YCPBoolean(false);
     }
@@ -221,7 +226,7 @@ YCPValue alsaStore(int card=-1)
 	cmd+=tmp;
     }
     cmd+=" > /dev/null 2>&1";
-    y2error("executing '%s'", cmd.c_str());
+    y2debug("executing '%s'", cmd.c_str());
     if(system(cmd.c_str())!=-1)
     {
 	return YCPBoolean(true);
@@ -241,7 +246,7 @@ YCPValue alsaRestore(int card=-1)
 	cmd+=tmp;
     }
     cmd+=" > /dev/null 2>&1";
-    y2error("executing '%s'", cmd.c_str());
+    y2debug("executing '%s'", cmd.c_str());
     if(system(cmd.c_str()))
     {
         return YCPBoolean(true);
