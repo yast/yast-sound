@@ -45,7 +45,7 @@
      * @return symbol
      */
 
-    define VolumeDialog () ``{
+    global define VolumeDialog () ``{
 
 	    //unmute these devices
 	/* help text: adjusting volume */
@@ -117,7 +117,7 @@
     * @return symbol `back | `cancel
     */
 
-    define ErrorDialog (map save_entry, string err) ``{
+    global define ErrorDialog (map save_entry, string err) ``{
 				    // Help text - intenal YaST2 error 
     
 	y2debug("%1", save_entry);
@@ -174,7 +174,7 @@ its parameters using the 'Advanced setup'.");
     * @return symbol `back | `cancel
     */
 
-    define SuccessDialog (map save_entry) ``{
+    global define SuccessDialog (map save_entry) ``{
                                     // Help text - intenal YaST2 error 
 
         string help_text = lookup(STRINGS, "SuccessDialog", "");
@@ -224,31 +224,35 @@ its parameters using the 'Advanced setup'.");
        *        2. on succes unmute and volume dialog
        *        3. on fail display error message
        */
+    
+    global define sound_volume(map save_entry, integer card_id, boolean finish, 
+				boolean quick, list save_info) ``{
+
     boolean need_restart    = true;
-    map save_entry	    = Args (0);
-    integer card_id	    = Args (1);
-    boolean finish	    = false;
+//    map save_entry	    = Args (0);
+//    integer card_id	    = Args (1);
+//    boolean finish	    = false;
     boolean test_mode	    = false;
 
-    boolean quick = false;
+//    boolean quick = false;
 
     UI::DisableWizardAbortButton();
 
-    if (size (Args ()) > 2)
-    {
-	finish = Args (2);
-    }
+//    if (size (Args ()) > 2)
+//    {
+//	finish = Args (2);
+//    }
     
-    if (size (Args ()) >3)
-    {
-	quick= Args (3);
-    }
+//    if (size (Args ()) >3)
+//    {
+//	quick= Args (3);
+//    }
     
-    list save_info = [];
-    if (size (Args()) > 4)
-    {
-	save_info=Args(4);
-    }
+//    list save_info = [];
+//    if (size (Args()) > 4)
+//    {
+//	save_info=Args(4);
+//    }
 
     string err_msg = "";
 
@@ -314,6 +318,8 @@ its parameters using the 'Advanced setup'.");
     UI::ChangeWidget (`id(`next), `Label, UI::NextButtonLabel());
 
     return $["ui" : ui, "return" : size (err_msg) == 0];
+
+}
 
 }
 

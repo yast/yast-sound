@@ -34,6 +34,7 @@
     include "sound/routines.ycp";
     include "sound/ui.ycp";
     include "sound/write_routines.ycp";
+    include "sound/volume.ycp";
 
     boolean __sparc=nil;
 
@@ -109,7 +110,7 @@
     global define _snd_quick2(boolean type) ``{
 	save_entry  = add_common_options(save_entry, 0);
 	save_entry  = add_alias(save_entry, 0);
-	map res	    = CallFunction (`sound_volume(save_entry, 0, true, type, []));
+	map res	    = sound_volume(save_entry, 0, true, type, []);
 	symbol ui   = lookup(res, "ui", nil);
 	if (ui == `next)
 	{

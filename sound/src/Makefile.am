@@ -15,7 +15,9 @@ include_DATA = \
 	oss_routines.ycp \
 	ui.ycp \
 	texts.ycp \
-	card_wizard.ycp 
+	card_wizard.ycp \
+	mixer.ycp \
+	volume.ycp
 
 
 modules_DATA = 	\
@@ -24,9 +26,7 @@ modules_DATA = 	\
 	sound_write.ycp		\
 	sound_complex.ycp	\
 	sound_options.ycp	\
-	sound_volume.ycp     	\
 	sound_select.ycp	\
-	sound_mixer.ycp         \
 	sound_summary.ycp
 
 menu_DATA = menuentry_sound.ycp

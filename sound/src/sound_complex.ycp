@@ -25,6 +25,8 @@
 
     textdomain "sound";
 
+    include "sound/mixer.ycp";
+
 //    include "misc_defines.ycp";
 //    include "sound/routines.ycp";
 //    include "sound/ui.ycp";
@@ -213,7 +215,7 @@ Try to restart sound system?")))
 	    else if (ui == `b_volume)
 	    {
 		integer card_id = UI::QueryWidget (`id(`configured_table), `CurrentItem);	
-		map res = CallFunction(`sound_mixer(card_id));
+		map res = mixerDialog(card_id);
 		if (lookup(res, "ui", nil) == `abort || lookup(res, "ui", nil) == `cancel)
                 {       
                     return $["ui": `abort];
