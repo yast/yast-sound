@@ -52,19 +52,22 @@
      */
 
 
-    map save_entry=$[];
+    map save_entry = $[];
+    boolean was_complex = false;
 
     global define _snd_select() ``{
-	list nh=maplist(`e, sound_cards, ``(lookup(e, "model", "")));
-	if(size(nh)==0)
+	sound_cards = getConfigurableCards(save_info);
+	if((size(sound_cards) == 0) && (!was_complex))
 	{
 	    return `detail;
 	}
+	list nh=maplist(`e, sound_cards, ``(lookup(e, "model", "")));
 
         list ch=maplist(`e, save_info, ``(lookup(e, "model", ""))); 
 	map res=CallFunction(`sound_select(nh, save_info));
-	card_id=lookup(res, "id", -1);
-	if(card_id==-1)
+	symbol ui = lookup(res, "ui", `abort);
+	card_id=lookup(res, "id", 0);
+	if(card_id == -1)
 	{
 	    return `manual;
 	}
@@ -82,10 +85,6 @@
 	string modelname=lookup(save_entry, "model", "");
 	map res=quickConfig(modelname, "snd-card-0", card_id, 15);
 	symbol ui=lookup(res, "ui", nil);
-//	if(ui==`next)
-//	{
-//	    save_info=[save_entry];
-//	}
 	return ui;	
     }
 
@@ -107,12 +106,43 @@
      */
 
     global define _snd_manual() ``{
-	map res = add_card_manually(save_info);
+	map res = CallFunction(`sound_manual());
+
+	// if user selects the soundcards that has been already autodetected, 
+	// use the detected card instead of manual selection (because it causes
+	// some problems with uniq. keys)
+
 	symbol ui = lookup(res, "ui", `abort);
+    
+	boolean override = false;
+	string uniq_k="";
+	string label="";
+
+
 	if(ui == `next)
 	{
-	    save_info = add(save_info, lookup(res, "return", $[]));
+	    uniq_k = isa_uniq();
+	    label = lookup(res, "model", "Sound card");
+
+	    list cds = filter(`e, sound_cards, ``(lookup(e, "module", "") == lookup(res, "module", nil)));
+	    y2error("%1", cds);
+	    if (size(cds) > 0)
+	    {
+		label = lookup(select(cds, 0), "model", "Sound card");
+		uniq_k = lookup(select(cds, 0), "unique_key", isa_uniq());
+	    }
+
+	    save_entry=$[
+		"module"    : lookup(res, "module", ""),
+		"model"	    : label,
+		"unique_key": uniq_k
+		];
+	    card_id=-1;
 	}	
+	if(ui == `back)
+	{
+	    save_entry=$[];
+	}
 	return ui;
     }
 
@@ -121,8 +151,57 @@
      *
      */
 
-    global define _snd_options() ``{
+    global define _snd_add() ``{
+	list nh=maplist(`e, sound_cards, ``(lookup(e, "model", "")));
+	map res=WhichDialog(nh);
+	symbol ui=lookup(res, "ui", `back);
+        card_id=lookup(res, "card_id", -1);
+        if(card_id == -1 && ui == `next)
+        {
+            return `manual;
+        }
 
+	return ui;	
+    }
+
+    /** 
+     * sound card deletion
+     *
+     */
+
+    global define _snd_delete() ``{
+	if(UI::YesNoPopup(_("Do you really want to delete this entry?")))
+	{
+	    boolean terminate = stop_programs();
+	    if(terminate == false)
+            {
+                return `next;
+            }
+//            integer card_id = UI::QueryWidget (`id(`configured_table), `CurrentItem);
+
+            string modname = lookup(select(save_info, card_id), "module", "");
+
+            // we have to rember volume/mute settings because after a card removal
+            // everything is muted and set to 0.
+            list vol_settings = get_vol_settings();
+
+            list rem = get_indices_for_removal(save_info, modname);
+            save_info = remove_save_entries(save_info, rem);
+            vol_settings = multi_remove(vol_settings, rem);
+
+            SaveModulesEntry (save_info, [], true);
+
+            SCR::Execute (.target.bash, "/etc/init.d/alsasound stop > /dev/null 2>&1", $[]);
+            alsasound_start_tmp(true);
+            y2error(sformat("%1", vol_settings));
+            set_vol_settings(vol_settings);
+ 
+	    // now we have to update the unconfigured cards list
+	    sound_cards = getConfigurableCards(save_info); 
+
+	}
+
+	return `next;
     }
 
     /*
@@ -130,16 +209,26 @@
      *
      */
 
-    global define _snd_config() ``{
-	map save_entry=select(sound_cards, card_id);
+    global define _snd_config( /* symbol finish_sym */) ``{
+	if (card_id >= 0)
+	{
+	    save_entry=select(sound_cards, card_id);
+	}
 	map res=OneCardWizard(save_entry, size(save_info), false, 15, false, save_info);
 
         symbol ui=lookup(res, "ui", nil);
-        if(ui==`next)
+        if(ui == `next)
         {
             save_info=add(save_info, lookup(res, "return", $[]));
-            sound_cards=remove(sound_cards, card_id);
+	    if (card_id >= 0)
+	    {
+		sound_cards=remove(sound_cards, card_id);
+	    }
             // TODO: another dialog should be called
+	    if (size(sound_cards) == 0)
+	    {
+		return `detail;
+	    }
         }
 	return ui;
     }
@@ -150,6 +239,7 @@
      */
 
     global define _snd_complex() ``{
+	was_complex = true;
 	map res=CallFunction(`sound_complex(save_info));
         symbol ui=lookup(res, "ui", nil);
         if(ui==`next)
@@ -199,7 +289,7 @@
 	}
 	arg_n = arg_n - 1;
     }
-    list sound_cards  = get_audio ();
+    list sound_cards  = []; // get_audio ();
 
     list save_info    = read_save_info ();
  
@@ -216,23 +306,15 @@
     boolean exit = false;
     list sound_db = nil;
 
-    if(!fileexist("/usr/lib/YaST2/sndcards.ycp"))
+    if(SCR::Read(.target.size, "/usr/lib/YaST2/sndcards.ycp")==-1) //!fileexist("/usr/lib/YaST2/sndcards.ycp"))
     {
 	UI::MessagePopup(_("Sound card database not found. Please check your installation."));
 	UI::CloseDialog();
 	return;			
     }
-    sound_cards=filter_configured(save_info, sound_cards);
-    if(size(sound_cards)>0)
-    {
-	// get all the apropriate information from the database
-	sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
+    
+    sound_cards = getConfigurableCards(save_info);
 
-    // filter out modules with unspecified module name (sound card not supported by alsa / no module found)
-	sound_cards = filter(`e, sound_cards, ``(lookup(e, "module", $[])!=$[]));
-    // create save_info entries
-	sound_cards = convert_to_save_info(sound_cards);
-    }
     integer all_cards_num=size(sound_cards);
 
     if(exit)
@@ -241,23 +323,13 @@
 	return;
     }
     SCR::Execute(.target.bash, "rm /tmp/modules.conf > /dev/null 2>&1; touch /tmp/modules.conf > /dev/null 2>&1", $[]);
-//    SaveModulesEntry(save_info, [], true);
-    boolean skipped = false;
-    if(all_cards_num == 1)
-    {
-	call_complex_dialog=false;
-    }
-    else
-    {
-	call_complex_dialog=true;
-    }
     
     nm256_opl3sa2_warn(sound_cards);
 
     symbol state=`card_select;
 
     
-    // test data
+// test data
 //    save_info=[];
 //    sound_cards=[$["model":"Pokusna karta", "module": "snd-card-emu10k1", "unique_key":"kx", "options": []]];
 
@@ -276,10 +348,18 @@
 
     map m_aliases=$[
 	    "intro"	: ``(_snd_select()),
-	    "config"	: ``(_snd_config()),
-	    "options"	: ``(_snd_options()),
-	    "manual"	: ``(_snd_manual()),
+
+	    "config1"	: ``(_snd_config()),
+	    "config2"	: ``(_snd_config()),
+
+	    "manual1"	: ``(_snd_manual()),
+	    "manual2"	: ``(_snd_manual()),
+
 	    "complex"	: ``(_snd_complex()),
+	    "delete"	: ``(_snd_delete()),
+	    "select"	: ``(_snd_add()),
+
+	    // quick configuration
 	    "quick"	: ``(_snd_quick()),
 	    "quick2"	: ``(_snd_quick2(true)),
 	    "quick3"	: ``(_snd_quick2(false))
@@ -305,35 +385,60 @@
 		    `next	    :	`finish,
 		    `abort	    :	`abort
 		],
+
+
 	    "intro"	: 
 		$[
 		    `next	    :	`finish,
-		    `configure	    :   "config",
-		    `options	    :	"options",
-		    `manual	    :	"manual",
+		    `configure	    :   "config1",
+		    `manual	    :	"manual1",
 		    `detail	    :	"complex",
 		    `abort	    :	`abort
 		],
-	    "config"	: 
+
+
+	    "config1"	: 
 		$[
 		    `next	    :	"intro",
-		    `skip	    :	"manual",
+		    `detail	    :	"intro",
 		    `abort	    :   `abort
 		],
-	    "options"	:
+	    "manual1"	: 
 		$[
-		    `next	    :	"intro",
-		    `abort	    :	`abort
-		],
-	    "manual"	: 
-		$[
-		    `next	    :	"intro",
+		    `next	    :	"config1",
 		    `abort	    :	`abort		
-		],		
+		],
+
+	    "config2"	: 
+		$[
+		    `next	    :	"complex",
+		    `detail	    :	"complex",
+		    `abort	    :   `abort
+		],
+	    "manual2"	: 
+		$[
+		    `next	    :	"config2",
+		    `abort	    :	`abort		
+		],
+	    
+
 	    "complex"	:
 		$[
 		    `next	    :	`finish,
-		    `abort	    :	`abort
+		    `abort	    :	`abort,
+		    `add_manual     :	"manual2",
+		    `add_select	    :	"select",
+		    `delete	    :	"delete"
+		],
+	    "select"	:
+		$[
+		    `abort	    :	`abort,
+		    `next	    :	"config2",
+		    `manual	    :	"manual2"
+		],
+	    "delete"	:
+		$[
+		    `next	    :	"complex"
 		]
 	];
 
@@ -358,16 +463,6 @@
 
     // always save unique keys 
 	save_unique_keys (maplist(`e, save_info, ``(lookup(e, "unique_key", ""))));
-
-//	if (lookup (rc_vars, "START_ALSA", "yes") == "no")
-//	{
-//	    SCR(`Execute (.target.bash, "/etc/init.d/alsasound stop", $[]));
-//	}
-//	else
-//	{
-//	    SCR(`Execute (.target.bash, "/sbin/depmod", $[]));
-//	    SCR(`Execute (.target.bash, "/etc/init.d/alsasound restart", $[]));
-//	}
     }
 
     UI::CloseDialog ();

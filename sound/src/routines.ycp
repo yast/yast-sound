@@ -22,6 +22,28 @@
 //    include "ui/summary.ycp";
 
     /**
+     * 
+     *
+     */
+
+    global define getConfigurableCards(list save_info) ``{
+	list snd = get_audio();
+	snd = filter_configured(save_info, snd);
+	if (size(snd) > 0)
+	{ 
+	    // get all the apropriate information from the database
+	    snd =  maplist(`e, snd, ``(add (e, "module", get_module (e))));
+
+	    // filter out modules with unspecified module name (sound card not supported by alsa / no module found)
+	    snd = filter(`e, snd, ``(lookup(e, "module", $[])!=$[]));
+	    // create save_info entries
+	    snd = convert_to_save_info(snd);
+	}
+	return snd;
+    }
+
+
+    /**
      * logtime- logs current time - used for performance 
      * improvements
      *
@@ -79,54 +101,6 @@
             i=i+1;
         }
         return true;	
-    }
-
-    /**
-     * when adding card manually, this function prepares
-     * a save_info record. 
-     * @param list save_info created earlier
-     * @return list save_info with added card
-     *
-     */
-
-    global define add_card_manually(list save_info) ``{
-	symbol ui=nil;
-	map entry=$["unique_key": isa_uniq(), "options": $[]];
-	while(true)
-	{
-            map res=CallFunction(`sound_manual());
-
-            if(lookup(res, "ui", nil)==`next)
-            {
-                entry=add(entry, "model", lookup(res, "model", ""));
-                entry=add(entry, "module", lookup(res, "module", ""));
-            }
-            else
-            {
-                ui=lookup(res, "ui", nil);
-                if(ui==`abort || ui==`cancel)
-                {
-                    ui= `abort;
-                }
-                break;
-            }
-	    res=OneCardWizard(entry,  size(save_info), `next, 6, false, save_info);
-	    if(lookup(res, "ui", `cancel)==`next)
-	    {
-	        entry=lookup(res, "return", $[]);
-	        ui=`next;
-	        break;
-	    }
-	    else
-	    {
-	        if(lookup(res, "ui", `cancel)!=`back)
-	        {
-	            ui=`abort;
-	            break;
-	        }
-	    }
-	}
-	return $["ui": ui, "return": entry];
     }
 
     /** 
@@ -363,7 +337,7 @@
      */
 
     global define get_running_cards () ``{
-        if (fileexist("/proc/asound/cards"))
+        if (SCR::Read(.target.size, "/proc/asound/cards") != -1) //fileexist("/proc/asound/cards"))
         {
             list asound = SCR::Read(.proc.asound.cards);
             if (is(select (asound, 0), map))
@@ -495,7 +469,7 @@
 
     global define get_audio() ``{
         string tmpdir=SCR::Read (.target.tmpdir);
-        if(fileexist(tmpdir+"/audio.ycp"))
+        if (SCR::Read(.target.size, tmpdir+"/audio.ycp") != -1) // fileexist(tmpdir+"/audio.ycp"))
         {
             return SCR::Read(.target.ycp, tmpdir+"/audio.ycp");
         }
@@ -601,7 +575,8 @@
 	{
 	    SCR::Execute(.audio.alsa.store, 0, 0);
 	}   
-	string p=sformat(".audio.alsa.cards.%1.store", cardid);
+	string p=sformat(".audio.alsa.cards.%1.store", card_id);
+
 	SCR::Execute(topath(p), 0, 0);
     }
 
@@ -618,7 +593,7 @@
 
     global define PlayTest (map user_settings, integer card_id) ``{
 
-        if (!fileexist(lookup (user_settings, "audio_file", "")))
+        if (SCR::Read(.target.size, lookup (user_settings, "audio_file", "")) == -1) //!fileexist(lookup (user_settings, "audio_file", "")))
         {
             string file = lookup (user_settings, "audio_file", "");
 
@@ -645,11 +620,11 @@
      * @return empty string on success/ error message on failure
      */ 
 
-    global define check_module(map save_entry) ``{
+    global define check_module(map save_entry, integer card_id) ``{
 	// TODO: check by /proc/asound/cards
 	map pm = SCR::Read(.proc.modules);
 	string mod_name=lookup(save_entry, "module", "off");
-        if (!haskey (pm, mod_name))
+        if (!haskey (pm, mod_name) || size(get_running_cards()) <= card_id)
         {
 
                 // To translators: label to error popup
@@ -920,7 +895,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      */
 
     global define FontsInstalled() ``{
-	return fileexist("/usr/share/sfbank/creative");
+	return SCR::Read(.target.size, "/usr/share/sfbank/creative") >=0; // fileexist("/usr/share/sfbank/creative");
     }
 
     /** @return true if the sound card supports sound fonts
@@ -1086,7 +1061,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	integer pos=0;
 	save_info=maplist(`e, save_info, 
 	``{
-	    map opts=lookup(lookup(e, "modules", $[]), "options", $[]);
+	    map opts=lookup(/* lookup(e, "module", $[]) */ e, "options", $[]);
 	    opts=add(opts, "snd_index", sformat("%1", pos));
 	    opts=add(opts, "snd_id", sformat("card%1", pos+1));
 	    e=add(e, "alias", sformat("snd-card-%1", pos));

@@ -303,7 +303,9 @@
 //    list save_entry = Args(0);
     map save_entry = Args(0);
 
-    list db=GetCardDatabase();
+
+//    list db=GetCardDatabase();
+    read_db();
 
     string modname=lookup(save_entry, "module", "");
     string cardlabel=lookup(save_entry, "model", "");

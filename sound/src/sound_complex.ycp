@@ -59,98 +59,6 @@
 	return tmp;
     }
 
-  /**
-   * just decides which way to go-
-   * manual or autodetected
-   * @return map with new save_info_entry
-   */
-    define WhichDialog ()	``{
-    // help text 
-
-	string helptext=lookup(STRINGS, "WhichDialog");
-
-	list nc = [];
-	integer i = 0;
-
-	list sound_cards  = get_audio ();
-//	if(db==nil)
-//	{
-//	    db=GetCardDatabase();
-//	}
-
-
-	sound_cards = maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
-	sound_cards = filter(`e, sound_cards, ``(lookup(e, "module", $[])!=$[]));
-	sound_cards = filter_configured(save_info, sound_cards);
-	sound_cards = convert_to_save_info(sound_cards);
-
-
-	maplist (`e, sound_cards, 
-	``{
-	    nc = add (nc, `item(`id(i), lookup(e, "model", "")));
-	 	  i = i + 1;
-	});
-    
-	term con = WhichDlgCon(nc);
-
-	// dialog title
-	UI::SetWizardContents (_("Configure a sound card"), con, helptext, true, true);
-	// Next - button label
-	UI::ChangeWidget(`id(`next), `Label, UI(`NextButtonLabel()));
-
-	if (size (nc) == 0) 
-	{
-	    UI::ChangeWidget (`id(`sel), `Enabled, false);
-	    UI::ChangeWidget (`id(`auto), `Enabled, false);
-	}
-	else
-	{
-	    UI::ChangeWidget(`id(`sel), `CurrentItem, 0);
-	}
-
-	any ui = nil;
-
-
-	repeat 
-	{
-	    ui = UI::UserInput ();
-	
-	    if (ui == `manual)
-	    {
-		UI::ChangeWidget (`id(`sel), `Enabled, false);
-	    }
-	    else if (ui == `auto)
-	    {
-		UI::ChangeWidget (`id(`sel), `Enabled, true);
-	    }	
-	    else if (ui == `abort || ui == `cancel)
-	    {
-		if(ReallyAbort())
-		{
-		    break;
-		}
-	    }
-	} until ((((ui == `back) || (ui == `next) || ui == `cancel))); 
-
-	map new_entry=$[];
-
-	symbol way=UI::QueryWidget (`id(`rg), `CurrentButton);
-	if(way == `auto)
-	{
-	    integer index=UI::QueryWidget(`id(`sel), `CurrentItem);
-	    new_entry=select(sound_cards, index);
-	}
-	else if(way == `manual)
-	{
-	    new_entry=$["unique_key": isa_uniq()];
-	}
-
-
-	return $["ui" : ui,
-		"entry"  : new_entry];
-
-    }
-
     define createTable(list save_info) ``{
 	list runn=get_running_cards();
 	integer pos=0;
@@ -213,7 +121,9 @@
 	any ui=nil;
         string helptext=lookup(STRINGS, "ComplexDialog");
 
-	if(size(save_info) != size(SCR::Dir(.audio.alsa.cards)))
+	y2error(" save_info %1, agent %2", size(save_info), size(SCR::Dir(.audio.alsa.cards)));
+
+	if(size(save_info) != size(get_running_cards())) // size(SCR::Dir(.audio.alsa.cards)))
 	{
 	    if(UI::YesNoPopup(_("The number of currently running cards doesn't match 
 the number of configured cards in your configuration files. 
@@ -254,14 +164,17 @@ Try to restart sound system?")))
 	    UI::ChangeWidget(`id(`b_seq), `Enabled, false);
 	}
 
-	repeat 
+	do 
 	{
 	    SCR::Execute(.audio.alsa.restore, 0, 0);
 
 	    ui = UI::`UserInput ();
-	    if (ui == `b_delete && UI::YesNoPopup(_("Do you really want to delete this entry?"))) 
+	    if (ui == `b_delete) // && UI::YesNoPopup(_("Do you really want to delete this entry?"))) 
 	    {
-		boolean terminate=stop_programs();
+		ui = `delete;
+		// global variable card_id
+		card_id = UI::QueryWidget (`id(`configured_table), `CurrentItem);
+/*		boolean terminate=stop_programs();
 		if(terminate==false)
 		{
 		    continue;
@@ -285,19 +198,19 @@ Try to restart sound system?")))
 		y2error(sformat("%1", vol_settings));
 		set_vol_settings(vol_settings);
 		
-		cc=createTable(save_info);
+//		cc=createTable(save_info);
     
-		UI::ChangeWidget (`id(`configured_table), `Items, cc);
-		if (size (cc) == 0) 
-		{
-		    SCR::Execute (.target.bash, "/etc/init.d/alsasound stop > /dev/null 2>&1", $[]);
-		    enableButtons(false);
-		}
-		else
-		{ 
-		    UI::ChangeWidget(`id(`configured_table), `CurrentItem, 0);
-		}
-	    }
+//		UI::ChangeWidget (`id(`configured_table), `Items, cc);
+//		if (size (cc) == 0) 
+//		{
+//		    SCR::Execute (.target.bash, "/etc/init.d/alsasound stop > /dev/null 2>&1", $[]);
+//		    enableButtons(false);
+//		}
+//		else
+//		{ 
+//		    UI::ChangeWidget(`id(`configured_table), `CurrentItem, 0);
+//		}
+*/	    }
 	    else if (ui == `b_options)
 	    {
 		integer card_id = UI::QueryWidget (`id(`configured_table), `CurrentItem);
@@ -369,83 +282,22 @@ Try to restart sound system?")))
 	    else if (ui == `b_conf2) 
 	    // add soundcard
 	    {
-		repeat 
+		list cards=get_audio();
+		if(size(cards)!=0)
 		{
-		    map result = $[];
-		    list cards=get_audio();
-	    
-		    if(size(cards)!=0)
-		    {
-			cards = maplist(`e, cards, ``(add (e, "module", get_module (e))));
-			cards = filter(`e, cards, ``(lookup(e, "module", $[])!=$[]));
-			cards = filter_configured(save_info, cards);
-		    }
+		    cards = maplist(`e, cards, ``(add (e, "module", get_module (e))));
+		    cards = filter(`e, cards, ``(lookup(e, "module", $[])!=$[]));
+		    cards = filter_configured(save_info, cards);
+		}
+		
 
-		    if (size (cards) > 0)
-		    {
-			result = WhichDialog ();
-		    }
-		    else 
-		    {
-			result = $["ui" : `next, "entry" : $["unique_key": isa_uniq()]];
-		    }
-		    ui = lookup (result, "ui", `cancel);
-		    map entry=lookup(result, "entry", $[]);
-		    if (ui == `next) 
-		    {
-			string uni=lookup(entry, "unique_key", "");
-			boolean showMan=false;
-			map res=$[];
-			if(uni==isa_uniq())
-			{
-			    showMan=true;
-			}
-			map res=$[];
-			if(showMan)
-			{
-			    map res=add_card_manually(save_info);
-			}
-			else
-			{
-			    res=OneCardWizard(entry,  size(save_info), `next, 6, false, save_info);
-			}
-			symbol ui=lookup(res, "ui", nil);
-			if(ui == `abort)
-			{
-			    return $["ui": `abort];
-			}
-			else if(ui == `next)
-			{
-			    entry=lookup(res, "return");
-			    save_info=add(save_info, entry);
-			}    
-	
-		    }
-		    else if (ui == `cancel || ui == `abort)
-		    {
-			return $["ui" : `abort];
-			break;
-		    }
-		} until ((ui == `back) || (ui == `next) || (ui == `cancel) || (ui == `skip));
-	    
-		ui = nil;
-
-		cc = createTable(save_info);
-
-		// dialog title
-		UI::SetWizardContents (_("Sound configuration"), con, helptext, true, true);
-		UI::ChangeWidget(`id(`configured_table), `Items, cc);
-		// Finish - button label
-		UI::ChangeWidget(`id(`next), `Label, UI::FinishButtonLabel());
-	    
-		if (size (cc) == 0) 
+		if(size(cards) == 0)
 		{
-		    enableButtons(false);
+		    ui = `add_manual;
 		}
 		else
 		{
-		    UI::ChangeWidget(`id(`configured_table), `CurrentItem, 0);
-		    enableButtons(true);
+		    ui = `add_select;
 		}
 	    }
 	    else if(ui == `cancel || ui == `abort)
@@ -457,7 +309,7 @@ Try to restart sound system?")))
 	    }
 	
 	
-	} until (((ui == `back) || (ui == `next) || ui == `cancel));
+	} while (!contains([`back, `next, `cancel, `abort, `add_manual, `add_select, `delete], ui));
     
 
 	return $["ui"       : ui,
