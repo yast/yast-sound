@@ -1,6 +1,8 @@
 #
 # Makefile.am for y2a_audio/doc
 #
+# $Id$
+#
 
 SUBDIRS = autodocs
 
