@@ -70,7 +70,6 @@
 	list nc = [];
 	integer i = 0;
 
-//	list not_yet = get_not_yet (configured_unique);
 	list sound_cards  = get_audio ();
 	if(db==nil)
 	{
@@ -146,7 +145,6 @@
 
 
 	return $["ui" : ui,
-//	        "way" : UI(`QueryWidget (`id(`rg), `CurrentButton)),
 		"entry"  : new_entry];
 
     }
@@ -205,7 +203,7 @@
 	// help text 
         string helptext=lookup(STRINGS, "ComplexDialog");
 
-/*	if(size(conf_cards) < size(uniq_keys))
+	if(size(save_info) < size(get_running_cards()))
 	{
 	    if(UI(`YesNoPopup(_("There is configured sound card, but is not functional at
  the moment, because the kernel modules are not present. Try to load them?"))))
@@ -214,11 +212,11 @@
 		y2error("alsa restarted");
 	    }
 	}
-*/
+
 	list cc = createTable(save_info);
  
 	boolean show_fonts=false;
-	maplist(`e, get_audio(), ``{ if(HasFonts(e)) show_fonts=true;});
+	maplist(`e, save_info, ``{ if(HasFonts(e)) show_fonts=true;});
 	
 	term con = ComplexDlgCon(cc, 
 			(lookup (rc_vars, "START_ALSA", "no") == "yes"), 
@@ -365,7 +363,6 @@
 		    map entry=lookup(result, "entry", $[]);
 		    if (ui == `next) 
 		    {
-//			map entry=lookup(result, "entry", $[]);
 			string uni=lookup(entry, "unique_key", "");
 			boolean showMan=false;
 			map res=$[];
@@ -373,45 +370,6 @@
 			{
 			    showMan=true;
 			}
-/*			while(true)
-			{
-			    if(showMan)
-			    {
-				res=CallModule("sound_manual", []);
-				
-				if(lookup(res, "ui", nil)==`next)
-				{
-				    entry=add(entry, "model", lookup(res, "model", ""));
-				    entry=add(entry, "module", lookup(res, "module", ""));
-				}
-				else 
-				{
-				    ui=lookup(res, "ui");
-				    if(ui==`abort || ui==`cancel) 
-				    {
-					return $["ui": `abort];
-				    }
-				    break;
-				}
-			    }
-			    res=OneCardWizard(entry,  size(save_info), `next, 6, false, save_info);
-			    if(lookup(res, "ui", `cancel)==`next)
-			    {
-				entry=lookup(res, "return", $[]);
-				ui=`next;
-				break;
-			    }
-			    else
-			    {
-				if(lookup(res, "ui", `cancel)!=`back)
-				{
-				    ui=`abort;
-				    break;
-				}
-			    }
-			}
-			
-*/			
 			map res=$[];
 			if(showMan)
 			{
@@ -421,7 +379,12 @@
 			{
 			    res=OneCardWizard(entry,  size(save_info), `next, 6, false, save_info);
 			}
-			if(ui == `next)
+			symbol ui=lookup(res, "ui", nil);
+			if(ui == `abort)
+			{
+			    return $["ui": `abort];
+			}
+			else if(ui == `next)
 			{
 			    entry=lookup(res, "return");
 			    save_info=add(save_info, entry);
@@ -467,13 +430,6 @@
 	} until (((ui == `back) || (ui == `next) || ui == `cancel));
     
 
-      //to_delete = filter (`e, to_delete, ``(e == lookup (lookup (lookup (result, "return"), "modules"), "alias")));
-//	if (size (to_delete) > 0)
-//	{
-//	    save_info = mark_off (to_delete);
-//	}
-
-
 	return $["ui"       : ui,
 		"save_info" : save_info,
 		"configured_unique" : configured_unique,
@@ -487,8 +443,6 @@
 
     list save_info = Args(0);
     list configured_unique = Args(1);
-
-//    cards=order_cards_by_uniques(cards, configured_unique);
 
     list to_delete = [];
     boolean config_mode = false;

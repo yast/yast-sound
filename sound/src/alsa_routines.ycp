@@ -43,22 +43,6 @@
     }
 
     /**
-     *
-     *
-     *
-     *
-     */
-    global define get_card_label(map card)
-    ``{
-	list lab=splitstring(hardware_name(card),"\n");
-	if(select(lab, 1)=="")
-	{
-	    return select(lab, 0);
-	}
-	return select(lab, 1);
-    }
-
-    /**
      * creates a save-info-like list of cards
      * @param detected cards
      */

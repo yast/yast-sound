@@ -23,11 +23,11 @@
     include "ui/summary.ycp";
     include "misc_defines.ycp";
     include "sound/routines.ycp";
+    include "sound/read_routines.ycp";
 
     list cards=get_audio();
     list keys=read_unique_keys();
-
-    list runcards = SCR(`Read(.proc.asound.cards));
+    list save_info=read_save_info ();
 
     list conflist=[];	// configured
     list notlist=[];	// not configured
@@ -36,9 +36,9 @@
 	
     string key="";
     
-    foreach(`card, runcards, 
+    foreach(`entry, save_info, 
     ``{
-	conflist=add(conflist, removeBlanks(lookup(card, "line1", "")));
+	conflist=add(conflist, lookup(entry, "model", ""));
     });
 
     foreach(`card, cards, 
@@ -46,7 +46,7 @@
 	key=lookup(card, "unique_key", "");
 	if(!contains(keys, key))
         {
-            notlist=add(notlist, removeBlanks(hardware_name(card)));
+            notlist=add(notlist, get_card_label(card));
         }
     });
 
