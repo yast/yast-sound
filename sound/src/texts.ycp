@@ -26,93 +26,47 @@
 
     global define STRINGS_() ``{
 	return $["DisplayName":
-	     UI(_("<p>If you want to configure this sound card and adjust its volume check <b>Normal setup</b>.</p>"))+
-	     UI (_("<p>If you want to set a special option, check the <b>Advanced setup</b> radio button.
-Most users won't need this.</p>"))+
-	     UI (_("<p>If you have more than one sound card, you can check <b>Skip</b> to
-configure an other card than the one that is displayed on the right.</p>"))+
-	    UI(_("<p>For quick automatic setup check <b>Quick automatic setup</b>.</p>")),
+	     UI(_("<p>If you want to configure this sound card and adjust its volume check <b>Normal setup</b>.</p><p>If you want to set a special option, check the <b>Advanced setup</b> radio button. Most users won't need this.</p><p>If you have more than one sound card, you can check <b>Skip</b> to configure an other card than the one that is displayed on the right.</p><p>For quick automatic setup check <b>Quick automatic setup</b>.</p>")),
 
 	    
 	    "ManualDialog":
-	    UI(_("<p>Please <b>manually</b> choose the sound\
- card, you want to configure. You can search for a particular sound\
- card by entering the name in the search box.</p>"))+
-	    UI(_("<p>Select <b>All</b> if you want\
- to see the whole list of supported sound card models.</p>")),
+	    UI(_("<p>Please <b>manually</b> choose the sound card, you want to configure. You can search for a particular sound card by entering the name in the search box.</p><p>Select <b>All</b> if you want to see the whole list of supported sound card models.</p>")),
       
 
 	    "WhichDialog":
-	    UI (_("<p>Please select what kind of card you want to configure.</p>"))+
-	    UI (_("<p>If the list contains <b>autodetected</b> (and not yet configured) cards, select one and go ahead. "))+
-	    UI (_("Otherwise use <b>manual selection</b>.</p>")),
+	    UI (_("<p>Please select what kind of card you want to configure.</p><p>If the list contains <b>autodetected</b> (and not yet configured) cards, select one and go ahead. Otherwise use <b>manual selection</b>.</p>")),
 
 	
 	    "WhichDialogMsg":
-	    UI (_("There are programs running that are currently using the audio device.\n")) +
-	    UI (_("To reset the configuration these programs must be terminated. Proceed?")),
+	    UI (_("There are programs running that are currently using the audio device.\n To reset the configuration these programs must be terminated. Proceed?")),
 
 
 	    "ComplexDialog":
-	    UI(_("<p>The complete sound cards list. Use the <b>Finish</b> button \
-to save sound card information.</p>"))+
-	    UI(_("<p>Use <b>Delete</b> button to remove configured sound card. \
-<b>Add soundcard</b> button can be used for adding sound card.</p>"))+
-	    UI(_("<p>Use the <b>start ALSA</b> check button to enable (resp. disable) \
-ALSA start-up during boot time. Check the <b>start sequencer</b> if you want to load modules \
-for playing MIDI files during boot-time (these modules can be loaded on demand).</p>")),
+	    UI(_("<p>The complete sound cards list. Use the <b>Finish</b> button to save sound card information.</p><p>Use <b>Delete</b> button to remove configured sound card. <b>Add soundcard</b> button can be used for adding sound card.</p><p>Use the <b>start ALSA</b> check button to enable (resp. disable) ALSA start-up during boot time. Check the <b>start sequencer</b> if you want to load modules for playing MIDI files during boot-time (these modules can be loaded on demand).</p>")),
 
 	      // To translators: To reset the sound configuration these programs must be terminated
 	      // To translators: label message
 	    "ComplexDialogMsg":
-	    UI (_("There are programs running that are currently using the audio device.\n"))+
-	    UI (_("To reset the configuration these programs must be terminated. Proceed?")),
+	    UI (_("There are programs running that are currently using the audio device.\n To reset the configuration these programs must be terminated. Proceed?")),
 
 
 	    "OptionsDialog":
-	    "<p>"+
-	    UI(_("Here, you can modify the options for the sound modules.\n"))+
-	    UI(_("If you are not <b>absolutely sure</b> what you are doing, please leave this dialog untouched."))+
-	    "</p>"+
-	    UI (_("<p>Choose the option you want\
- to set, use the <b>Set</b> button to enable new value. You can reset\
- all values by pressing <b>Reset</b>. Numeric values can be entered as\
- decimal or hexadecimal (hexadecimal with a <b>0x</b> prefix).</p>"))+
-	    "<p>",
-   
+	    UI(_("<p>Here, you can modify the options for the sound modules.\n If you are not <b>absolutely sure</b> what you are doing, please leave this dialog untouched. </p><p>Choose the option you want to set, use the <b>Set</b> button to enable new value. You can reset all values by pressing <b>Reset</b>. Numeric values can be entered as decimal or hexadecimal (hexadecimal with a <b>0x</b> prefix).</p>")),
 
 	    "VolumeDialog":
-	    UI(_("<p>Please adjust the volume.</p>"))+
-	    UI(_("<p>You can test your sound card by pressing the <b>Test</b> button.</p>"))+
-	    UI(_("<p>After the configuration is\
- done you can use <b>amixer</b> (or any program of your choice) for\
- adjusting the volume.</p>"))+
-	    UI(_("<p><b>WARNING/SPECIAL\
- NOTE:</b>Please start testing your sound card with <b>very</b> low\
- volume settings to prevent an accident with too much loud\
- noise.</p>")),
+	    UI(_("<p>Please adjust the volume.</p><p>You can test your sound card by pressing the <b>Test</b> button.</p><p>After the configuration is done you can use <b>amixer</b> (or any program of your choice) for adjusting the volume.</p><p><b>WARNING/SPECIAL NOTE:</b>Please start testing your sound card with <b>very</b> low volume settings to prevent an accident with too much loud noise.</p>")),
 
 
 	    "ErrorDialog":
 	    UI(_("<p>An error has occurred. </p>"))+
-	    UI(_("<p>You should check that you have\
- correctly installed the <b>ALSA</b> package (from the series 'snd') and that\
- you are running this as a root.</p>"))+
-	    UI (_("<p>If the the problem\
- persists, you can try to pass some <b>options</b> to the ALSA module.\
- If you still can't get your sound card working, you can try\
- <i>OSS/Free</i> or another module.</p>\
- <p>However, <b>YaST2</b>\
- sound configuration currently only supports ALSA.</p>")),
+	    UI(_("<p>You should check that you have correctly installed the <b>ALSA</b> package (from the series 'snd') and that you are running this as a root.</p><p>If the the problem persists, you can try to pass some <b>options</b> to the ALSA module. If you still can't get your sound card working, you can try <i>OSS/Free</i> or another module.</p><p>However, <b>YaST2</b> sound configuration currently only supports ALSA.</p>")),
 
 	 
 	    "SuccessDialog":
 	    UI(_("<P>Automatic configuration finished successfully.</P>")),
  
 	    "nm256hackWarning":
-	    UI(_("Configuring this sound card on some Sony VAIO notebooks
- may be unsuccessful with running X. You may avoid these problems by specifying snd_vaio_hack
- option value to 1 or configuring this card outside X. Proceed?")),
+	    UI(_("Configuring this sound card on some Sony VAIO notebooks may be unsuccessful with running X. You may avoid these problems by specifying snd_vaio_hack option value to 1 or configuring this card outside X. Proceed?")),
 
 	    "SaveModuleEntry":
 	    UI(_("Error while saving '/etc/modules.conf'.\n")),
@@ -151,12 +105,10 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 	    UI(_("Install Soundfonts")),
 
 	    "soundFontQuestion":
-	    UI(_("Would you like to let YaST2 install the Wavetable-Soundfonts
-from your Soundblaster Live! / AWE driver CD ?")),
+	    UI(_("Would you like to let YaST2 install the Wavetable-Soundfonts from your Soundblaster Live! / AWE driver CD ?")),
 
 	    "soundFontAppeal":
-	    UI(_("Please insert the driver CD for the 
-Soundblaster Live! / AWE card in the cdrom drive.")),
+	    UI(_("Please insert the driver CD for the Soundblaster Live! / AWE card in the cdrom drive.")),
 
 	    "soundFontFinal":
 	    // To translators: the messaage below will look like this: "14 soundfont-files have been installed in /usr/lli/asdf"
@@ -169,8 +121,7 @@ Soundblaster Live! / AWE card in the cdrom drive.")),
 	    UI(_("Would you like to change the CD and retry ?")),
 
 	    "opl3sa_nm256_warn":
-	    UI(_("'%1' and '%2' sound cards were autodetected on your system. For proper
-functionality, please skip the '%1' soundcard and configure only the '%2'."))
+	    UI(_("'%1' and '%2' sound cards were autodetected on your system. For proper functionality, please skip the '%1' soundcard and configure only the '%2'."))
 	    ];
     }
 

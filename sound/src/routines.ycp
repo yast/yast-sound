@@ -587,11 +587,20 @@
     }
 
     /**
-     * command must be string with $CHANNEL and $VALUE included
+     * volume in percents (0..100)
      * @return any
      */
-    global define SetVolume (string command, string channel, string value, integer card_num) ``{
-	return SCR(`Execute (.target.bash, command, $["CHANNEL" : channel, "VOLUME" : value, "CARD_NUM" : card_num]));
+    global define SetVolume (string group, integer cardid, integer value) ``{
+	string p=sformat(".alsa.mixer.%1.%2.value", cardid, group);
+
+	SCR(`Write(topath(p), value));
+    }
+
+    global define unmute(list devices, integer card_id) ``{
+	foreach(`dev, devices,
+	``{
+	    SCR(`Write(topath(sformat(".alsa.mixer.%1.%2.mute", card_id, dev)), false));
+	});
     }
 
     /**
@@ -620,18 +629,9 @@
         }
         else
         {
-            string play_cmd = lookup (user_settings, "play_cmd", "");
             string audio_file = lookup (user_settings, "audio_file", "");
                   // more cards
-            if (no_alsa)
-            {
-                SCR(`Execute (.target.bash_background, sformat("%1 %2", play_cmd, audio_file)));
-            }
-            else
-            {
-		SCR(`Execute (.target.bash_background, sformat("%1 -c %2 %3 ", play_cmd, card_id, audio_file)));
-//                Shell(sformat("%1 -c %2 %3 &", play_cmd, card_id, audio_file), $[]);
-            }
+	    SCR(`Execute (.target.bash_background, sformat("aplay -c %1 %2 ", card_id, audio_file)));
         }
         return "";
     };

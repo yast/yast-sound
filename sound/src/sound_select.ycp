@@ -19,13 +19,15 @@
  */
 
 {
+    textdomain "sound";
+
     include "sound/ui.ycp";
 
     // show the dialog
     selectHardware( maplist(`e, sound_cards, ``(lookup(e, "model", ""))),
                     maplist(`e, save_info, ``(lookup(e, "model", ""))));
 
-    UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
+    UI(`ChangeWidget(`id(`next), `Label, NextButtonLabel()));
 
     any ui=nil;
     repeat

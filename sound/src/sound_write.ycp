@@ -82,6 +82,8 @@
     UI(`SetWizardContents (_("Sound configuration"), con, helptext, false, false));
     UI(`DisableWizardAbortButton());
 
+    SaveVolume();
+
     SaveModulesEntry(save_info, [], false);
 /*
       // Step ONE: save '/etc/modules.conf'
