@@ -26,6 +26,7 @@
     include "sound/ui.ycp";
     include "sound/texts.ycp";
 
+//    include "browser.ycp";
 
     // text constants for sound module
     map STRINGS=STRINGS_();
@@ -244,6 +245,8 @@
     // get all the apropriate information from the database
     sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
 
+//    BrowseTree(sound_cards);
+
     // filter out modules with unspecified module name (sound card not supported by alsa / not autodetected)
     sound_cards = filter(`e, sound_cards, ``(lookup(e, "module", $[])!=$[]));
 
@@ -275,6 +278,8 @@
     {
 	call_complex_dialog=true;
     }
+    
+    nm256_opl3sa2_warn(sound_cards);
 
     while (cont) 
     {
@@ -332,7 +337,7 @@
     
 	if (call_complex_dialog) 
 	{
-	    result = CallModule ("sound_complex", [sound_cards, save_info, configured_unique]);
+	    result = CallModule ("sound_complex", [get_audio(false, false)/*sound_cards*/, save_info, configured_unique]);
 	    //BrowseTree(["result from complex", result]);
 	}
 	else

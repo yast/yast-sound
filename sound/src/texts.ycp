@@ -166,7 +166,11 @@ Soundblaster Live! / AWE card in the cdrom drive.")),
 	    UI(_("No Soundfont-files found.")),
 
 	    "soundFontRetry":
-	    UI(_("Would you like to change the CD and retry ?"))
+	    UI(_("Would you like to change the CD and retry ?")),
+
+	    "opl3sa_nm256_warn":
+	    UI(_("'%1' and '%2' sound cards were autodetected on your system. For proper
+functionality, please skip the '%1' soundcard and configure only the '%2'."))
 	    ];
     }
 

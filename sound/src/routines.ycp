@@ -1122,13 +1122,23 @@
     }
 
    /**
-   * Detected, but not configured cards
+   * Detected, but not configured cards. contains only cards supported by alsa
    *
    * @return list
    */
     global define get_not_yet () ``{
+
+
         list all = get_audio (test_mode, config_mode);
         list not_yet = get_unique_not (all, ["configured"], "sound", false, config_mode);
+
+	if(size(not_yet)>0)
+	{
+	    list db=GetCardDatabase(); // needed for get_module function
+	    not_yet=maplist(`e, not_yet, ``(add (e, "module", get_module (e))));
+	}
+
+	not_yet=filter(e, not_yet, ``(lookup(`e, "module", $[])!=$[]));	
 
         return not_yet;
     }
@@ -1231,7 +1241,12 @@
 	SCR(`Execute(.target.bash, cmd, $[]));
 	cmd="/bin/echo options snd snd_cards_limit=16 snd_major=116 >> "+get_tmp_modules_conf();
 	SCR(`Execute(.target.bash, cmd, $[]));
-	cmd=sformat("/bin/grep \"^[^#].*snd-card-\" /etc/modules.conf >> %1", get_tmp_modules_conf());
+	
+//	cmd=sformat("/bin/grep \"^[^#].*snd-card-\" /etc/modules.conf >> %1", get_tmp_modules_conf());
+	cmd=sformat("grep \"^alias.snd-card-[0-9]*\" /etc/modules.conf >> %1", get_tmp_modules_conf());
+	SCR(`Execute(.target.bash, cmd, $[]));
+	
+	cmd=sformat("grep \"^options.snd-card-\" /etc/modules.conf >> %1", get_tmp_modules_conf());
 	SCR(`Execute(.target.bash, cmd, $[]));
     }
 
@@ -1243,7 +1258,6 @@
      */
  
     global define add_tmp_module_record(map card, integer cid) ``{
-	// TODO: remove old records (especially aliases with 'off' name)
 	string module_name=lookup(lookup(card, "module", $[]), "name", "off");
 	string cmd=sformat("/bin/echo alias snd-card-%1 %2 >> ", cid, module_name)+get_tmp_modules_conf();
 	SCR(`Execute(.target.bash, cmd, $[]));
@@ -1272,8 +1286,8 @@
     }
 
     /**
-     *	removes card entry from temporary modules.conf
-     *
+     *	removes card entry from temporary modules.conf. 
+     *  functional only for removing the last record.
      */
 
     global define remove_tmp_module_record(integer cid) ``{
@@ -1282,6 +1296,23 @@
 
 	cmd=sformat("sed /snd_index=%1/d %2 > %3", cid, get_tmp_modules_conf()+"2", get_tmp_modules_conf());
 	SCR(`Execute(.target.bash, cmd, $[]));
+    }
+
+    /**
+     *	removes entry from /tmp/modules.conf.tmp by the module name
+     *
+     */
+
+    global define remove_tmp_module_by_name(string mod_name) ``{
+	string cmd=sformat("sed /%1/d %2 > %3", mod_name, get_tmp_modules_conf(), get_tmp_modules_conf()+"2");	
+	SCR(`Execute(.target.bash, cmd, $[]));
+	
+	y2error(cmd);
+
+	cmd=sformat("cp %1 %2", get_tmp_modules_conf()+"2", get_tmp_modules_conf());
+	SCR(`Execute(.target.bash, cmd, $[]));
+	y2error(cmd);
+
     }
 
     /** 
@@ -1367,10 +1398,52 @@
 	}
     }
 
-    /** 
-     *  
-     *
-     *
+    /**
+     *  helping hand for order_cards_by_uniques
+     *  returns true, if unique_key1 is before unique_key2 in uniques list
      */
+
+    global define uniq_order(string key1, string key2, list uniques) ``{
+
+
+	integer i=0;
+	while(i<size(uniques))
+	{
+	    if(select(uniques, i)==key2) return false;
+	    if(select(uniques, i)==key1) return true;
+	    i=i+1;
+	}
+	return true;
+    }
+
+    /** 
+     *  function to order card entries to appropriate order given by uniq_keys
+     *  @param cards card list from .probe.sound
+     *  @param uniques unique keys from /var/lib/YaST/unique.inf
+     */
+
+    global define order_cards_by_uniques(list cards, list uniques) ``{
+	return sort(`e1, `e2, cards, 
+	    ``(uniq_order(lookup(e1, "unique_key", ""), lookup(e2, "unique_key", ""), uniques)));
+    }
+
+    /**
+     * shows warning message when both nm265 and opl3sa2 cards are present
+     * @param cards list of sound cards
+     */
+    
+    global define nm256_opl3sa2_warn(list sound_cards) ``{
+	list s1=filter(`e, sound_cards, 
+	    ``(lookup(lookup(lookup(e, "module", $[]), "module", $[]), "name", "")=="snd-card-nm256"));
+	list s2=filter(`e, sound_cards, 
+	    ``(lookup(lookup(lookup(e, "module", $[]), "module", $[]), "name", "")=="snd-card-opl3sa2"));
+
+	if(size(s1)>0 && size(s2)>0)
+	{
+	    string name1=mergestring(splitstring(hardware_name(select(s1, 0)), "\n"), " ");
+	    string name2=mergestring(splitstring(hardware_name(select(s2, 0)), "\n"), " ");
+	    UI(`MessagePopup(sformat(lookup(STRINGS, "opl3sa_nm256_warn", ""), name1, name2)));
+	}
+    }
 
 }
