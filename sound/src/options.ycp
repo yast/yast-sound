@@ -90,12 +90,7 @@
         {
             list poss_list = [];
 
-            if (type == "int")
-            {
-		// currently is not possible to have integer values... (?)
-                poss_list = maplist (integer v, poss,``(tointeger(value) == v));
-            }
-            else
+            if (type != "int")
             {
                 poss_list = maplist (string v, poss, ``(value == v));
             }
@@ -117,10 +112,10 @@
      *  @param lk list of keys to look for in 1st param
      *  @return list of items
      */
-    define list create_table (list lm, list lk) ``{
-	list res = [];
+    define list<term> create_table (list lm, list lk) ``{
+	list<term> res = [];
 	integer pos = 0;
-	foreach (map m, lm, ``{
+	foreach (map<string,any> m, (list<map<string,any> >) lm, ``{
 	    res = add(res, `item(`id(pos),
 		lookup(m, lk[0]:"", ""),
 		lookup(m, lk[1]:"", ""),
@@ -193,7 +188,7 @@
 	boolean parse_error	= false;
 	list l			= flatten ((list<list>)parse_bracket(input));
 
-	l = maplist(list e, l, ``{
+	l = maplist(list<any> e, (list<list<any> >) l, ``{
 	    if (size(e) == 0)
 	    {
 		return [];
@@ -285,10 +280,10 @@
      * @param default string default value (preselected in combo)
      * @return term combobox widget
      */
-    define term gen_list(list vals, string default) ``{
-	vals = maplist (string e, vals, ``(`item(`id(e), e, default == e)));
+    define term gen_list(list<string> vals, string default) ``{
+	list<term> vls = maplist (string e, vals, ``(`item(`id(e), e, default == e)));
 	// combo box label
-	return `ComboBox(`id(`poss),`opt(`notify), _("&Possible value:"), vals);
+	return `ComboBox(`id(`poss),`opt(`notify), _("&Possible value:"), vls);
     }
 
     /**
@@ -305,7 +300,7 @@
 	    UI::ReplaceWidget(`id(`reppoint), defWidget());
 	    return;
 	}
-	term widg = gen_list(l, default);
+	term widg = gen_list((list<string>)l, default);
 
 	UI::ReplaceWidget(`id(`reppoint), widg);
     }
@@ -389,7 +384,8 @@
 	string help_text = Sound::STRINGS["OptionsDialog"]:"";
 
 	map origOptions = opts;
-	list options = maplist (string name, map o, opts, ``($[
+	list options = maplist (string name, map<string,any> o,
+	    (map <string, map <string, any> >) opts, ``($[
 	    // label: description of option is not available
 	    "description" : getDescr(o["descr"]:nil),
 	    "name"	  : name,
@@ -398,7 +394,7 @@
 	    "default"     : o["default"]:""]
 	));
 
-	list itemized_descriptions = create_table (options,
+	list<term> itemized_descriptions = create_table (options,
 	    ["description", "name", "value"]);
 
 	integer current_option = 0;
@@ -496,7 +492,7 @@
 		{
 		    UI::ChangeWidget(`id(`table),`Item(current_option,2),value);
 
-		    list tmp = [];
+		    list<term> tmp = [];
 		    maplist (term e, itemized_descriptions, ``{
 			if (current_option ==
 			    (integer) select((list) select (e, 0, []), 0, 0))
@@ -561,7 +557,7 @@
 
 	// now show the dialog
 	map result	= OptionsDialog (label, params);
-	list vals	= result["return"]:[];
+	list<term> vals	= result["return"]:[];
 
 	// convert from table entries (items) back to card
 	map opts = $[];

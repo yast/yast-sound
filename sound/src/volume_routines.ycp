@@ -142,7 +142,7 @@
 
 	// start 'snd' module first
 	cmds = flatten ([[snd], cmds]);
-	maplist(string cmd, cmds, ``{
+	maplist(string cmd, (list<string>) cmds, ``{
 	    map res = (map) SCR::Execute(.target.bash_output, cmd, $[]);
 	    if (res["stderr"]:"" != "")
                 y2error("/sbin/modprobe error output: \n" + res["stderr"]:"");
@@ -171,7 +171,7 @@
 	    mods = add(mods, "emu10k1");
 	    mods = add(mods, "cs4281");
 	    map modules = (map) SCR::Read(.proc.modules);
-	    foreach(string mod, mods, ``{
+	    foreach(string mod, (list<string>) mods, ``{
 		if(haskey(modules, mod))
 		{
 		    SCR::Execute(.target.bash,sformat("/sbin/rmmod -r %1",mod));

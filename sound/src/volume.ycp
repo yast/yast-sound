@@ -281,7 +281,7 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
     else
     {
 	integer pos = -1;
-	new_save = maplist (map card, save_info, ``{
+	new_save = maplist (map card, (list<map>) save_info, ``{
 	    pos = pos + 1;
 	    return (pos == card_id) ? save_entry : card;
 	});

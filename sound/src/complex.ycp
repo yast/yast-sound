@@ -49,7 +49,7 @@
 	    string state = "";
 	    if (Sound::use_alsa)
 	    {
-		if (size(filter(map f, runn, ``(f["number"]:-1 == pos))) !=0 )
+		if (size(filter(map f, (list<map>) runn, ``(f["number"]:-1 == pos))) !=0 )
 		{
 		    // to translators: "(The card is) running
 		    state = _("Running");
@@ -76,7 +76,7 @@
 		// card was autodetected
 		{
 		    list audio = Sound::detected_cards;
-		    audio = filter(map g, audio,
+		    audio = filter(map g, (list<map>) audio,
 			``(g["unique_key"]:"" == card["unique_key"]:""));
 		    if (size(audio) != 0)
 		    {

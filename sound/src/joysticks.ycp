@@ -20,7 +20,7 @@
 
 textdomain "sound";
 
-map JoystickDB = $[
+map<string,list<string> > JoystickDB = $[
 
     "a3d":
     [
