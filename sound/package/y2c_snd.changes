@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Dec 12 16:59:11 CET 2000 - kkaempf@suse.de
+
+- use tmpdir instead of /tmp
+
+-------------------------------------------------------------------
 Sat Dec  9 13:29:27 CET 2000 - dan@suse.cz
 
 - options exist test, disabling sound table omitted 
