@@ -3,7 +3,7 @@
 #
 
 docdir = @DOCDIR@
-htmldir = $(docdir)/y2c_snd
+htmldir = $(docdir)/implementation
 
 html_DATA =		\
 	design-1.html		\
