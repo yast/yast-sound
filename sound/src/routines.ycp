@@ -1313,13 +1313,20 @@
      *  @param symlink is path to default.sf2 that is to be created
      */
 
-    global define InstallFonts(string symlink) ``{
+    global define InstallFonts(string symlink, boolean dontask) ``{
 	boolean answer=false;
 
 	// step 1: want install?
-
-	answer=UI(`YesNoHeadlinePopup(	lookup(STRINGS, "soundFontTitle", ""), 
+	if(dontask)
+	{   
+	    answer=true;
+	}
+	else
+	{
+	    answer=UI(`YesNoHeadlinePopup(	lookup(STRINGS, "soundFontTitle", ""), 
 					lookup(STRINGS, "soundFontQuestion", "")));
+	}
+	
 	if(!answer) 
 	{
 	    return;
