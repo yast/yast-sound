@@ -30,6 +30,8 @@
 
     import "Sound";
     import "Mode";
+    import "Summary";
+    import "Wizard";
     Mode::config = true;
     Sound::autoinstallation = true;
 
@@ -41,29 +43,25 @@
     }
     if ( !is ( Args (0), map ) )
     {
-	y2error ("Bad argument for lilo_auto: %1", Args (0));
+	y2error ("Bad argument for sound_auto: %1", Args (0));
 	return false;
     }
     
     // The settings are in the first argument
-    map settings = $[];
-    boolean cms_mode = false;
+    map settings = $[];    
     {
 	integer i = 0;
 	while (i < size (Args()))
 	{
-	    if (is (Args (i), map) && nil != Args (i))	settings = Args (i);
-	    else if (Args (i) == .cms)			cms_mode=true;	   
+	    if (is (Args (i), map) && nil != Args (i))	settings = Args (i);	    
 	    i = i + 1;
 	}
     }
-      
+         
+    Sound::Import ( settings );
     y2milestone("Imported: (%1)", settings);
 
-    Sound::Import ( settings );
-
-    define set_contents(map settings) ``{
-	Sound::Import ( settings );
+    define set_contents() ``{	
 	term contents =
 	    `VBox(
 		  `VSpacing(1),
@@ -80,41 +78,30 @@
 			    contents, "", true, true);
     }
 
-
-    if ( cms_mode) {
-	import "Wizard"; 
-	set_contents(settings);
-	any ret = nil;
-	repeat {
-	    ret = UI::UserInput();
-	    if (ret == `configure)
+    set_contents();
+    any result = nil;
+    any ret = nil;
+    repeat {
+	ret = UI::UserInput();
+	if (ret == `configure)
+	{	    	       
+	    result =  CallFunction(`sound());
+	    y2milestone("result: %1", result);
+	    if (result == `next || result == `finish)
 	    {
-		map result = CallModule("sound_auto", [settings]);
-		if (result!=$[])
-		    settings = result;
-
-		set_contents(settings);
-	    }
-	    else if (ret == `reset) {
-		settings = $[];		
-		Sound::modules_conf=[];
-		Sound::volume_settings=[];
-		Sound::rc_vars=$[];
-		set_contents(settings);		
-	    }
-	    else if (ret == `help)
-	    {
-		UI::LongTextPopup (_("Help"), `RichText (_("Help")), 50, 15);
-	    }
-	} until ( ret == `key || ret ==`next || ret == `back);
-	return [ret,settings];
-
-    }
-    
-    
-    if (CallFunction(`sound()) != `back)
-    {
-        return Sound::Export ();
-    }
-    return $[];
+		settings = Sound::Export ();
+	    } 
+	    Sound::Set(settings);
+	    set_contents();
+	}
+	else if ( ret == `reset)
+	{
+	    settings= $[];
+	    Sound::Set(settings);
+	    set_contents();
+	}		
+    } until (ret == `back || ret == `next || ret ==`key);   
+  
+    return [ret, settings];
+           
 }
