@@ -18,6 +18,8 @@
  */
 
 {
+    textdomain "sound";
+
     include "ui/summary.ycp";
     include "misc_defines.ycp";
     include "sound/routines.ycp";
@@ -90,7 +92,7 @@
     foreach(`card, conflist, 
     ``{
 	// to translators: '(sound card is) Configured as snd-card-1'
-	retlist=add(retlist, summaryDevice(card, sformat("Configured as snd-card-%1.", i)));
+	retlist=add(retlist, summaryDevice(card, sformat(UI(_("Configured as snd-card-%1.")), i)));
 	i=i+1;
     });
     

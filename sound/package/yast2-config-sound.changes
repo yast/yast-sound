@@ -1,17 +1,12 @@
 -------------------------------------------------------------------
-Mon Apr 30 15:23:04 CEST 2001 - dmeszar@suse.cz
+Mon Apr 30 16:21:03 CEST 2001 - dmeszar@suse.cz
 
-- sound fonts loading enabled, abort dialog unified, summary spaces fixed
+- sound fonts loading enabled, abort dialog unified, summary spaces fixed 
 
 -------------------------------------------------------------------
 Tue Apr 24 16:08:09 CEST 2001 - ro@suse.de
 
 - fixed time-stamps in tar
-
--------------------------------------------------------------------
-Thu Apr 26 16:18:41 CEST 2001 - dmeszar@suse.cz
-
-- abort button causes CloseDialog. 
 
 -------------------------------------------------------------------
 Tue Apr 24 07:26:02 PDT 2001 - dmeszar@suse.cz
