@@ -84,7 +84,7 @@
     list gs = splitstring(generic_string, "\n");
 
 //    string pattern = "(snd-[^ \t]*)[\t ]*info_parm_(snd_[^=]*)=enable:\\(snd_enable\\)(.*)";
-    string pattern = "(snd-[^ \t]*)[\t ]*info_parm_([^=]*)=enable:\\(snd_enable\\)(.*)";
+    string pattern = "(snd-[^ \t]*)[\t ]*info_parm_([^=]*)=enable:\\(enable\\)(.*)";
 
     list ltmp = [];
     list lx = [];
@@ -99,8 +99,10 @@
     ``{
 	lx = regexptokenize(e, pattern);
 	parmname = select(lx, 1, "");
-    if (substring (parmname, 0, 4) != "snd_")
-        parmname = "snd_" + parmname;
+	if (substring (parmname, 0, 4) != "snd_" && parmname != "")
+	{
+	    parmname = "snd_" + parmname;
+	}
 	if (size(lx) > 0 &&
         !contains(["snd_index", "snd_enable", "snd_id"], parmname))
 	{
@@ -164,5 +166,5 @@
 	outdb = add(outdb, k, v);
     });
 
-    SCR::Write(.target.ycp, "./modlist.ycp.in", outdb);
+    SCR::Write(.target.ycp, "./modlist.ycp", outdb);
 }
