@@ -159,16 +159,8 @@
     map rc_vars_b = nil;
     list volume_settings_b = nil;
 
-    /**
-     * Is "snd_" prefix used for sound module parameter names? (ALSA only)
-     * Variable must be nil for first, will be initialized when needed
-     */
-    boolean use_snd_prefix = nil;
-
     // ----------- prototypes for routines.ycp:
 
-    global define string snd_prefix ();
-    global define boolean snd_prefix_used ();
     global define void LoadDatabase (boolean use_ui);
     global define list CreateModprobeCommands();
     global define string ProbeOldChip (string chip);
@@ -179,38 +171,6 @@
     include "sound/routines.ycp";
 
     // ----------- function definitions:
-
-    /**
-     * Checks (via 'modinfo snd') if "snd_" prefix is used for module parameters
-     * (ALSA only)
-     * @return true/false
-     * TODO remove this for new kernels...
-     */
-    global define boolean snd_prefix_used () ``{
-
-	if (use_snd_prefix == nil)
-	{
-	    use_snd_prefix = false; // default for new kernels
-	    map<string,string> modinfo =(map<string,string>)SCR::Read (.modinfo.kernel.kernel.sound.core.snd);
-
-	    foreach (string key, string desc, modinfo, ``{
-		// check only parameters, ignore other keys returned by modinfo
-		if (key != "module_author" && key != "module_description" &&
-		    key != "module_filename" && substring (key, 0, 4) == "snd_")
-		    use_snd_prefix = true;
-	    });
-	}
-	return use_snd_prefix;
-    }
-
-    /**
-     * Returns current prefix of module parameters (ALSA only)
-     * @return "snd_" or empty string
-     */
-    global define string snd_prefix () ``{
-
-	return snd_prefix_used () ? "snd_" : "";
-    }
 
     /* tiwai: /usr/src/linux/Documentation/sound/alsa/Joystick.txt
 PCI Cards
@@ -584,8 +544,7 @@ could make your system unstable.
 
 		    if (data["default"]:"" != "")
 		    {
-			string opname = check_parameter_name (op);
-			opts = add(opts, opname , data["default"]:"");
+			opts = add (opts, op , data["default"]:"");
 		    }
 		});
 		map entry = $[

@@ -135,8 +135,8 @@
 	// get the list of commands needed for start
 	list cmds = Sound::CreateModprobeCommands();
 
-	string snd = sformat ("/sbin/modprobe snd %1cards_limit=%2 %1major=116",
-	    Sound::snd_prefix (), size(Sound::modules_conf));
+	string snd = sformat ("/sbin/modprobe snd cards_limit=%1 major=116",
+	    size (Sound::modules_conf));
 
 	if (!Sound::use_alsa)
 	{
