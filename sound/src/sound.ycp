@@ -28,7 +28,7 @@
 
 // Menuentry for the YaST2 menu
     if (Args() == [ "get_menuentry" ])
-	return [ "lan", $[
+	return [ "sound", $[
 	    `menuentry    : UI(_("Hardware/Sound")),
 	    `arguments    : [ ],
 	    `widget       : `RichText(

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Dec  7 16:48:57 CET 2000 - arvin@suse.de
+
+- call sound (not lan) in menu
+
+-------------------------------------------------------------------
 Thu Dec  7 16:00:25 CET 2000 - arvin@suse.de
 
 - fix double quoted symbol
