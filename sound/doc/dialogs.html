@@ -1,0 +1,76 @@
+<HTML><BODY><PRE>
+
+<B>Sound config dialogs
+====================</B>
+
+<B>1. quick config dialog</B>
+
+this dialog is shown when there is exactly one card and it is not configured. 
+intro dialog is accessed via 'More detailed installation of snd cards'
+
+<U>file:</U> <a href=autodocs/ui.html>ui.ycp</A>
+<u>function:</U> <a href=autodocs/ui.html#quickConfig>quickConfig</A>
+<a href="pics/quick.png">screenshot</A>
+
+<B>2. quick config finish dialog </B>
+
+shown when 'Zuick automatic setup' was checked in 'quick' dialog or
+'configuration type dialog' and kernel module was successfully loaded.
+otherwise <A href=autodocs/volume.html#ErrorDialog'>ErrorDialog</A> is shown
+
+<U>file:</U> <a href=autodocs/volume.html>volume.ycp</A>
+<U>function:</U> <a href=autodocs/volume.html#SuccessDialog>SuccessDialog</A>
+<a href=pics/success.png>screenshot</A>
+
+<B>3. intro dialog</B>
+
+shown when there are more than one card, at least one unconfigured or when 
+'More detailed installation of snd cards' in quick dialog is checked.
+
+<U>file:</U> <a href=autodocs/select.html>select.ycp</A>
+<U>function:</U> <a href=autodocs/select.html#sound_select>sound_select</A>
+<A href=pics/intro.png>screenshot</A>
+
+<B>4. config type dialog</B>
+
+quick/normal/expert config for card selected in intro/manual dialog
+
+<U>file:</U> <a href=autodocs/ui.html>ui.ycp</A>
+<U>function</U> <a href=autodocs/ui.html#DisplayName>DisplayName</A>
+<a href=pics/conftype.png>screenshot</A>
+
+<B>5. complex dialog</B>
+
+<U>file:</U> <a href=autodocs/complex.html>complex.ycp</A>
+<U>function:</U> <a href=autodocs/complex.html#sound_complex>sound_complex</A>
+<a href=pics/complex.png>screenshot</A>
+
+<B>6. mixer dialog</B>
+
+<U>file:</U> <a href=autodocs/mixer.html>mixer.ycp</A>
+<U>function:</U> <a href=autodocs/mixer.html#mixerDialog>mixerDialog</A>
+<a href=pics/mixer.png>screenshot</A>
+
+<B>7. adding a new card</B>
+
+when the 'Add soundcard' in the complex dialog is pressed and there is at least
+one unconfigured autodetected card. otherwise, the manual dialog is shown immediatelly.
+
+<U>file:</U> <a href=autodocs/ui.html>ui.ycp</A>
+<U>function:</U> <a href=autodocs/ui.html#WhichDialog>WhichDialog</A>
+<a href=pics/addcard.png>screenshot</A>
+
+<b>8. manual card selection</b>
+
+<U>file:</U> <a href=autodocs/manual.html>manual.ycp</A>
+<u>function:</u> <a href=autodocs/manual.html#sound_manual>sound_manual</A>
+<a href=pics/manual.png>screenshot</A>
+
+<B>9. options dialog</B>
+
+<u>file:</U> <a href=autodocs/options.html>options.ycp</A>
+<U>function:</u> <a href=autodocs/options.html#sound_options>sound_options</A>
+<A href=pics/options.png>screenshot</A>
+
+
+</pre></body></html>
