@@ -29,7 +29,7 @@
      * @param uniq_key unique key
      */
 
-    global define createAliasComment(string model, string uniq_key) ``{
+    global define string createAliasComment(string model, string uniq_key) ``{
 	string comment = "# " + uniq_key + ":" + model + "\n";
 	return comment;
     }
@@ -40,7 +40,7 @@
      * @param tmp save to temporary file, not to /etc/modules.conf
      * @return boolean
      */
-    global define SaveOneModulesEntry (map entry, boolean tmp) ``{
+    global define boolean SaveOneModulesEntry (map entry, boolean tmp) ``{
 	path mod		= .modules;
         path mod_alias		= .modules.alias;
         path mod_options	= .modules.options;
@@ -72,7 +72,7 @@
      *
      */
 
-    global define SaveModulesOptions(list save_info, boolean tmp)
+    global define void SaveModulesOptions(list save_info, boolean tmp)
     ``{
 	path mod_options = .modules.options;
 	if (tmp)
@@ -128,7 +128,7 @@
      *
      */
 
-    global define removeOldEntries(list als) ``{
+    global define void removeOldEntries(list als) ``{
 	maplist(`e, als,
 	``{
 	    if (is_snd_alias(e) ||
@@ -148,7 +148,7 @@
      * @param tmp write to /tmp/modules.conf (not to /etc/modules.conf)
      * @return map return struct: $["return": boolean, "err_msg": string]
      */
-    global define SaveModulesEntry (list save_info, list system, boolean tmp) ``{
+    global define map SaveModulesEntry (list save_info, list system, boolean tmp) ``{
 	path mod		= .modules;
 	path mod_alias		= .modules.alias;
 	path mod_options	= .modules.options;
@@ -223,15 +223,15 @@
      * Save volume (for alsa it's alsactl store
      * @return map return struct: $["return": integer, "err_msg": string]
      */
-    global define SaveVolume () ``{
-	SCR::Execute(.audio.alsa.store, 0, 0);
+    global define boolean SaveVolume () ``{
+	return SCR::Execute(.audio.alsa.store, 0, 0);
     }
 
     /**
      * Additional hack to enable ALSA joystick support
      * @return boolean
      */
-    global define EnableJoystick () ``{
+    global define boolean EnableJoystick () ``{
         string tmpdir = SCR::Read(.target.tmpdir);
         return SCR::Execute(.target.bash, "/usr/sbin/alsactl -f " + tmpdir + "/asound.conf store;\
                 /usr/bin/sed /\"Joystick\"/s/false/true/ " + tmpdir + "/asound.conf >/etc/asound.conf;\
@@ -243,7 +243,7 @@
      * function to finish ALSA instalation
      * @return void
      */
-    global define AlsaFinish () ``{
+    global define void AlsaFinish () ``{
         EnableJoystick ();
     }
     /**
@@ -252,7 +252,7 @@
      * @return string error string
      */
 
-    global define SaveRCValues (map rc) ``{
+    global define string SaveRCValues (map rc) ``{
         string err_msg = "";
 	if (contains (maplist (`k, `v, rc, ``(SCR::Write(topath(sformat(".rc.system.%1", k)), v))), false) ||
             !SCR::Write(.rc.system, nil))

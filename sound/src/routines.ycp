@@ -23,7 +23,7 @@
      * @return string
      */
 
-    global define hardware_name (map hardware_entry) ``{
+    global define string hardware_name (map hardware_entry) ``{
         string sub_vendor = "";
         string sub_device = "";
 
@@ -46,7 +46,7 @@
      * @return list of entries of not configured cards
      */
 
-    global define filter_configured(list save_info, list cards) ``{
+    global define list filter_configured(list save_info, list cards) ``{
         cards = filter(`e, cards,
         ``{
             string uniq     = lookup(e, "unique_key", "");
@@ -68,7 +68,7 @@
      * @return string
      */
 
-    global define whoami() ``{
+    global define string whoami() ``{
 	string cmd = "/usr/bin/whoami";
 	map ret = SCR::`Execute(.target.bash_output, cmd, $[]);
 	string out = lookup(ret, "stdout", "");
@@ -86,7 +86,7 @@
      * @param comment string
      */
 
-    global define logtime(string comment) ``{
+    global define void logtime(string comment) ``{
 	string s    = SCR::Read(.target.string, "/proc/uptime");
 	list l	    = splitstring(s, " ");
 	float f	    = tofloat(select(l, 0, ""));
@@ -102,7 +102,7 @@
      *
      */
 
-    global define get_card_label(map card)
+    global define string get_card_label(map card)
     ``{
         list lab = splitstring(hardware_name(card),"\n");
 	if (size(lab) == 0 )
@@ -124,7 +124,7 @@
      *
      */
 
-    global define is_snd_alias(string alias) ``{
+    global define boolean is_snd_alias(string alias) ``{
 	if (use_alsa)
 	{
 	    return regexpmatch(alias, "^snd-card-[0-9]*$");
@@ -141,7 +141,7 @@
      * @return string
      */
 
-    global define isa_uniq() ``{
+    global define string isa_uniq() ``{
 	return "uniq.virtual";
     }
 
@@ -150,7 +150,7 @@
    * @param vars list of variables to read
    * @return map optname: value
    */
-    global define read_rc_vars (list vars) ``{
+    global define map read_rc_vars (list vars) ``{
         return listmap (`k, vars, ``([k, SCR::Read(topath(sformat (".rc.system.%1", k)))]));
     }
 
@@ -163,7 +163,7 @@
      *  @return integer
      */
 
-    global define hextoi(string num) ``{
+    global define integer hextoi(string num) ``{
 	return tointeger(num);
     }
 
@@ -175,7 +175,7 @@
      *
      */
 
-    global define save_unique_keys (list keys) ``{
+    global define boolean save_unique_keys (list keys) ``{
         list orig = SCR::Read(.var.lib.yast.unique);
         if (orig == nil)
         {
@@ -194,7 +194,7 @@
      * @return integer
      */
 
-    global define search_card_id (string name) ``{
+    global define integer search_card_id (string name) ``{
         list all_cards = get_card_names ("all");
         integer pos = 0;
         integer len = size (name);
@@ -217,7 +217,7 @@
      * @param default value to select as default
      * @return list
      */
-    global define itemize_list (list l, integer default) ``{
+    global define list itemize_list (list l, integer default) ``{
         integer i = 0;
         list itemized_list = [];
         integer s = size (l);
@@ -236,7 +236,7 @@
      * @return list with unique keys
      */
 
-    global define read_unique_keys () ``{
+    global define list read_unique_keys () ``{
 	list already = [];
 	if (SCR::Read(.target.size, "/var/lib/YaST/unique.inf") > 0)
 	{
@@ -274,7 +274,7 @@
      *  @return boolean
      */
 
-    global define nm256hack (string modname) ``{
+    global define boolean nm256hack (string modname) ``{
         if (modname == "snd-card-nm256")
         {
             // special warning message for in a special case
@@ -289,7 +289,7 @@
      * @param card map read from .probe.sound
      * @return map
      */
-    global define get_module (map card) ``{
+    global define map get_module (map card) ``{
 
 	string bus        = lookup (card, "bus", "");
 	integer offset    = (tolower (bus) == "isa") ? 0x20000 : 0x10000;
@@ -330,7 +330,7 @@
      * @return void
      */
 
-    global define unmute(list devices, integer card_id) ``{
+    global define void unmute(list devices, integer card_id) ``{
 	list avail = SCR::Dir(topath(sformat(".audio.alsa.cards.%1.channels", card_id)));
 	if (avail == nil || size(avail)==0)
 	{
@@ -352,14 +352,14 @@
      *
      */
 
-    global define storeVolume(integer card_id) ``{
+    global define boolean storeVolume(integer card_id) ``{
 	if (card_id == -1)
 	{
 	    SCR::Execute(.audio.alsa.store, 0, 0);
 	}
 	string p = sformat(".audio.alsa.cards.%1.store", card_id);
 
-	SCR::Execute(topath(p), 0, 0);
+	return SCR::Execute(topath(p), 0, 0);
     }
 
 
@@ -371,8 +371,7 @@
      * @return empty string on success/ error message on failure
      */
 
-    global define check_module(map save_entry, integer card_id) ``{
-	// TODO: check by /proc/asound/cards
+    global define string check_module(map save_entry, integer card_id) ``{
 	map pm = SCR::Read(.proc.modules);
 	string mod_name=lookup(save_entry, "module", "off");
         if (!haskey (pm, mod_name) || size(get_running_cards()) <= card_id)
@@ -395,7 +394,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      *  @return list
      */
 
-    global define create_table (list lm, list lk)
+    global define list create_table (list lm, list lk)
     ``{
 	list res = [];
 	integer pos = 0;
@@ -420,7 +419,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      * @param des string
      * @return list
      */
-    global define parse_values (string des) ``{
+    global define list parse_values (string des) ``{
         list ret = [];
         integer pos = 0;
         integer len = size (des);
@@ -485,7 +484,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
    * @return string
    * @example mysformat(["Message %1 %2 %3", "A", "B", "C"])  ->  "Message A B C"
    */
-    global define mysformat (list msg)
+    global define string mysformat (list msg)
     ``{
         if (size (msg) == 0)
         {
@@ -511,7 +510,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      * returns error message, empty string if ok
      * @return string
      */
-    global define check_value (string value, string type, list poss) ``{
+    global define string check_value (string value, string type, list poss) ``{
         if (type == "int")
         {
             if (tolower(substring (value, 0, 2)) == "0x")               // hex number
@@ -587,7 +586,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      *
      */
 
-    global define restore_mod_params(map params, map values) ``{
+    global define void restore_mod_params(map params, map values) ``{
 	return mapmap(`e, `f, params,
 	``{
 	    f = add(f, "value", lookup(values, e, ""));
@@ -600,7 +599,8 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      * @return
      */
 
-    global define get_tmp_modules_conf() ``{
+    global define string get_tmp_modules_conf() ``{
+	// TODO: remove this func
 	string tmpdir = SCR::Read (.target.tmpdir);
 	// TODO: move this file to yast tmp dir
 	return "/tmp/modules.conf";
@@ -612,7 +612,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      *
      */
 
-    global define FontsInstalled() ``{
+    global define boolean FontsInstalled() ``{
 	return SCR::Read(.target.size, "/usr/share/sfbank/creative") >= 0; // fileexist("/usr/share/sfbank/creative");
     }
 
@@ -620,7 +620,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      * @param save_entry
      */
 
-    global define HasFonts(map save_entry) ``{
+    global define boolean HasFonts(map save_entry) ``{
 	if (contains(["snd-card-emu10k1", "snd-card-sbawe", "emu10k1"], lookup(save_entry, "module", "")))
 	{
 	    return true;
@@ -633,7 +633,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      *  @param dontask if true, skip the first messagebox
      */
 
-    global define InstallFonts(string symlink, boolean dontask) ``{
+    global define void InstallFonts(string symlink, boolean dontask) ``{
 	boolean answer = false;
 
 	// step 1: want install?
@@ -691,7 +691,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      * @param sound_cards list of sound cards
      */
 
-    global define nm256_opl3sa2_warn(list sound_cards) ``{
+    global define void nm256_opl3sa2_warn(list sound_cards) ``{
 	list s1 = filter(`e, sound_cards,
 	    ``(lookup(e, "module", "") == "snd-card-nm256"));
 	list s2 = filter(`e, sound_cards,
@@ -717,7 +717,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      *  @return list of integers
      */
 
-    global define get_indices_for_removal(list save_info, string mod_name, integer card_id)
+    global define list get_indices_for_removal(list save_info, string mod_name, integer card_id)
     ``{
 	list ret = [];
 	boolean remove_all = false;
@@ -752,7 +752,8 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      *
      */
 
-    global define multi_remove(list input, list id_list) ``{
+    global define list multi_remove(list input, list id_list) ``{
+	// TODO: remove me
 	id_list = sort(`x, `y, id_list, ``(x >= y));
 	maplist(`e, id_list, ``{if (e < size(input)) input = remove(input, e); });
 	return input;
@@ -765,8 +766,9 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      * @return new save_info
      */
 
-    global define remove_save_entries(list save_info, list id_list)
+    global define list remove_save_entries(list save_info, list id_list)
     ``{
+	// TODO: valorize me
 	save_info = multi_remove(save_info, id_list);
 
 	integer pos = 0;
@@ -787,7 +789,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      *
      */
 
-    global define stop_programs() ``{
+    global define boolean stop_programs() ``{
 	integer fuser = SCR::Execute (.target.bash, "/bin/fuser /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]);
 
 	if (fuser == 0)
@@ -816,7 +818,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      * @param save_info
      */
 
-    global define ConfCardsRT(list save_info) ``{
+    global define string ConfCardsRT(list save_info) ``{
 	list retlist = [];
 	list conflist = [];
 	foreach(`entry, save_info,

@@ -88,7 +88,7 @@
      *
      */
 
-    global define _snd_select() ``{
+    global define symbol _snd_select() ``{
 	Sound::UpdateUnconfiguredCards();
 //#	sound_cards = getConfigurableCards(save_info);
 	if ((size(Sound::unconfigured_cards) == 0) && (!was_complex))
@@ -114,7 +114,7 @@
      *
      */
 
-    global define _snd_quick() ``{
+    global define symbol _snd_quick() ``{
 	save_entry = select(Sound::unconfigured_cards, 0, $[]);
 	card_id = 0;
 	string modelname    = lookup(Sound::modules_conf, "model", "");
@@ -128,7 +128,7 @@
      * @param type boolean quick/normal config
      */
 
-    global define _snd_quick2(boolean type) ``{
+    global define symbol _snd_quick2(boolean type) ``{
 	save_entry  = add_common_options(Sound::modules_conf, 0);
 	save_entry  = add_alias(save_entry, 0);
 	map res	    = sound_volume(save_entry, 0, true, type, []);
@@ -145,7 +145,7 @@
      *
      */
 
-    global define _snd_manual() ``{
+    global define symbol _snd_manual() ``{
 	map res = sound_manual();
 
 	// if user selects the soundcards that has been already autodetected,
@@ -191,7 +191,7 @@
      *
      */
 
-    global define _snd_add() ``{
+    global define symbol _snd_add() ``{
 	list nh     = maplist(`e, Sound::unconfigured_cards, ``(lookup(e, "model", "")));
 	map res	    = WhichDialog(nh);
 	symbol ui   = lookup(res, "ui", `back);
@@ -209,7 +209,7 @@
      *
      */
 
-    global define _snd_delete() ``{
+    global define symbol _snd_delete() ``{
 	if (UI::YesNoPopup(_("Do you really want to delete this entry?")))
 	{
 	    boolean terminate = stop_programs();
@@ -248,7 +248,7 @@
      *
      */
 
-    global define _snd_config() ``{
+    global define symbol _snd_config() ``{
 	if (card_id >= 0)
 	{
 	    save_entry = select(Sound::unconfigured_cards, card_id, $[]);
@@ -280,7 +280,7 @@
      *
      */
 
-    global define _snd_complex() ``{
+    global define symbol _snd_complex() ``{
 	was_complex = true;
 	map res	    = sound_complex(Sound::modules_conf);
         symbol ui   = lookup(res, "ui", nil);

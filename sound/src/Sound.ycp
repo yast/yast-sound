@@ -57,7 +57,7 @@
      * do hardware detection
      */
 
-    global define DetectHardware() ``{
+    global define boolean DetectHardware() ``{
 	// do noop if cards were already detected
 	if (detected_cards != nil)
 	{
@@ -72,7 +72,7 @@
      * searches for sound alias in /etc/modules.conf
      */
 
-    global define ReadModulesConf() ``{
+    global define void ReadModulesConf() ``{
 	modules_conf = read_save_info();
     }
 
@@ -80,7 +80,7 @@
      * update list of unconfigured cards (necessaty when deleting configured card)
      */
 
-    global define UpdateUnconfiguredCards() ``{
+    global define void UpdateUnconfiguredCards() ``{
 	unconfigured_cards = getConfigurableCards(modules_conf);
     }
 
@@ -88,7 +88,7 @@
      * Read all sound settings from the SCR
      * @return boolean True on success
      */
-    global define Read(block _unused) ``{
+    global define boolean Read(block _unused) ``{
 	// first detect sound cards
 	DetectHardware();
 	// load data from /etc/modules.conf
@@ -107,7 +107,7 @@
      * (For use by autoinstallation.)
      * @return boolean True on success
      */
-    global define Import(map settings) ``{
+    global define boolean Import(map settings) ``{
 	// initialize these unneeded values
 	detected_cards = [];
 	unconfigured_cards = [];
@@ -131,7 +131,8 @@
      * Update the SCR according to sound settings
      * @return boolean True on success
      */
-    global define Write(block _unused, block _unused2) ``{
+    global define boolean Write(block _unused, block _unused2) ``{
+	// TODO: check return value
 	CallFunction (`sound_write(modules_conf, rc_vars));
 	return true;
     }
@@ -141,7 +142,7 @@
      * (For use by autoinstallation.)
      * @return map Dumped settings (later acceptable by Import())
      */
-    global define Export() ``{
+    global define map Export() ``{
 	return $[
 		"modules_conf"	    : modules_conf,
 		"rc_vars"	    : rc_vars,
@@ -153,7 +154,7 @@
      * opens alsa sound cards database
      */
 
-    global define LoadDatabase() ``{
+    global define void LoadDatabase() ``{
 	map sound_db =$[];
 	if (db_cards == nil || db_cards == $[])
 	{
@@ -174,7 +175,7 @@
      * just writes all variables to log. don't use in Master.
      */
 
-    global define DumpToLog() ``{
+    global define void DumpToLog() ``{
 	y2error(sformat("%1", [Sound::modules_conf, rc_vars, true, true, get_vol_settings()]));
     }
 
