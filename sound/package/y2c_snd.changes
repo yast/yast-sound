@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Sat Dec  9 13:29:27 CET 2000 - dan@suse.cz
+
+- options exist test, disabling sound table omitted 
+
+-------------------------------------------------------------------
 Fri Dec  8 13:26:35 CET 2000 - dan@suse.cz
 
 - spec file fix 
