@@ -52,8 +52,11 @@
 	y2debug("param=%1", param);
 
 	/* Create a  summary*/
-	if(func == "Summary") {
-		Sound::Import(param);
+	if(func == "Import") {
+		ret = Sound::Import(param);
+	}
+	/* Create a  summary*/
+	else if(func == "Summary") {
 		ret = Sound::Summary();
 	}
 	/* Reset configuration */
@@ -63,7 +66,6 @@
 	}
 	/* Change configuration (run AutoSequence) */
 	else if (func == "Change") {
-		Sound::Import(param);
 		ret =  WFM::CallFunction(`sound());
 	}
 	/* Return actual state */
@@ -73,10 +75,10 @@
 	/* Write givven settings */
 	else if (func == "Write") {
 		import "Progress";
-		Sound::Import(param);
 		Progress::off();
 		ret = Sound::Write();
 		Progress::on();
+		return ret;
 	}
 	/* Unknown function */
 	else {
