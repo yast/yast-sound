@@ -28,21 +28,20 @@
     // list of all card models (generated only once and cached)
     global list all_card_names = [];
 
+    // list of all sound modules (table items)
+    global list all_module_items = [];
+
     /**
-     * returns cards manufactured by given vendor
-     * @param vendor if "all" returns all models
+     * returns cards manufactured by given vendor (ALSA only) or driver
+     * @param key vendor or driver; if "all" returns all models
+     * @param keys in which set is the key: "vendors" or "modules"
      * @return list with sound card models
      */
-    global define list get_card_names (string vendor) ``{
-
-	// when called from ManualDialogModules, parameter is name of module,
-	// otherwise (from ManualDialogModules) it is vendor
-
-	if (!Sound::use_alsa)
-	    return [sformat("Sound card (%1)", vendor)];
+    global define list get_card_names (string key, string keys) ``{
 
 	Sound::LoadDatabase(true);
-        if (vendor == "all" || vendor == "")
+
+        if (key == "all" || key == "")
         {
 	    if (all_card_names == [] || all_card_names == nil)
 	    {
@@ -53,10 +52,27 @@
 	    }
 	    return all_card_names;
         }
-	else
+
+	if (keys == "vendors")
 	{
 	    // names from db_vendors (vendor name not included - not necessary)
-	    return sort (Sound::db_vendors[vendor]:[]);
+	    return sort (Sound::db_vendors[key]:[]);
+	}
+	else
+	{
+	    if (!Sound::use_alsa)
+		return [sformat("Sound card (%1)", key)];
+
+	    map mods = mapmap (integer k, string v, Sound::db_module_index,
+		``($[v : k]));
+	    integer index	= mods[key]:0;
+	    list cards		= sort (Sound::db_cards[index]:[]);
+
+	    if (cards == [])
+	    {
+		cards = [ Sound::db_modules[key, "description"]:"" ];
+	    }
+	    return cards;
 	}
     }
 
@@ -167,7 +183,12 @@
 	    entry = add(entry, "options", opts);
 	    return entry;
 	}
-
+// FIXME: check parameters existence!!! - they are currently not in database
+// (filtered out during generation: index, enable, id)
+// Solution:
+// 1. include params in database, but don't show in YaST (just add automatically
+// when present
+// 2. check their existence with modinfo
 	opts = add (opts, Sound::snd_prefix() + "index",sformat ("%1",card_id));
 	opts = add (opts, Sound::snd_prefix() + "enable", "1");
 
@@ -220,27 +241,42 @@
      */
     global define list get_module_names() ``{
 
-	if (Sound::use_alsa)
-	    return [];
-
-	if (all_card_names == [] || all_card_names == nil)
+	if (all_module_items == [] || all_module_items == nil)
 	{
-	    list ret = SCR::Dir(.modinfo.kernel.drivers.sound);
-	    ret = filter(string mod, ret, ``(mod != "sound"));
-	    ret = add(ret, "emu10k1");
-	    ret = add(ret, "cs4281");
-	    ret = maplist(string e, ret,``{
-		string descr = lookup(
-		    (map)SCR::Read(add(.modinfo.kernel.drivers.sound, e)),
-		    "module_description", "");
-		return
+	    if (Sound::use_alsa)
+	    {
+		Sound::LoadDatabase(true);
+		list mods = maplist (string k, map v, Sound::db_modules, ``{
+		    return `item(`id(k), v["description"]:k);
+		});
+
+		mods = sort(term a, term b, mods, ``{
+		    return select(a, 1, "") <= select(b, 1, "");
+		});
+
+		// item for all sound card models in sound card driver list
+		mods = prepend(mods, `item(`id("all"), _("All")));
+		all_module_items = mods;
+	    }
+	    else
+	    {
+		list ret = SCR::Dir(.modinfo.kernel.drivers.sound);
+		ret = filter(string mod, ret, ``(mod != "sound"));
+		ret = add(ret, "emu10k1");
+		ret = add(ret, "cs4281");
+		ret = maplist(string e, ret,``{
+		    string descr = lookup(
+			(map)SCR::Read(add(.modinfo.kernel.drivers.sound, e)),
+			"module_description", "");
+		    return
 		    `item(`id(e), (descr != "" && descr != "<none>")? descr: e);
-	    });
-	    ret = sort(term a, term b, ret,
-		``(select(a, 1, "") < select(b, 1, "")));
-	    all_card_names = ret;
+		});
+		ret = sort(term a, term b, ret,
+		    ``(select(a, 1, "") < select(b, 1, "")));
+		all_module_items = ret;
+	    }
 	}
-	return all_card_names;
+	return all_module_items;
     }
 
     /**
@@ -468,7 +504,7 @@
      * @return integer position of the card
      */
     global define integer search_card_id (string name) ``{
-        list all_cards = get_card_names ("all");
+        list all_cards = get_card_names ("all", "vendors");
         integer pos = 0;
         integer len = size (name);
 	name = tolower(name);

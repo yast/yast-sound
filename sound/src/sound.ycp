@@ -387,7 +387,13 @@ map cmdline = $[
 // --------------------------------------------------------------------------
 
 
-any ret = CommandLineRun ( cmdline );
+any ret = nil;
+
+if (Sound::use_alsa)
+    ret = CommandLineRun ( cmdline );
+else
+    ret = SoundSequence ();
+
 y2debug("ret == %1", ret);
 
 y2milestone("Sound module finished");
