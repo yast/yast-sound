@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Jan  4 13:45:39 CET 2001 - dan@suse.cz
+
+- special warning dialog for nm256 cards
+
+-------------------------------------------------------------------
 Fri Dec 15 16:04:20 CET 2000 - dan@suse.cz
 
 - skip/back button sequence fixed (bug #4679)

@@ -169,6 +169,7 @@ may be unsuccessful with running X. You may avoid these problems by specifying s
 option value or configuring this card outside X. Proceed?"));
 	    return UI(`WarnDialog (warn_text));
 	}
+	return true;
     }
 
     // =========== dialogs ===========
