@@ -717,7 +717,12 @@ Do you want to select the driver manually?"),
 
 	string database_name = "sndcards.ycp";
 
-	map user_settings = $["audio_file" : "/usr/share/sounds/alsa/whistle.au"];
+	map user_settings = $["audio_file" : "/usr/share/sounds/alsa/test.wav",
+			      "play_cmd"   : "/usr/bin/aplay" ];
+
+	// OLD
+	// map user_settings = $["audio_file" : "/usr/share/sounds/alsa/whistle.au",
+	//		      "play_cmd"   : "/bin/cat" ];
 
 	boolean cont = true;
 	map snd_info = $[];
