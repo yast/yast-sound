@@ -118,6 +118,29 @@
 	    CloseDialog();
 	};
 
+	define WarnDialog(string message) ``{
+
+	    OpenDialog(`opt(`decorated, `warncolor),
+		       `HBox(
+			   `HSpacing(1),
+			   `VBox(
+			       `VSpacing(0.2),
+			       `Heading(message),
+			       `HBox(
+				   `PushButton(`id(`yes),  _("&Yes")),
+				   `HStretch(),
+				   `PushButton(`opt(`default), _("&No"))
+				   ),
+			       `VSpacing(0.2)
+			       ),
+			   `HSpacing(1)
+			   )
+		);
+	    any ret = UserInput();
+	    CloseDialog();
+	    return (ret == `yes);
+	    
+	};
     });
 
 
@@ -133,6 +156,20 @@
 
     }
 
+    define nm256hack (map card) ``{
+	string module_name = "";
+	if (!haskey(card, "module"))	    
+	    module_name = lookup(get_module (card), "name", "");
+	else
+	    module_name = lookup (lookup(lookup (card, "module", $[]), "module", ""), "name", "");
+
+	if (module_name == "snd-card-nm256"){
+	    string warn_text = UI(_("Configuring this sound card on some Sony notebooks
+may be unsuccessful with running X. You may avoid these problems by specifying snd_buffer-top
+option value or configuring this card outside X. Proceed?"));
+	    return UI(`WarnDialog (warn_text));
+	}
+    }
 
     // =========== dialogs ===========
 
@@ -215,6 +252,12 @@ configure an other card than the one that is displayed on the right.</p>"));
 
 	    act_dialog = select (dialog, id);
 
+	    if (id+1 == size (dialog))
+		if (!nm256hack(card)) {
+		    id = 0;
+		    continue;
+		}
+	    
 	    result = eval(act_dialog);
 	    ui = lookup(result, "ui", `cancel);
 	    

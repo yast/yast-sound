@@ -76,6 +76,8 @@
 	SCR(`Execute (.target.bash, "/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`", $[]));
 
 
+
+	    
 	if (!mod_active) {
 	    if (!probe)
 		SCR (`Execute (.target.insmod, module_name, module_options));

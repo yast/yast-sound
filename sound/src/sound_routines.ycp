@@ -96,7 +96,7 @@ define get_audio (boolean test_mode, boolean config_mode) ``{
       $["baseclass"    : "Multimedia controller", 
        "bus"           : "PCI", 
        "device"        : "ES1371 [AudioPCI-97]", 
-       "device_id"     : 70513, 
+       "device_id"     : 98309, 
        "resource"      : $["io":[$["active":true, "length":0, "mode":"rw", "start":28672]], 
   			"irq":[$["count":0, "enabled":true, "irq":10]]], 
        "rev"           : "6", 
@@ -106,7 +106,7 @@ define get_audio (boolean test_mode, boolean config_mode) ``{
        "sub_vendor_id" : 70260, 
        "subclass"      : "Multimedia audio controller", 
        "vendor"        : "Ensoniq", 
-       "vendor_id"     : 70260,
+       "vendor_id"     : 69832,
        "unique_key"    : "test2.test2"]];
 
 }
