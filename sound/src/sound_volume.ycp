@@ -113,7 +113,7 @@
 	// Help text - adjusting volume 1/4
 	string help_text = UI(_("<p>Please adjust the volume.</p>"));
 				// Help text - adjusting volume 2/4
-	help_text = help_text + UI(_("<p>You can test your sound card by pressing the <i>Test</i> button.</p>"));
+	help_text = help_text + UI(_("<p>You can test your sound card by pressing the <b>Test</b> button.</p>"));
 				// Help text - adjusting volume 3/4
 	help_text = help_text + UI(_("<p>After the configuration is\
  done you can use <b>amixer</b> (or any program of your choice) for\
@@ -128,19 +128,30 @@
 
 	integer vol = 10;
 				// TODO: add some other device ajusting here (stereo, other devices like CD, etc ...)???
-	term con = `VBox (
+	term con = `HBox(
+	    `HSpacing (3),
 	    `VBox (
-		`Top (
-		    `Label (hardware_name (card))
-		    ),
-		`Slider (`id(`volume), `opt(`notify), _("Volume"), 0, 100, vol)
+		`VSpacing (),
+		`Top (`VBox(
+		    `Left(`Label(_("Settings for sound card"))),
+		    `Label (`opt(`outputField), hardware_name (card))
+		    )),
+		// To translators keep backlash here
+		`Frame (_("Level adjust \& test"), `HBox(
+		    `HSpacing (),
+		    `VBox(
+			`VSpacing (0.5),
+			`Slider (`id(`volume), `opt(`notify), _("Volume"), 0, 100, vol),
+			`VSpacing (),
+			`PushButton (`id (`test), _("&Test")),
+			`VSpacing (0.5),
+			`Label (_("Press 'Test' to start playing sound sample")),
+			`VSpacing (0.5)
+			),
+		    `HSpacing ())),
+		`VStretch ()
 		),
-	    `VStretch (),
-				// To translators: this label is just above the Test button
-	    `Label (_("To test the sound card press the button")),
-				// To translators: Test button label
-	    `PushButton (`id (`test), _("&Test"))
-	    );
+	    `HSpacing (3));
 
 	UI(`SetWizardContents (_("Sound cards"), con, help_text, true, true));
 	SetVolume (lookup (user_settings, "mixer"), "Master", sformat ("%1", vol));

@@ -126,33 +126,40 @@
     };
 
 
-    define DisplayName (string name) ``{
+    define DisplayName (string name, string cname) ``{
 
 	// help text 1/3
 	string helptext = UI (_("<p>This sound card will
- configured. If you want to configure this sound card press <i>Next</i>
- use <i>Back</i> button to go back</p>"));
+ configured. If you want to configure this sound card press <b>Next</b>
+ use <b>Back</b> button to go back</p>"));
 	
 	// Help text 2/3 (one sound card found)
 	helptext = helptext + UI (_("<p>You can
  change option values that are passed to the module by pressing the
- <i>Options</i> button.</p>"));
+ <b>Options</b> button.</p>"));
 	// help text 2/3
-	helptext = helptext + UI (_("<p>Press <i>Skip</i> button to skip the configuration of this card.</p>"));
+	helptext = helptext + UI (_("<p>Press <b>Skip</b> button to skip the configuration of this card.</p>"));
 	
 	term con = `VBox (
-	    `HVCenter(
-		`VBox(
-		    // To translators: label message 1/2 The sound card XY will be configured
-		    `Label (_("The sound card\n")),
-		    `Label (`opt(`outputField), name),
-		    // To translators: label message 2/2 The sound card XY will be configured
-		    `Label (_("\nwill be configured."))
+	    `VStretch (),
+	    `HBox(`HSpacing (3),
+		  `HVCenter(
+		      `VBox(
+			  // To translators: label message 1/2 The sound card XY will be configured
+			  `Left(`Label (_("The sound card\n"))),
+			  `Label (`opt(`outputField), name),
+			  `VSpacing (),
+			  // To translators: label message 2/2 The sound card XY will be configured
+			  `Left(`Label (_("\nwill be configured as"))),
+			  `Label (`opt(`outputField), cname)
+			  ))),
+	    `VStretch (),
+	    `VBox(
+		`HSquash(`HBox (
+		    `HWeight(1, `PushButton (`id(`options), _("Options"))),
+		    `HWeight(1, `PushButton (`id(`skip), _("Skip")))
 		    )),
-	    `HBox (
-		`PushButton (`id(`options), _("Options")),
-		`PushButton (`id(`skip), _("Skip"))
-		)
+		`VSpacing ())
 	    );
 	
 	UI(`SetWizardContents (_("Sound card configuration"), con, helptext, true, true));
@@ -171,7 +178,7 @@
     define OneCardWizard (map card, integer card_id, any ui) ``{
 	
 
-	list dialog = [``DisplayName (hardware_name (card)),
+	list dialog = [``DisplayName (hardware_name (card), sformat("snd-card-%1", card_id)),
 		      ``CallModule ("sound_volume", [card])];
 			//$["ui" : `next, "return" : true]];
 

@@ -134,18 +134,22 @@
 
 //	term con = `VBox (`VSquash(`Tree(`id(`tree), `opt(`hstretch), "Select", tree)));
 
-    	con = add (con, `HBox (
-    	    `ReplacePoint (`id (`rep_drv),
-    			   // To translators: selection box title
-    			   `SelectionBox (`id (`sel_drv), `opt(`notify), _("Sound card driver"), module_names)
-    		),
-    	    `ReplacePoint(`id(`rep_mod),
-    			  // To translators: selection box title
-    			  `SelectionBox (`id (`sel_mod), `opt(`notify), _("Sound card model"), card_names)
-    		)
-    	    ));
-  	// To translators: text entry label
-  	con = add (con, `TextEntry (`id(`search), `opt(`notify), _("Search")));
+    	con = add (con, `VBox(
+	    `HBox (
+		`ReplacePoint (`id (`rep_drv),
+			       // To translators: selection box title
+			       `SelectionBox (`id (`sel_drv), `opt(`notify), _("Sound card driver"), module_names)
+		    ),
+		`ReplacePoint(`id(`rep_mod),
+			      // To translators: selection box title
+			      `SelectionBox (`id (`sel_mod), `opt(`notify), _("Sound card model"), card_names)
+		    )),
+	    `VSpacing (),
+	    `TextEntry (`id(`search), `opt(`notify), _("Search")),
+	    `VSpacing ()
+	    ));
+		   // To translators: text entry label
+		   //con = add (con, `TextEntry (`id(`search), `opt(`notify), _("Search")));
 
 	UI(`SetWizardContents (_("Sound manual configuration"), con, helptext, true, true));
 	UI(`ChangeWidget(`id(`sel_drv), `CurrentItem, select (module_names, 0)));

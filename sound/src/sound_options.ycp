@@ -215,8 +215,8 @@
 	
 				// Help text for options 3/4
 	help_text = help_text + UI (_("<p>Choose the option you want\
- to set, use the <i>Set</i> button to enable new value. You can reset\
- all values by pressing <i>Reset</i>. Numeric values can be entered as\
+ to set, use the <b>Set</b> button to enable new value. You can reset\
+ all values by pressing <b>Reset</b>. Numeric values can be entered as\
  decimal or hexadecimal (hexadecimal with a <b>0x</b> prefix).</p>"));
 	
 	help_text = help_text + "<p>";
@@ -239,22 +239,29 @@
 	string current_option_name = lookup (select (options, 0), "name");
 
 	if (size (itemized_descriptions) > 0) {
-	    con = `VBox (
-		`VSquash(`Top(`Label (hardware_name (card)))),
+	    con = `HBox(
+		`HSpacing (3),
+		`VBox (
+		`VSquash(`Top(`Label (`opt(`outputField), hardware_name (card)))),
+		`VSpacing (),
 		// To translators: Table headers "description" -- option description, "option" -- option name, "value" -- value of an option
 		`Table (`id(`table), `opt (`notify, `immediate), `header(_("Description"), _("Option"),
 										       `Right(_("Value"))), itemized_descriptions),
+		`VSpacing (0.5),
 		`VBox (
 		    `TextEntry (`id (`des), current_option_name,
 				lookup (select (options, current_option), "value", "")),
+		    `VSpacing (0.5),
 		    `HBox (
 			// "set" button: Sets the option value
 			`PushButton (`id (`set), `opt(`default), _("&Set")),
 			// "reset" button: Resets all values
 			`PushButton (`id (`reset), _("&Reset"))
 			)
-		    )
-		);
+		    ),
+		`VSpacing (0.5)
+		),
+		`HSpacing (3));
 	    
 	}
 	else {			// there are no options

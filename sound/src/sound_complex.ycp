@@ -11,7 +11,7 @@ include "lan_routines.ycp";
  */
 define get_not_yet () ``{
     list all = get_audio (test_mode, config_mode);
-    list not_yet = get_unique_not (all, ["configured"], "sound", false);
+    list not_yet = get_unique_not (all, ["configured"], "sound", false, config_mode);
 
     return not_yet;
 
@@ -78,7 +78,8 @@ define WhichDialog () ``{
     });
     
 
-    term con = `HSquash(
+    term con = `HBox(
+	`HSpacing (3),
 	`Frame(`id(`frame), _("Select"), 
 	       `HBox (`HSpacing (1), `VBox (
 		   `RadioButtonGroup (`id(`rg), `VBox (
@@ -91,7 +92,8 @@ define WhichDialog () ``{
 		       `Left(`RadioButton (`id(`manual), `opt(`notify), _("&Manual selection"), (size (nc) == 0))),
 		       `VSpacing (1)
 		       ))),
-		      `HSpacing (1))));
+		      `HSpacing (1))),
+	`HSpacing (3));
 
 
 
@@ -346,6 +348,7 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 list cards     = Args(0);
 list save_info = Args(1);
 list to_delete = [];
+boolean config_mode = false;
 
 map rc_vars = read_rc_vars (["START_ALSA", "START_ALSA_SEQ"]);
 
