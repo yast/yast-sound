@@ -497,9 +497,9 @@
 		    list<term> tmp = [];
 		    maplist (term e, itemized_descriptions, ``{
 			if (current_option ==
-			    (integer) select((list) select (e, 0, []), 0, 0))
+			    (integer) select((term)select (e, 0, `id(0)), 0, 0))
 			{
-			    tmp = add (tmp, `item(select (e, 0, ""),
+			    tmp = add (tmp, `item(`id (current_option),
 				select (e, 1, ""), select (e, 2, ""), value));
 			}
 			else
