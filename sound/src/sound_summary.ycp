@@ -58,6 +58,6 @@
         retlist=add(retlist, summaryDevice(card, summaryNotConfigured()));
     });
 
-    y2error(summaryDevicesList(retlist));
+    return summaryDevicesList(retlist);
 
 }
