@@ -1,0 +1,49 @@
+@HEADER-COMMENT@
+
+# neededforbuild  alsa alsa-devel autoconf automake dejagnu expect tcl yast2 yast2-core yast2-core-devel yast2-devtools yast2-testsuite gpp libgpp yast2-runlevel hwinfo
+
+@HEADER@
+
+Requires:	yast2 yast2-core yast2-runlevel hwinfo
+Summary:	Yast2 - Sound configuration
+
+
+%description
+This package is a part of YaST2. It contains the necessary scripts to
+configure sound card.
+
+@PREP@
+
+@BUILD-YCP@
+
+@INSTALL-YCP@
+
+@CLEAN@
+
+%files
+%defattr(-,root,root)
+
+# sound
+%dir @yncludedir@/sound
+@yncludedir@/sound/*.ycp
+@clientdir@/sound*.ycp
+@clientdir@/proposal_sound.ycp
+@clientdir@/joystick.ycp
+@configdir@/sound.y2cc
+@configdir@/joystick.y2cc
+@ybindir@/copyfonts
+@moduledir@/Sound.ycp
+@moduledir@/Joystick.ycp
+
+# database
+@ydatadir@/sndcards.ycp
+
+# agent-audio
+@plugindir@/libpy2ag_audio.so.*
+@scrconfdir@/*.scr
+
+@plugindir@/libpy2ag_audio.so
+@plugindir@/libpy2ag_audio.la
+%docdir @docdir@
+%doc @docdir@/*
+

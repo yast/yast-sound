@@ -5,3 +5,5 @@ idlist.ycp.in
 modlist.ycp
 modlist.ycp.in
 sndcards.ycp.in
+Makefile.in
+Makefile
