@@ -488,7 +488,7 @@
 	    "quick2"	: ``(_snd_quick2(true)),
 	    "quick3"	: ``(_snd_quick2(false)),
 
-	    "joystick"	: ``(joystick())
+	    "joystick"	: ``(joystick()) // joystick won't be called from here(?)
 	];
 
     map m_sequence = $[
@@ -564,7 +564,11 @@
 	    "delete"	:
 		$[
 		    `next	    :	"complex"
-		]
+		],
+        "joystick"   :
+        $[
+            `next       :   `finish
+        ]
 	];
 
     symbol ui = WizardSequencer(m_aliases, m_sequence);

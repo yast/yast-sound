@@ -278,12 +278,18 @@ Use <b>Add sound card</b> to add a sound card.
 </p>
 ") +
 _("<p>
+Check <b>start sequencer</b> to load modules for playing MIDI 
+files during boot. These modules can be loaded on demand.
+</p>
+"));
+/*
+_("<p>
 Use <b>start ALSA</b> to enable or 
 disable ALSA start-up during boot. Check <b>start 
 sequencer</b> to load modules for playing MIDI 
 files during boot. These modules can be loaded on demand.
 </p>
-"));
+"));*/
 	    ret = add(ret, "ErrorDialog",
             _("<p>An error has occurred. </p>")+
 _("<p>
