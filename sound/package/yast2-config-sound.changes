@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Nov  9 14:32:52 CET 2001 - dmeszar@suse.cz
+
+- use Wizard module, Wizard_hw module and other new libycp features
+
+-------------------------------------------------------------------
 Thu Oct  4 14:19:08 CEST 2001 - dmeszar@suse.cz
 
 - setting volume to 75% for test sample for 'daca' cards (ppc)
