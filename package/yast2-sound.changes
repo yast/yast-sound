@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Dec  5 15:32:49 CET 2003 - jsuchome@suse.cz
+
+- Manual dialog: possibility to choose a card both by kernel and vendor
+
+-------------------------------------------------------------------
 Mon Dec  1 15:43:25 CET 2003 - jsuchome@suse.cz
 
 - syntax fixes for new interpreter
