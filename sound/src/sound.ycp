@@ -35,6 +35,10 @@
     include "sound/ui.ycp";
     include "sound/write_routines.ycp";
     include "sound/volume.ycp";
+    include "sound/options.ycp";
+    include "sound/complex.ycp";
+    include "sound/select.ycp";
+    include "sound/manual.ycp";
 
     boolean __sparc=nil;
 
@@ -82,7 +86,7 @@
 	list nh	    = maplist(`e, sound_cards, ``(lookup(e, "model", "")));
 
         list ch	    = maplist(`e, save_info, ``(lookup(e, "model", ""))); 
-	map res	    = CallFunction(`sound_select(nh, save_info));
+	map res	    = sound_select(nh, save_info);
 	symbol ui   = lookup(res, "ui", `abort);
 
 	card_id = lookup(res, "id", 0);
@@ -125,7 +129,7 @@
      */
 
     global define _snd_manual() ``{
-	map res = CallFunction(`sound_manual());
+	map res = sound_manual();
 
 	// if user selects the soundcards that has been already autodetected, 
 	// use the detected card instead of manual selection (because it causes
@@ -260,7 +264,7 @@
 
     global define _snd_complex() ``{
 	was_complex = true;
-	map res	    = CallFunction(`sound_complex(save_info));
+	map res	    = sound_complex(save_info);
         symbol ui   = lookup(res, "ui", nil);
         if (ui == `next)
         {

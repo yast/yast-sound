@@ -17,16 +17,16 @@ include_DATA = \
 	texts.ycp \
 	card_wizard.ycp \
 	mixer.ycp \
-	volume.ycp
+	volume.ycp \
+	options.ycp \
+	complex.ycp \
+	select.ycp \
+	manual.ycp
 
 
 modules_DATA = 	\
 	sound.ycp 		\
-	sound_manual.ycp	\
 	sound_write.ycp		\
-	sound_complex.ycp	\
-	sound_options.ycp	\
-	sound_select.ycp	\
 	sound_summary.ycp
 
 menu_DATA = menuentry_sound.ycp
