@@ -20,7 +20,7 @@
 
 {
     textdomain "sound";
-    include "ui/summary.ycp";
+    import "Summary";
 
     global define map sound_select(list sound_cards, list save_info) ``{
 

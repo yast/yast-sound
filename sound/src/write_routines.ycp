@@ -20,7 +20,6 @@
 {
     textdomain "sound";
 
-    include "misc_defines.ycp";
     include "sound/routines.ycp";
 
     /**

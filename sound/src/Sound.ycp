@@ -21,14 +21,14 @@
 {
     // Set the name of the module
     module "Sound";
+    import "Runlevel";
 
     include "sound/read_routines.ycp";
     include "sound/alsa_routines.ycp";
     include "sound/routines.ycp";
-    include "misc_defines.ycp";
 
     include "browser.ycp";
-
+    import "Summary";
 
     global boolean autoinstallation = false;
     // list for storing detected cards
@@ -109,7 +109,7 @@
 	rc_vars = read_rc_vars ();
 	// load volume settings
 	volume_settings = get_vol_settings();
-	BrowseTree(volume_settings);
+	UpdateUnconfiguredCards();
 	return true;
     }
 
@@ -191,6 +191,30 @@
 
     global define void DumpToLog() ``{
 	y2error(sformat("%1", [Sound::modules_conf, rc_vars, true, true, get_vol_settings()]));
+    }
+
+    global define string Summary() ``{
+	list retlist    = [];       // return value of the module
+
+	list keys = maplist(`e, Sound::modules_conf, ``(lookup(e, "unique_key", "...")));
+
+	retlist = maplist(`card, Sound::modules_conf,
+	``(
+	    // to translators: '(sound card is) Configured as snd-card-1'
+	    Summary::Device(lookup(card, "model", "Sound card"), sformat(_("Configured as %1."), 
+		lookup(card, "alias", "snd-card-0")))
+	));
+
+	foreach(`card, Sound::detected_cards,
+	``{
+	    if (!contains(keys, lookup(card, "unique_key", "...")))
+	    {
+		retlist = add(retlist, Summary::Device(get_card_label(card), Summary::NotConfigured()));
+	    }
+	});
+
+	return Summary::DevicesList(retlist);
+
     }
 
 }

@@ -300,7 +300,6 @@ its parameters using the 'Advanced setup'.");
 	    $["Master":70, "PCM":70, "CD":70, "Synth": 70]);
 
 	list devs2 = maplist(`k, `v, devs, ``(k));
-	y2error("devices to unmute: %1", devs2);
 
         foreach (`dev, `vol, devs, ``(SetVolume (dev, card_id, vol)));
 

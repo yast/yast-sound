@@ -33,7 +33,8 @@ clients_DATA = 	\
 
 menu_DATA = menuentry_sound.y2cc
 
-modules_DATA = Sound.ycp
+modules_DATA = Sound.ycp	\
+	Joystick.ycp
 
 bin_SCRIPTS = copyfonts
 
