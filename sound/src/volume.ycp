@@ -14,8 +14,6 @@
  *   Dan Vesely <dan@suse.cz>
  *   Dan Meszaros <dmeszar@suse.cz>
  *
- * String corrections by Christian Steinruecken <cstein@suse.de>, 2001/08/01
- *
  *
  * $Id$
  *
@@ -115,7 +113,7 @@
 
 	if (finish)
 	{
-	    UI::ChangeWidget (`id(`next), `Label, Label::FinishButton());
+	    Wizard::SetNextButton(`next, Label::FinishButton() );
 	}
 
 	if (HasFonts(save_entry) && !FontsInstalled())
@@ -224,7 +222,7 @@ its parameters using the 'Advanced setup'.");
 	Wizard::SetContents (Label::ErrorMsg(), con, help_text, true, false);
 	if (finish)
 	{
-	    UI::ChangeWidget (`id(`next), `Label, Label::FinishButton());
+	    Wizard::SetNextButton(`next, Label::FinishButton() );
 	}
 
 	UI::SetFocus(`id(`back));
@@ -370,7 +368,7 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
     }
     if (Sound::use_ui)
     {
-	UI::ChangeWidget (`id(`next), `Label, Label::NextButton());
+	Wizard::RestoreNextButton();
     }
 
     return $["ui" : ui, "return" : size (err_msg) == 0];
