@@ -25,12 +25,11 @@ $[
 # FIXME: snd-als4000 and snd-intel8x0 need snd_joystick option to enable joystick.
     "snd-als4000":
     $[
-	"GAMEPORT_MODULE": "ns558"
+	"GAMEPORT_MODULE": "off"
     ],
     "snd-cmipci":
     $[
-	"GAMEPORT_MODULE": "ns558",
-	"JOYSTICK_CONTROL": "Joystick"
+	"GAMEPORT_MODULE": "off"
     ],
     "snd-cs4281":
     $[
@@ -46,14 +45,11 @@ $[
     ],
     "snd-ens1370":
     $[
-	"GAMEPORT_MODULE": "ns558",
-	"JOYSTICK_CONTROL": "Joystick Enable"
+	"GAMEPORT_MODULE": "off"
     ],
     "snd-ens1371":
     $[
-	"GAMEPORT_MODULE": "ns558",
-	"JOYSTICK_CONTROL": "Joystick Enable",
-	"JOYSTICK_CONTROL_PORT": "0x200"
+	"GAMEPORT_MODULE": "off"
     ],
     "snd-es1938":
     $[
@@ -61,8 +57,7 @@ $[
     ],
     "snd-es1968":
     $[
-	"GAMEPORT_MODULE": "ns558",
-	"JOYSTICK_CONTROL": "Joystick"
+	"GAMEPORT_MODULE": "off"
     ],
     "snd-fm801":
     $[
@@ -80,16 +75,13 @@ $[
     $[
 	"GAMEPORT_MODULE": "off"
     ],
-    "snd-via686":
+    "snd-via82xx":
     $[
-	"GAMEPORT_MODULE": "ns558",
-	"JOYSTICK_CONTROL": "Joystick"
+	"GAMEPORT_MODULE": "off"
     ],
     "snd-ymfpci":
     $[
-	"GAMEPORT_MODULE": "ns558",
-	"JOYSTICK_CONTROL": "Joystick",
-	"JOYSTICK_CONTROL_PORT": "0x201"
+	"GAMEPORT_MODULE": "off"
     ],
     "snd-es1688":
     $[
