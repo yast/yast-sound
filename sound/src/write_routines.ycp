@@ -50,6 +50,17 @@
      */
     global define SaveModulesEntry (list cards, list system) ``{
         string err_msg="";
+	list als=SCR(`Read(.modules.alias));
+	maplist(`e, als, 
+	``{
+	    if(	issubstring(e, "snd-card-") ||
+		issubstring(e, "sound-service-") ||
+		issubstring(e, "sound-slot-"))
+		{
+		    SCR(`Write(.modules.alias, nil, e));
+		}
+	});
+
     
         if ((contains(maplist (`e, cards, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) 
             {
@@ -149,5 +160,5 @@
             }
 	return err_msg;
     }
-
+    
 }

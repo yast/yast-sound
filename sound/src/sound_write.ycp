@@ -57,6 +57,8 @@
     textdomain "sound";
     include "sound/texts.ycp";
 
+    include "browser.ycp";
+
     map STRINGS=STRINGS_();
 
     include "sound/write_routines.ycp";
