@@ -5,7 +5,7 @@
 SUBDIRS = autodocs # implementation
 
 docdir = @DOCDIR@
-htmldir = $(docdir)/y2c_snd
+htmldir = $(docdir)
 
 html_DATA =		\
 	others.html	\

@@ -6,7 +6,7 @@
 
 
 docdir = @DOCDIR@
-htmldir = $(docdir)/y2c_snd/autodocs
+htmldir = $(docdir)/autodocs
 
 ycp_files = \
 	../../src/menuentry_sound.ycp \
@@ -21,8 +21,9 @@ ycp_files = \
 	../../src/sound_volume.ycp \
 	../../src/write_routines.ycp
 
-all: $(ycp_files)
+html_DATA = index.html $(wildcard *.html)
+
+index.html: $(ycp_files)
 	@YAST2DIR@/bin/ycpdoc -d. $(ycp_files)
 
-clean:
-	rm -f *~ *.html
+CLEANFILES = $(html_DATA)

@@ -8,10 +8,8 @@ docdir = @DOCDIR@
 htmldir = $(docdir)/autodocs
 
 html_DATA = index.html $(wildcard *.html)
-MAINTAINERCLEANFILES = $(html_DATA)
+CLEANFILES = $(html_DATA)
 
 index.html: $(srcdir)/../../src/*.h
 	cd $(srcdir)/../../src && @YAST2DIR@/bin/ydoc @RPMNAME@ *.h
 	mv -f $(srcdir)/../../src/*.html .
-
-CLEANFILES = $(html_DATA)
