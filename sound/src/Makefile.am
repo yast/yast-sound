@@ -31,10 +31,6 @@ client_DATA = 	\
 	joystick.ycp		\
 	sound_proposal.ycp
 
-config_DATA = \
-	sound.y2cc \
-	joystick.y2cc
-
 desktop_DATA = \
 	sound.desktop	\
 	joystick.desktop
@@ -51,6 +47,6 @@ ycpchook = sound
 sound:
 	ln -s . sound
 
-EXTRA_DIST = $(module_DATA) $(config_DATA) $(ynclude_DATA) $(ybin_SCRIPTS) $(client_DATA) $(desktop_DATA)
+EXTRA_DIST = $(module_DATA) $(ynclude_DATA) $(ybin_SCRIPTS) $(client_DATA) $(desktop_DATA)
 
 include $(top_srcdir)/Makefile.am.common

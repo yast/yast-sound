@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Sat Feb 07 23:23:13 CET 2004 - arvin@suse.de
+
+- removed config files (*.y2cc)
+
+-------------------------------------------------------------------
 Mon Feb  2 15:40:41 CET 2004 - jsuchome@suse.cz
 
 - fixed testsuite
@@ -34,7 +39,7 @@ Tue Nov 18 13:55:40 CET 2003 - jsuchome@suse.cz
 
 - fixed button label in helptext (#33076)
 - migrated to doxygen
-- 2.9.4 
+- 2.9.4
 
 -------------------------------------------------------------------
 Fri Nov  7 16:22:08 CET 2003 - jsuchome@suse.cz
@@ -46,7 +51,7 @@ Fri Nov  7 16:22:08 CET 2003 - jsuchome@suse.cz
 -------------------------------------------------------------------
 Mon Oct 27 11:44:11 CET 2003 - jsuchome@suse.cz
 
-- fix: parameter names checked (for 'snd_' prefix) before writing (#32632) 
+- fix: parameter names checked (for 'snd_' prefix) before writing (#32632)
 
 -------------------------------------------------------------------
 Fri Oct 24 15:36:21 CEST 2003 - jsuchome@suse.cz
@@ -167,7 +172,7 @@ Mon May 12 09:59:19 CEST 2003 - jsuchome@suse.de
 
 - probe old ISA cards with alsaconf (#25285)
 - added Progress steps to Read function
-- 2.8.1 
+- 2.8.1
 
 -------------------------------------------------------------------
 Thu Mar 20 15:40:09 CET 2003 - jsuchome@suse.de
