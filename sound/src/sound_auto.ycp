@@ -152,7 +152,7 @@
 		// correctly:
 		settings = UpdateCardsToTargetSystem (settings);
 		Sound::Import (settings);
-		WFM::CallFunction ("sound_write", [ settings ]);
+		ret = WFM::CallFunction ("sound_write", [ settings ]);
 		Progress::on();
 		return ret;
 	}
