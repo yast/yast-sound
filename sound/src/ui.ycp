@@ -470,21 +470,21 @@
 
         titles=add(titles, _("Hardware detection didn't find any devices"));
             // 1:new 0:already
-        titles=add(titles, "Hardware detection found a new device");
+        titles=add(titles, _("Hardware detection found a new device"));
             // 2:new 0:already
-        titles=add(titles, "Hardware detection found new devices");
+        titles=add(titles, _("Hardware detection found new devices"));
             // 0:new 1:already
-        titles=add(titles, "Hardware detection found already installed device");
+        titles=add(titles, _("Hardware detection found already installed device"));
             // 1:new 1:already
-        titles=add(titles, "Hardware detection found a new device and already\ninstalled device");
+        titles=add(titles, _("Hardware detection found a new device and already\ninstalled device"));
             // 2:new 1:already
-        titles=add(titles, "Hardware detection found new devices and already\ninstalled device");
+        titles=add(titles, _("Hardware detection found new devices and already\ninstalled device"));
             // 0:new 2:already
-        titles=add(titles, "Hardware detection found already installed devices");
+        titles=add(titles, _("Hardware detection found already installed devices"));
             // 1:new 2:already
-        titles=add(titles, "Hardware detection found a new device and already\ninstalled devices");
+        titles=add(titles, _("Hardware detection found a new device and already\ninstalled devices"));
             // 2:new 2:already
-        titles=add(titles, "Hardware detection found new devices and already\ninstalled devices");
+        titles=add(titles, _("Hardware detection found new devices and already\ninstalled devices"));
 
 	titles=UI(titles);
 

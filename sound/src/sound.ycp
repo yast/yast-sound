@@ -165,7 +165,7 @@
 	    list nh=maplist(`e, sound_cards, ``(lookup(e, "model", "")));
 	    list ch=maplist(`e, save_info, ``(lookup(e, "model", "")));
 	    y2error(nh);
-	    res=CallModule("sound_select", [nh, ch]);
+	    res=CallFunction(`sound_select(nh, ch));
 	    symbol ui=lookup(res, "ui", nil);
 	    if(ui==`next)
 	    {
@@ -220,7 +220,7 @@
 	// edit options
 	{
 	    map entry=select(save_info, card_id);
-	    map res=CallModule("sound_options", [entry]);
+	    map res=CallFunction(`sound_options(entry));
 	    symbol ui=lookup(res, "ui", nil);
 	    if(ui==`next)
 	    {
@@ -254,7 +254,7 @@
 	else if(state==`detail)
 	// edit card options
 	{
-	    map res=CallModule("sound_complex", [save_info, []]);
+	    map res=CallFunction(`sound_complex(save_info));
 	    symbol ui=lookup(res, "ui", nil);
 	    if(ui==`next)
 	    {
@@ -313,7 +313,7 @@
 
     if (ui == `save) 
     {
-	CallModule ("sound_write", [save_info]);
+	CallFunction (`sound_write(save_info));
 
     // always save unique keys 
 	save_unique_keys (maplist(`e, save_info, ``(lookup(e, "unique_key", ""))));

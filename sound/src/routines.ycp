@@ -63,7 +63,7 @@
 	map entry=$["unique_key": isa_uniq(), "options": $[]];
 	while(true)
 	{
-            res=CallModule("sound_manual", []);
+            res=CallFunction(`sound_manual());
 
             if(lookup(res, "ui", nil)==`next)
             {

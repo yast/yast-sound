@@ -30,6 +30,9 @@
     path pth=topath(sformat(".audio.alsa.cards.%1.channels", card_id));
     list channels=SCR(`Dir(pth));
 
+    pth=topath(sformat(".audio.alsa.cards.%1.name", card_id));
+    string card_name=SCR(`Read(pth));
+
     // get list of muted channels
     list muted=[];
     foreach(`e, channels, 
@@ -72,7 +75,7 @@
 Press <B>Next</B> button to store volume settings, press <B>Back</B> to restore original settings.</P>"));
 
     term con=mixerWidget(channels);
-    UI(`SetWizardContents (_("Volume settings"), con, help, true, true));
+    UI(`SetWizardContents (sformat(UI(_("Volume settings for card '%1'")), card_name),con, help, true, true));
     UI(`ChangeWidget(`id(`next), `Label, UI(`NextButtonLabel())));
 
     path pth=nil;
