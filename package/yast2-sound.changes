@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Jul  8 16:56:09 CEST 2002 - mvidner@suse.cz
+
+- Provides/Obsoletes also the devel subpackage
+
+-------------------------------------------------------------------
 Sun Jul 07 22:43:21 CEST 2002 - arvin@suse.de
 
 - moved non binary files to /usr/share/YaST2
