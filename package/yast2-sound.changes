@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Mar 11 16:09:52 CET 2003 - jsuchome@suse.de
+
+- removed calling of agent for /var/lib/yast/unique
+- rebuild needed witch correct tarball (#25064)
+
+-------------------------------------------------------------------
 Mon Mar 10 17:56:10 CET 2003 - jsuchome@suse.de
 
 - tiwai@suse.de:
