@@ -441,7 +441,7 @@
     if ( size(flatten(add([Sound::modules_conf], Sound::unconfigured_cards))) == 1)
     {
 	boolean nm256out = nm256hack(lookup(select(Sound::unconfigured_cards, 0, $[]), "module", ""));
-	y2error("%1", nm256out);
+	y2debug("continue configuring: %1", nm256out);
 	if (!nm256out)
 	{
 	    UI::CloseDialog();

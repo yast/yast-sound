@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Aug 14 15:40:39 CEST 2002 - lslezak@suse.cz
+
+- merged proofread texts
+- version 2.6.15
+
+-------------------------------------------------------------------
 Wed Aug  7 16:58:08 CEST 2002 - lslezak@suse.de
 
 - added 3rd parameter to select() in sound DB generator
