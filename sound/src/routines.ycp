@@ -22,9 +22,10 @@
 //    include "ui/summary.ycp";
 
     /**
-     *
-     *
-     *
+     * for a given card detected by libhd this function creates a 
+     * label
+     * @param map entry from .probe.audio
+     * @return string card label
      *
      */
     global define get_card_label(map card)
@@ -36,6 +37,14 @@
         }
         return select(lab, 1);
     }
+
+    /**
+     * returns true if given string is valid sound alias
+     * (snd-card-1 .. snd-card-16)
+     * @param string alias
+     * @return boolean
+     *
+     */
 
     global define is_snd_alias(string alias) ``{
 	if(find(alias, "snd-card-")!=0)
@@ -58,6 +67,13 @@
         return true;	
     }
 
+    /**
+     * when adding card manually, this function prepares
+     * a save_info record. 
+     * @param list save_info created earlier
+     * @return list save_info with added card
+     *
+     */
 
     global define add_card_manually(list save_info) ``{
 	symbol ui=nil;
@@ -99,7 +115,9 @@
 	return $["ui": ui, "return": entry];
     }
 
-    /** returns list of items: [`item(`id(module_name), "module label")]
+    /** 
+     * creates a list of sound modules for selection box
+     * @return list of items: [`item(`id(module_name), "module label")]
      */
     global define get_module_names() ``{
 	list ret=[];
@@ -116,6 +134,7 @@
     /** returns card models list 
      *
      * @param modname if "all" returns all models
+     * @return list with sound cards driven by given module
      *
      *
      */
@@ -144,7 +163,9 @@
     }
 
     /**  
-     *	returns module name for a given card model
+     * returns module name for a given card model
+     * @param string card name
+     * @return modules name
      *
      */
 
@@ -180,90 +201,6 @@
 
     global define isa_uniq() ``{
 	return "uniq.virtual";
-    }
-
-    /**
-     * returns true if char is blank
-     */
-    global define isBlank(string s) ``{
-        if(s=="\n" || s=="\t" || s==" ")
-        {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     *  removes trailing and leading blank chars from string
-     *
-     *
-     */
-    global define removeBlanks(string str)``{
-        //emtpy  string
-        if(size(str)==0) return "";
-
-        integer bound=size(str);
-        integer first=0;
-        integer last=size(str)-1;
-        // find first non-blank char
-        while(first<bound && isBlank(substring(str, first, 1)))
-        {
-            first=first+1;
-        }
-
-        while(last>=0 && isBlank(substring(str, last, 1)))
-        {
-            last=last-1;
-        }
-        if(last>first)
-        {
-            return substring(str, first, last-first+1);
-        }
-        return "";
-    }
-
-
-  /** 
-   * returns the substring that is after the last occurence of the given character(string)
-   * @param str input string
-   * @param delim deliminator string (usually 1 character)
-   * @return string that is after last occurence of delim string in str string
-   */
-    global define afterLast(string str, string delim) ``{
-	integer cut=0;
-	while(true)
-	{
-	    cut=find(str, delim);
-	    if(cut==-1)
-	    {
-		return str;
-	    }
-	    str=substring(str, cut+size(delim), size(str)-cut-size(delim));
-	}
-	// unreachable code
-	return "";
-    }
-
-  /**
-   * returns substring that is before the last occurence of the given character(string)
-   * @see afterLast
-   */
-
-    global define beforeLast(string str, string delim) ``{
-	if(!issubstring(str, delim))
-	{
-	    return str;
-	}
-	integer pos=size(str)-size(delim);
-	while(pos>=0)
-	{
-	    if(find(substring(str, pos, size(str)-pos), delim)==0)
-	    {
-		return substring(str, 0, pos);
-	    }
-	    pos=pos-1;
-	}
-	return str;
     }
 
   /**
@@ -308,13 +245,13 @@
 
 
     /**
-     * returns sound card database
+     * loads sound card database to global variable sound_db
      * @return list
      */
 
     global define GetCardDatabase() ``{
 	textdomain "sound_db";
-	y2error("Reading card database");
+	y2debug("Reading card database");
 	sound_db=eval(SCR(`Read (.target.yast2, "sndcards.ycp")));
 	textdomain "sound";
 //	return database;
@@ -322,6 +259,8 @@
 
     /** 
      * function for reading sound_db on demand
+     * checks if sound_db is empty. if true, loads the database
+     * to it. otherwise does nothing
      *
      */
 
@@ -359,7 +298,6 @@
      * @return list
      */
 
-    /* !!! variable cards is inherited from module sound_manual.ycp*/
     global define get_cards (string module_name) ``{
         list ret = [];
 
@@ -585,32 +523,19 @@
 	integer device_id = lookup (card, "device_id", 0);
 
 	list fc = [];
-/*
-	if(size(lookup(card, "module", [])) > 0)
-	{
-	    map mod=select(lookup(card, "module", []), 0);
-	    map fmod=fetchmodule(lookup(mod, "name", []));
-	    if(lookup(mod, "name", "") != "")
-	    {
-		return $["name": lookup(mod, "name", ""),
-			 "module": mod, 
-			 "params": lookup(fmod, "params", []),
-			 "libhd": [],
-			 "cards": ["Multimedia audio controller"]];
-	    }
-	}
-*/	
 	if (tolower (bus) == "pci") 
 	{
 	    fc = filter (`d, sound_db, 
-			 ``(filter(`c, lookup (d, "libhd", []), ``((lookup (c, "vendor_id", 0) == vendor_id - offset) && 
-							       (contains(lookup(c, "device_id", 0), device_id - offset)))) != []));
+		 ``(filter(`c, lookup (d, "libhd", []), 
+		    ``((lookup (c, "vendor_id", 0) == vendor_id - offset) && 
+		       (contains(lookup(c, "device_id", 0), device_id - offset)))) != []));
 	}
 	else 
 	{
 	    fc = filter (`d, sound_db, 
-		   ``(filter(`c, lookup (d, "libhd", []), ``((lookup (c, "vendor_id", 0) == vendor_id - offset) &&
-							 (lookup (c, "device_id", 0) == device_id - offset))) != []));
+		   ``(filter(`c, lookup (d, "libhd", []), 
+			``((lookup (c, "vendor_id", 0) == vendor_id - offset) &&
+			   (lookup (c, "device_id", 0) == device_id - offset))) != []));
 	}
 
 	if (fc!=nil)
@@ -650,6 +575,12 @@
 	    SCR(`Write(topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, dev)), false));
 	});
     }
+
+    /**
+     * stores the volume to file. stored volume will be 
+     * restored after reboot
+     *
+     */
 
     global define storeVolume(integer card_id) ``{
 	if(card_id==-1)

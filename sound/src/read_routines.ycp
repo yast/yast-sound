@@ -33,6 +33,58 @@
     }
 
     /**
+     * parses special alias comment
+     * @param comment
+     * @return pair [model, uniq_key] or [] on parse error
+     *
+     */
+
+    /**
+ * Extacts the unique key and the name of the card from comment in the
+ * modules.conf placed before char-major-81-x
+ * @param Comment before the char-major-81-x
+ * @return map Returns map: $[ "unique_key" : string, "name" : string ] or
+nil
+ */
+    global define extractUniqueKey(string comment) ``{
+	map result = nil;
+
+	// split to lines
+	list comment_lines = splitstring(comment, "\n");
+
+	// find last line with a ":"
+	string line_with_uk = "";
+	integer colon_pos_uk = nil;
+	foreach(`line, comment_lines, ``{
+	    integer c_pos = findfirstof(line, ":");
+	    if (c_pos != nil)
+	    {
+		line_with_uk = line;
+		colon_pos_uk = c_pos;
+	    }
+	});
+
+	// did we find it?
+	if (colon_pos_uk != nil)
+	{
+	    // extract name
+	    string name = substring(line_with_uk,
+				    colon_pos_uk + 1,
+				    size(line_with_uk) - colon_pos_uk - 1);
+	    // extract unique key
+	    integer start_uk = findfirstnotof(line_with_uk, "# \t");
+	    string uk = substring(line_with_uk,
+				  start_uk,
+				  colon_pos_uk - start_uk);
+
+	    result = $[ "name" : name, "unique_key" : uk ];
+	}
+
+	return result;
+    }
+
+
+    /**
      * reads already saved info from modules.conf
      * example:
      * [
@@ -91,15 +143,14 @@
 
 		string comment=SCR(`Read(.modules.alias.comment, e));
 		// first remove trash from the end and beginning of the comment string
-		comment=afterLast(beforeLast(comment, "\n"), "\n");
-		comment=removeBlanks(afterLast(comment, "#"));
-		integer pos=find(comment, ":");
 		string uniq="";
 		string model="";
-		if(pos>=0)
+		map res=extractUniqueKey(comment); //  parseModuleComment(comment);
+		y2error("%1", res);
+		if(res!=nil)
 		{
-		    uniq=substring(comment, 0, pos);
-		    model=substring(comment, pos+1, size(comment)-pos-1);
+		    uniq=lookup(res, "unique_key"); //substring(comment, 0, pos);
+		    model=lookup(res, "name"); //substring(comment, pos+1, size(comment)-pos-1);
 		}   
 		
 		else 

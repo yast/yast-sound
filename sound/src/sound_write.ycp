@@ -66,6 +66,7 @@
 
     boolean test_mode = false;
     list save_info = Args (0);
+    map rc_vars=$[];
 
     string helptext = "";
     string err_msg = "";
@@ -73,7 +74,7 @@
       
     if (size (Args ()) > 1)
     {
-	test_mode = Args (1);
+	rc_vars = Args (1);
     }
 
 				  // label message
@@ -85,6 +86,7 @@
     SaveVolume();
 
     SaveModulesEntry(save_info, [], false);
+    SaveRCValues(rc_vars);
 /*
       // Step ONE: save '/etc/modules.conf'
     if (!test_mode)

@@ -103,7 +103,6 @@ sh();
 sh();
 
     list save_info    = read_save_info ();
-
  
     map rc_vars       = $[];
     integer card_id   = 0;
@@ -281,6 +280,7 @@ sh();
 	    if(ui==`next)
 	    {
 		save_info=lookup(res, "save_info", []);
+		rc_vars=lookup(res, "rc_vars", []);
 		state=`save;
 	    }
 	    else if(ui==`abort)
@@ -335,20 +335,20 @@ sh();
 
     if (ui == `save) 
     {
-	CallFunction (`sound_write(save_info));
+	CallFunction (`sound_write(save_info, rc_vars));
 
     // always save unique keys 
 	save_unique_keys (maplist(`e, save_info, ``(lookup(e, "unique_key", ""))));
 
-	if (lookup (rc_vars, "START_ALSA", "yes") == "no")
-	{
-	    SCR(`Execute (.target.bash, "/etc/init.d/alsasound stop", $[]));
-	}
-	else
-	{
-	    SCR(`Execute (.target.bash, "/sbin/depmod", $[]));
-	    SCR(`Execute (.target.bash, "/etc/init.d/alsasound restart", $[]));
-	}
+//	if (lookup (rc_vars, "START_ALSA", "yes") == "no")
+//	{
+//	    SCR(`Execute (.target.bash, "/etc/init.d/alsasound stop", $[]));
+//	}
+//	else
+//	{
+//	    SCR(`Execute (.target.bash, "/sbin/depmod", $[]));
+//	    SCR(`Execute (.target.bash, "/etc/init.d/alsasound restart", $[]));
+//	}
     }
 
     UI(`CloseDialog ());
