@@ -553,7 +553,7 @@
 	map p2		= restore_mod_params (params,save_entry["options"]:$[]);
 	params		= restore_mod_params (params,save_entry["options"]:$[]);
 
-	UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
+	Wizard::RestoreNextButton();
 
 	// now show the dialog
 	map result	= OptionsDialog (label, params);
