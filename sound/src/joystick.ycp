@@ -1,0 +1,84 @@
+/**
+ *
+ *
+ * File:
+ *   joystick.ycp
+ *
+ * Module:
+ *   Sound
+ *
+ * Authors:
+ *   Dan Meszaros <dmeszar@suse.cz>
+ *
+ * $Id$
+ *
+ * Joystick config screen + actions
+ *
+ *
+ */
+
+{
+
+    textdomain "sound";
+
+    import "Arch";
+    import "Runlevel";
+
+    include "wizard/sequencer.ycp";
+    import  "Wizard_hw";
+    include "ui/common_popups.ycp";
+    import  "Wizard";
+
+    import  "Joystick";
+
+    global define joy_dialog() ``{
+	string caption = _("Joystick configuration");
+	string helptext =
+_("<P>In this dialog you can specify your joystick type. If your
+joystick type is not in the list, select <B>Generic analog joystick</B>
+(the first item in the list).</P>") +
+
+_("<P><B>Note:</B> You need to have your joystick plugged in your computer
+before you press the <B>Next</B> button.</P>");
+
+
+	map joysticks = SCR::Read(.target.yast2, "include/sound/joysticks.ycp");
+
+	list joylist = [];
+
+	joylist = flatten (maplist(`k, `v, joysticks, ``(maplist(`l, v, ``([k, l])))));
+
+	joylist = sort(`k, `v, joylist, ``(select(k, 1, "") <= select(v, 1, "")));
+
+	joylist = maplist(`e, joylist, ``(`item(`id(select(e, 0, "")), select(e, 1, ""))));
+
+	joylist = prepend(joylist, `item(`id(`analog), _("Generic analog joystick"), true));
+
+	term contents =
+	    `VBox(
+		`VSpacing(3),
+		`HBox(
+		    `HSpacing(6),
+		    `SelectionBox(`id(`os), _("&Select your joystick type:"), joylist),
+		    `HSpacing(6)
+		),
+		`VSpacing(3)
+	    );
+
+
+	Wizard::SetContents (caption, contents, helptext, true, true);
+
+	symbol s = nil;
+	do
+	{
+	    s =UI::UserInput();
+
+	    if (s == `abort && !ReallyAbort())
+	    {
+		s = `skip_event;
+	    }
+
+	} while (!contains([`next, `back, `abort, `cancel], s));
+	return s;
+    }
+}

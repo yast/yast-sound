@@ -107,7 +107,7 @@
 		    break;
 		}
 	    }
-	} while (!contains([`back, `next, `cancel], ui));
+	} while (!contains([`back, `next, `cancel, `joystick], ui));
 	return ui;
     }
 
@@ -306,11 +306,27 @@ its parameters using the 'Advanced setup'.");
 	unmute(devs2, card_id);
 	if (!quick)
 	{
-	    ui = VolumeDialog ();
+	    while (true)
+	    {
+		ui = VolumeDialog ();
+		if (ui != `joystick)
+		{
+		    break;
+		}
+		symbol s = joy_dialog();
+		if (s == `abort || s == `cancel)
+		{
+		    ui = `abort;
+		    break;
+		}
+	    }
 	}
 	else
 	{
-	    SetVolume ("Master", card_id, 75);
+	    string master_elem = lookup(lookup(Sound::db_modules, modname, $[]), 
+		"main_volume", "Master");
+
+	    SetVolume (master_elem, card_id, 75);
 	    ui = SuccessDialog(save_entry);
 	}
 	storeVolume(card_id);
