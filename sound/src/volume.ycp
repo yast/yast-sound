@@ -196,61 +196,6 @@ its parameters using the 'Advanced setup'.");
 	return ui;
     }
 
-    /**
-    * shows success message in wizard
-    * @param save_entry info about card config
-    * @return symbol `back | `cancel
-    */
-
-    global define symbol SuccessDialog (map save_entry) ``{
-                                    // Help text - intenal YaST2 error
-
-        string help_text = lookup(STRINGS, "SuccessDialog", "");
-
-        term con = `HVCenter
-          (
-            `VBox
-            (
-                    // error message
-              `Label (_("Your sound card is ready for use.")),
-              `VSpacing (),
-              `Label (`opt(`outputField), lookup(save_entry, "model", "")),
-              `VSpacing (),
-              `Label ("")
-            )
-          );
-
-            // dialog title
-        Wizard::SetContents (_("Success"), con, help_text, true, true);
-        if (finish)
-        {
-            UI::ChangeWidget (`id(`next), `Label, Label::FinishButton());
-        }
-
-        repeat
-        {
-            ui =  UI::UserInput ();
-	    if (ui == `cancel || ui == `abort)
-	    {
-		if (ReallyAbort())
-		{
-		    return `abort;
-		}
-	    }
-        } until ((ui == `back) || ui == `next);
-
-	if (ui == `next)
-	{
-	    // reset table pointers
-	    Sound::curr_driver = "";
-	    Sound::curr_model = "";
-	}
-        return ui;
-    }
-
-
-
-
   // ===== main =====
       /*
        * Steps:
@@ -278,11 +223,6 @@ its parameters using the 'Advanced setup'.");
 
     boolean need_restart    = true;
     boolean test_mode	    = false;
-
-//    if (autoinstall)
-//    {
-//	quick = true;
-//   }
 
     Wizard::DisableAbortButton();
 
@@ -368,8 +308,7 @@ its parameters using the 'Advanced setup'.");
 	    {
 		joy_dialog(card_id, `next);
 	    }
-
-	    ui = SuccessDialog(save_entry);
+	    ui = `next;
 	}
 	storeVolume(card_id);
     }
@@ -385,6 +324,12 @@ its parameters using the 'Advanced setup'.");
 	    sound_stop();
 	    sound_start_tmp(true);
 	}
+    }
+    else
+    {
+	// reset pointers to card table
+	Sound::curr_driver = "";
+	Sound::curr_model = "";
     }
 
     if (!Sound::autoinstallation)

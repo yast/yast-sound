@@ -581,7 +581,7 @@
 	        // dialog title
         Wizard::SetContents (_("Configure a sound card"), con, helptext, true, true);
         // Next - button label
-        UI::ChangeWidget(`id(`next), `Label, UI(Label::NextButton()));
+        UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
 
         if (size (nc) == 0)
         {
