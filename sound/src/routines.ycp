@@ -155,18 +155,6 @@
     }
 
 
-
-    /**
-     *  Converts hex num to integer keeps decimal number as is. Hexadecimal
-     *  number assumes to have prefix ``0x''. Doesn't  check the syntax.
-     *	@param num string value
-     *  @return integer
-     */
-
-    global define integer hextoi(string num) ``{
-	return tointeger(num);
-    }
-
     /**
      *  writes unique keys of the configured cards to /var/lib/YaST/unique.inf
      *  @param keys list with uniq keys
@@ -439,12 +427,12 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
                 {
                     if (substring (des, pos, 1) == ",")
                     {
-                        ret = add (ret, hextoi (substring (des, s, pos - s)));
+                        ret = add (ret, tointeger (substring (des, s, pos - s)));
                         s = pos + 1;
                     }
                     pos = pos + 1;
                 }
-                ret = add (ret, hextoi (substring (des, s, pos - s)));
+                ret = add (ret, tointeger (substring (des, s, pos - s)));
             }
             else if (tolower(substring (des, pos, 6)) == "range=")
             {
@@ -477,30 +465,6 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
         return ret;
     }
 
-  /**
-   * "sformates" list from sound database, where are localized messages, with
-   * optional formating information
-   * @param msg message to be formated
-   * @return string
-   * @example mysformat(["Message %1 %2 %3", "A", "B", "C"])  ->  "Message A B C"
-   */
-    global define string mysformat (list msg)
-    ``{
-        if (size (msg) == 0)
-        {
-            return "";
-        }
-
-	term format=``(sformat());
-
-        integer i = 0;
-        while (i < size (msg))
-        {
-            format = add (format, select (msg, i, ""));
-            i = i + 1;
-        }
-        return eval (format);
-    }
 
     /**
      * checks whether param #1 is if type of param #2
@@ -560,7 +524,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
             if (type == "int")
             {
-                poss_list = maplist (`v, poss, ``(hextoi (value) == v));
+                poss_list = maplist (`v, poss, ``(tointeger (value) == v));
             }
             else
             {
@@ -709,42 +673,6 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
 
     /**
-     *	when user wants to delete a card, all cards using given module must be removed.
-     *  this function returns list of positions of cards using the module
-     *  @param	save_info all cards' donfiguration
-     *	@param	mod_name module name
-     *  @param  card_id id of currently removed card
-     *  @return list of integers
-     */
-
-    global define list get_indices_for_removal(list save_info, string mod_name, integer card_id)
-    ``{
-	list ret = [];
-	boolean remove_all = false;
-	integer pos = 0;
-	maplist(`e, save_info,
-	``{
-	    if (lookup(e, "module", "") == mod_name)
-	    {
-		ret = add(ret, pos);
-	    }
-	    else
-	    {
-		if (size(ret) > 0)
-		{
-		    remove_all = true;
-		}
-	    }
-	    pos = pos + 1;
-	});
-	if (!remove_all)
-	{
-	    return [card_id];
-	}
-	return ret;
-    }
-
-    /**
      * remove memebers listed in id_list list
      * @param input
      * @param id_list
@@ -766,11 +694,8 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      * @return new save_info
      */
 
-    global define list remove_save_entries(list save_info, list id_list)
+    global define list recalc_save_entries(list save_info)
     ``{
-	// TODO: valorize me
-	save_info = multi_remove(save_info, id_list);
-
 	integer pos = 0;
 	save_info = maplist(`e, save_info,
 	``{

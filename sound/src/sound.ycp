@@ -223,9 +223,10 @@
             // everything is muted and set to 0.
             list vol_settings = get_vol_settings();
 
-            list rem	    = [card_id]; //get_indices_for_removal(Sound::modules_conf, modname, card_id);
-            Sound::modules_conf	    = remove_save_entries(Sound::modules_conf, rem);
-            vol_settings    = multi_remove(vol_settings, rem);
+            Sound::modules_conf	    = remove(Sound::modules_conf, card_id);
+	    Sound::modules_conf	    = recalc_save_entries(Sound::modules_conf);
+
+	    vol_settings    = multi_remove(vol_settings, rem);
 
             SaveModulesEntry (Sound::modules_conf, [], true);
 

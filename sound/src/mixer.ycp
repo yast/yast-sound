@@ -143,7 +143,6 @@
 
 global define map mixerDialog(integer card_id) ``{
 
-    integer card_id	= Args(0);
     path pth		= topath(sformat(".audio.alsa.cards.%1.channels", card_id));
     list channels	= use_alsa ? SCR::Dir(pth) : ["Master"];
     list muted		= [];
@@ -203,7 +202,6 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
     Wizard::SetContents (sformat(_("Volume settings for card '%1'"), card_name),con, help, true, true);
     UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
 
-    path    pth = nil;
     any	    ui = nil;	// 'any' is essential here- value can be `next `abort... or string (channel name,
 			//  whose name is dynamical)
     integer value = 0;
