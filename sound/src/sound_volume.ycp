@@ -258,7 +258,7 @@ boolean need_restart=true;
     {
 	SCR(`Execute(.target.bash, "/etc/init.d/alsasound stop", $[]));
 	add_tmp_module_record(module_map, card_id);
-	alsasound_start_tmp();
+	alsasound_start_tmp(true);
 	err_msg = check_module(module_map);
 //	err_msg = probe_module (module_map, user_settings);
 //        SCR(`Execute(.target.bash, "/etc/init.d/rcalsasound start", $[]));

@@ -1214,12 +1214,12 @@
 
     /**
      * alsasound_start_tmp starts alsa using temporary modules.conf
-     *
+     * @param restore true - call alsactl restore, false - don't
      *
      *
      */
 
-    global define alsasound_start_tmp() ``{
+    global define alsasound_start_tmp(boolean restore) ``{
 	string cmd="depmod -C "+get_tmp_modules_conf();
 	SCR(`Execute(.target.bash, cmd, $[]));
 
@@ -1232,7 +1232,6 @@
 	{
 	    modname=SCR(`Read(.tmp.modules.alias, sformat("snd-card-%1", pos)));
 	    cmd=sformat("/sbin/modprobe -C %1 %2", get_tmp_modules_conf(), modname);
-	    y2error("executing "+cmd);
 	    SCR(`Execute(.target.bash, cmd, $[]));
 	    pos=pos+1;
 	}
@@ -1240,9 +1239,12 @@
 
 //	string cmd=sformat("/bin/grep \"alias.*snd-card-[0-9]\" %1 | cut -f 3 | sort | uniq | while read A ;do modprobe -C %2 $A; done", get_tmp_modules_conf(), get_tmp_modules_conf());
 //	SCR(`Execute(.target.bash, cmd, $[]));	
-//	SCR(`Execute(.target.bash, "/usr/sbin/alsactl restore", $[]));
+	if(restore)
+	{
+	    SCR(`Execute(.target.bash, "/usr/sbin/alsactl restore", $[]));
+	}
     }
- 
+
     /** 
      * creates temporary modules.conf.
      * it will be used for starting sound modules
@@ -1324,11 +1326,9 @@
 	string cmd=sformat("sed /%1/d %2 > %3", mod_name, get_tmp_modules_conf(), get_tmp_modules_conf()+"2");	
 	SCR(`Execute(.target.bash, cmd, $[]));
 	
-	y2error(cmd);
 
 	cmd=sformat("cp %1 %2", get_tmp_modules_conf()+"2", get_tmp_modules_conf());
 	SCR(`Execute(.target.bash, cmd, $[]));
-	y2error(cmd);
 
     }
 
@@ -1469,7 +1469,6 @@
      */
 
     global define save_single_tmp_modules_conf(string entry_name, map entry) ``{
-	 y2error("Saving entry "+entry_name);
 	 if (haskey (entry, "alias"))
             {
                 SCR(`Write(.tmp.modules.alias, entry_name, lookup(entry, "alias")));
@@ -1497,7 +1496,6 @@
 	    i=i+1;
 	}
 	maplist (`e, save_info, ``(save_single_tmp_modules_conf(lookup (e, "name", ""), lookup (e, "modules", $[]))));  
-	y2error("Saving...");
 	SCR(`Write(.tmp.modules, nil));
     }
     
@@ -1557,7 +1555,6 @@
 
     global define remove_uniques(list key_list, list id_list) ``{
 	id_list=sort(`x, `y, id_list, ``(x>=y));
-	    y2error(sformat("%1", id_list));
 	maplist(`e, id_list, ``{if(e<size(id_list)) key_list=remove(key_list, e); });
 	return key_list;
     }
