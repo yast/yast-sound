@@ -10,3 +10,11 @@ libtool
 config.log
 aclocal.m4
 Makefile.am
+config.guess
+config.sub
+depcomp
+install-sh
+ltmain.sh
+missing
+mkinstalldirs
+autom4te.cache
