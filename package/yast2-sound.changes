@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Sep 18 15:52:41 CEST 2003 - jsuchome@suse.cz
+
+- joystick fix: widgets ID's were translated which caused the test
+  dialog not to work (#31295)
+- 2.8.10
+
+-------------------------------------------------------------------
 Tue Sep 16 14:20:46 CEST 2003 - jsuchome@suse.cz
 
 - check for nil values to prevent error messages in log

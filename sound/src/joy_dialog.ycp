@@ -412,15 +412,17 @@ and press some of its buttons several times.
     // generate appropriate dialog for the joystick
     term joy_attrib = `VBox();
     string widget_name = "";
+    string widget_id = "";
     integer min = -32767; // see js_event.value in linux/joystick.h
     integer max = 32767;
     i = 0;
     while (i < axes)
     {
         widget_name = sformat(_("Axis %1"), i);
+        widget_id = sformat("Axis %1", i);
 /*        joy_attrib = add (joy_attrib, `BarGraph(`id(widget_name),
             `opt(`autoShortcut), [ max, max ], [ "", "" ]));*/
-        joy_attrib = add (joy_attrib, `ProgressBar(`id(widget_name),
+        joy_attrib = add (joy_attrib, `ProgressBar(`id(widget_id),
             `opt(`autoShortcut), widget_name, 2*max, max));
         joy_attrib = add (joy_attrib,
             `VSpacing(1));
@@ -433,8 +435,9 @@ and press some of its buttons several times.
     while (i < buttons )
     {
         widget_name = sformat(_("Button %1"), i);
+        widget_id = sformat ("Button %1", i);
         joy_buttons = add (joy_buttons,
-            `Label (`id(widget_name), widget_name + " " + not_pressed));
+            `Label (`id(widget_id), widget_name + " " + not_pressed));
         joy_buttons = add (joy_buttons,
             `HSpacing(2));
         i = i+ 1;
@@ -481,10 +484,10 @@ and press some of its buttons several times.
                 // button pressed
                 if (val == 1)
                     UI::ChangeWidget(`id(sformat("Button %1", number)), `Value,
-                        sformat("Button %1", number) + " " + pressed);
+                        sformat(_("Button %1"), number) + " " + pressed);
                 else
                     UI::ChangeWidget(`id(sformat("Button %1", number)), `Value,
-                        sformat("Button %1", number) + " " + not_pressed);
+                        sformat(_("Button %1"), number) + " " + not_pressed);
             }
             else if (type == 2)
             {
