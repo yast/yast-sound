@@ -1,5 +1,6 @@
 {
-    include "gen_routines.ycp";
+    include "./include/gen_routines.ycp";
+//    include "gen_routines.ycp";
 
     global define translate_descr(string descr) ``{
 	list matches = [
@@ -83,7 +84,8 @@
     string generic_string = SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.generic_string");
     list gs = splitstring(generic_string, "\n");
 
-    string pattern = "(snd-[^ \t]*)[\t ]*info_parm_(snd_[^=]*)=enable:\\(snd_enable\\)(.*)";
+//    string pattern = "(snd-[^ \t]*)[\t ]*info_parm_(snd_[^=]*)=enable:\\(snd_enable\\)(.*)";
+    string pattern = "(snd-[^ \t]*)[\t ]*info_parm_([^=]*)=enable:\\(snd_enable\\)(.*)";
 
     list ltmp = [];
     list lx = [];
@@ -108,6 +110,7 @@
 		return;
 	    }
 	    parmname = select(lx, 1, "");
+        parmname = "snd_" + parmname;
 	    descr = lookup(lookup(modopts, modname, $[]), parmname, " ");
 
 	    // these two declaration must be here
