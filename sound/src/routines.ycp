@@ -17,9 +17,9 @@
 
 {
     textdomain "sound";
-    include "misc_defines.ycp";
+//    include "misc_defines.ycp";
     include "lan/lan_routines.ycp";
-    include "ui/summary.ycp";
+//    include "ui/summary.ycp";
 
     /**
      *
@@ -103,7 +103,7 @@
      */
     global define get_module_names() ``{
 	list ret=[];
-	if(sound_db==nil) return [];
+	read_db();
 	foreach(`e, sound_db, 
 	``{
 	    ret=add(ret, `item(`id(lookup(lookup(e, "module", $[]), "name", "")), lookup(e, "name", _("Unknown module name"))));
@@ -121,6 +121,7 @@
      */
 
     global define get_card_names(string modname) ``{
+	read_db();
 	if(modname=="all")
 	{
 	    list cards=[];
@@ -148,6 +149,7 @@
      */
 
     global define get_module_by_cardname(string cardname) ``{
+	read_db();
 	list mod=filter(`e, sound_db,
 	``(contains(lookup(e, "cards"), cardname))
 	);
@@ -162,6 +164,7 @@
 
     global define get_module_params(string modname) ``{
 	// database must be read some elsewhere
+	read_db();
 	list mod=filter(`e, sound_db, ``(lookup(lookup(e, "module", $[]), "name", "")==modname));
 	if(size(mod)>0)
 	{
@@ -312,9 +315,21 @@
     global define GetCardDatabase() ``{
 	textdomain "sound_db";
 	y2error("Reading card database");
-	sound_db=SCR(`Read (.target.yast2, "sndcards.ycp"));
+	sound_db=eval(SCR(`Read (.target.yast2, "sndcards.ycp")));
 	textdomain "sound";
 //	return database;
+    }
+
+    /** 
+     * function for reading sound_db on demand
+     *
+     */
+
+    global define read_db() ``{
+	if(sound_db==nil || size(sound_db)==0)
+	{
+	    GetCardDatabase();
+	}
     }
 
     /**
@@ -348,6 +363,7 @@
     global define get_cards (string module_name) ``{
         list ret = [];
 
+	read_db();
         if (tolower(module_name) == "all")
         {	// copy the whole database
         maplist (`e, sound_db,
@@ -561,10 +577,7 @@
      * @return map
      */
     global define get_module (map card) ``{
-	if (sound_db == nil)
-	{
-	    return $[];
-	}
+	read_db();
 
 	string bus        = lookup (card, "bus", "");
 	integer offset    = condition ((tolower (bus) == "isa"), 0x20000, 0x10000);
@@ -667,7 +680,7 @@
                   // To translators: just one file will be displayed
                   // To translators: if the test audio file can not be found this message is displayed
                   // To translators: This is just popup message, shouldn't be too long
-            string msg = sformat (UI (_("Cannot find file:\n %1\n\n(test audio file)")), file);
+            string msg = sformat (_("Cannot find file:\n %1\n\n(test audio file)"), file);
 
             return msg;
         }
@@ -695,9 +708,9 @@
         {
 
                 // To translators: label to error popup
-            return sformat (UI(_("The kernel module %1 for sound support
+            return sformat (_("The kernel module %1 for sound support
 could not be loaded. This can be caused by incorrect
-module parameters, including invalid IO or IRQ parameters.")), mod_name);
+module parameters, including invalid IO or IRQ parameters."), mod_name);
         }
         return "";
 
@@ -835,7 +848,7 @@ module parameters, including invalid IO or IRQ parameters.")), mod_name);
                 if (filterchars(rest, "0123456789abcdef") != rest)
                 {
                       // To translators: popup message, wrong value
-                      return sformat (UI(_("The value: %1 must be a number")), value);
+                      return sformat (_("The value: %1 must be a number"), value);
                 }
             }
             else                // decimal number
@@ -848,7 +861,7 @@ module parameters, including invalid IO or IRQ parameters.")), mod_name);
                 if (filterchars(rest, "0123456789") != rest)
                 {
                             // To translators: popup message, wrong value
-                    return sformat (UI(_("The value: %1 must be a number")), value);
+                    return sformat (_("The value: %1 must be a number"), value);
                 }
             }
         }
@@ -862,10 +875,10 @@ module parameters, including invalid IO or IRQ parameters.")), mod_name);
                 if (wrong_char == " ")
                 {
                                         // To translators: "space" means blank character
-                    wrong_char = wrong_char + " " + UI(_("(space)"));
+                    wrong_char = wrong_char + " " + _("(space)");
                 }
                         // To translators: popup message, wrong value
-                return  sformat (UI(_("String cannot contain: %1")), wrong_char);
+                return  sformat (_("String cannot contain: %1"), wrong_char);
             }
         }
 
@@ -886,7 +899,7 @@ module parameters, including invalid IO or IRQ parameters.")), mod_name);
             if (!contains (poss_list, true))
             {
                       // To translators: popup message, wrong value
-                return sformat (UI(_("The value must be one of %1")), poss);
+                return sformat (_("The value must be one of %1"), poss);
             }
         }
 
@@ -1185,7 +1198,7 @@ module parameters, including invalid IO or IRQ parameters.")), mod_name);
 	foreach(`card, conflist,
 	``{
 	    // to translators: '(sound card is) Configured as snd-card-1'
-	    retlist=add(retlist, summaryDevice(card, sformat(UI(_("Configured as snd-card-%1.")), i)));
+	    retlist=add(retlist, summaryDevice(card, sformat(_("Configured as snd-card-%1."), i)));
 	    i=i+1;
 	});
 

@@ -22,15 +22,26 @@
     textdomain "sound";
 
     include "misc_defines.ycp";
-    include "sound/routines.ycp";
-    include "sound/ui.ycp";
-    include "sound/texts.ycp";
-    include "sound/read_routines.ycp";
+
+    include "wizard/sequencer.ycp";
+    include "ui/wizard_hw.ycp";
+    include "ui/common_popups.ycp";
+    include "ui/wizard_dialog.ycp";
+
     include "sound/alsa_routines.ycp";
     include "sound/card_wizard.ycp";
+    include "sound/read_routines.ycp";
+    include "sound/routines.ycp";
+    include "sound/texts.ycp";
+    include "sound/ui.ycp";
     include "sound/write_routines.ycp";
 
-    include "browser.ycp";
+    integer www=0;
+
+    global define sh() ``{
+	www=www+1;
+	y2error("Step %1#", www);
+    }
 
     // text constants for sound module
     map STRINGS=STRINGS_();
@@ -39,25 +50,27 @@
     if (Args() == [ "get_menuentry" ])
     {
 	return [ "sound", $[
-	    `menuentry    : UI(_("Hardware/Sound")),
+	    `menuentry    : _("Hardware/Sound"),
 	    `arguments    : [ ],
 	    `widget       : `RichText(
 	    //
-	    UI(_("Launch this module to configure your sound card."))
+	    _("Launch this module to configure your sound card.")
 	    +
-	    UI(_("<p>You need to be logged in as <i>root</i> in order to do this.</p>"))),
+	    _("<p>You need to be logged in as <i>root</i> in order to do this.</p>")),
 	    `codefragment : nil ]
 	];
     }
 
     
     // ========== MAIN ==========
+
+
     OpenMainDialog();
     InitializingDialog ();
 
-
+sh();
     UI(`DisableWizardAbortButton());
-
+sh();
     boolean test_mode     = false;
     boolean config_mode   = false;
     boolean autoinst_mode = false;
@@ -85,11 +98,12 @@
 	}
 	arg_n = arg_n - 1;
     }
+sh();
     list sound_cards  = get_audio ();
+sh();
 
     list save_info    = read_save_info ();
- 
-//    CreateTmpModulesConf();
+
  
     map rc_vars       = $[];
     integer card_id   = 0;
@@ -106,24 +120,22 @@
 
     if(!fileexist("/usr/lib/YaST2/sndcards.ycp"))
     {
-	UI(`MessagePopup(UI(_("Sound card database not found. Please check your installation."))));
+	UI(`MessagePopup(_("Sound card database not found. Please check your installation.")));
 	UI(`CloseDialog());
 	return;			
     }
-
+sh();
     sound_cards=filter_configured(save_info, sound_cards);
-
-    GetCardDatabase(); // loads the database to sound_db
-    
+sh();
     if(size(sound_cards)>0)
     {
 	// get all the apropriate information from the database
 	sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
 
-
+sh();
     // filter out modules with unspecified module name (sound card not supported by alsa / no module found)
 	sound_cards = filter(`e, sound_cards, ``(lookup(e, "module", $[])!=$[]));
-    
+sh();    
     // create save_info entries
 	sound_cards = convert_to_save_info(sound_cards);
     }
@@ -134,10 +146,12 @@
 	UI(`CloseDialog ());
 	return;
     }
-    
+sh();
     SCR(`Execute(.target.bash, "rm /tmp/modules.conf; touch /tmp/modules.conf", $[]));
-    SaveModulesEntry(save_info, [], true);
-
+sh();
+//    SaveModulesEntry(save_info, [], true);
+      SCR(`Dir(.lilo));
+sh();
     boolean skipped = false;
     if(all_cards_num == 1)
     {

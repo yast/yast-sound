@@ -20,9 +20,9 @@
 
 {
     textdomain "sound";
-
-    include "sound/ui.ycp";
-    include "sound/routines.ycp";
+    include "ui/summary.ycp";
+//    include "sound/ui.ycp";
+//    include "sound/routines.ycp";
 
     list sound_cards=Args(0);
     list save_info=Args(1);

@@ -63,7 +63,7 @@
     foreach(`card, conflist, 
     ``{
 	// to translators: '(sound card is) Configured as snd-card-1'
-	retlist=add(retlist, summaryDevice(card, sformat(UI(_("Configured as snd-card-%1.")), i)));
+	retlist=add(retlist, summaryDevice(card, sformat(_("Configured as snd-card-%1."), i)));
 	i=i+1;
     });
 
