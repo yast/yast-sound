@@ -189,8 +189,7 @@ define map mixerDialog (integer card_id) ``{
 	    channels = filter (string ch, (list<string>) channels, ``(ch !=master_channel));
 	    channels = prepend (channels, master_channel);
 	}
-
-	channels = (list<list<string> >)
+	channels = (list<list>)
 	maplist(string ch, (list<string>) channels, ``{
 	    if (contains(muted, ch))
 	    {
