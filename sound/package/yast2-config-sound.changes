@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Jan  8 21:32:04 CET 2002 - dmeszar@suse.cz
+
+- moved /etc/sysconfig/alsa to /etc/sysconfig/sound
+
+-------------------------------------------------------------------
 Mon Jan  7 16:33:36 CET 2002 - dmeszar@suse.cz
 
 - removed START_ALSA (moved to runlevel editor) and START_ALSA_SEQ

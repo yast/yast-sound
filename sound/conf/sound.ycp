@@ -29,5 +29,5 @@
 .alsa
 
 `ag_rcconfig(
-  RcFile("/etc/sysconfig/alsa")
+  RcFile("/etc/sysconfig/sound")
 )
