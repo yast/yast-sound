@@ -43,7 +43,7 @@
 				// sets the volume, with amixer check
 				// if an error occurs popup error is displayed
 	define set_volume (string device, integer v) ``{
-	    integer ret = Shell ("/usr/bin/amixer set $DEV $VOL% unmute 2>/dev/null", $["DEV" : device, "VOL" : v]);
+	    integer ret = Shell ("/usr/bin/amixer set \"$DEV\" $VOL% unmute 2>/dev/null", $["DEV" : device, "VOL" : v]);
 	    if (ret == 127){
 				// To translators: This is just popup message, shouldn't be too long
 		UI (`DisplayMessage (_("Cannot find program 'amixer'.\nPlease install the package 'ALSA' from the 'snd1' series")));
