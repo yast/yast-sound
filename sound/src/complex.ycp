@@ -170,7 +170,7 @@ Try to restart sound system?")))
 	    {
 		ui = `delete;
 		// global variable card_id
-		card_id = UI::QueryWidget (`id(`configured_table), `CurrentItem);
+		card_id = UI::QueryWidget (`id(`configured_table),`CurrentItem);
 	    }
 	    else if (ui == `b_options)
 	    {
@@ -285,8 +285,8 @@ Restart sound system now?
 	    }
 
 
-	} while (!contains([`back, `next, `cancel, `abort, `add_manual, `add_select, `delete], ui));
-
+	} while (!contains(
+	[`back, `next, `cancel, `abort, `add_manual, `add_select, `delete],ui));
 
 	return $["ui": ui];
     }

@@ -9,12 +9,11 @@
  *   Sound
  *
  * Summary:
- *   UI interface
+ *   user interface functions for sound module
  *
  * Authors:
  *   Dan Veselý <dan@suse.cz>
  *   Dan Meszaros <dmeszar@suse.cz>
- *
  *
  */
 
@@ -37,36 +36,40 @@
      * @param has_joy sound card supports joystick
      * @return map symbol of next dialog
      */
+    global define map DisplayName (string name, string cname, integer cpos,
+				   integer flags, boolean has_joy) ``{
 
-    global define map DisplayName (string name, string cname, integer cpos, integer flags, boolean has_joy) ``{
-	string helptext = lookup(STRINGS, "DisplayName", "");
-	term con = AutoconfDlg(name, cname, cpos, has_joy);
+	string helptext	= STRINGS["DisplayName"]:"";
+	term con	= AutoconfDlg (name, cname, cpos, has_joy);
 	// dialog header
-	Wizard::SetContents (_("Sound card configuration"), con, helptext, true, true);
-		// dialog title
-	integer flagc = 1;
-	integer flagp = 0;
-	boolean selected = false;
+	Wizard::SetContents (_("Sound card configuration"), con,
+	    helptext, true, true);
 
-	list flages = [`quick, `normal, `intro];
+	// dialog title
+	integer flagc	= 1;
+	integer flagp	= 0;
+	boolean selected = false;
+	list flages	= [`quick, `normal, `intro];
+
 	while (flagp < 3)
 	{
 	    if ((flagc & flags) == 0)
 	    {
-		UI::ChangeWidget(`id(select(flages, flagp, 0)), `Enabled, false);
+		UI::ChangeWidget(`id(flages[flagp]:`quick), `Enabled, false);
 	    }
 	    else
 	    {
 		if (!selected)
 		{
 		    selected = true;
-		    UI::ChangeWidget(`id(`action), `CurrentButton, select(flages, flagp, 0));
+		    UI::ChangeWidget(`id(`action), `CurrentButton,
+			flages[flagp]:`quick);
 		}
 	    }
 	    flagp = flagp + 1;
 	    flagc = flagc * 2;
 	}
-		// Next button label
+
 	UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
 
 	symbol input = `quick;
@@ -79,7 +82,6 @@
 		    return $["ui" : `abort];
 		}
 	    }
-
 	    input = UI::UserInput();
 
 	} while (input != `next && input !=`back);
@@ -92,14 +94,13 @@
 	    {
 		output = `next;
 	    }
-	    // global variable conf_joystick
 	    if (has_joy == true)
 	    {
-		conf_joystick = UI::QueryWidget(`id(`joystick), `Value);
+		Sound::conf_joystick = UI::QueryWidget(`id(`joystick), `Value);
 	    }
 	    else
 	    {
-		conf_joystick = false;
+		Sound::conf_joystick = false;
 	    }
 	}
 	return $["ui" : output];
@@ -113,14 +114,14 @@
      * @param has_joy set to true if configured card supports joystick
      * @return map symbol for next dialog
      */
+    global define map quickConfig(string name, string cname, integer cpos,
+				  boolean has_joy) ``{
 
-    global define map quickConfig(string name, string cname, integer cpos, boolean has_joy) ``{
-        string helptext = lookup(STRINGS, "quickConfig", "");
-        term con = QuickconfDlg(name, cname, cpos, has_joy);
+        string helptext = STRINGS["quickConfig"]:"";
+        term con	= QuickconfDlg (name, cname, cpos, has_joy);
 	// dialog header
-        Wizard::SetContents (_("Sound card configuration"), con, helptext, true, true);
-                // dialog title
-                // Next button label
+        Wizard::SetContents (_("Sound card configuration"), con,
+	    helptext, true, true);
         UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
 
 	symbol input = `quick;
@@ -142,30 +143,16 @@
         {
 	    if (has_joy == true)
 	    {
-		conf_joystick = UI::QueryWidget(`id(`joystick), `Value);
+		Sound::conf_joystick = UI::QueryWidget(`id(`joystick), `Value);
 	    }
 	    else
 	    {
-		conf_joystick = false;
+		Sound::conf_joystick = false;
 	    }
-
             output = UI::QueryWidget(`id(`action), `CurrentButton);
         }
         return $["ui" : output];
     }
-
-
-    /**
-     *
-     *	OpenMainDialog
-     *
-     * @return void
-     */
-
-    global define void OpenMainDialog() ``{
-	Wizard::CreateDialog();
-    }
-
 
     /**
      *	UI controls for volume setting dialog
@@ -174,56 +161,48 @@
      *  @param vol initial volume (0-100)
      *  @return term volume dialog contents
      */
+    global define term VolumeCon (map save_entry , integer vol) ``{
 
-    global define term VolumeCon(map save_entry , integer vol) ``{
-	// volume option label
-	term slider = `IntField(`id(`volume), `opt(`notify), _("&Volume"), 0, 100, vol);
+	term slider = `IntField(`id(`volume), `opt(`notify),
+	    // volume slider label
+	    _("&Volume"), 0, 100, vol);
 
 	if (UI::HasSpecialWidget(`Slider))
 	{
-	          // slider label
-	    slider = `Slider (`id(`volume), `opt(`notify), _("&Volume"), 0, 100, vol);
+	    slider = `Slider (`id(`volume), `opt(`notify),
+		// volume slider label
+		_("&Volume"), 0, 100, vol);
 	}
 
-	term con = `HBox
-	  (
+	term con = `HBox (
 	    `HSpacing (3),
-	    `VBox
-	    (
-	      `VSpacing (),
-	      `Top
-	      (`VBox
-		(
-			// dialog title
-		  `Left(`Label(_("Settings for sound card"))),
-		  `Label (`opt(`outputField), lookup(save_entry, "model", ""))
-			)),
-		  `Frame
-		  // frame label
-		  (_("Volume adjust and test"),
-		    `HBox
-		    (
-		      `HSpacing (),
-		      `VBox
-		      (
+	    `VBox (
+		`VSpacing (),
+		`Top (`VBox(
+		    // dialog title
+		    `Left(`Label(_("Settings for sound card"))),
+		    `Label (`opt(`outputField), save_entry["model"]:"")
+		)),
+		// frame label
+		`Frame(_("Volume adjust and test"), `HBox(
+		    `HSpacing (),
+		    `VBox (
 			`VSpacing (0.5),
 			slider,
 			`VSpacing (),
-			    // Test - button label
+			// Test - button label
 			`PushButton (`id (`test), `opt(`key_F6), _("&Test")),
 			`VSpacing (0.5),
-			    // message label
-			`Label (_("Press 'Test' to start playing sound sample")),
+			// message label
+			`Label(_("Press 'Test' to start playing sound sample")),
 			`VSpacing (0.5)
-		      ),
-		      `HSpacing ()
-		    )
-		  ),
-		  `VStretch () //,
-//		  `PushButton(`id(`joystick), _("&Configure joystick"))
-	      ),
-	      `HSpacing (3));
-
+		    ),
+		    `HSpacing ()
+		)),
+		`VStretch ()
+	    ),
+	    `HSpacing (3)
+	);
 	return con;
     }
 
@@ -231,28 +210,33 @@
      *	UI controls for options setting dialog
      *
      *  @param cardlabel card model string
-     *  @param itemized_descriptions option list (preformated using 'create_table' with tripples: description, name, value
-     *  @param current_option index of initially selected item
+     *  @param itemized_descriptions option list (preformated using
+     *		'create_table' with tripples: description, name, value)
      *  @param current_option_name initially selected item name
+     *  @param current_option_value value of current option
      *  @return term options dialog contents
-     *  @see sound_options#create_table
+     *  @see options#OptionsDialog
      */
 
-    global define term OptionsCon(string cardlabel, list itemized_descriptions, integer current_option, string current_option_name) ``{
-	con = `HBox
-              (
-                `HSpacing (3),
-                `VBox
-                (
-                  `VSquash(`Top(`Label (`opt(`outputField), cardlabel))),
-                  `VSpacing (),
-                      // To translators: Table headers "description" -- option description, "option" -- option name, "value" -- value of an option
-                  `Table (`id(`table), `opt (`notify, `immediate), `header(_("Description"), _("Option"), `Right(_("Value"))), itemized_descriptions),
-                  `VSpacing (0.5),
-		  `HBox
-		  (
+    global define term OptionsCon (string cardlabel, list itemized_descriptions,
+		    string current_option_name, string current_option_value) ``{
+
+	return `HBox (
+	    `HSpacing (3),
+	    `VBox (
+		`VSquash(`Top(`Label (`opt(`outputField), cardlabel))),
+                `VSpacing (),
+		`Table (`id(`table), `opt (`notify, `immediate), `header(
+		    // Table header -- option description
+		    _("Description"),
+		    // Table header -- option name
+		    _("Option"),
+		    // Table header -- value of an option
+		    `Right(_("Value"))), itemized_descriptions),
+                `VSpacing (0.5),
+		`HBox (
 		    `TextEntry (`id (`des), `opt(`notify), current_option_name,
-			    lookup (select (options, current_option, ""), "value", "")),
+			current_option_value),
 		    `VBox(
 			`Label(""),
 			`HBox(
@@ -262,14 +246,12 @@
 			    `PushButton (`id (`reset), _("R&eset all"))
 			)
 		    )
-
-		  ),
-		  `Left(`ReplacePoint(`id(`reppoint), `Label(""))),
-                  `VSpacing (0.5)
-                ),
-                `HSpacing (3)
-              );
-	return con;
+		),
+		`Left(`ReplacePoint(`id(`reppoint), `Label(""))),
+                `VSpacing (0.5)
+            ),
+	    `HSpacing (3)
+        );
     }
 
     /**
@@ -279,44 +261,38 @@
      * @return term card type selection dialog contents
      * @see WhichDialog
      */
+    global define term WhichDlgCon (list nc) ``{
 
-    global define term WhichDlgCon(list nc) ``{
-	term con = `HBox(
+	return `HBox(
             `HSpacing (3),
-            `Frame
 	    // frame label
-            (`id(`frame), _("Select"),
-                `HBox
-                (
-                    `HSpacing (1),
-                    `VBox
-                    (
-                        `RadioButtonGroup
-                        (`id(`rg),
-                            `VBox
-                            (
-                                `VSpacing (1),
-                                `Left(`VBox
-                                (
-                      // label of radiobutton
-                                    `Left(`RadioButton(`id(`auto), `opt (`notify), _("&Autodetected"), (size (nc) > 0))),
-                           // label of list with autodetected cards
-                                    `VSquash(`SelectionBox(`id(`sel), _("&List of autodetected"), nc))
-
-                                )),
-                                `VSpacing (1),
-                       // label of radio button
-                                `Left(`RadioButton (`id(`manual), `opt(`notify), _("&Select from list"), (size (nc) == 0))),
-                                `VSpacing (1)
-                            )
-                        )
-                    ),
-                    `HSpacing (1)
-                )
-            ),
+            `Frame (`id(`frame), _("Select"), `HBox (
+		`HSpacing (1),
+		`VBox (
+		    `RadioButtonGroup (`id(`rg), `VBox (
+			`VSpacing (1),
+			`Left(`VBox (
+			    `Left(`RadioButton(`id(`auto), `opt (`notify),
+				// label of radiobutton
+				_("&Autodetected"), (size (nc) > 0))
+			    ),
+			    `VSquash(`SelectionBox(`id(`sel),
+				// label of list with autodetected cards
+				_("&List of autodetected"), nc)
+			    )
+                        )),
+			`VSpacing (1),
+			`Left(`RadioButton (`id(`manual), `opt(`notify),
+			    // label of radio button
+			    _("&Select from list"), (size (nc) == 0))
+			),
+			`VSpacing (1)
+                    ))
+                ),
+		`HSpacing (1)
+            )),
             `HSpacing (3)
         );
-	return con;
     }
 
     /**
@@ -325,66 +301,65 @@
      * @param start_alsa_seq as previous
      * @param show_font_but show button for sound fonts installation
      * @return widget
-     *
      */
-
-    global define term ComplexDlgCon(list cc, boolean start_alsa_seq, boolean show_font_but) ``{
+    global define term ComplexDlgCon (list cc, boolean start_alsa_seq,
+				      boolean show_font_but) ``{
 	term butts = nil;
 	term alsabuts = `Empty();
 	if  (Sound::use_alsa)
 	{
 	    alsabuts = `HBox(
-			// check box label
-                         `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("&Start sequencer"), start_alsa_seq))
-//			 `PushButton(`id(`b_joy), _("&Joystick"))
-		    );
+		`Left(`CheckBox(`id(`b_seq), `opt(`notify),
+		    // check box label
+		    _("&Start sequencer"), start_alsa_seq))
+	    );
 	}
 	if (show_font_but)
-    {
-        butts = `HBox(
+	{
+	    butts = `HBox(
 		alsabuts,
-            `VBox (
-			    // push button label
-                `PushButton (`id(`b_fonts),`opt(`key_F7), _("&Install soundfonts..."))
-            )
-        );
-    }
+		`VBox (`PushButton (`id(`b_fonts),`opt(`key_F7),
+		    // push button label
+		    _("&Install soundfonts..."))
+		)
+	    );
+	}
 	else
 	{
 	    butts =  alsabuts;
-
 	}
-	term con = `HBox
-            (
-                `HSpacing (3),
-                `VBox
-                (
-                    `Table (`id(`configured_table), `opt (`notify, `immediate),
-                    // table header labels
-                        `header(_("Number"), _("Card model"), _("State")), cc),
-                    `VSpacing (0.5),
-                    `HBox
-                    (
+	term con = `HBox (
+            `HSpacing (3),
+            `VBox (
+		`Table (`id(`configured_table), `opt (`notify, `immediate),
+		    // table header label
+                    `header(_("Number"),
+		    // table header label
+		    _("Card model"),
+		    // table header label
+		    _("State")), cc),
+                `VSpacing (0.5),
+                `HBox (
+		    `PushButton (`id(`b_conf2), `opt (`key_F3),
 			// push button label
-            `PushButton (`id(`b_conf2), `opt (`key_F3), _("Add sound &card")),
-			// push button label
-			`PushButton (`id(`b_options), `opt (`key_F4), _("&Options")),
-			// push button label
-			`PushButton (`id(`b_volume), `opt (`key_F6), _("&Volume")),
-			`HStretch (),
-			// push button label
-            `PushButton (`id(`b_delete), `opt (`key_F5), _("&Delete"))
-                    ),
-                    `VSpacing (0.5),
-                    `HBox
-                    (
-                        `HStretch (),
-			butts
-                    ),
-                    `VSpacing (0.5)
+			_("Add sound &card")),
+		    // push button label
+		    `PushButton (`id(`b_options), `opt(`key_F4), _("&Options")),
+		    // push button label
+		    `PushButton (`id(`b_volume), `opt (`key_F6), _("&Volume")),
+		    `HStretch (),
+		    // push button label
+		    `PushButton (`id(`b_delete), `opt (`key_F5), _("&Delete"))
                 ),
-                `HSpacing (3)
-            );
+		`VSpacing (0.5),
+                `HBox (
+		    `HStretch (),
+		    butts
+                ),
+                `VSpacing (0.5)
+            ),
+	    `HSpacing (3)
+        );
 	return con;
     }
 
@@ -396,47 +371,49 @@
      * @param has_joy If true checkbox for joystick configuration is added
      * @return term with widget
      */
-
-    global define term AutoconfDlg(string name, string cname, integer cpos, boolean has_joy) ``{
+    global define term AutoconfDlg (string name, string cname, integer cpos,
+				    boolean has_joy) ``{
 	string clab = "";
-
 	if (cpos < 3)
 	{
-	    clab = "\n" + sformat(select(lookup(STRINGS, "soundCount", ""), cpos, ""), cname, "");
+	    clab = "\n" + sformat (STRINGS["soundCount", cpos]:"", cname);
 	}
 	else
 	{
-	    clab = "\n" + sformat(select(lookup(STRINGS, "soundCount", ""), 3, ""), cname, cpos + 1, "");
+	    clab = "\n" + sformat(STRINGS["soundCount", 3]:"", cname, cpos + 1);
 	}
 
-	// push button label
-	term jcheckbox = (has_joy == true) ? `Left(`CheckBox(`id(`joystick), _("&Configure joystick"))) : `Empty();
+	term jcheckbox = (!has_joy) ? `Empty() :
+	    // push button label
+	    `Left (`CheckBox(`id(`joystick), _("&Configure joystick")));
 
-	term con =
-            `VBox (
-                `VSpacing (1),
-		// this is the first part of message "The sound card 'cardname' will be configured as the first snd card"
-                `Label (`opt (`hstretch), _("The sound card\n")),
-                `HBox (`HSpacing (5), `Label (`opt (`hstretch), name)),
-                `Label (`opt (`hstretch), clab),
-                `VSpacing (1),
-                `HBox (`HSpacing (5), `RadioButtonGroup (
-                    `id (`action),
-                    `VBox (
-			 // radio button label - type of setup
-                        `RadioButton (`id (`quick), `opt (`hstretch, `notify), _("&Quick automatic setup"), true),
-                        `VSpacing (0.3),
-			 // radio button label - type of setup
-                        `RadioButton (`id (`normal), `opt (`hstretch, `notify), _("Normal &setup")),
-                        `VSpacing (0.3),
-			 // radio button label - type of setup
-                        `RadioButton (`id (`options), `opt (`hstretch, `notify), _("Advanced setup with possibility to change &options")),
-			`VSpacing (3),
-			jcheckbox
-                        )
-                    )),
-                `VStretch ()
-                );
+	term con = `VBox (
+	    `VSpacing (1),
+	    // this is the first part of message "The sound card 'cardname'
+	    // will be configured as the first snd card"
+	    `Label (`opt (`hstretch), _("The sound card\n")),
+	    `HBox (`HSpacing (5), `Label (`opt (`hstretch), name)),
+	    `Label (`opt (`hstretch), clab),
+            `VSpacing (1),
+	    `HBox (`HSpacing (5),
+	      `RadioButtonGroup (`id (`action), `VBox (
+		`RadioButton (`id (`quick), `opt (`hstretch, `notify),
+		    // radio button label - type of setup
+		    _("&Quick automatic setup"), true),
+                `VSpacing (0.3),
+                `RadioButton (`id (`normal), `opt (`hstretch, `notify),
+		    // radio button label - type of setup
+		    _("Normal &setup")),
+                `VSpacing (0.3),
+                `RadioButton (`id (`options), `opt (`hstretch, `notify),
+		    // radio button label - type of setup
+		    _("Advanced setup with possibility to change &options")),
+		`VSpacing (3),
+		jcheckbox
+              ))
+	    ),
+	    `VStretch ()
+        );
 	return con;
     }
 
@@ -447,49 +424,50 @@
      * @param cpos card position
      * @param has_joy If true checkbox for joystick configuration is added
      * @return term widget
-     *
      */
-
-        global define term QuickconfDlg(string name, string cname, integer cpos, boolean has_joy) ``{
+    global define term QuickconfDlg (string name, string cname, integer cpos,
+				     boolean has_joy) ``{
         string clab = "";
-
         if (cpos < 3)
         {
-            clab = "\n" + sformat(select(lookup(STRINGS, "soundCount", ""), cpos, ""), cname, "");
+            clab = "\n" + sformat(STRINGS["soundCount", cpos]:"", cname);
         }
         else
         {
-            clab = "\n" + sformat(select(lookup(STRINGS, "soundCount", ""), 3, ""), cname, cpos + 1, "");
+            clab = "\n" + sformat(STRINGS["soundCount", 3]:"", cname, cpos + 1);
         }
 
-	// check box label
-	term jcheckbox = (has_joy == true) ? `Left(`CheckBox(`id(`joystick), _("&Configure joystick"))) : `Empty();
+	term jcheckbox = (!has_joy) ? `Empty() :
+	    // push button label
+	    `Left (`CheckBox(`id(`joystick), _("&Configure joystick")));
 
-        term con =
-            `VBox (
-                `VSpacing (1),
-                // this is the first part of message "The sound card 'cardname' will be configured as the first snd card"
-                `Label (`opt (`hstretch), _("The sound card\n")),
-                `HBox (`HSpacing (5), `Label (`opt (`hstretch), name)),
-                `Label (`opt (`hstretch), clab),
-                `VSpacing (1),
-                `HBox (`HSpacing (5), `RadioButtonGroup (
-                    `id (`action),
-                    `VBox (
-			 // radio button label - type of setup
-                        `RadioButton (`id (`quick), `opt (`hstretch, `notify), _("&Quick automatic setup"), true),
-                        `VSpacing (0.3),
-			 // radio button label - type of setup
-                        `RadioButton (`id (`normal), `opt (`hstretch, `notify), _("Normal &setup")),
-                        `VSpacing (0.3),
-			 // radio button label - type of setup
-                        `RadioButton (`id (`intro), `opt (`hstretch, `notify), _("&More detailed installation of sound cards")),
-			`VSpacing(3),
-			jcheckbox
-                        )
-                    )),
-                `VStretch ()
-                );
+        term con = `VBox (
+	    `VSpacing (1),
+            // this is the first part of message "The sound card 'cardname'
+	    // will be configured as the first snd card"
+            `Label (`opt (`hstretch), _("The sound card\n")),
+            `HBox (`HSpacing (5), `Label (`opt (`hstretch), name)),
+            `Label (`opt (`hstretch), clab),
+            `VSpacing (1),
+            `HBox (`HSpacing (5),
+	      `RadioButtonGroup (`id (`action),`VBox (
+		`RadioButton (`id (`quick), `opt (`hstretch, `notify),
+		    // radio button label - type of setup
+		    _("&Quick automatic setup"), true),
+                `VSpacing (0.3),
+                `RadioButton (`id (`normal), `opt (`hstretch, `notify),
+		    // radio button label - type of setup
+		    _("Normal &setup")),
+		`VSpacing (0.3),
+                `RadioButton (`id (`intro), `opt (`hstretch, `notify),
+		    // radio button label - type of setup
+		    _("&More detailed installation of sound cards")),
+		`VSpacing(3),
+		jcheckbox
+              ))
+	    ),
+	    `VStretch ()
+        );
         return con;
     }
 
@@ -498,14 +476,8 @@
      *  dialog to be displayed when user presses 'Abort' button
      *	@return boolean yes/no
      */
-
-    global define boolean ReallyAbort()
-    ``{
-	if (Sound::Changed() || Joystick::Changed())
-	{
-	    return Popup::ReallyAbort(true);
-	}
-	return true;
+    global define boolean ReallyAbort() ``{
+	return Popup::ReallyAbort (Sound::Changed() || Joystick::Changed());
     }
 
     /**
@@ -515,54 +487,53 @@
      * @param confHw list with already configured hardware
      * @return void
      */
-
-    global define void selectHardware(list newHw, string confHw) ``{
+    global define void selectHardware (list newHw, string confHw) ``{
 	integer index = -1;
-        newHw = maplist(`e, newHw, ``{
+        newHw = maplist (string cardname, newHw, ``{
             index = index + 1;              // select first item
-            return `item(`id(index), e, index == 0);
-            });
+            return `item(`id(index), cardname, index == 0);
+        });
 
-	    // to translators: the full meaning of message is: "Add other not detected soundcard"
-	newHw = add(newHw, `item(`id(-1), _("Other (not detected)"), size(newHw) == 0));
+	// the full meaning of message is: "Add other not detected soundcard"
+	newHw = add (newHw, `item(`id(-1), _("Other (not detected)"),
+	    size(newHw) == 0));
 
 	// label above list
-	term widget=Wizard_hw::DetectedContent(_("&Sound cards to configure"), newHw, false, 
-					// label above list
-					sformat(_("<P><B>Already configured sound cards:</B>%1</P>"), confHw));
+	term widget = Wizard_hw::DetectedContent(_("&Sound cards to configure"),
+	    newHw, false,
+	    // label above list
+	    sformat(_("<P><B>Already configured sound cards:</B>%1</P>"),confHw)
+	);
 
-	string helptext = lookup(STRINGS, "selectHardware", "");
+	string helptext = STRINGS["selectHardware"]:"";
 
 	// dialog header
-	Wizard::SetContents (_("Sound card configuration"), widget, helptext, true, true);
-
+	Wizard::SetContents (_("Sound card configuration"), widget, helptext,
+	    true, true);
     }
 
     /**
-     * displays a dialog that offer to configure detected or manually selected card
+     * displays a dialog that offer to configure detected or
+     * manually selected card
      * @param cards detected cards
      * @return `auto/`manual
      */
+    global define map WhichDialog (list cards) ``{
 
-    global define map WhichDialog (list cards)       ``{
-    // help text
+        string helptext = STRINGS["WhichDialog"]:"";
+        list nc		= [];
+        integer i	= 0;
 
-        string helptext = lookup(STRINGS, "WhichDialog", "");
-
-        list nc = [];
-        integer i = 0;
-
-        maplist (`e, cards,
-        ``{
-            nc = add (nc, `item(`id(i), e));
-                  i = i + 1;
+        maplist (string cardname, cards, ``{
+            nc = add (nc, `item(`id(i), cardname));
+            i = i + 1;
         });
 
         term con = WhichDlgCon(nc);
 
-	        // dialog title
-        Wizard::SetContents (_("Configure a sound card"), con, helptext, true, true);
-        // Next - button label
+	// dialog title
+        Wizard::SetContents (_("Configure a sound card"), con, helptext,
+	    true, true);
         UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
 
         if (size (nc) == 0)
@@ -596,7 +567,7 @@
                     break;
                 }
             }
-        } while (!contains([`back, `next, `cancel], ui)); //(((ui == `back) || (ui == `next) || ui == `cancel)));
+        } while (!contains([`back, `next, `cancel], ui));
 
         integer cid = 0;
 
@@ -610,10 +581,7 @@
 	    cid = -1;
 	}
 
-
-        return $["ui" : ui,
-                "card_id"  : cid];
-
+        return $[ "ui" : ui, "card_id"  : cid ];
     }
 
-}
+}//EOF

@@ -157,8 +157,8 @@
 	    }
 	}
 
-        if ((contains(maplist (`e, save_info,
-		``(SaveOneModulesEntry (e))), false)))
+        if ((contains (maplist (map entry, save_info,
+		``(SaveOneModulesEntry (entry))), false)))
         {
             // Error message
             err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry", "");
@@ -168,9 +168,8 @@
 	{
 
 	    list oss_aliases = alsa_oss(size(save_info));
-	    foreach(`e, oss_aliases,
-	    ``{
-		SCR::Write(add (mod_alias, e["alias"]:""), e["module"]:"");
+	    foreach(map a, oss_aliases, ``{
+		SCR::Write(add (mod_alias, a["alias"]:""), a["module"]:"");
 	    });
 	    SCR::Write(add (add (mod_alias, "sound-slot-0"), "comment"),
             "\n\n\n# YaST2: sound system dependent part\n#\n");
@@ -194,7 +193,7 @@
      */
 
     global define string SaveRCValues (map rc) ``{
-	SCR::Write(.sysconfig.sound.LOAD_SEQUENCER, lookup(rc, "LOAD_ALSA_SEQ", "no"));
+	SCR::Write (.sysconfig.sound.LOAD_SEQUENCER, rc["LOAD_ALSA_SEQ"]:"no");
 	return "";
     }
 

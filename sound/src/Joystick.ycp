@@ -68,15 +68,17 @@
 	    map j = $[];
 
 	    // go thru 'vars' list and read all variable values
-	    foreach(`v, vars, ``{
-		tmp = SCR::Read(topath(sformat(".sysconfig.joystick.%1_%2", v, pos)));
+	    foreach(string v, vars, ``{
+		tmp = SCR::Read (
+		    topath(sformat(".sysconfig.joystick.%1_%2", v, pos)));
 		j = add(j, v, tmp);
 	    });
 
 	    // read model comment
-	    string model = SCR::Read(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment", pos)));
+	    string model = SCR::Read(topath(
+		sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment",pos)));
 
-	    y2debug("Read comment: %1", model);
+	    y2debug("Read model comment: %1", model);
 
 	    // remove trailing newline character
 	    if (size(model) > 0 && substring(model, size(model) - 1, 1) == "\n")
@@ -84,16 +86,16 @@
 		model = substring(model, 0, size(model) - 1);
 	    }
 
-
 	    // if comment has more lines get last line as model name
 	    list lines = splitstring(model, "\n");
 
 	    // select last line from comment
 	    if (size(lines) > 1)
 	    {
-		model = select(lines, size(lines) - 1, "");
+		model = lines [ size(lines) - 1 ]:"";
 
-		// store global comment for joystick modules - it is before first module
+		// store global comment for joystick modules -
+		// - it is before first module
 		if (pos == 0)
 		{
 		    lines = remove(lines, size(lines) - 1);
@@ -103,15 +105,15 @@
 		}
 	    }
 
-
 	    // set model
-	    if (SCR::Read(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1", pos))) == "" || model == nil)
+	    if (SCR::Read(topath(
+		    sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1", pos)))==""
+		|| model == nil)
 	    {
 		model = "";
 	    }
 	    else
 	    {
-
 		// remove comment char
 		if (substring(model, 0, 1) == "#")
 		{
@@ -126,7 +128,8 @@
 		}
 
 		// remove new line char
-		if (size(model) > 1 && substring(model, size(model) - 1, 1) == "\n")
+		if (size(model) > 1 &&
+		    substring(model, size(model) - 1, 1) == "\n")
 		{
 		    model = substring(model, 0, size(model) - 1);
 		}
@@ -140,19 +143,15 @@
 	}
 
 	joystick_backup = joystick;
+	return true;
     }
 
     /**
      * Return configuration status
      * @return true if configuration was changed
      */
-
     global define boolean Changed() ``{
-	if (joystick != joystick_backup)
-	{
-	    return true;
-	}
-	return false;
+	return (joystick != joystick_backup);
     }
 
     /**
@@ -162,26 +161,30 @@
     global define boolean SaveOneJoystick (integer pos) ``{
 
 	// first remove old settings
-	maplist(`e, vars, ``(SCR::Write(topath(sformat(".sysconfig.joystick.%1_%2", e, pos)), "")));
+	foreach (string v, vars, ``{
+	    SCR::Write(topath(sformat(".sysconfig.joystick.%1_%2", v, pos)),"");
+	});
 
 	// delete old model
-	SCR::Write(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment", pos)), "");
+	SCR::Write(topath(
+	    sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment", pos)),"");
 
 	map j = select(joystick, pos, $[]);
 
-	foreach(`v, vars, ``{
-	    SCR::Write(topath(sformat(".sysconfig.joystick.%1_%2", v, pos)), lookup(j, v, ""));
+	foreach (string v, vars, ``{
 
-	    if (lookup(j, v, "") != "")
+	    SCR::Write(topath(sformat(".sysconfig.joystick.%1_%2", v, pos)),
+		j[v]:"");
+
+	    if (j[v]:"" != "")
             {
 	        // if there is variable with value != "" enable joystick service
 	        start = "enable";
             }
-
 	});
 
 	// write model comment
-	string model = lookup(j, "model", nil);
+	string model = j["model"]:"";
 
 	// add comment before first model
 	if (pos == 0)
@@ -207,19 +210,30 @@
 
 	if (size(model) > 0)
 	{
-	    SCR::Write(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment", pos)), model);
+	    SCR::Write(topath(
+		sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment", pos)),
+		model);
 	}
-
+	return true;
     }
 
+    /**
+     * Stop joystick service
+     */
     global define boolean Stop() ``{
 	return SCR::Execute(.target.bash, "/etc/init.d/joystick stop", $[]);
     }
 
+    /**
+     * Write sysconfig values (flush)
+     */
     global define boolean WriteConfig() ``{
 	return SCR::Write(.sysconfig.joystick, nil);
     }
 
+    /**
+     * Start joystick service and insserv it
+     */
     global define boolean StartAndEnable() ``{
 
 	if (start == "enable")
@@ -251,7 +265,7 @@
 
 	while (pos < 4)
 	{
-        // update /etc/sysconfig/joystick file
+	    // update /etc/sysconfig/joystick file
 	    SaveOneJoystick (pos);
 	    pos = pos + 1;
 	}

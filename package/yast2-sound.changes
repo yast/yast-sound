@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Nov  7 16:22:08 CET 2003 - jsuchome@suse.cz
+
+- basic command-line interface
+- large code cleanup (removed unused parts, corrected comments, etc.)
+- 2.9.3
+
+-------------------------------------------------------------------
 Mon Oct 27 11:44:11 CET 2003 - jsuchome@suse.cz
 
 - fix: parameter names checked (for 'snd_' prefix) before writing (#32632) 

@@ -27,6 +27,8 @@
     if ( func == "MakeProposal" )
     {
 	boolean force_reset = param["force_reset"]:false;
+	// TODO: check installation: ForceReset was called each time in Propose
+	// before 9.1
 
 	if (force_reset)
 	{
@@ -78,7 +80,7 @@
     }
     else if ( func == "Write" )
     {
-	Sound::Write(``{}, ``{});
+	Sound::Write (``{}, ``{});
     }
 
     return ret;

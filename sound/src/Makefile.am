@@ -20,7 +20,8 @@ ynclude_DATA = \
 	select.ycp \
 	manual.ycp \
 	joy_dialog.ycp\
-	joysticks.ycp
+	joysticks.ycp		\
+	wizards.ycp
 
 
 client_DATA = 	\

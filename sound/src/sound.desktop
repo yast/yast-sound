@@ -6,10 +6,10 @@ X-KDE-ModuleType=Library
 X-KDE-RootOnly=true
 X-KDE-HasReadOnlyMode=true
 X-KDE-Library=yast2
-X-SuSE-YaST-Call=sound .from_menu
+X-SuSE-YaST-Call=sound
 
 X-SuSE-YaST-Group=Hardware
-X-SuSE-YaST-Argument=.from_menu
+X-SuSE-YaST-Argument=
 X-SuSE-YaST-RootOnly=true
 X-SuSE-YaST-AutoInst=all
 X-SuSE-YaST-Geometry=
@@ -17,7 +17,7 @@ X-SuSE-YaST-SortKey=
 X-SuSE-YaST-AutoinstResource=
 
 Icon=soundcard
-Exec=/sbin/yast2 sound .from_menu
+Exec=/sbin/yast2 sound
 
 Name=Sound
 GenericName=Configure your sound card

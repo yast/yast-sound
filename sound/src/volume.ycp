@@ -19,11 +19,10 @@
  *
  * $Id$
  *
- *
- * parameters: 1st: module, Map, map of card
- *             2nd: card_id, integer
- *             3rd: boolean - finish
- *
+ * Steps:
+ *        1. try to insert kernel module
+ *        2. on succes unmute and volume dialog
+ *        3. on fail display error message
  */
 
 {
@@ -33,6 +32,7 @@
     import "Popup";
     import "Label";
     import "Mode";
+    import "Report";
 
     import "Sound";
 
@@ -40,29 +40,19 @@
 
 
     /**
-     * This dialog sipmply reads user input and calls apropriate set funtion
+     * This dialog simply reads user input and calls apropriate set funtion
      *
+     * @param finish show 'finish' button instead of 'next'
      * @return symbol next dialog
      */
+    global define symbol VolumeDialog (boolean finish) ``{
 
-    global define symbol VolumeDialog () ``{
+	string help_text	= STRINGS["VolumeDialog"]:"";
+	integer vol		= 50;
+	term con		= VolumeCon(save_entry, vol);
 
-	    //unmute these devices
-	/* help text: adjusting volume */
-
-	string help_text = lookup(STRINGS, "VolumeDialog", "");
-
-	integer vol = 50;
-/*
-	if (find(lookup(save_entry, "model", ""), "(daca)") >= 0)
-	{
-	    vol = 75;
-	}
-*/
-
-	term con = VolumeCon(save_entry, vol);
-	    // dialog title
-	Wizard::SetContents (_("Sound card volume"), con, help_text, true, true);
+	// dialog title
+	Wizard::SetContents (_("Sound card volume"), con, help_text, true,true);
 
 	if (Mode::config)
 	{
@@ -74,19 +64,16 @@
 	    UI::ChangeWidget (`id(`next), `Label, Label::FinishButton());
 	}
 
-/* Sound fonts installation */
 	if (HasFonts(save_entry) && !FontsInstalled())
 	{
+	    /* Sound fonts installation */
 	    InstallFonts("", false);
 	}
 
-/* end of sound fonts installation */
-
-	string master_elem = lookup(lookup(Sound::db_modules, modname, $[]), 
-	    "main_volume", "Master");
+	string master_elem = Sound::db_modules[modname, "main_volume"]:"Master";
         setVolume (master_elem, card_id, vol);
 	// some cards use Headphone instead of Master (bug #26539):
-	setVolume("Headphone", card_id, vol);
+	setVolume ("Headphone", card_id, vol);
 
 	do
 	{
@@ -95,12 +82,12 @@
 	    if (ui == `volume)
 	    {
 		vol = UI::QueryWidget(`id(`volume), `Value );
-		setVolume(master_elem, card_id, vol);
-		setVolume("Headphone", card_id, vol);
+		setVolume (master_elem, card_id, vol);
+		setVolume ("Headphone", card_id, vol);
 	    }
 	    else if (ui == `test)
 	    {
-		if (!test_mode)
+		if (!Mode::test)
 		{
 		    string msg = PlayTest(card_id);
 		    if (msg != "")
@@ -109,14 +96,15 @@
 		    }
 		}
 	    }
-	    else if (ui == `next && conf_joystick)
+	    else if (ui == `next && Sound::conf_joystick)
 	    {
 		symbol ret = joy_dialog(card_id, `next);
 		if (ret == `back)
 		{
 		    con = VolumeCon(save_entry, vol);
 		    // dialog header
-		    Wizard::SetContents (_("Sound card volume"), con, help_text, true, true);
+		    Wizard::SetContents (_("Sound card volume"), con,
+			help_text, true, true);
 		    continue;
 		}
 		else
@@ -138,19 +126,25 @@
     }
 
     /**
-    * shows error message in wizard
-    * @param save_entry card config
-    * @param err error string to be shown
-    * @return symbol `back | `cancel
-    */
-
-    global define symbol ErrorDialog (map save_entry, string err) ``{
-				    // Help text - intenal YaST2 error
+     * shows error message in wizard
+     * @param save_entry card config
+     * @param err error string to be shown
+     * @param finish show 'finish' button instead of 'next'
+     * @return symbol `back | `cancel
+     */
+    global define symbol ErrorDialog (map save_entry, string err, boolean finish) ``{
 
 	y2debug("%1", save_entry);
-	string help_text = lookup(STRINGS, "ErrorDialog", "");
-	string additional = "";
-	if (lookup(save_entry, "module", "") == "snd-cs461x")
+
+	if (!Sound::use_ui) // used by cmd-line handlers
+	{
+	    Report::Error (err);
+	    return `back;
+	}
+	string help_text	= STRINGS["ErrorDialog"]:"";
+	string additional	= "";
+
+	if (save_entry["module"]:"" == "snd-cs461x")
 	{
 	    // error message
 	    additional = "\n\n" + _("Please try to configure this sound card manually 
@@ -159,20 +153,18 @@ Logic CS4236\" driver and configure
 its parameters using the 'Advanced setup'.");
 	}
 
-	term con = `HVCenter
-	  (
-	    `VBox
-	    (
-		    // error message
-	      `Label (_("An error occured during the installation of")),
-	      `VSpacing (),
-	      `Label (`opt(`outputField), lookup(save_entry, "model", "")),
-	      `VSpacing (),
-	      `Label (err + additional)
+	term con = `HVCenter (
+	    `VBox (
+		// error message
+		`Label (_("An error occured during the installation of")),
+		`VSpacing (),
+		`Label (`opt(`outputField), save_entry["model"]:""),
+		`VSpacing (),
+		`Label (err + additional)
 	    )
-	  );
+	);
 
-	    // dialog title
+	// dialog title
 	Wizard::SetContents (Label::ErrorMsg(), con, help_text, true, false);
 	if (finish)
 	{
@@ -197,100 +189,81 @@ its parameters using the 'Advanced setup'.");
 	return ui;
     }
 
-  // ===== main =====
-      /*
-       * Steps:
-       *        1. try to insert kernel module
-       *        2. on succes unmute and volume dialog
-       *        3. on fail display error message
-       */
+/**
+ * shows volume dialog for normal setup or success dialog for quick setup
+ * in case of failure show error dialog with 'next' button disabled
+ * @param save_entry card config
+ * @param card_id id of currently donfigured card
+ * @param finish show 'finish' button instead of 'next'
+ * @param quick quick/normal config
+ * @param save_info config of previuosly configured cards
+ * @return map result and next dialog
+ */
+global define map sound_volume (map save_entry, integer card_id, boolean finish,
+				boolean quick, list save_info) ``{
 
-    /**
-     * shows volume dialog for normal setup or success dialog for quick setup
-     * in case of failure show error dialog with 'next' button disabled
-     * @param save_entry card config
-     * @param card_id id of currently donfigured card
-     * @param finish show 'finish' button instead of 'next'
-     * @param quick quick/normal config
-     * @param save_info config of previuosly configured cards
-     * @return map result and next dialog
-     */
+    Sound::LoadDatabase (true);
 
-    global define map sound_volume(map save_entry, integer card_id, boolean finish,
-				    boolean quick, list save_info) ``{
+    boolean need_restart	= true;
+    string err_msg		= "";
+    list modules_conf_backup	= Sound::modules_conf;
 
-
-    Sound::LoadDatabase();
-
-    boolean need_restart    = true;
-    boolean test_mode	    = false;
-
-    Wizard::DisableAbortButton();
-
-    list modules_conf_backup = Sound::modules_conf;
-
-    string err_msg = "";
+    if (Sound::use_ui) Wizard::DisableAbortButton();
 
     if (Mode::config)
     {
         stop_programs();
     }
 
-// #################################
-
-    if (!test_mode)
+    // create new (temporary) modules.conf
+    list new_save = [];
+    if (card_id >= size(save_info))
     {
-	list new_save = [];
-	if (card_id >= size(save_info))
-	{
-	    new_save = add(save_info, save_entry);
-	}
-	else
-	{
-	    integer pos = -1;
-	    new_save = maplist(`e, save_info,
-	    ``{
-		pos = pos + 1;
-		return (pos == card_id) ? save_entry :  e;
-	    });
-	}
-
-	Sound::modules_conf = new_save;
-
-	if (!Mode::config)
-	{
-	    sound_stop();
-	    sound_start_tmp(true);
-	    err_msg = check_module(save_entry, card_id);
-	}
+	new_save = add(save_info, save_entry);
     }
-// #################################
+    else
+    {
+	integer pos = -1;
+	new_save = maplist (map card, save_info, ``{
+	    pos = pos + 1;
+	    return (pos == card_id) ? save_entry : card;
+	});
+    }
+
+    Sound::modules_conf = new_save;
+
+    // now restart sound system with new (current) card
+    if (!Mode::config)
+    {
+	sound_stop();
+	sound_start_tmp(true);
+	err_msg = check_module(save_entry, card_id);
+    }
+
     symbol ui = nil;
 
     if (size (err_msg) > 0)
     {
-	ui = ErrorDialog (save_entry, err_msg);
+	ui = ErrorDialog (save_entry, err_msg, finish);
     }
     else
     {
-
-	string modname = lookup(save_entry, "module", "snd-dummy");
+	string modname = save_entry["module"]:"snd-dummy";
 
 	if (!Mode::config)
 	{
-	    Sound::InitMixer(card_id, lookup(save_entry, "module","snd-dummy"));
+	    Sound::InitMixer(card_id, modname);
 	}
-
 	if (!quick)
 	{
 	    while (true)
 	    {
-		ui = VolumeDialog ();
+		ui = VolumeDialog (finish);
 		if (ui != `joystick)
 		{
 		    break;
 		}
-		symbol s = joy_dialog(card_id, `next);
+		symbol s = joy_dialog (card_id, `next);
 		if (s == `abort || s == `cancel)
 		{
 		    ui = `abort;
@@ -300,12 +273,13 @@ its parameters using the 'Advanced setup'.");
 	}
 	else
 	{
-	    string master_elem = lookup(lookup(Sound::db_modules, modname, $[]),
+	    string master_elem = lookup (Sound::db_modules[modname]:$[],
 		"main_volume", "Master");
 
-	    setVolume (master_elem, card_id, 75);
+	    setVolume (master_elem, card_id, Sound::default_volume);
+	    setVolume ("Headphone", card_id, Sound::default_volume);
 
-	    if (conf_joystick == true)
+	    if (Sound::conf_joystick == true && Sound::use_ui)
 	    {
 		joy_dialog(card_id, `next);
 	    }
@@ -320,8 +294,6 @@ its parameters using the 'Advanced setup'.");
     {
 	if (!Mode::config)
 	{
-//	    SaveModulesEntry(save_info, [], true);
-
 	    sound_stop();
 	    sound_start_tmp(true);
 	}
@@ -337,19 +309,14 @@ its parameters using the 'Advanced setup'.");
     if (!Mode::config)
     {
 	SCR::Execute(.audio.alsa.restore, 0 ,0);
-    }
-
-    UI::ChangeWidget (`id(`next), `Label, Label::NextButton());
-
-    if (!Mode::config)
-    {
 	SCR::Execute(.target.bash, "/usr/bin/killall aplay 2> /dev/null", $[]);
+    }
+    if (Sound::use_ui)
+    {
+	UI::ChangeWidget (`id(`next), `Label, Label::NextButton());
     }
 
     return $["ui" : ui, "return" : size (err_msg) == 0];
-
 }
 
-}
-
-
+}//EOF
