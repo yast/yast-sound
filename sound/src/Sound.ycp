@@ -88,6 +88,12 @@
      *
      */
     global map db_indices = nil;
+
+    /**
+     * map of card vendors
+     */
+    global map db_vendors = nil;
+
     /**
      *
      */
@@ -98,7 +104,19 @@
      */
     global boolean use_ui = false;
 
+    /**
+     * currently used card vendor (pointer to table)
+     */
+    global string curr_vendor = "";
+
+    /**
+     * currently used card driver (pointer to table)
+     */
     global string curr_driver = "";
+
+    /**
+     * currently used card model (pointer to table)
+     */
     global string curr_model = "";
 
     /**
@@ -182,7 +200,7 @@ Probe the chip now?
 
 	list probelist = [];
 	foreach (`chip, chips, ``{
-	    // FIXME snd- prefix could be removed from sndcards database?
+	    // TODO snd- prefix could be removed from sndcards database?
 	    string name = db_modules["snd-"+chip,"description"]:"";
 	    if (name != "")
 		name = sformat ("%1 (%2)", name, chip);
@@ -563,6 +581,8 @@ could make your system unstable.
 	    db_indices	= lookup(sound_db, "indices", $[]);
 	    db_module_index = lookup(sound_db, "mod_idx", $[]);
 
+	    db_vendors	= sound_db ["vendors"]:$[];
+
 	    textdomain "sound";
 	    UI::CloseDialog();
 	}
@@ -664,11 +684,10 @@ could make your system unstable.
     }
 
     /**
-     * creates list of command that will be used for sound system start (emulates 'rcalsasound start' somehow)
+     * creates list of command that will be used for sound system start
+     * (emulates 'rcalsasound start' somehow)
      * @return list of shell commands
-     *
      */
-
     global define list CreateModprobeCommands() ``{
 	list outlist = [];
 	// create distinct list of all modules
@@ -679,11 +698,12 @@ could make your system unstable.
 	    maplist(`k, `v, opts, ``{
 		optstr = optstr+ sformat(" %1=%2", k, v);
 	    });
-	    // we need to tell 'modprobe' not to look into modules.conf now, because
-	    // it may contain messed options for the module %1 that will break the module
-	    // loading. (modprobe will merge options specified in param %2 with those specified
-	    // in modules.conf)
-	    string modprobe = sformat("/sbin/modprobe -C /dev/null %1 %2", modname, optstr);
+	    // we need to tell 'modprobe' not to look into modules.conf now,
+	    // because it may contain messed options for the module %1 that
+	    // would break the module loading. (modprobe will merge options
+	    // specified in param %2 with those specified in modules.conf)
+	    string modprobe = sformat("/sbin/modprobe -C /dev/null %1 %2",
+		modname, optstr);
 	    outlist = add(outlist, modprobe);
 	});
 
@@ -712,14 +732,14 @@ could make your system unstable.
 	{
 	    return true;
 	}
-	ForceReset();// FIXME this sould not be called every time??? (also from sound_proposal)
+	ForceReset();// FIXME this should not be called every time??? (also from sound_proposal)
 
 	// fix for nm256 cards: see bug #10384: leave this card unconfigured.
 	// loading of this module fails under some notebooks, nm256 module
 	// also makes some problems on other notebooks: there are detected
 	// two cards on some machines, althrough there is a sinlge card.
 	// two cards are detected: one that use opl3sa module and second one
-	// that uses nm256. let's solve this problem by filtering the nm256 mofdule out.
+	// that uses nm256. let's solve this problem by filtering the nm256 module out.
 
 	unconfigured_cards = filter(`e, unconfigured_cards, ``(lookup(e, "module", "") != "snd-nm256"));
 

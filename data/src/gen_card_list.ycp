@@ -54,6 +54,7 @@
     list l = splitstring(s, "\n");
 
     map output = $[];
+    map vendors_cards = $[];
 
     list toks = [];
 
@@ -66,7 +67,19 @@
 	}
 	if (size(toks) > 0)
 	{
-	    output = add (output, lookup(index, select(toks, 0, " "), -1), get_card_list(e));
+	    list cardlist = get_card_list(e);
+	    foreach (string cardname, cardlist, ``{
+		list card = splitstring (cardname, ",");
+		string vendor = card[1]:"other";
+		if (substring (vendor, 0, 1) == " ")
+		    vendor = substring (vendor, 1);
+		if (haskey (vendors_cards, vendor))
+		    vendors_cards [vendor] = add (vendors_cards[vendor]:[],
+			card[0]:"");
+		else
+		    vendors_cards [vendor] = [ card[0]:"" ];
+	    });
+	    output = add (output, lookup(index, select(toks, 0, " "), -1), cardlist);
 	}
 
     });
@@ -81,6 +94,16 @@
 	    y2error("module %1 not defined in module_index.ycp file!", select(e, 0, ""));
 	}
 	string cardname = select(e, 1, "");
+	list card = splitstring (cardname, ",");
+	string vendor = card[1]:"other";
+	if (substring (vendor, 0, 1) == " ")
+	    vendor = substring (vendor, 1);
+	if (haskey (vendors_cards, vendor))
+	    vendors_cards [vendor] = add (vendors_cards[vendor]:[],
+		card[0]:"");
+	else
+	    vendors_cards [vendor] = [ card[0]:"" ];
+
 	if (haskey(output, i))
 	{
 	    list oldlist = lookup(output, i, []);
@@ -95,4 +118,5 @@
 
     SCR::Write(.target.ycp, "./cardlist.ycp", output);
 
+    SCR::Write(.target.ycp, "./vendors.ycp", vendors_cards);
 }

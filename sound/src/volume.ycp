@@ -330,6 +330,7 @@ its parameters using the 'Advanced setup'.");
     {
 	// reset pointers to card table
 	Sound::curr_driver = "";
+	Sound::curr_vendor = "";
 	Sound::curr_model = "";
     }
 

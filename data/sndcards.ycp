@@ -3299,5 +3299,490 @@ $[
         ]
       ]
     ]
+  ],
+  "vendors" : $[
+    "3D Melody" : [
+      "MF1000"
+    ],
+    "A-trend" : [
+      "3DS724A",
+      "3DS801A"
+    ],
+    "ALI" : [
+      "M5451",
+      "M5455",
+      "M1535(D)"
+    ],
+    "ALSA" : [
+      "Dummy soundcard",
+      " MIDI serial u16550",
+      "Virtual rawmidi device"
+    ],
+    "AMD" : [
+      "InterWave STB with TEA6330T",
+      "AMD768",
+      "AMD8111"
+    ],
+    "AMP Ltd" : [
+      "AUDIO2000"
+    ],
+    "AOpen" : [
+      "FX-3D Plus",
+      "FX-3D Pro Radio",
+      "AW37",
+      "AW180",
+      "AW230",
+      "AW300",
+      "AW320",
+      "AW724/744/Pro"
+    ],
+    "ASOUND" : [
+      "ASONIC-8738"
+    ],
+    "Abit" : [
+      "AU10"
+    ],
+    "Acer" : [
+      "AW35/Pro",
+      "AW37"
+    ],
+    "Addonics" : [
+      "SV 750"
+    ],
+    "Analog Devices" : [
+      "AD1815",
+      "AD1816A",
+      "AD1847",
+      "AD1848"
+    ],
+    "Apple" : [
+      "PowerMac",
+      "PowerBook",
+      "iMac",
+      "iBook"
+    ],
+    "AudioExecl" : [
+      "AV 510",
+      "MD Mate"
+    ],
+    "Avance Logic" : [
+      "ALS100 - PRO16PNP",
+      "ALS110",
+      "ALS120",
+      "ALS200",
+      "ALS4000"
+    ],
+    "Aztech" : [
+      "AZF3328"
+    ],
+    "Aztech Systems" : [
+      "AZT2320",
+      "AZT3000",
+      "AZT3300",
+      "PRO16V",
+      "Sound Galaxy",
+      "PCI 64-Q3D",
+      "PCI 288-Q3DII"
+    ],
+    "Best Union" : [
+      "Miss Melody 4DWave PCI",
+      "Miss Melody ALS4000",
+      "Miss Melody 4DWave PCI",
+      "Miss Melody S3 Sound",
+      "Miss Melody Maestro Sound",
+      "Miss Melody Samba Tornado",
+      "Miss Melody Solo-1 Sound"
+    ],
+    "C-Media" : [
+      "CMI8330",
+      "CMI8338A",
+      "CMI8338B",
+      "CMI8738",
+      "CMI8738B"
+    ],
+    "CHIC" : [
+      "True Sound 4Dwave"
+    ],
+    "Chic Techlonogy" : [
+      "CoolSound 4000",
+      "True Sound 4D Wave-DX",
+      "True Sound 724"
+    ],
+    "Cirrus Logic" : [
+      "Sound Fusion (CS4280)",
+      "Sound Fusion (CS4610)",
+      "Sound Fusion (CS4612)",
+      "Sound Fusion (CS4615)",
+      "Sound Fusion (CS4622)",
+      "Sound Fusion (CS4624)",
+      "Sound Fusion (CS4630)",
+      "CS4281"
+    ],
+    "Compustar" : [
+      "WinFast CMI-8738/PCI"
+    ],
+    "Creative Labs" : [
+      "SB 16",
+      "SB Vibra16C",
+      "SB Vibra16CL",
+      "SB Vibra16S",
+      "SB Vibra16X",
+      "SB 1.0/SB 2.0/SB Pro",
+      "SB AWE 32",
+      "SB AWE 64 Gold",
+      "SB AWE 64",
+      "SB Audigy",
+      "SB Live!/PCI512/E-mu APS",
+      "SB PCI64/128 (ES1370)",
+      "Ectiva EV1938",
+      "SB PCI64/128 (ES1371/73)",
+      "Vibra PCI128"
+    ],
+    "Crystal" : [
+      "3D"
+    ],
+    "Crystal Computer" : [
+      "TidalWave128"
+    ],
+    "Crystal Semiconductors" : [
+      "CS4248",
+      "CS4231",
+      "CS4235",
+      "CS4236",
+      "CS4237",
+      "CS4238",
+      "CS4239"
+    ],
+    "Dell" : [
+      "Optiplex GX1",
+      "Workstation 400 sound"
+    ],
+    "Diamond Multimedia" : [
+      "MonsterSound MX400",
+      "Sonic Impact S100 (model m2)",
+      "Sonic Impact S100 (model m3)"
+    ],
+    "Digigram" : [
+      "miXart",
+      "VX222",
+      "VXPocket440",
+      "VXPocket"
+    ],
+    "Digimate" : [
+      "3D Sound"
+    ],
+    "Dynasonic" : [
+      "Dynasonic 3-D"
+    ],
+    "Dynasonix" : [
+      "Dynasonix Pro"
+    ],
+    "ESS" : [
+      "ES1688 AudioDrive",
+      "ES1688 PnP AudioDrive",
+      "ES688 AudioDrive",
+      "ES688 PnP AudioDrive",
+      "AudioDrive ES968",
+      "ES1868 PnP AudioDrive",
+      "ES1869 PnP AudioDrive",
+      "ES1878 PnP AudioDrive",
+      "ES1879 PnP AudioDrive",
+      "ES1887 AudioDrive",
+      "ES1887 PnP AudioDrive",
+      "ES1888 AudioDrive",
+      "ES1888 PnP AudioDrive",
+      "ES1938",
+      "ES1946",
+      "ES1969",
+      "Maestro 1",
+      "Maestro 2",
+      "Maestro 2e",
+      "Allegro PCI",
+      "Allegro-1 PCI",
+      "Canyon3D-2/LE PCI",
+      "ES1988",
+      "Maestro3 PCI"
+    ],
+    "Ectiva" : [
+      "EV1938"
+    ],
+    "EliteGroup" : [
+      "P5TX-LA sound"
+    ],
+    "Ensoniq" : [
+      "AudioPCI-97 ES1370",
+      "AudioPCI ES1371/73",
+      "AudioPCI ES1373"
+    ],
+    "ForteMedia" : [
+      "FM801"
+    ],
+    "Gallant" : [
+      "SC-70P"
+    ],
+    "Gateway" : [
+      "E1000 Onboard CS4236B"
+    ],
+    "Generic" : [
+      "USB Audio"
+    ],
+    "Genius" : [
+      "Sound Maker 3DJ",
+      "Sound Maker 3DX",
+      "SoundMaker Live 5.1"
+    ],
+    "Gravis" : [
+      "UltraSound Classic",
+      "UltraSound Extreme",
+      "UltraSound MAX",
+      "UltraSound Plug & Play"
+    ],
+    "Guillemot" : [
+      "MaxiSound 16 PnP",
+      "MaxiSound Fortissimo"
+    ],
+    "HIS" : [
+      "4DWave PCI",
+      "4DWave PCI"
+    ],
+    "Hercules" : [
+      "Game Fortissimo II",
+      "Game Muse XL",
+      "Game Theater XP"
+    ],
+    "Hewlett Packard" : [
+      "Omnibook 5500",
+      "HP6330 sound"
+    ],
+    "Highscreen" : [
+      "Sound-Boostar 16 3D"
+    ],
+    "Hoontech" : [
+      "SoundTrack Digital 4DWave NX"
+    ],
+    "IBM" : [
+      "Aptiva 2137 E24",
+      "IntelliStation M Pro",
+      "PC 300PL sound"
+    ],
+    "ICEnsemble" : [
+      "Generic Envy24",
+      "Generic ICE1712",
+      "Generic Envy24HT",
+      "Generic ICE1724"
+    ],
+    "Intel" : [
+      "Marlin Spike Mobo CS4235",
+      "AL440LX sound",
+      "82801AA-ICH",
+      "82801BA-ICH2",
+      "82801CA-ICH3",
+      "82801DB-ICH4",
+      "82901AB-ICH0",
+      "ICH5",
+      "MX440",
+      "ICH5"
+    ],
+    "Jaton" : [
+      "SonicWave 4D",
+      "Sonicwave 4D"
+    ],
+    "KORG" : [
+      "korg1212"
+    ],
+    "Labway" : [
+      "Labway D1X",
+      "XWave Elite Value",
+      "XWave128",
+      "XWave192",
+      "XWave320",
+      "XWave512",
+      "XWave576",
+      "XWaveG5X",
+      "XWaveG5X QS3000A",
+      "XWaveJ8X",
+      "XWave4000",
+      "XWave5000/Pro",
+      "XWave6000/Pro",
+      "XWave7100"
+    ],
+    "MED" : [
+      "MED3210"
+    ],
+    "MOTU" : [
+      "MidiTimePiece AV multiport MIDI"
+    ],
+    "MidiMan M Audio" : [
+      "Audiophile 24/96",
+      "Delta 1010",
+      "Delta 1010LT",
+      "Delta 44",
+      "Delta 66",
+      "Delta DiO 2496",
+      "Revolution 7.1",
+      "DMAN PCI",
+      "Delta DiO 2448",
+      "Delta 410"
+    ],
+    "NEC" : [
+      "PK-UG-X013"
+    ],
+    "NVidia" : [
+      "nForce Audio",
+      "nForce2 Audio",
+      "nForce3 Audio"
+    ],
+    "NeoMagic" : [
+      "MagicWave 3DX",
+      "NM256AV",
+      "NM256ZX"
+    ],
+    "NewClear" : [
+      "3D"
+    ],
+    "OAK" : [
+      "Mozart"
+    ],
+    "OPTi" : [
+      "82C924 (AD1848)",
+      "82C925 (AD1848)",
+      "82C924 (CS4231)",
+      "82C925 (CS4231)",
+      "82C931/3"
+    ],
+    "PINE" : [
+      "Schubert 32 PCI"
+    ],
+    "Panasonic" : [
+      "PCA761AW"
+    ],
+    "Philips" : [
+      "PCA70PS",
+      "PCA761AW"
+    ],
+    "RME" : [
+      "Hammerfall",
+      "Hammerfall-Light",
+      "Digi32 PRO",
+      "Digi32",
+      "Digi32/8",
+      "Digi96",
+      "Digi96/8 PAD",
+      "Digi96/8 PRO",
+      "Digi96/8 PST",
+      "Digi96/8"
+    ],
+    "RTL" : [
+      "RTL3000"
+    ],
+    "S3" : [
+      "SonicVibes PCI"
+    ],
+    "SMarian" : [
+      "Prodif Plus"
+    ],
+    "STB" : [
+      "SoundRage32",
+      "Soundrage 32",
+      "Ultrasound 32-Pro"
+    ],
+    "Shark" : [
+      "Predator4D-PCI"
+    ],
+    "Shuttle" : [
+      "HOT-241",
+      "HOT-245",
+      "HOT-255"
+    ],
+    "SiS" : [
+      "SI7012",
+      "SI7018 PCI Audio"
+    ],
+    "Sony" : [
+      "VAIO N505VX",
+      "VAIO PCG-F480"
+    ],
+    "TerraTec" : [
+      "AudioSystem EWS64S",
+      "Base 64",
+      "Maestro 32/96",
+      "AudioSystem EWS64L/XL",
+      "DMX 6Fire",
+      "EWS 88D",
+      "EWS 88MT",
+      "EWX 24/96",
+      "128i PCI",
+      "DMX",
+      "512i Digital",
+      "Aureon 5.1 Fun"
+    ],
+    "Terratec" : [
+      "Aureon 5.1 Sky",
+      "Aureon 7.1 Space"
+    ],
+    "Toshiba" : [
+      "Satellite Pro 4200",
+      "Tecra 8000"
+    ],
+    "Trident" : [
+      "4DWave DX",
+      "4DWave NX"
+    ],
+    "Trust" : [
+      "Sound Export Digital Surround"
+    ],
+    "Turtle Beach" : [
+      "TBS-2000",
+      "Tropez Plus",
+      "Malibu",
+      "Maui/Tropez/Tropez+",
+      "Daytona",
+      "Malibu",
+      "Santa Cruz"
+    ],
+    "Typhoon Soundsystem" : [
+      "CS4236B"
+    ],
+    "Unknown" : [
+      "Digital PC 5000 Onboard"
+    ],
+    "VIA" : [
+      "VT1724",
+      "VT8233A/C",
+      "VT82C686A/B/C",
+      "VIA8235"
+    ],
+    "VideoLogic" : [
+      "SonicFury"
+    ],
+    "Warpspeed" : [
+      "ONSpeed 4DWave PCI"
+    ],
+    "Yamaha" : [
+      "OPL3SA3",
+      "YMF719E-S",
+      "YMF724",
+      "YMF724F",
+      "YMF740",
+      "YMF740C",
+      "YMF744",
+      "YMF754"
+    ],
+    "Zoltrix" : [
+      "Nightingale"
+    ],
+    "other" : [
+      "Aztech/Newcom SC-16 3D",
+      "Shark Predator ISA",
+      "SIC CrystalWave 32",
+      "Intel PR440FX Onboard",
+      "Avance Logic ALS-007",
+      "Diamond Technologies DT-019X",
+      "Hoontech SoundTrack DSP 24",
+      "Hoontech SoundTrack DSP 24 Media 7.1",
+      "Hoontech SoundTrack DSP 24 Value",
+      "RME HDSP-9652",
+      "RME Hammerfall-DSP"
+    ]
   ]
 ]

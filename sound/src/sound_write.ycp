@@ -190,11 +190,8 @@
 
     if (!Sound::write_only) { sleep(100); Progress::NextStage(); }
 
-    // write joystick configuration and restart service
+    // write joystick configuration
     Joystick::Write(``{ return false;});
-    // TODO: why is it restarted? It was done in Write, wasn't it?
-    if (Joystick::joystick != [])
-        SCR::Execute(.target.bash, "/etc/init.d/joystick restart", $[]);
 
     if (size(configuredcards) > 0)
     {

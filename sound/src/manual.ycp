@@ -27,13 +27,11 @@
     import "Label";
 
     /**
-     *	dialog for manual settings
-     *  @return map result
+     * Dialog for manual settings
+     * (shows the lists of Kernel Modules and Card Models)
+     * @return map result
      */
-
-
-    global define map ManualDialog () ``{
-
+    global define map ManualDialogModules () ``{
 
 	string helptext	    = lookup(STRINGS, "ManualDialog", "");
 	list module_names   = get_module_names();
@@ -129,7 +127,6 @@
 
 	string model   = UI::QueryWidget (`id(`sel_mod), `CurrentItem);
 	string modname = UI::QueryWidget (`id(`sel_drv), `CurrentItem);
-
 	if (ui == `next)
 	{
 	    Sound::curr_driver = modname;
@@ -145,13 +142,136 @@
     }
 
     /**
+     * Dialog for manual adding the sound card
+     * (shows the lists of Vendors and Models)
+     *  @return map result
+     */
+    global define map ManualDialogVendors () ``{
+
+	string helptext		= STRINGS["ManualDialog"]:"";
+	list vendor_names	= get_vendor_names ();
+	list card_names		= get_card_names (Sound::curr_vendor);
+
+	term contents = `VBox (
+	    `HBox (
+		`ReplacePoint (`id (`rep_vendor),
+		    `SelectionBox (`id (`sel_ven), `opt(`notify),
+		    // selection box title
+		    _("Sound card &vendor"), vendor_names)
+		),
+		`ReplacePoint(`id(`rep_mod),
+		    `SelectionBox (`id (`sel_mod), `opt(`notify),
+		    // selection box title
+		    _("Sound card &model"), card_names)
+		    )
+	    ),
+	    `VSpacing (),
+	    // textetry label
+	    `TextEntry (`id(`search), `opt(`notify), _("&Search")),
+	    `VSpacing ()
+	);
+
+	// dialog title
+	Wizard::SetContentsButtons (_("Manual sound card selection"), contents,
+	    helptext, Label::BackButton(), Label::NextButton());
+
+	// set current item here
+	if (Sound::curr_vendor == "")
+	    Sound::curr_vendor = select (vendor_names[0]:[], 1, "");
+	if (Sound::curr_model == "")
+	    Sound::curr_model = card_names[0]:"";
+
+	UI::ChangeWidget(`id(`sel_ven), `CurrentItem, Sound::curr_vendor);
+	UI::ChangeWidget(`id(`sel_mod), `CurrentItem, Sound::curr_model);
+
+	UI::SetFocus (`id(`sel_ven));
+	symbol ui = nil;
+	do
+	{
+	    ui = UI::UserInput ();
+
+	    if (ui == `sel_ven)
+	    {
+		string vendor = UI::QueryWidget (`id(`sel_ven), `CurrentItem);
+		card_names = get_card_names (vendor);
+
+		UI::ReplaceWidget (`id(`rep_mod), `SelectionBox (`id (`sel_mod),
+		    // To translators: selection box title
+		    _("Sound card &model"), card_names));
+
+		if (contains (card_names, Sound::curr_model))
+		    UI::ChangeWidget(`id(`sel_mod), `CurrentItem,
+			Sound::curr_model);
+		else
+		    UI::ChangeWidget(`id(`sel_mod), `CurrentItem,
+			card_names[0]:"");
+	    }
+	    else if (ui == `search)
+	    {
+		string entry = UI::QueryWidget (`id(`search), `Value);
+		integer card_id = search_card_id (entry);
+		card_names = get_card_names ("all");
+		// always "all" field in vendors list
+		UI::ChangeWidget (`id(`sel_ven),`CurrentItem, "all");
+		if (card_id >= 0)
+		{
+		    UI::ReplaceWidget (`id(`rep_mod),
+			// To translators: selection box title
+			`SelectionBox (`id (`sel_mod), _("Sound card &model"),
+			    card_names));
+
+		    UI::ChangeWidget(`id(`sel_mod), `CurrentItem,
+			card_names[card_id]:"");
+		}
+	    }
+	    else if ((ui == `abort || ui == `cancel) && ReallyAbort())
+	    {
+		ui = `abort;
+		break;
+	    }
+
+	} while (!contains([`next, `back, `abort], ui));
+
+	map ret = $["ui" : ui];
+
+
+	if (ui == `next)
+	{
+	    string vendor	= UI::QueryWidget (`id(`sel_ven), `CurrentItem);
+	    string model	= UI::QueryWidget (`id(`sel_mod), `CurrentItem);
+	    string longmodel	= model;
+
+	    if (vendor != "all")
+	    {
+		// vendor is included in model name
+		if (vendor != "other")
+		    longmodel = sformat ("%1, %2", model, vendor);
+	    }
+	    else
+	    {
+		// get vendor from cardname (for "all")
+		list allcard = splitstring (model, ",");
+		vendor = select (allcard, 1, "other");
+		if (substring (vendor, 0,1) == " ")
+		   vendor = substring (vendor, 1);
+		model = allcard[0]:model;
+	    }
+	    string modname = get_module_by_cardname (longmodel);
+
+	    Sound::curr_vendor	= vendor;
+	    Sound::curr_model	= model;
+
+	    ret = $["ui" : `next, "module" : modname, "model" : model];
+	}
+	return ret;
+    }
+
+    /**
      * just calls ManualDialog
      * @return map passed result from ManualDialog
      */
-
     global define map sound_manual() ``{
-    // ==== main ====
 
-	return ManualDialog ();
+	return Sound::use_alsa ? ManualDialogVendors (): ManualDialogModules();
     }
 }
