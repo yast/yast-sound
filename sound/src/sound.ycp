@@ -26,7 +26,7 @@
 		`widget       : `RichText(
 		    UI(_("Launch this module to configure your sound card."))
 		    +
-		    UI(_("<p>You need to be logged in as <i>root</i> in order to do this.</p>"))),
+		    UI(_("<p>You must be logged in as <i>root</i> in order to configure your sound card.</p>"))),
 		`codefragment : nil ]
 	    ];
 
@@ -512,7 +512,7 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 
 			    // To translators: popup message (more sound cards was detected, and user choosed the one where driver can not be found in DB
 			if (UI (`YesOrNo (_("\
-There is no available driver for the selected card.
+There is no driver available for the card you selected.
 Do you want to select the driver manually?"),
 					  _("&Yes"), _("&No"))))
 			{
@@ -540,12 +540,12 @@ Do you want to select the driver manually?"),
 				con = `VBox ();
 
 				// help text 1/1
-				help_text = UI (_("<p>By pressing the
- <i>Next</i> button you should get your sound card working.</p>"));
+				help_text = UI (_(
+"<p>Pressing the <i>Next</i> button will finish the sound card configuration.</p>"));
 
 				    // help text 2/2
-				help_text = help_text + UI (_("<p>You
- can change options that are passed to the module by pressing
+				help_text = help_text + UI (_(
+"<p>You can change options that are passed to the module by pressing
  the <i>Options</i> button.</p>"));
 
 
@@ -643,12 +643,12 @@ Do you want to select the driver manually?"),
 			con = `VBox ();
 
 			    // help text 1/2
-			help_text = UI (_("<p>By pressing the <i>Next</i> button you should get your sound card working.</p>"));
+			help_text = UI (_(
+"<p>Pressing the <i>Next</i> button will finish the sound card configuration.</p>"));
 			    // help text 2/2
-			help_text = help_text + UI (_("<p>You can
- change option values that are passed to the module by pressing the
- <i>Options</i> button.</p>"));
-
+			help_text = help_text + UI (_(
+"<p>You can change options that are passed to the module by pressing
+ the <i>Options</i> button.</p>"));
 
 			    //message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
 
