@@ -26,7 +26,7 @@
     global define SetVolume (string group, integer cardid, integer value) ``{
 	if (is_sparc())
 	{
-	    string cmd = sformat("aumix -d /dev/mixer%1 -w %2", cardid, value);
+	    string cmd = sformat("/usr/bin/aumix -d /dev/mixer%1 -w %2", cardid, value);
 	    SCR::Execute(.target.bash, cmd, $[]);
 	}
 	else
@@ -51,8 +51,8 @@
         }
         else
         {
-	    y2error("executing: "+ sformat("mpg123 -a /dev/dsp%1 %2", card_id, fname));
-            SCR::Execute (.target.bash_background, sformat("mpg123 -a /dev/dsp%1 %2", card_id, fname));
+	    y2debug("executing: "+ sformat("mpg123 -a /dev/dsp%1 %2", card_id, fname));
+            SCR::Execute (.target.bash_background, sformat("/usr/bin/mpg123 -a /dev/dsp%1 %2", card_id, fname));
         }
         return "";
     }

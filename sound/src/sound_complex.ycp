@@ -116,7 +116,7 @@
     define ComplexDialog () ``{
 	// help text 
 	any ui = nil;
-        string helptext = lookup(STRINGS, "ComplexDialog");
+        string helptext = lookup(STRINGS, "ComplexDialog", "");
 
 	y2debug(" save_info %1, agent %2", size(save_info), size(SCR::Dir(.audio.alsa.cards)));
 
@@ -156,7 +156,7 @@ Try to restart sound system?")))
 	    UI::ChangeWidget(`id(`configured_table), `CurrentItem, 0);
 	}
     
-	if (lookup (rc_vars, "START_ALSA") != "yes")
+	if (lookup (rc_vars, "START_ALSA", "") != "yes")
 	{
 	    UI::ChangeWidget(`id(`b_seq), `Enabled, false);
 	}
@@ -179,7 +179,7 @@ Try to restart sound system?")))
 		map entry = select(save_info, card_id);    
 	
 		map res = CallFunction(`sound_options(entry));
-		if (lookup(res, "ui") == `next)
+		if (lookup(res, "ui", nil) == `next)
 		{
 		    entry = lookup(res, "return", $[]);
 		    entry = add_common_options(entry, card_id);
@@ -198,7 +198,7 @@ Try to restart sound system?")))
 			}
 		    });
 		}
-		else if (lookup(res, "ui") == `abort || lookup(res, "ui") == `cancel)
+		else if (lookup(res, "ui", nil) == `abort || lookup(res, "ui", nil) == `cancel)
 		{
 		    return $["ui" : `abort];
 		}
@@ -213,7 +213,7 @@ Try to restart sound system?")))
 	    {
 		integer card_id = UI::QueryWidget (`id(`configured_table), `CurrentItem);	
 		map res = CallFunction(`sound_mixer(card_id));
-		if (lookup(res, "ui") == `abort || lookup(res, "ui") == `cancel)
+		if (lookup(res, "ui", nil) == `abort || lookup(res, "ui", nil) == `cancel)
                 {       
                     return $["ui": `abort];
                 }
@@ -287,12 +287,12 @@ Try to restart sound system?")))
     map rc_vars		= read_rc_vars (["START_ALSA", "START_ALSA_SEQ"]);
 
 
-    if (size(lookup (rc_vars, "START_ALSA")) == 0)
+    if (size(lookup (rc_vars, "START_ALSA", "")) == 0)
     {
 	rc_vars = add (rc_vars, "START_ALSA", "yes");
     }
 
-    if (size (lookup (rc_vars, "START_ALSA_SEQ")) == 0)
+    if (size (lookup (rc_vars, "START_ALSA_SEQ", "")) == 0)
     {
 	rc_vars = add (rc_vars, "START_ALSA_SEQ", "yes");
     }

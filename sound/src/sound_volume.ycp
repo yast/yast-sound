@@ -50,7 +50,7 @@
 	    //unmute these devices
 	/* help text: adjusting volume */
 
-	string help_text = lookup(STRINGS, "VolumeDialog");
+	string help_text = lookup(STRINGS, "VolumeDialog", "");
 
 	integer vol = 10;
 
@@ -116,7 +116,7 @@
 				    // Help text - intenal YaST2 error 
     
 	y2debug("%1", save_entry);
-	string help_text = lookup(STRINGS, "ErrorDialog");
+	string help_text = lookup(STRINGS, "ErrorDialog", "");
 	string additional = "";
 	if (lookup(save_entry, "module", "") == "snd-card-cs461x")
 	{
@@ -146,6 +146,8 @@ its parameters using the 'Advanced setup'.");
 	    UI::ChangeWidget (`id(`next), `Label, UI::FinishButtonLabel());
 	}
 
+	UI::SetFocus(`id(`back));
+
 	repeat 
 	{
 	    ui =  UI::UserInput ();
@@ -170,7 +172,7 @@ its parameters using the 'Advanced setup'.");
     define SuccessDialog (map save_entry) ``{
                                     // Help text - intenal YaST2 error 
 
-        string help_text = lookup(STRINGS, "SuccessDialog");
+        string help_text = lookup(STRINGS, "SuccessDialog", "");
 
         term con = `HVCenter
           (
@@ -263,9 +265,10 @@ its parameters using the 'Advanced setup'.");
     }
     else
     {
-        maplist (`dev, ["Master", "PCM", "PCM,1", "Wave", "Master Digital", "Synth"],
-    		    ``(SetVolume (dev, card_id, 70)));
-	unmute(["Master", "PCM", "PCM,1", "Wave", "Master Digital", "Synth"], card_id);
+	list devs = ["Master", "PCM", "PCM,1", "Wave", "Master Digital", "Synth", 
+			"Speaker", "Line Out", "Wave Playback Volume"];
+        maplist (`dev, devs, ``(SetVolume (dev, card_id, 70)));
+	unmute(devs, card_id);
 	if (!quick)
 	{
 	    ui = VolumeDialog ();

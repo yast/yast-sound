@@ -23,8 +23,8 @@
     global define is_sparc() ``{
 	if (__sparc == nil)
 	{
-	    map user_sets = SCR::Read(.target.ycp, "/var/lib/YaST2/user_settings");
-	    __sparc = (lookup(user_sets, "arch_sparc", false));
+	    import "Arch";
+	    __sparc = Arch::sparc;
 	}
 	return __sparc;
     }
@@ -94,26 +94,14 @@
      */
 
     global define is_snd_alias(string alias) ``{
-	string al = use_alsa ? "snd-card-" : "sound-slot-";
-	
-	if (find(alias, al) != 0)
+	if (use_alsa)
 	{
-	    return false;
-	}   	
-	integer i = size(al);
-        if (i == size(alias))
-        {
-            return false;
-        }
-        while (i < size(alias))
-        {
-            if (!contains(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], substring(alias, i, 1)))
-            {
-                 return false;
-            }
-            i = i + 1;
-        }
-        return true;	
+	    return regexpmatch(alias, "^snd-card-[0-9]*$");
+	}
+	else
+	{
+	    return regexpmatch(alias, "^sound-slot-[0-9]*$");
+	}
     }
 
 
@@ -228,7 +216,7 @@
         {	// copy the whole database
         maplist (`e, sound_db,
             ``{
-                if (size (lookup (e, "cards", [])) > 0) ret = add (ret, lookup (e, "cards"));
+                if (size (lookup (e, "cards", [])) > 0) ret = add (ret, lookup (e, "cards", []));
                 else ret = add (ret, [lookup (e, "name", "")]);
             });
         }
@@ -289,7 +277,7 @@
 	``{
 	    if (lookup(e, "state", "") == "configured")
 	    {
-		output = add(output, lookup(e, "unique", nil));
+		output = add(output, lookup(e, "unique", ""));
 	    }
 	}
 
@@ -316,23 +304,6 @@
         return true;
     }
 
-
-
-
-    /**
-     * same as  ()?():(); statement in c
-     * @return any
-     */
-    global define condition (boolean c, any s1, any s2) ``{
-	if (c) 
-	{ 
-	    return eval (s1);
-	}
-	else
-	{
-	    return eval (s2);
-	}
-    };
 
 
     /** 
@@ -372,23 +343,6 @@
 
 
     /**
-     * runs a perl script 'fetchmodule' and returns a sndcards-like module record    
-     * for a non-alsa module
-     * @param 1st modude name (eg. 'cs4231')
-     */
-
-    global define fetchmodule(string modname)
-    ``{
-	string tmpdir = SCR::Read (.target.tmpdir);
-	SCR::Execute (.target.bash, sformat ("/usr/bin/fetchmodule %1.o > %2/mod.ycp" , modname, tmpdir));
-	{
-	    map out = SCR::Read(.target.ycp, tmpdir + "/mod.ycp");
-	    return eval(out);
-	}
-	return [];
-    }
-
-    /**
      * Looks up in the database for the module
      * @return map
      */
@@ -396,7 +350,7 @@
 	read_db();
 
 	string bus        = lookup (card, "bus", "");
-	integer offset    = condition ((tolower (bus) == "isa"), 0x20000, 0x10000);
+	integer offset    = (tolower (bus) == "isa") ? 0x20000 : 0x10000;
 	integer vendor_id = lookup (card, "vendor_id", 0);
 	integer device_id = lookup (card, "device_id", 0);
 
@@ -424,23 +378,25 @@
 	return $[];
     }
 
-    global define SetVolumeFast(integer cardid, integer value) ``{
-	string p = sformat(".target.volume.%1", cardid);
-	if (value >= 100)
-	{
-	    value = 99;
-	}
-	if (value < 0)
-	{
-	    value = 0;
-	}
-	SCR::Write(p, value);
-    }
+    /**
+     * umnute channel 'devide' of the 'card_id'-th sound card. alsa only
+     * @param devices list of channels to be unmuted
+     * @param id of the card
+     * return void
+     */
 
     global define unmute(list devices, integer card_id) ``{
+	list avail = SCR::Dir(topath(sformat(".audio.alsa.cards.%1.channels", card_id)));
+	if (avail == nil || size(avail)==0)
+	{
+	    avail = [];
+	}
 	foreach(`dev, devices,
 	``{
-	    SCR::Write(topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, dev)), false);
+	    if (contains(avail, dev))
+	    {
+		SCR::Write(topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, dev)), false);
+	    }
 	});
     }
 
@@ -890,7 +846,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
         {
                   // To translators: To reset the sound configuration these programs must be terminated
                   // To translators: label message
-	    string msg = lookup(STRINGS, "WhichDialogMsg");
+	    string msg = lookup(STRINGS, "WhichDialogMsg", "");
                   // Yes, No - button labels
             boolean terminate = UI::YesNoPopup (msg);
             if (terminate)

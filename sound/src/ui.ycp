@@ -49,7 +49,7 @@
      */
 	  
     global define DisplayName (string name, string cname, integer cpos, integer flags) ``{
-	string helptext = lookup(STRINGS, "DisplayName");
+	string helptext = lookup(STRINGS, "DisplayName", "");
 	term con = AutoconfDlg(name, cname, cpos);
 	UI::SetWizardContents (_("Sound card configuration"), con, helptext, true, true);
 		// dialog title
@@ -108,7 +108,7 @@
      */
 
     global define quickConfig(string name, string cname, integer cpos, integer flags) ``{
-        string helptext = lookup(STRINGS, "quickConfig");
+        string helptext = lookup(STRINGS, "quickConfig", "");
         term con = QuickconfDlg(name, cname, cpos);
         UI::SetWizardContents (_("Sound card configuration"), con, helptext, true, true);
                 // dialog title
@@ -494,7 +494,7 @@
 	any widget=HwCreateDetectedContent(_("&Sound cards to configure"), newHw, false, 
 					sformat(_("<P><B>Already configured sound cards:</B>%1</P>"), confHw));
 	
-	string helptext = lookup(STRINGS, "selectHardware");
+	string helptext = lookup(STRINGS, "selectHardware", "");
 
 
 	UI::SetWizardContents (_("Sound card configuration"), widget, helptext, true, true);
@@ -504,7 +504,7 @@
     global define WhichDialog (list cards)       ``{
     // help text 
 
-        string helptext = lookup(STRINGS, "WhichDialog");
+        string helptext = lookup(STRINGS, "WhichDialog", "");
 
         list nc = [];
         integer i = 0;

@@ -122,7 +122,7 @@
      *
      */
 
-    global define removeOldEntries(list save_info) ``{
+    global define removeOldEntries(list als) ``{
 	maplist(`e, als, 
 	``{
 	    if (is_snd_alias(e) ||
@@ -156,11 +156,16 @@
 	}
 	SaveModulesOptions(save_info, tmp);
 
+	list als=[];
+
         string err_msg = "";
-	list als = SCR::Read(mod_alias);
+	if (contains(SCR::Dir(mod), "alias"))
+	{
+	    als = SCR::Read(mod_alias);
+	}
 	// remove old entries
 
-	removeOldEntries(save_info);
+	removeOldEntries(als);
 
 	SCR::Write(mod_alias, "off", "char-major-14");
 	SCR::Write(mod_alias, "off", "char-major-116");	
@@ -181,12 +186,9 @@
 		if (is_sparc())
 		{
 		    string modname = lookup(select(save_info, 0), "module", "off");
-		    SCR::Write(mod_alias, modname, "char-major-14");
+		    SCR::Write(mod_alias, "sound-slot-0", "sound");
 		}
-		else
-		{
-		    SCR::Write(mod_alias, "sound", "char-major-14");
-		}
+		SCR::Write(mod_alias, "sound", "char-major-14");
 	    }
 	}
 
@@ -194,7 +196,7 @@
 		``(SaveOneModulesEntry (e, tmp))), false))) 
         {
             // Error message
-            err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry"); 
+            err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry", ""); 
             return $["return": false, "err_msg": err_msg];
         }
 	if (size(save_info) > 0 && use_alsa)
@@ -221,7 +223,7 @@
 //        tointeger(lookup(lookup(lookup (e, "modules", $[]), "options", $[]), "snd_index", 0))))))), false))
             {
                 // Error message
-                err_msg = lookup(STRINGS, "SetAllChannels");
+                err_msg = lookup(STRINGS, "SetAllChannels", "");
                 return $["return": false, "err_msg": err_msg];
             }
         return $["return": true, "err_msg": ""];
@@ -265,7 +267,7 @@
             !SCR::Write(.rc.system, nil))
             {
                 // Error message
-                err_msg = sformat (lookup(STRINGS, "saveRCValues"), "/etc/rc.config");
+                err_msg = sformat (lookup(STRINGS, "saveRCValues", ""), "/etc/rc.config");
             }
 	return err_msg;
     }
