@@ -11,6 +11,7 @@
  * Authors: 
  * Dan Meszaros <dmeszar@suse.cz>
  * 
+ * String corrections by Christian Steinruecken <cstein@suse.de>, 2001/08/01
  * 
  * $Id$
  * 
@@ -171,8 +172,8 @@
 	}
     });
 
-    string help=_("<P>With this dialog you can set volume for each channel of selected sound card. 
-Press <B>Next</B> button to store volume settings, press <B>Back</B> to restore original settings.</P>");
+    string help=_("<P>With this dialog you can set volume for each channel of the selected sound card. 
+Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the original settings.</P>");
 
     term con=mixerWidget(channels);
     UI(`SetWizardContents (sformat(_("Volume settings for card '%1'"), card_name),con, help, true, true));

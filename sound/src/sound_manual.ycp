@@ -11,6 +11,9 @@
  * Authors:
  *   Dan Veselý <dan@suse.cz>
  *
+ * String corrections by Christian Steinruecken <cstein@suse.de>, 2001/08/01
+ * 
+ *
  * $Id$
  *
  */
@@ -138,7 +141,7 @@
     
 //    if (db==nil) 
 //    {
-//	UI(`MessagePopup(_("The Sound card database cannot be found!!!")));
+//	UI(`MessagePopup(_("The Sound card database cannot be found!")));
 //	return $["ui" : `back];
 //    }
     return ManualDialog ();
