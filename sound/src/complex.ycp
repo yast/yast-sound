@@ -179,8 +179,11 @@ Try to restart sound system?")))
 		map res = sound_options(entry);
 		if (lookup(res, "ui", nil) == `next)
 		{
+		    map oldentry = entry;
+
 		    entry = lookup(res, "return", $[]);
 		    entry = add_common_options(entry, card_id);
+
 		    integer pos = 0;
 		    save_info = maplist(`e, save_info,
 		    ``{
@@ -195,6 +198,17 @@ Try to restart sound system?")))
 			    return entry;
 			}
 		    });
+		    if (oldentry != entry)
+		    {
+			if (UI::YesNoPopup(_("To apply changes, sound system
+must be restarted.
+Restart sound system now?")))
+			{
+			    sound_stop();
+			    SaveModulesEntry(save_info, [], true);
+			    sound_start_tmp(true);
+			}
+		    }
 		}
 		else if (lookup(res, "ui", nil) == `abort || lookup(res, "ui", nil) == `cancel)
 		{
