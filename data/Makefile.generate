@@ -23,7 +23,7 @@ modlist.ycp:
 	/sbin/yast2 src/gen_opt_list.ycp
 
 clean:
-	rm cardlist.ycp	    \
+	rm -f cardlist.ycp	    \
 	   modlist.ycp	    \
 	   idlist.ycp	    \
 	   sndcards.ycp.in  \
