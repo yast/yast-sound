@@ -1,17 +1,9 @@
 $[
-    "snd-pmac":
+    "snd-powermac":
     $[
-	"description" : "PowerMac AWACS",
+	"description" : "PowerMac on-board",
 	"params":
 	$[
-	    "snd_dac_frame_size":
-	    $[
-		"descr": _("DAC frame size in kB for PMac AWACS driver."),
-	    ],
-	    "snd_adc_frame_size":
-	    $[
-		"descr": _("ADC frame size in kB for PMac AWACS driver.")
-	    ],
 	    "snd_enable_beep":
 	    $[
 		"descr": _("Enable beep using PCM."),
