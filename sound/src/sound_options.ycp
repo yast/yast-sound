@@ -9,6 +9,9 @@
  * Summary:
  *   Module for setting options passed to the module
  *
+ * String corrections by Christian Steinruecken <cstein@suse.de>, 2001/08/01
+ * 
+ *
  * Authors:
  *   Dan Vesely <dan@suse.cz>, 2000
  *
@@ -154,7 +157,7 @@
 
 	list origOptions=options;
 	y2error(sformat("%1", origOptions));
-				    // always omit these options -- they are assigned dynamicly
+				    // always omit these options -- they are assigned dynamically
 	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_id"));
 	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_index"));
 	options = maplist (`e, options, ``($["description" : mysformat (lookup (e, "description")),
@@ -266,7 +269,7 @@
 		}
 			
 	    }
-	    else if (ui == `reset && UI(`YesNoPopup(_("Really reset all values?")))) 
+	    else if (ui == `reset && UI(`YesNoPopup(_("Do you really want to reset all values?")))) 
 	    {
 		UI(`ChangeWidget(`id(`des), `Value, ""));
 			

@@ -13,6 +13,9 @@
  * Authors:
  *   Dan Veselý <dan@suse.cz>
  *
+ * String corrections by Christian Steinruecken <cstein@suse.de>, 2001/08/01
+ * 
+ *
  * $Id$
  *
  *
@@ -94,7 +97,7 @@
 	    {
 		if (finish)
 		{
-		    if (!UI (`YesNoPopup (_("Sound volume and the configuration\nfor the sound card will be saved now."))))
+		    if (!UI (`YesNoPopup (_("The sound volume and the configuration\nfor the sound card will be saved now."))))
 		    {
 		      continue;
 		    }
@@ -129,7 +132,7 @@
 	    `VBox
 	    (
 		    // error message
-	      `Label (_("An error occured during installing")),
+	      `Label (_("An error occured during the installation of")),
 	      `VSpacing (),
 	      `Label (`opt(`outputField), lookup(save_entry, "model", "")),
 	      `VSpacing (),
@@ -175,7 +178,7 @@
             `VBox
             (
                     // error message
-              `Label (_("Your sound card is ready to use.")),
+              `Label (_("Your sound card is ready for use.")),
               `VSpacing (),
               `Label (`opt(`outputField), lookup(save_entry, "model", "")),
               `VSpacing (),
