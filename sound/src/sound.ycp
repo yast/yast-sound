@@ -161,7 +161,7 @@ define boolean AddCardHandler (map options) ``{
 		    card_no);
 	    }
 	    // result message, %1 is card name
-	    CommandLine::Print (sformat (_("Successfully added card '%1'"),
+	    CommandLine::Print (sformat (_("Successfully added card '%1'."),
 		save_entry["model"]:""));
 	    if (haskey (options, "play"))
 		PlayTest (Sound::card_id);
@@ -299,7 +299,7 @@ define boolean SetParametersHandler (map options) ``{
 	return false;
     }
 
-    string out = sformat (_("Sound card '%1'"), save_entry["model"]:"");
+    string out = sformat (_("Sound Card '%1'"), save_entry["model"]:"");
     CommandLine::Print (out);
     // TODO set parameters of the card...
     // TODO volume: setVolume + storeVolume
@@ -350,7 +350,7 @@ map cmdline = $[
 	"remove" :$[
 	    "handler"	: RemoveCardHandler,
 	    // translators: command line help text for remove action
-	    "help"	: _("Remove sound card(s)")
+	    "help"	: _("Remove sound cards")
 	],
 	"playtest" :$[
 	    "handler"	: TestCardHandler,
