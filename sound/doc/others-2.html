@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="SGML-Tools 1.0.9">
+ <TITLE>Sound configuration with alsa and sndconfig: Sound card drivers</TITLE>
+ <LINK HREF="others-3.html" REL=next>
+ <LINK HREF="others-1.html" REL=previous>
+ <LINK HREF="others.html#toc2" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="others-3.html">Next</A>
+<A HREF="others-1.html">Previous</A>
+<A HREF="others.html#toc2">Contents</A>
+<HR>
+<H2><A NAME="sound drivers"></A> <A NAME="s2">2. Sound card drivers</A></H2>
+
+<P>Sound card drivers are (usually) kernel modules (for kernel >= 2.2.x). It means
+they have to be loaded at some time. This can be done by hand (with
+<CODE>/sbin/insmode</CODE>) or during booting (with <CODE>/etc/conf.modules</CODE>).
+<P>
+<H2><A NAME="alsa-driver"></A> <A NAME="ss2.1">2.1 Alsa-drivers</A>
+</H2>
+
+<P>These drivers are compatible with the OSS/Free and OSS/Linux sound drivers (the
+drivers in the kernel), but has its own interface that is even better
+than the OSS drivers. A list of features can be found at
+<A HREF="http://www.alsa-project.org/intro.html">http://www.alsa-project.org/intro.html</A>.
+<P>
+<P>The list of ALSA Supported sound cards can be found at 
+<A HREF="http://www.alsa-project.org/src/soundcards.html">http://www.alsa-project.org/src/soundcards.html</A>.
+<P>The list of alsa-driver modules can be found at 
+<A HREF="others-5.html#alsa-driver modules">apendix</A>.
+<P><I>requires:</I> kernels >= 2.2.x
+<P><I>provides:</I> sound card drivers (as kernel modules)
+<P>
+<H2><A NAME="ss2.2">2.2 OSS/Free-drivers</A>
+</H2>
+
+<P>Drivers from 
+<A HREF="http://www.opensound.com/ossfree/index.html">Open Sound System</A> are now part of Linux kernel.
+<P>The list of OSS/Free supported sound cards, which are not supported by
+Alsa can be found in 
+<A HREF="others-5.html#alsa unsupported">apendix</A>.
+<P>
+<P><I>requires:</I> nothing
+<P><I>provides:</I> sound card drivers (as kernel modules)
+<P>
+<HR>
+<A HREF="others-3.html">Next</A>
+<A HREF="others-1.html">Previous</A>
+<A HREF="others.html#toc2">Contents</A>
+</BODY>
+</HTML>

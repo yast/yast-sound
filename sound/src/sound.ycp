@@ -1,0 +1,628 @@
+/**
+ *
+ * $Id$
+ *
+ * Module:		sound.ycp 	 
+ *
+ * Author: 		Dan Veselý
+ *
+ *
+ * Purpose:		Installation of the sound card. If the sound card was not auto-detected ask user.
+ *		     
+ *                      uses other modules: sound_manual.ycp
+ *                                          sound_options.ycp
+ *                                          sound_volume.ycp
+ *                                          sound_save.ycp
+ *                                          sound_already.ycp
+ *
+ */
+
+{
+	  // Menuentry for the YaST2 menu
+	if (Args() == [ "get_menuentry" ]) 
+	    return [ "sound", $[
+		`menuentry    : UI(_("Hardware/Sound")),
+		`arguments    : [ ],
+		`widget       : `RichText(
+		    UI(_("Launch this module to configure your sound card."))
+		    +
+		    UI(_("<p>You need to be logged in as <i>root</i> in order to do this.</p>"))),
+		`codefragment : nil ]
+	    ];
+	
+	    // === UI ===
+
+	UI(``{
+
+		// The main dialog. Copied from installation.ycp.
+	    OpenDialog(`opt(`defaultsize),
+		       `VBox(`Image(`suseheader, "SuSE"),
+			     `HBox(`HWeight(30, `RichText(`id(`help), "")),
+				   `HWeight(70, `VBox(
+				       `Left(`Heading(`id(`title), _("YaST2\nInitializing ..."))),
+				       `HVCenter(`ReplacePoint(`id(`contents), `Empty())),
+				       `HBox(
+					       // back pushbutton: the user input is ignored and the last dialog is called
+					   `PushButton(`id(`back), `opt(`disabled), _("&Back")),
+					   `HStretch(),
+					       // next pushbutton: the user input is checked and the next dialog is called
+					   `PushButton(`id(`next), `opt(`disabled), _("&Next"))))))));
+    
+	    define SetContents(string title, term contents, string helptext,
+			       boolean has_back, boolean has_next) ``{
+		ChangeWidget(`id(`next), `Enabled, has_next);
+		ChangeWidget(`id(`back), `Enabled, has_back);
+		ChangeWidget(`id(`help), `Value, helptext);
+		ChangeWidget(`id(`title), `Value, title);
+		ReplaceWidget(`id(`contents), contents);
+		    // ControlWidget(TheWizardDialog(), `id(`next), `SetFocus());
+	    };
+
+
+	    
+	    
+		// This is a popup dialog for displaying (usually) error messages      
+	    define DisplayMessage(string message, integer code, string stack) ``{
+		    // ok pushbutton: confirm the dialog
+		term t = `VBox();
+		t = add(t, `Left(`Label(message)));
+		if (code != 0)
+			// optional warning dialog text
+		    t = add(t, `Left(`Label(sformat(_("Error code %1"), code))));
+		if (stack != "") 
+		    t = add(t, `Left(`Label(stack)));
+		OpenDialog(`opt(`decorated), add(t, `PushButton(_("&OK"))));
+		UserInput();
+		CloseDialog();
+	    };
+
+
+	        // This is a popup dialog with Yes/No question
+	    define DisplayYesNo(string message) ``{
+		
+		term t = `VBox();
+		t = add(t, `Left(`Label(message)));
+		term b = `HBox (
+		    `PushButton(`id(`no), `opt (`default), _("&No")),
+		    `PushButton(`id(`yes), _("&Yes"))
+		    );
+		OpenDialog(`opt(`decorated), add(t, b));
+		any ui = UserInput();
+		CloseDialog();
+		
+		return (ui == `yes);
+		
+	    };
+	});
+
+				// same as  ()?():(); statement in c
+	define condition (boolean c, any s1, any s2) ``{
+	    if (c)
+		return eval (s1);
+	    else
+		return eval (s2);
+	};
+	
+
+	
+				// creates new list from list l
+				// but cards with the same device/vendor id are added just once
+	define remove_duplicates (list l) ``{
+	    
+	    list n = [];
+	    foreach (`c, l, ``{
+		integer vid = lookup (c, "vendor_id", 0);
+		integer did = lookup (c, "device_id", 0);
+		boolean to_add = true;
+		foreach (`nc, n, ``{
+		    if ((lookup (nc, "device_id", -1) == did) && (lookup (nc, "vendor_id", -1) == vid))
+			to_add = false;
+		});
+		if (to_add)
+		    n = add (n, c);
+	    });
+	    return n;
+	};
+
+
+				// orig is list of maps
+				// to add is list (same lenght) of new values that will be added to each map
+				// with 'key' key
+	define add_keys (list orig, list to_add, string key) ``{
+	    integer i = 0;
+	    integer s = size (orig);
+	    if (s == 0)
+		s = size (to_add);
+	    
+	    list ret = [];
+		
+	    map curr_map = $[];
+	    
+	    while (i < s) {
+		curr_map = condition ((size (orig) > i), ``select (orig, i), $[]);
+		if (size (to_add) > i)
+		    curr_map = add (curr_map, key, select (to_add, i));
+		else
+		    curr_map = add (curr_map, key, "");
+		ret = add (ret, curr_map);
+		i = i + 1;
+	    }
+	    
+	    return ret;
+	    
+	};
+
+
+
+	
+				// itemize list, FIXME: try to convert it to use maplist
+	define itemize_list (list l, integer default) ``{
+	    integer i = 0;
+	    list itemized_list = [];
+	    integer s = size (l);
+	    while (i < s) {
+		itemized_list = add (itemized_list, `item (`id(i), select (l, i), (i == default)));
+		i = i + 1;
+	    }
+	    
+	    return itemized_list;
+	};
+	
+
+				// extracts sound card name from map read from SCR
+	define soundcard_name (map device) ``{
+	    string sub_vendor = lookup (device, "sub_vendor", "");
+	    string sub_device = lookup (device, "sub_device", "");
+	    
+	    if ((sub_vendor != "") && (sub_device != ""))
+		return (sub_vendor + " " + sub_device);
+	    else
+		return (lookup (device, "vendor", "Unknown vendor") + " " + lookup (device, "device", "Unknown device"));
+
+	};
+	
+				// looks-up for a kernel module for this
+				// bus, vendor_id, device_id sound card
+	define get_module (string bus, integer vendor_id, integer device_id) ``{
+
+	    list|void snd_database = ReadY2 (database_name);
+
+	    integer offset = condition ((tolower (bus) == "isa"), 0x20000, 0x10000);
+
+	    list|void fc = [];
+	    
+	    if (tolower (bus) == "pci") 
+		fc = filter (`d, snd_database, 
+			     ``(filter(`c, lookup (d, "libhd"), ``((lookup (c, "vendor_id") == vendor_id - offset) && 
+								   (contains(lookup(c, "device_id"), device_id - offset)))) != []));
+	    
+	    
+	    else {
+		
+		
+		fc = filter (`d, snd_database, 
+			     ``(filter(`c, lookup (d, "libhd"), ``((lookup (c, "vendor_id") == vendor_id - offset) &&
+								   (lookup (c, "device_id") == device_id - offset))) != []));
+		
+	    }
+
+	    if (fc != nil)
+		return condition ((size (fc) > 0), ``select (fc, 0), $[]);
+	    return $[];
+	    
+	};
+
+
+
+				// this routine tests if the ALSA
+				// package is installed, it is
+				// necessary to have installed this
+				// package in order to continue with
+				// the configuration
+	    define IsAlsaInstalled () ``{
+		
+		integer ret = Shell ("/bin/rpm -q alsa");
+		
+		if (ret == 127) {
+			// To translators: This is just popup message, shouldn't be too long
+		    UI (`DisplayMessage (_("Cannot execute the program \"rpm\"."), 0,
+					     // To translators: This is just popup message, shouldn't be too long
+					 _("Please check if the 'rpm' package from the series 'a1' is installed.")));
+		}
+		
+				// if this package not installed, we have to use alsa au file
+		if (Shell ("/bin/rpm -q snd_au") == 0)
+		    user_settings = add (user_settings, "audio_file", "/usr/share/sounds/au/linus-english.au");
+		
+		return (ret == 0);
+	    };
+	    
+
+				// this dialog is displayed if ALSA
+				// not istalled
+	    define NotInstalled () ``{
+				// Help text when Alsa-drivers are not installed 1/1
+		string help_text = UI(_("Sound support needs to have installed <b>ALSA</b> package. You find it in the <b>SuSE</b> distribution (series 'snd') or you can download it from <i>http://www.alsa-project.org</i>"));
+		
+		UI(`SetContents (_("Sound cards"),
+				 `HVCenter (
+				// This label is displayed when no alsa package is not installed
+				// To translators: label message
+				     `Label (_("Please install the package ALSA (Advanced Linux Sound Architecture)\n before you proceed with the configuration of your sound system."))
+				     ), help_text, true, false));
+		
+		return UI(`UserInput ());
+	    };
+
+
+				// this dialog is displayed, when
+				// sndcards DB not found, this should
+				// never happen, just if someone
+				// delete or edit this db
+
+	    define DBNotFound () ``{
+				// Help text when sndcards database not found 1/1
+		string help_text = UI(_("This generally means that some internal <b>YaST2</b> file is missing or corrupted. Please try to reinstall <b>YaST2</b>, you find it in <b>SuSE</b> distribution, series 'a1'."));
+		
+		UI(`SetContents (_("Sound cards"),
+				 `HVCenter (
+				// To translators: label message
+				     `Label (_("The Sound card database cannot be found!!!"))
+				     ), help_text, true, true));
+		
+		return UI(`UserInput ());
+	    };
+
+
+	
+	define GetAudio () ``{
+
+	    return remove_duplicates (SCR(`Read(.probe.byclass.multimedia.audio)));
+
+/*
+	    list simulation = [
+		$["vendor_id" : 0x1274 + 0x10000,
+		 "device_id" : 0x5000 + 0x10000,
+		 "bus" : "pci"],
+		$["vendor_id" : 0x1275 + 0x10000,
+		 "device_id" : 0x5001 + 0x10000,
+		 "bus" : "pci"]
+	    ];
+	    
+	    return simulation;
+*/  
+	};
+	
+
+
+// ============= dialogs ============
+	
+	    // First dialog
+	define FindCard () ``{
+
+				// To translators: label message (if longer than 50 chars, must be devided by '\n' 
+	    locale msg = _("Searching for a sound card on your system...");
+	    term con = `ReplacePoint (`id (`rp), `Label (msg));
+	    
+	    UI(`SetContents (_("Sound cards"), con, help_text, false, false));
+
+	    return GetAudio ();
+	    
+	};
+
+	define DisplayFound (void|list found) ``{
+
+	    term con = `VBox ();
+	    boolean prev = true;
+	    boolean next = true;
+
+	    string message = "";
+	    map module = $[];
+	    map ret = $[];	// return one (or none) entry from SCR
+	    
+		// nothing was found
+	    if (found ==nil || found == []) {
+
+				// Help text 1/2 (autodetection failed)
+		help_text = UI (_("<p>The autodetection for a sound card were unsuccessful.</p>"));
+				// Help text 1/2 (autodetection failed)
+		help_text = help_text + UI(_("If you still want to configure your sound card, press the <i>Manual</i> button. Otherwise simply quit by pressing the <i>Back</i> button.</p>"));
+		
+		message = UI (_("There were found no sound cards on your system.\n Try manual setup."));
+		con = add (con, `HVCenter(`ReplacePoint(`id(`rp), `Label(message))));
+		con = add (con, `Bottom(`PushButton(`id (`manual), _("&Manual"))));
+	    
+		next = false;
+	    }
+		
+  	    else {
+		
+		    // one sound card
+		if (size (found) == 1) {
+
+		    
+		    
+		    ret = select (found, 0);
+
+			//module = lookup (ret, "module", $[]);
+			//if (size (module) == 0)
+		    module = get_module (lookup (ret, "bus", ""), lookup (ret, "vendor_id", 0), lookup (ret, "device_id", 0));
+		    
+		    if (size(module) == 0) {
+			    // To translators: parameter is sound card name
+			message = sformat (UI(_("The sound card\n%1\ncan not be configured,\nbecause there is no available driver.")),
+					   soundcard_name (ret));
+			con = add (con, `HVCenter(`ReplacePoint (`id(`rp), `Label(message))));
+			con =  add (con, `Bottom(`PushButton(`id (`manual), _("&Let me choose"))));
+
+			    // Help text 1/2 (driver not available)
+			help_text = UI(_("<p>This means that appropriate driver for your your sound card is not available<p>."));
+			    // Help text 2/2 (driver not available)			
+			help_text = help_text + UI(_("<p>You may try to use one of available drivers that can fit to your sound card by pressing <i>Let me choose</i> button.</p>"));
+			
+			next = false;
+		    }
+		    else {
+ 			    // To translators: parameter is sound card name
+			message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
+			con = add (con, `HVCenter(`Label(message)));
+			con = add (con, `Bottom(`PushButton(`id (`options), _("&Options"))));
+			
+			    // Help text 1/2 (one sound card found)
+			help_text = UI (_("<p>The sound card was found. If you want to configure this sound card press <i>Next</i> otherwise quit by pressing <i>Back</i><p/>"));
+			    // Help text 2/2 (one sound card found)
+			help_text = help_text + UI (_("<p>You can change options that are passed to the module by pressing <i>Options</i> buton.</p>"));
+
+			ret = add (ret, "module", module);
+		    }
+		    
+		}
+		
+		    // more sound cards
+		else {
+		    integer i = 0;
+		    con = add (con, `SelectionBox (`id(`fc), `opt(`notify), _("Sound card models"),
+						   maplist(`card, found, ``(`item(`id(sformat ("%1/%2",
+											       lookup (card, "vendor_id", 0),
+											       lookup (card, "device_id", 0))),
+										  soundcard_name (card))))));
+		    
+		    con = add (con, `PushButton(`id (`options), `opt(`disabled), _("&Options")));
+
+		    			    // Help text 1/1 (more sound cards detected)
+			help_text = UI(_("<p>There were found more sound cards. Please select <b>the one</b> you want to configure.</p>"));
+
+		    next = false;
+		}
+		
+	    }
+
+	    UI(`SetContents (_("Sound cards"), con, help_text, prev, next));
+
+	    any ui = nil;
+	    term prev_con = con;
+	    
+	    integer manual_driver = 0; // these are for the history browsing
+	    integer manual_model = 0;
+	    options_entered = $[];
+	    
+	    integer card_number = 1;
+	    repeat {
+
+		ui = UI(`UserInput ());
+
+		if (ui == `fc) {
+				// selection
+		    string sel = UI (`QueryWidget (`id(`fc), `CurrentItem));
+		    integer vid = tointeger (substring (sel, 0, findfirstnotof (sel, "0123456789")));
+		    integer did = tointeger (substring (sel, findfirstnotof (sel, "0123456789") + 1));
+		    ret = select (filter (`s, found, ``((lookup (s, "vendor_id", -1) == vid) && ((lookup (s, "device_id", -1) == did)))), 0);
+		    module = get_module (lookup (ret, "bus", ""), lookup (ret, "vendor_id", 0), lookup (ret, "device_id", 0));
+
+		    if (size (module) == 0) {
+			UI(`ChangeWidget(`id(`next), `Enabled, false));
+			UI(`ChangeWidget(`id(`options), `Enabled, false));
+
+			if (UI (`DisplayYesNo (_("There is no available driver for selected card.\nDo you want to select the driver manually?"))))
+			{
+			    
+			    options_entered = $[]; // clear options
+			    if (!selected_manually) {
+				prev_con = con;
+			    }
+
+			    map|void manual = CallFunction (`sound_manual (database_name, manual_driver, manual_model));
+
+			    if (manual == nil) {
+				message = sformat (UI(_("Can not find module: %1")), "sound_manual");
+				UI (`DisplayMessage (message, 0, ""));
+			    }
+		    
+			    else if (size (manual) > 0) {
+				
+				ret = lookup (manual, "scr", $[]);
+				module = lookup (ret, "module");
+				manual_driver = lookup(lookup (manual, "return", $[]), "driver", 0);
+				manual_model = lookup(lookup (manual, "return", $[]), "model", 0);
+				
+				con = `VBox ();
+
+				// help text 1/1
+				help_text = UI (_("<p>By pressing the <i>Next</i> button you should get your sound card working.</p>"));
+				    // help text 2/2
+				help_text = help_text + UI (_("<p>You can change options that are passed to the module by pressing <i>Options</i> buton.</p>"));
+				
+				message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
+				con = add (con, `ReplacePoint (`id(`rp), `HVCenter(`Label(message))));
+				con = add (con, `Bottom(`PushButton(`id (`options), _("&Options"))));
+				next = true;
+				
+				selected_manually = true;
+			    }
+
+
+				/*
+			    message = UI (_("Try manual setup."));
+			    con = add (con, `HVCenter(`ReplacePoint(`id(`rp), `Label(message))));
+			    con = add (con, `Bottom(`PushButton(`id (`manual), _("&Manual"))));
+			    
+			    UI(`SetContents (_("Sound cards"), con, help_text, prev, next));
+				*/
+
+			}
+			
+		    }
+		    else {
+			
+			ret = add (ret, "module", module);
+			UI(`ChangeWidget(`id(`next), `Enabled, true));
+			UI(`ChangeWidget(`id(`options), `Enabled, true));
+		    }
+		}
+		else if (ui == `options) {
+
+//  		    if (lookup (options_entered, "snd_id", "") == "")
+//  			options_entered = add (options_entered, "snd_id", sformat ("card%1", card_number));
+
+//  		    if (lookup (options_entered, "snd_index", "") == "")
+//  			options_entered = add (options_entered, "snd_index", sformat ("%1", card_number));
+
+
+		    module = lookup (ret, "module");
+		    map|void options = CallFunction (`sound_options (soundcard_name (ret),
+									 lookup (module, "params", []),
+									 options_entered, 0));
+
+		    if (options == nil) {
+			message = sformat (UI(_("Can not find module: %1")), "sound_options");
+			UI (`DisplayMessage (message, 0, ""));
+		    }
+		    else if (size (options) > 0) {
+				// according to the SCR
+			ret = add (ret, "args", lookup (options, "args", ""));
+			ret = add (ret, "conf", lookup (options, "conf", ""));
+			options_entered = lookup (options, "entered", $[]);
+
+		    }
+		    
+
+		    UI(`SetContents (_("Sound cards"), con, help_text, prev, next));
+		}
+		
+		else if ((ui == `manual) || (selected_manually && (ui == `back))) {
+
+		    options_entered = $[]; // clear options
+		    
+		    if (!selected_manually) {
+			prev_con = con;
+		    }
+		    
+		    map|void manual = CallFunction (`sound_manual (database_name, manual_driver, manual_model));
+
+		    if (manual == nil) {
+			message = sformat (UI(_("Can not find module: %1")), "sound_manual");
+			UI (`DisplayMessage (message, 0, ""));
+		    }
+		    
+		    else if (size (manual) > 0) {
+			
+			ret = lookup (manual, "scr", $[]);
+			module = lookup (ret, "module");
+			manual_driver = lookup(lookup (manual, "return", $[]), "driver", 0);
+			manual_model = lookup(lookup (manual, "return", $[]), "model", 0);
+
+			con = `VBox ();
+
+			    // help text 1/2
+			help_text = UI (_("<p>By pressing the <i>Next</i> button you should get your sound card working.</p>"));
+			    // help text 2/2
+			help_text = help_text + UI (_("<p>You can change options that are passed to the module by pressing <i>Options</i> buton.</p>"));
+			
+			message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
+			con = add (con, `ReplacePoint (`id(`rp), `HVCenter(`Label(message))));
+			con = add (con, `Bottom(`PushButton(`id (`options), _("&Options"))));
+			next = true;
+			
+			selected_manually = true;
+		    }
+		    else {
+			con = prev_con;	// restore content
+			next = false;
+			selected_manually = false;
+		    }
+		    
+		    
+		    UI(`SetContents (_("Sound cards"), con, help_text, prev, next));
+
+		    continue;
+		    
+		}
+		
+	    } until (((ui == `back) || (ui == `next) || ui == `cancel));
+	    
+	    if (ui == `next) {
+		
+		    //UI (`DisplayMessage(sformat ("%1", lookup (ret, "module", "Unknown module")), 0, ""));
+		
+		return ret;
+	    }
+
+	    return $[];
+	    
+	};
+
+
+	    // ===== main =====
+
+				// This help text is displayed during some "userless" operations,
+				// like searching in DB, saving, etc ...
+	string help_text = UI (_("<p>No help text available.<p>"));
+	
+	string database_name = "sndcards.ycp";
+
+	map user_settings = $["audio_file" : "/usr/share/sounds/alsa/whistle.au"];
+
+	boolean cont = true;
+	map snd_info = $[];
+	boolean selected_manually = false;
+	
+	list found = FindCard ();
+	map options_entered = $[];
+
+	any already = CallFunction (`sound_already ());
+
+	if (IsAlsaInstalled ()) {
+	    
+	    if (already == nil || already == `next) {   
+		
+		while (cont) {
+		    
+		    snd_info = DisplayFound (found);
+		    found = [snd_info];
+		    
+		    if (size (snd_info) > 0) {
+			while (cont) {
+			    any vol_ui = CallFunction (`sound_volume (snd_info));
+			    cont = (vol_ui != `next);
+			    if (vol_ui == `next)
+				cont = (CallFunction (`sound_save (snd_info, options_entered)) != `next);
+			    else if (vol_ui == `back)
+				break;
+			}
+		    }
+		    else {
+			cont = false;
+		    }
+		
+		
+		}
+	    
+	    }
+	}
+
+	else {			// ALSA not installed
+	    NotInstalled ();
+	}
+
+	UI(`CloseDialog());
+}

@@ -1,0 +1,229 @@
+/*
+ * Module where an attemp of inserting module is provided,
+ * if everything goes well adjusting volume is done here
+ * otherwise error message is displayed
+ * Dan Veselý <dan@suse.cz>, 2000
+ *
+ * $Id$
+ *
+ *
+ * parameters: 1st: module, Map, map of complete info about module (i.e. name, options, etc ...)
+ * 
+ */
+
+{
+	
+	SCR(``{			// gets list of all devices from amixer (map: "device"), TODO: read values as well
+	    
+	    MountAgent (`anyagent(
+		``Description (
+		    ``Run("/usr/bin/amixer"),         // real file name
+		    " ",                     // Comment
+		    true,                     // read-only
+		    ``List (
+			Tuple (
+			    String ("Group '"),
+			    `device (String ("^'")),
+			    String ("^\n")
+			    ),
+			"\n"
+			)
+		    )
+		), .usr.bin.amixer);
+	});
+
+
+				// here the test sound is played, by
+				// default ist alsa whistle sound, but
+				// if snd_au package is installed,
+				// than it's Linus Torvals voice, the
+				// if the test file cannot be found,
+				// the message is displayed
+
+	define PlayTest () ``{
+	    
+	    if ((Shell ("/bin/ls $FILE", $["FILE" : lookup (user_settings, "audio_file")]) != 0)) {
+		string file = lookup (user_settings, "audio_file");
+		
+		    // To translators: just one file will be displayed
+		    // To translators: if the test audio file can not be found this message is displayed
+		    // To translators: This is just popup message, shouldn't be too long
+		string msg = sformat (UI (_("Cannot find file:\n %1\n\n(test audio file)")), file);
+		
+		UI (`DisplayMessage (msg, 0, ""));
+	    }
+	    else
+		Shell ("/bin/cat $AUDIO > /dev/audio &", $["AUDIO" : lookup (user_settings, "audio_file")]);
+	};
+
+	
+	
+	  
+				// sets the volume, with amixer check
+				// if an error occurs popup error is displayed
+	define set_volume (string device, integer v) ``{
+	    integer ret = Shell ("/usr/bin/amixer set $DEV $VOL unmute 2>/dev/null", $["DEV" : device, "VOL" : v]);
+	    if (ret == 127){
+				// To translators: This is just popup message, shouldn't be too long
+		UI (`DisplayMessage (_("Cannot find program 'amixer'"), 0,
+				// To translators: This is just popup message, shouldn't be too long
+				     _("Please install the package 'ALSA' from the 'snd' series")));
+	    }
+	    return ret;
+	};
+
+
+				// unmute all devices to vol
+	define unmute_all (integer vol) ``{
+	    list devices = SCR(`Read(.usr.bin.amixer));
+	    
+	    foreach (`d, devices, ``{
+		set_volume (lookup (d, "device", "Master"), vol);
+	    });
+	    
+	    set_volume ("Master", vol);
+	    
+	};
+
+				// tries to insert module with options (if any)
+				// return string with error message (empty string if ok)
+	define probe_module (map snd_info) ``{
+	    string module_name = lookup (lookup (lookup (snd_info, "module", $[]), "module", $[]), "name", "");
+	    string cmd = module_name;
+	    boolean probe = lookup (lookup (lookup (snd_info, "module", $[]), "module", $[]), "modprobe", true);
+	    boolean mod_active = lookup (lookup (lookup (snd_info, "module", $[]), "module", $[]), "active", false);
+		
+	    if (size (cmd) == 0)
+		return _("Invalid module name.");
+
+	    cmd = cmd + condition ((size (lookup (snd_info, "args", "")) > 0), ``(" " + lookup (snd_info, "args", "")), "");
+
+	    Shell("/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`");
+
+
+	    if (mod_active == false) {
+		if (!probe)
+		    Shell("/sbin/insmod " + cmd);
+		else
+		    Shell("/sbin/modprobe " + cmd);
+	    }
+
+	    Shell("/sbin/modprobe snd-pcm-oss"); // backwards OSS compatibility
+
+	    map pm = SCR(`Read(.proc.modules));
+
+	    if (!haskey (pm, module_name))
+		return sformat (UI(_("The kernel module %1 for sound support\ncannot be loaded.")), module_name);
+	
+	    return "";
+	    
+	};
+	
+	
+
+	    // ===== main =====
+
+
+				// Help text - adjusting volume 1/3
+	string help_text = UI(_("<p>Please adjust the volume.</p>"));
+				// Help text - adjusting volume 2/3
+	help_text = help_text + UI(_("<p>You can test your sound card by pressing the <i>Test</i> button.</p>"));
+				// Help text - adjusting volume 3/3
+	help_text = help_text + UI(_("<p>After the configuration is done you can use <b>amixer</b> (or any program of your choice) for adjusting the volume.</p>"));
+	
+	map snd_info = Args (0);
+
+	term con = `VBox ();
+	
+	integer vol = 50;		// let's start with 50% volume for Master
+	integer step = 3;
+
+	string err = probe_module (snd_info);
+
+	boolean back = true;
+	boolean next = false;
+	
+		
+	if (size (err) > 0) {
+		// error
+
+				// Help text - intenal YaST2 error 1/3
+	    help_text = UI(_("<p>This indicates some kind of error. There might be several reasons. </p>"));
+				// Help text - intenal YaST2 error 2/3
+	    help_text = help_text + UI(_("<p>You should check that you have installed right <b>ALSA</b> package (series 'snd') for sound support or you're running this as a root.</p>"));
+				// Help text - intenal YaST2 error 3/3
+	    help_text = help_text + UI (_("<p>If the the problem persist you can try to pass some <b>options</b> to the ALSA kernel module. If you still can't get sound card working, you can try <i>OSS/Free</i> or another modules, which are currently not supported by <b>YaST2</b>.</p>"));
+	    
+	    con = `VBox(`Top (`Label (soundcard_name (snd_info))),
+			`HVCenter(`Label (err)));
+		
+	}
+
+	else {
+
+	    next = true;
+				// let's unmute all devices to 90%
+	    unmute_all (90);
+	    
+	    
+				// TODO: add some other device ajusting here (stereo, other devices like CD, etc ...)???
+	    con = `VBox (
+		`VBox (
+		    `Top (
+			`Label (soundcard_name (snd_info))
+			),
+		    `ReplacePoint (`id(`rprog),
+				// To translators: progress bar title
+				   `ProgressBar(`id(`pb), _("Volume"), 100, vol)),
+		    `HBox (
+			`PushButton (`id(`minus), "-"),
+			`PushButton (`id(`plus), "+")
+			)
+		    ),
+		`VStretch (),
+				// To translators: this label is just above the Test button
+		`Label (_("To test the sound card press the button")),
+				// To translators: Test button label
+		`PushButton (`id (`test), _("&Test"))
+		);
+	}
+	
+	UI(`SetContents (_("Sound cards"), con, help_text, back, next));
+	
+	any ui = nil;
+	
+	repeat {
+	    
+	    ui =  UI (`UserInput ());
+	    
+	    if (ui == `minus) {
+		if (vol > step) {
+		    vol = vol - step;
+		    set_volume ("Master", vol);
+		}
+		else {
+		    vol = 0;
+		}
+	    }
+	    else if (ui == `plus) {
+		if (vol + step < 100) {
+		    vol = vol + step;
+		    set_volume ("Master", vol);
+		}
+		else {
+		    vol = 100;
+		}
+	    }
+	    else if (ui == `test)
+		PlayTest ();
+	    
+	    UI (`ChangeWidget(`id(`pb), `Value, vol));
+	    
+	} until ((ui == `back) || (ui == `next) || ui == `cancel);
+
+
+	return ui;
+	
+}
+
+

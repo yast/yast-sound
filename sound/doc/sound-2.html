@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="SGML-Tools 1.0.9">
+ <TITLE>YaST2: Sound configuration: Design</TITLE>
+ <LINK HREF="sound-1.html" REL=previous>
+ <LINK HREF="sound.html#toc2" REL=contents>
+</HEAD>
+<BODY>
+Next
+<A HREF="sound-1.html">Previous</A>
+<A HREF="sound.html#toc2">Contents</A>
+<HR>
+<H2><A NAME="s2">2. Design</A></H2>
+
+<P>YCP was chosen for implementing the Configurator.
+<P>
+<H2><A NAME="database"></A> <A NAME="ss2.1">2.1 Sound cards database</A>
+</H2>
+
+<P>A sound cards database is provided (now by generating directly from
+alsa modules <CODE>/sbin/modinfo</CODE>.) In it, each module
+have a record that consists of this info:
+<OL>
+<LI><B>Module name</B> (string) user readable name of the module.</LI>
+<LI><B>Module info</B> (map) real module file name and
+some additional info.</LI>
+<LI><B>Cards</B> (list) list of strings with real card
+names. These are the cards that are supported by this module</LI>
+<LI><B>Libhd info</B> (list) list of pairs
+&quot;device_id&quot;, &quot;vendor_id&quot; for matching with
+cards detected by libhd.</LI>
+<LI><B>Module parameters</B> (list) list of options that
+can be passed to module.</LI>
+</OL>
+<P><B>An example of the database:</B>
+<P>
+<HR>
+<PRE>
+[
+$[
+        "name" : "ADI SoundPort AD1816A",
+        "module" : 
+                $[
+                "name" : "snd-card-ad1816a",
+                "modprobe" : true
+        ],
+        "cards" : [
+                "Highscreen Sound-Boostar 16 3D"
+        ],
+        "libhd" : [
+                $["vendor_id" : 0x1605,
+                  "device_id" : [0x7180, 0x7181]],
+                $["vendor_id" : 0x7150,
+                  "device_id" : [0x7150, 0x7151]]
+        ],
+        "params" : [
+                $[
+                "name" : "snd_index",
+                "type" : "int",
+                "description" : "Index value for ad1816a based soundcard."
+                ],
+                $[
+                "name" : "snd_id",
+                "type" : "string",
+                "description" : "ID string for ad1816a based soundcard."
+                ],
+                $[
+                "name" : "snd_port",
+                "type" : "int",
+                "description" : "Port # for ad1816a driver. [PORT12]"
+                ],
+                $[
+                "name" : "snd_mpu_port",
+                "type" : "int",
+                "description" : "MPU-401 port # for ad1816a driver. [PORT12]"
+                ],
+                $[
+                "name" : "snd_fm_port",
+                "type" : "int",
+                "description" : "FM port # for ad1816a driver. [PORT12]"
+                ],
+                $[
+                "name" : "snd_irq",
+                "type" : "int",
+                "description" : "IRQ # for ad1816a driver. [IRQ]"
+                ],
+                $[
+                "name" : "snd_mpu_irq",
+                "type" : "int",
+                "description" : "MPU-401 IRQ # for ad1816a driver. [IRQ]"
+                ],
+                $[
+                "name" : "snd_dma1",
+                "type" : "int",
+                "description" : "1st DMA # for ad1816a driver. [DMA]"
+                ],
+                $[
+                "name" : "snd_dma1_size",
+                "type" : "int",
+                "description" : "1st DMA size for ad1816a driver. [DMA_SIZE]"
+                ],
+                $[
+                "name" : "snd_dma2",
+                "type" : "int",
+                "description" : "2nd DMA # for ad1816a driver. [DMA]"
+                ],
+                $[
+                "name" : "snd_dma2_size",
+                "type" : "int",
+                "description" : "2nd DMA size for ad1816a driver. [DMA_SIZE]"
+                ]
+        ]
+]
+]
+</PRE>
+<HR>
+<P>
+<H2><A NAME="ss2.2">2.2 Adding sound card to <I>/etc/conf.modules</I></A>
+</H2>
+
+<P>The values that must be written by the configurator:
+<OL>
+<LI><B>alias char-major-116 snd</B> aliases for the module snd.</LI>
+<LI><B>options snd snd_major=116 snd_cards_limit=1</B>
+options passed to module snd.</LI>
+<LI><B>alias snd-card-0 &lt;module&gt;</B>alias for sound
+card module &lt;module&gt;(this alias is used for starting sound by
+alsasound script in <CODE>/etc/rc.d</CODE>).</LI>
+<LI><B>options &lt;module&gt; snd_index=0 snd_id=CARD_1</B>options passed to module &lt;module&gt;.</LI>
+<LI><B>alias sound-slot-0 snd-card-0</B> OSS/Free emulation.</LI>
+<LI><B>alias sound-service-0-0 snd-mixer-oss</B> OSS/Free emulation.</LI>
+<LI><B>alias sound-service-0-1 snd-seq-oss</B> OSS/Free emulation.</LI>
+<LI><B>alias sound-service-0-3 snd-pcm-oss</B> OSS/Free emulation.</LI>
+<LI><B>alias sound-service-0-8 snd-seq-oss</B> OSS/Free emulation.</LI>
+<LI><B>alias sound-service-0-12 snd-pcm-oss</B> OSS/Free emulation.</LI>
+</OL>
+
+Always configurator should made a backup copy of an old
+<I>/etc/conf.modules</I>.
+<P>
+<H2><A NAME="dialogs"></A> <A NAME="ss2.3">2.3 Dialogs</A>
+</H2>
+
+<P>See the 
+<A HREF="sound-1.html#wizard">(auto)configurator</A> section.
+<P>
+<OL>
+<LI>There is no interaction with the user at this point,
+just label <I>&quot;Looking for a sound card on your
+system...&quot;</I>.
+<UL>
+<LI>Dialog: <I>&quot;Found cards&quot;</I> Selection box with
+found cards is displayed. User can choose one which
+will be configured. Buttons: <CODE>Back, Next</CODE></LI>
+<LI>Dialog: <I>&quot;There were found no sound cards on
+your system. Try manual setup.&quot;</I> Buttons: <CODE>Back,
+Next, Manual</CODE></LI>
+</UL>
+</LI>
+<LI>Dialogs:
+<OL>
+<LI>Dialog with a list boxes containing sound card
+drivers and models. Buttons: <CODE>Back, Next</CODE>.</LI>
+<LI>Dialog: <I>&quot;Manually configured
+drivers&quot;</I>. Buttons: <CODE>Back, Next</CODE>.</LI>
+</OL>
+</LI>
+<LI>Dialog: Adjusting volume with progress bar is
+displayed<I>&quot;To test the sound card press a 
+button&quot;</I>. Buttons:<CODE>Back, Next, Test, &quot;+&quot;,
+&quot;-&quot;</CODE>.</LI>
+<LI>Dialog: <I>&quot;Sound volume will be now saved.&quot;</I> Buttons:
+<CODE>Back, Next</CODE></LI>
+<LI>Dialog: <I>&quot;Configuration for the sound card will be now saved.&quot;</I> Buttons:
+<CODE>Back, Next</CODE></LI>
+</OL>
+<P>
+<HR>
+Next
+<A HREF="sound-1.html">Previous</A>
+<A HREF="sound.html#toc2">Contents</A>
+</BODY>
+</HTML>

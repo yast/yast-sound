@@ -1,0 +1,236 @@
+/*
+ * Module for manual selection of sound card from the database
+ * Dan Veselý <dan@suse.cz>, 2000
+ *
+ * $Id$
+ *
+ * parameters: 1st: name of database to read from, String
+ *             2nd: default driver to select, Integer
+ *             3rd: default model to select, Integer
+ *
+ * return: map with two keys (empty map when back button was pressed or some error occured.):
+ *
+ * "scr"    : Map, see below (very similar to map from SCR);
+ * "return" : Map with values as return values
+ *
+ * map "return" has these two keys:
+ * "driver": Integer, number of last clicked driver
+ * "model" : Integer, number of last clicked model
+ *
+ * There are these keys in "scr":
+ * "vendor"  : String, name of vendor
+ * "device"  : String, name of device
+ * "module"  : Map, see below
+ * "options" : Map, see below
+ *
+ * map "module" has these keys:
+ * "name"     : String, module name
+ * "modprobe" : Boolean
+ *
+ * map "options" has all the keys, as in DB
+ */
+
+{
+				// dialog when DB not found or corrupted
+	define DBNotFound () ``{
+				// Help text when sndcards database not found 1/1
+	    string help_text = UI(_("<p>This generally means that some
+ internal <b>YaST2</b> file is missing or corrupted. Please try to
+ reinstall <b>YaST2</b>, you find it in <b>SuSE</b> distribution,
+ series 'a1'.</p>"));
+	    
+	    UI(`SetContents (_("Sound cards"),
+			     `HVCenter (
+				// To translators: label message
+				 `Label (_("The Sound card database cannot be found!!!"))
+				 ), help_text, true, false));
+	    
+	    UI(`UserInput ());
+
+	    return $[];
+	};
+
+				// return list of cards for the module "module_name"
+	define GetCards (string module_name, list db) ``{
+	    
+	    list|void modules = filter (`s, db, ``(lookup (s, "name", "uknown_driver") == module_name));
+	    list cards = [];
+
+	    if ((modules == nil) || (modules == []))
+		return cards;
+
+	    cards = lookup (select (modules, 0), "cards");
+	    
+	    if (size (cards) == 0)
+		cards = add (cards, module_name); // to have at least one card name for the module
+	    
+	    return sort(cards);
+	};
+
+				// search for a model name in db, returns map with "driver" and  "model"  number
+	define SearchForCard (string name, list db) ``{
+	        integer len = size (name);
+		name = tolower(name);
+		integer i = -1;
+		list cards = [];
+		map ret = $[];
+
+		map driver = $[];
+		list|void cards_matches = nil;
+		
+		repeat {
+		    i = i + 1;
+		    driver = select (db, i);
+		    cards = sort(lookup (driver, "cards", []));
+		    if (size (cards) > 0)
+			cards_matches = maplist (`c, cards, ``(tolower(substring (c, 0, len)) == name));
+		    else
+			cards_matches = [tolower(substring(lookup (driver, "name"), 0, len)) == name];
+		}
+		until ((i + 2 > size (db)) || contains (cards_matches, true));
+		
+		if (contains (cards_matches, true)) { // let's find model number
+		    ret = add (ret, "driver", i);
+		    integer model = 0;
+
+		    while (!select (cards_matches, model)) {
+			model = model + 1;
+		    }
+
+		    ret = add (ret, "model", model);
+		}
+
+		return ret;
+		
+	};
+	
+
+	    // ==== main ====
+  
+	string help_text = UI(_("<p>No help text available.</p>"));
+
+
+	boolean prev = false;
+	boolean next = false;
+	locale msg = _("Reading sound card database ...");
+	term con = `Label (msg);
+
+	map ret = $[];
+	
+	UI(`SetContents (_("Sound cards"), con, help_text, prev, next));
+
+	list|void snd_database = ReadY2 (Args(0));
+	
+	if (snd_database == nil)
+	    return DBNotFound ();
+				// let's sort the database, looks nicer
+	snd_database = sort (`x, `y, snd_database, ``(lookup(x, "name") <= lookup(y, "name")));
+	
+	list drivers = maplist (`v, snd_database, ``(lookup(v, "name", "unknown driver")));
+	string current_driver = select (drivers, Args(1));
+	list models = GetCards (current_driver, snd_database);
+
+	list itemized_drivers = itemize_list (drivers, Args(1));
+	list itemized_models = itemize_list (models, Args(2));
+
+	    // Help text - manual configuration 1/1
+	help_text = UI(_("<p>Please choose the sound card, you want to configure <b>manually</b>. You can use the text entry at the bottom for searching for a particular sound card.</p>"));
+	
+	con = `VBox ();
+	con = add (con, `HBox (
+	    `ReplacePoint (`id (`rep_drv),
+			   `SelectionBox (`id (`sel_drv), `opt(`notify), _("Sound card driver"), itemized_drivers)
+			   ),
+	    `ReplacePoint(`id(`rep_mod),
+			  `SelectionBox (`id (`sel_mod), `opt(`notify), _("Sound card model"), itemized_models)
+			  )
+	    ));
+	con = add (con, `TextEntry (`id(`search), `opt(`notify), _("Search")));
+	
+	prev = true;
+	next = true;
+	
+	UI(`SetContents (_("Sound cards"), con, help_text, prev, next));
+
+	any ui = nil;
+	integer n_drv = Args(1);
+	
+	repeat {
+
+	    ui =  UI (`UserInput ());
+
+
+	    if (ui == `sel_drv) { // user selected some driver
+
+		n_drv = UI (`QueryWidget (`id(`sel_drv), `CurrentItem));
+		current_driver = select (drivers, n_drv);
+		models = GetCards (current_driver, snd_database);
+		itemized_models = itemize_list (models, 0);
+		
+		UI(`ReplaceWidget (`id(`rep_mod),
+				// To translators: selection box title
+				   `SelectionBox (`id (`sel_mod), _("Sound card model"), itemized_models)));
+	    }
+	    else if (ui == `search) {
+		string entry = UI(`QueryWidget (`id(`search), `Value));
+		if (size (entry) > 0) {
+		    map found = SearchForCard (entry, snd_database);
+
+		    if (size(found) > 0) {
+			n_drv = lookup (found, "driver", 0);
+			current_driver = select (drivers, n_drv);
+			itemized_drivers = itemize_list (drivers, lookup (found, "driver", 0));
+			models = GetCards (current_driver, snd_database);
+			itemized_models = itemize_list (models, lookup (found, "model", 0));
+
+			UI(`ReplaceWidget (`id(`rep_drv),
+				// To translators: selection box title
+					   `SelectionBox (`id (`sel_drv), `opt(`notify), _("Sound card driver"), itemized_drivers)));
+			UI(`ReplaceWidget (`id(`rep_mod),
+				// To translators: selection box title
+					   `SelectionBox (`id (`sel_mod), `opt(`notify), _("Sound card model"), itemized_models)));
+		    }
+		    
+		}
+		else {		// entry is empty
+		    n_drv = 0;
+		    current_driver = select (drivers, n_drv);
+		    itemized_drivers = itemize_list (drivers, 0);
+		    models = GetCards (current_driver, snd_database);
+		    itemized_models = itemize_list (models, 0);
+
+		    UI(`ReplaceWidget (`id(`rep_drv),
+				// To translators: selection box title
+				       `SelectionBox (`id (`sel_drv), `opt(`notify), _("Sound card driver"), itemized_drivers)));
+		    UI(`ReplaceWidget (`id(`rep_mod),
+				// To translators: selection box title
+				       `SelectionBox (`id (`sel_mod), `opt(`notify), _("Sound card model"), itemized_models)));
+		}
+		
+	    }
+	    
+	    
+	} until (((ui == `back) || (ui == `next) || ui == `cancel));
+
+
+	if (ui == `next) {
+	    map scr = $["vendor" : ""]; // we have no info about this
+	    map retval = $["driver" : n_drv,
+			  "model"   : UI (`QueryWidget (`id(`sel_mod), `CurrentItem))];
+
+	    map mod_rec = select (snd_database, n_drv);
+	    
+	    scr = add (scr, "device", sformat ("%1\n(driver: %2)",
+					       select (models, UI (`QueryWidget (`id(`sel_mod), `CurrentItem))),
+					       current_driver));
+
+	    scr = add (scr, "module", mod_rec);
+	    
+	    ret = add (ret, "scr", scr);
+	    ret = add (ret, "return", retval);
+	    
+	}
+	
+	return ret;
+
+}
