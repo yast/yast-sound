@@ -86,6 +86,7 @@ YCPValue alsaGetVolume(int card_id, const string& channel)
 
 		if (to - from == 0)
 		{
+		    snd_mixer_close(handle);
 		    return YCPInteger((long long) 0);
 		}
 		value = (long long)(100.0 * ((double)(left - from) / (double)(to - from)));
