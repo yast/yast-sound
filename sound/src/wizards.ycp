@@ -157,7 +157,7 @@
             }
 
 	    // remove joystick settings
-	    if (Sound::card_id < 4)
+	    if (Sound::card_id<4 && Joystick::joystick[Sound::card_id]:nil!=nil)
 	    {
 		Joystick::joystick = remove (Joystick::joystick,Sound::card_id);
 		Joystick::joystick[3] = $[];
