@@ -151,9 +151,9 @@ Try to restart sound system?")))
 			(lookup (rc_vars, "START_ALSA_SEQ", "no") == "yes"), show_fonts);
 
         // dialog title
-	UI::Wizard::SetContents (_("Sound configuration"), con, helptext, true, true);
+	Wizard::SetContents (_("Sound configuration"), con, helptext, true, true);
 	// Finish - button label
-	UI::ChangeWidget(`id(`next), `Label, UI::FinishButtonLabel());
+	ChangeWidget(`id(`next), `Label, UI::FinishButtonLabel());
     
 	if (size (cc) == 0) 
 	{
@@ -213,7 +213,7 @@ Try to restart sound system?")))
 		}
 		UI::ChangeWidget(`id(`next), `Label, UI::FinishButtonLabel());
 
-		UI::Wizard::SetContents (_("Sound configuration"), con, helptext, true, true);
+		Wizard::SetContents (_("Sound configuration"), con, helptext, true, true);
 		cc = createTable(save_info);
 		UI::ChangeWidget (`id(`configured_table), `Items, cc);
 		UI::ChangeWidget(`id(`configured_table), `CurrentItem, 0);
@@ -229,7 +229,7 @@ Try to restart sound system?")))
 
 		UI::ChangeWidget(`id(`next), `Label, UI::FinishButtonLabel());
         
-                UI::Wizard::SetContents (_("Sound configuration"), con, helptext, true, true);
+                Wizard::SetContents (_("Sound configuration"), con, helptext, true, true);
                 cc = createTable(save_info);
                 UI::ChangeWidget (`id(`configured_table), `Items, cc);
                 UI::ChangeWidget(`id(`configured_table), `CurrentItem, 0);

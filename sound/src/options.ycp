@@ -213,7 +213,7 @@
 
 
 		// dialog title
-	UI::Wizard::SetContents (_("Sound card advanced options"), con, help_text, true, true);
+	Wizard::SetContents (_("Sound card advanced options"), con, help_text, true, true);
 	if (size (itemized_descriptions) > 0) 
 	{
 	    UI::ChangeWidget(`id(`table), `CurrentItem, 0);

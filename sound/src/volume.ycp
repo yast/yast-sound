@@ -53,7 +53,7 @@
 
 	term con = VolumeCon(save_entry, vol);
 	    // dialog title
-	UI::Wizard::SetContents (_("Sound card volume"), con, help_text, true, true);
+	Wizard::SetContents (_("Sound card volume"), con, help_text, true, true);
 	if (finish)
 	{
 	    UI::ChangeWidget (`id(`next), `Label, UI::FinishButtonLabel());
@@ -139,7 +139,7 @@ its parameters using the 'Advanced setup'.");
 	  );
 	    
 	    // dialog title
-	UI::Wizard::SetContents (ErrorMsg(), con, help_text, true, false);
+	Wizard::SetContents (ErrorMsg(), con, help_text, true, false);
 	if (finish)
 	{
 	    UI::ChangeWidget (`id(`next), `Label, UI::FinishButtonLabel());
@@ -188,7 +188,7 @@ its parameters using the 'Advanced setup'.");
           );
 
             // dialog title
-        UI::Wizard::SetContents (_("Success"), con, help_text, true, true);
+        Wizard::SetContents (_("Success"), con, help_text, true, true);
         if (finish)
         {
             UI::ChangeWidget (`id(`next), `Label, UI::FinishButtonLabel());
@@ -246,7 +246,7 @@ its parameters using the 'Advanced setup'.");
 	quick = true;
     }
 
-    UI::Wizard::DisableAbortButton();
+    Wizard::DisableAbortButton();
 
     string err_msg = "";
 

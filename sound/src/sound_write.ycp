@@ -107,7 +107,7 @@
 
     if (autoinstall)
     {
-	UI::Wizard::CreateDialog();
+//	UI::Wizard::CreateDialog();
     }	
 
     list stones = [
@@ -128,7 +128,10 @@
 		stones, stones2, "TODO: help");
 
 
-    UI::Wizard::DisableAbortButton();
+    if (!autoinstall)
+    {
+        Wizard::DisableAbortButton();
+    }
 
     
     integer step = 0;
