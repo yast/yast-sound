@@ -300,9 +300,14 @@
      */
     global define boolean Write(block _unused, block _unused2) ``{
 	// TODO: check return value
-	map settings = Export();
-	settings = add (settings, "autoinstall", false);
-	CallFunction (`sound_write(settings));
+
+	if (Mode::test == false)
+	{
+	    map settings = Export();
+	    settings = add (settings, "autoinstall", false);
+	    CallFunction (`sound_write(settings));
+	}
+
 	return true;
     }
 

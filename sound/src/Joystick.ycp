@@ -22,6 +22,7 @@
     // Set the name of the module
     module "Joystick";
     import "Progress";
+    import "Mode";
 
     textdomain "sound";
 
@@ -41,6 +42,9 @@
     // comment for JOYSTICK_MODULE section in sysconfig
     string module_comment = "";
 
+    global string generic_joystick = "Generic analog joystick";
+    global string generic_joystick_translated = _("Generic analog joystick");
+
     /**
      * Read all joystick settings from the SCR
      * @param abort A block that can be called by Read to find
@@ -49,6 +53,16 @@
      * @return True on success
      */
     global define boolean Read (block abort) ``{
+
+	// values for test mode
+	if (Mode::test == true)
+	{
+	    joystick = [$["GAMEPORT_MODULE":"ns558", "JOYSTICK_CONTROL":"Joystick", "JOYSTICK_CONTROL_PORT":"", "JOYSTICK_MODULE":"analog", "JOYSTICK_MODULE_OPTION":"", "model":"Generic analog joystick"], $["GAMEPORT_MODULE":"", "JOYSTICK_CONTROL":"", "JOYSTICK_CONTROL_PORT":"", "JOYSTICK_MODULE":"", "JOYSTICK_MODULE_OPTION":"", "model":""], $["GAMEPORT_MODULE":"", "JOYSTICK_CONTROL":"", "JOYSTICK_CONTROL_PORT":"", "JOYSTICK_MODULE":"", "JOYSTICK_MODULE_OPTION":"", "model":""], $["GAMEPORT_MODULE":"", "JOYSTICK_CONTROL":"", "JOYSTICK_CONTROL_PORT":"", "JOYSTICK_MODULE":"", "JOYSTICK_MODULE_OPTION":"", "model":""]];
+	    joystick_backup = joystick;
+
+	    return true;
+	}
+
 	integer pos = 0;
 
 	joystick = [];
@@ -155,6 +169,13 @@
      * @return True on success
      */
     global define boolean Write (block abort) ``{
+
+	// do not write anything in the test mode
+	if (Mode::test == true)
+	{
+	    return true;
+	}
+
 	integer pos = 0;
 
 	map j = $[];
@@ -208,7 +229,7 @@
 		}
 	    }
 
-	    y2milestone("Model: %1", model);
+	    y2debug("Read model comment: %1", model);
 
 	    if (size(model) > 0)
 	    {
@@ -227,6 +248,8 @@
 
 	// enable/disable service
         Runlevel::ServiceAdjust("joystick", start);
+
+	y2milestone("%1", "Joystick configuration was written.");
 
 	return true;
     }
