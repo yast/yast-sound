@@ -1,7 +1,30 @@
+/**
+ * File:
+ *   sound_routines.ycp
+ *
+ * Module:
+ *   Sound
+ *
+ * Summary:
+ *   Useful rooutines for a sound cards configuration
+ *
+ * Authors:
+ *   Dan Vesely (dan@suse.cz)
+ *
+ * $Id$
+ *
+ * Useful routines
+ *		     
+ */
+
 {
 
-/*
+/**
  * same as  ()?():(); statement in c
+ * @param c condition
+ * @param statement 1
+ * @param statement 2
+ * @return one of evaluated statements
  */
 define condition (boolean c, any s1, any s2) ``{
     if (c) return eval (s1);
@@ -9,9 +32,10 @@ define condition (boolean c, any s1, any s2) ``{
 };
 
 
-/*
+/**
  * Simply returns list with ALSA OSS/Free emulation modules
- * Params: "number" ... number of sound cards
+ * @params number number of sound cards
+ * @return list of modules.conf entries
  */
 define alsa_oss (integer number) ``{
 
@@ -43,8 +67,10 @@ define alsa_oss (integer number) ``{
 }
 
 
-/*
+/**
  * This is no alsa hack function
+ * @param mod_name name of the module
+ * @return map with OSS/Free sound info
  */
 define no_alsa (string mod_name) ``{
     return $[
@@ -66,8 +92,11 @@ define no_alsa (string mod_name) ``{
 	];
 }
 
-/*
+/**
  * simply gets detected audio
+ * @param test_mode boolean
+ * @param config_mode boolean
+ * @return sound cards found by libhd
  */
 define get_audio (boolean test_mode, boolean config_mode) ``{
 
@@ -111,8 +140,10 @@ define get_audio (boolean test_mode, boolean config_mode) ``{
 
 }
 
-/*
+/**
  * Looks up in the database for the module
+ * @param card card map info
+ * @return map with ALSA module info
  */
 define get_module (map card) ``{
  
@@ -150,8 +181,11 @@ define get_module (map card) ``{
     
 }
 
-/*
+/**
  * Use another module than alsa
+ * @param card sound card info
+ * @param config_mode boolean
+ * @return boolean true if no ALSA should be used
  */
 define no_alsa_exception (map card, boolean config_mode) ``{
     
@@ -159,18 +193,21 @@ define no_alsa_exception (map card, boolean config_mode) ``{
 	return MacRisc ();
 }
 
+/** 
+ * Callback to test if MacRisc architecture is present
+ * @return boolean
+ */
 define MacRisc () ``{
     if (lookup (select (SCR(`Read(.probe.system)), 0), "system") == "MacRISC")
 	return true;
     return false;
 }
 
-/*
- * Creates save information based on card map return by libhd
- * First list of exceptions is processed (has two keys : "try" with function to 
- * provide test and "handle" with function to handle (return) the corrected result
- * otherwise vendor_id, device_id search in sound db is run
- *
+/**
+ * Creates save information based on card map return by libhd First list of exceptions is processed (has two keys : "try" with function to provide test and "handle" with function to handle (return) the corrected result otherwise vendor_id, device_id search in sound db is run
+ * @param card sound card info
+ * @param card_id card number
+ * @return map with save information
  */
 define create_save_info (map card, integer card_id) ``{
 
@@ -206,15 +243,21 @@ define create_save_info (map card, integer card_id) ``{
 
 }
 
-/*
- * command must be string with $CHANNEL and $VALUE included
+/**
+ * Sets volume command must be string with $CHANNEL and $VALUE included
+ * @param command command for set-up volume
+ * @param channel channel to set volume of
+ * @param value volume value
+ * @param card_num card number
+ * @return integer exit code
  */
 define SetVolume (string command, string channel, string value, integer card_num) ``{
     return SCR(`Execute (.target.bash, command, $["CHANNEL" : channel, "VOLUME" : value, "CARD_NUM" : card_num]));
 }
 
-/*
+/**
  * reads already saved info from modules.conf
+ * @return list of modules.conf entries
  */
 define read_save_info () ``{
     

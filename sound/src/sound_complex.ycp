@@ -1,4 +1,16 @@
-/*
+/**
+ * File:
+ *   sound_complex.ycp
+ *
+ * Module:
+ *   Sound
+ *
+ * Summary:
+ *   Sound complex dialog is handeled here
+ *
+ * Authors:
+ *   Dan Vesely
+ *
  * $Id$
  * 
  * sound complex dialog
@@ -16,8 +28,9 @@ include "misc_defines.ycp";
 include "sound/sound_routines.ycp";
 include "lan/lan_routines.ycp";
 
-/*
+/**
  * Detected, but not configured
+ * @return list of not yet configured cards
  */
 define get_not_yet () ``{
     list all = get_audio (test_mode, config_mode);
@@ -27,7 +40,10 @@ define get_not_yet () ``{
 
 }
 
-
+/**
+ * List of ALSA running cards
+ * @return list of ALSA runing cards
+ */
 define get_running_cards () ``{
     
     if (fileexist("/proc/asound/cards")) {
@@ -37,17 +53,20 @@ define get_running_cards () ``{
     return [];
 }
 
-/*
+/**
  * reads variables from rc.config
+ * @param vars list of varibles that should be read from rc.config
+ * @return list of maps with pairs name, value
  */
 define read_rc_vars (list vars) ``{
 
     return listmap (`k, vars, ``([k, SCR(`Read(topath(sformat (".rc.system.%1", k))))]));
 }
 
-/*
- * marks cards in save_info to "off"
- * from to_delete list and resets options
+/**
+ * marks cards in save_info to "off" from to_delete list and resets options
+ * @param to_delete list of cards that should be deleted
+ * @return list the same list, cards are marked off
  */
 define mark_off (list to_delete) ``{
 
@@ -67,9 +86,9 @@ define mark_off (list to_delete) ``{
 
 }
 
-/*
- * just decides which way to go
- * manual or autodetected
+/**
+ * just decides which way to go manual or autodetected (not used with current workflow)
+ * @return map with "ui" as user input
  */
 define WhichDialog () ``{
 
@@ -151,7 +170,10 @@ define WhichDialog () ``{
 }
 
 
-
+/**
+ * The complex table dialog
+ * @return map with "ui" as user input
+ */
 define ComplexDialog () ``{
     
     // help text 1/4

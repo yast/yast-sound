@@ -1,8 +1,19 @@
-/*
- * Module for setting options passed to the module
- * Dan Vesely <dan@suse.cz>, 2000
+/**
+ * File:
+ *   sound_options.ycp
+ *
+ * Module:
+ *   Sound
+ *
+ * Summary:
+ *   Module for setting options passed to the kernel sound module
+ *
+ * Authors:
+ *   Dan Vesely <dan@suse.cz>
  *
  * $Id$
+ *
+ * Module for setting options passed to the module
  *
  * parameters: 1st: card
  *
@@ -16,9 +27,11 @@
     include "sound/sound_routines.ycp";
 
 
-    /* creates itemized table entries,
-     * params: 1st: list of maps to take keys from
-     * 2nd: list of keys to look for in 1st param
+    /**
+     * creates itemized table entries,
+     * @param lm list of maps to take keys from
+     * @param lk list of keys to look for in 1st param
+     * @return list of items
      */
     define create_table (list lm, list lk) ``{
 	integer i = 0;
@@ -39,9 +52,11 @@
 	return itemized_list;
     };
 
-    /* Chooses one message according to
-     * the language, used for translating
-     * sndcard options 
+    /**
+     * Chooses one message according to the language, used for translating sndcard options 
+     * @param msgs map with localized messages
+     * @param lang language that is currently selected
+     * @return string transtaled message
      */
     define Trans (map|void msgs, string lang) ``{
 	string|void message = "";
@@ -58,9 +73,11 @@
     };
 
 
-    /*
-     * "sformates" list from sound database, where are localized messages, with 
-     * optional formating information
+    /**
+     * "sformates" list from sound database, where are localized messages, with optional formating information
+     * @param msg list with message to format
+     * @param lang language to format the message into
+     * @return formated message
      */
     define mysformat (list msg, string lang) ``{
 
@@ -78,9 +95,11 @@
     }
 
 
-    /*
-     * just tests, if the item exists
-     * otherwise returns default
+    /**
+     * just tests, if the item exists otherwise returns default
+     * @param l list to select from
+     * @param i id of item to be selected
+     * @param default default value when index is out of range 
      */
     define myselect (list l, integer i, any default) ``{
 	if (i < size (l)) return select (l, i);
@@ -89,12 +108,10 @@
 
 
 
-    /* tries to extract list of values from description
-     * these value are generated from alsa modules
-     * and can be in form
-     * [list=value,value,..] or
-     * [range=1-19] or something not
-     * recognized
+    /**
+     * tries to extract list of values from description these value are generated from alsa modules and can be in form [list=value,value,..] or [range=1-19] or something not recognized
+     * @param des string from ALSA module
+     * @return list of parsed values
      */
     define parse_values (string des) ``{
 	list ret = [];
@@ -144,9 +161,12 @@
 	return ret;
     }
 
-    /* 1st: checks if value is type,
-     * 2nd: if poss is nonempty, checks if value is one of them
-     * returns error message, empty string if ok
+    /**
+     * 1st: checks if value is type, 2nd: if poss is nonempty, checks if value is one of them
+     * @param value value to check
+     * @param type type to be checked for
+     * @param list of possible values
+     * @return error message, empty string if ok
      */
     define check_value (string value, string type, list poss) ``{
 
@@ -200,7 +220,11 @@
     }
 
 
-
+    /**
+     * Dialog realing querying options 
+     * param options list of options
+     * @return map with "UI" as user input
+     */
     define OptionsDialog (list options) ``{
 	string help_text = "<p>";
 	

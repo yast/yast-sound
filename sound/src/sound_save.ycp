@@ -1,8 +1,18 @@
-/*
- * Provides saving /etc/modules.conf and volume.
- * Dan Veselý <dan@suse.cz>, 2000
+/**
+ * File:
+ *   sound_save.ycp
+ *
+ * Module:
+ *   Sound
+ *
+ * Summary:
+ *   Provides saving /etc/modules.conf and volume for the sound.
+ *
+ * Authors:
+ *   Dan Veselý <dan@suse.cz>
  *
  * $Id$
+ *
  *
  * Params:
  *         1st ... map with information to store with these keys:
@@ -46,8 +56,11 @@
 
     textdomain "sound";
 
-    /*
+    /**
      * Saves one '/etc/modules.conf' entry
+     * @param entry_name name of modules.conf entry
+     * @param entry map with "alias" and "options"
+     * @return boolean result of the write
      */
     define SaveOneModulesEntry (string entry_name, map entry) ``{
 	boolean ret = true;
@@ -61,8 +74,11 @@
 	return ret;
     }
 
-    /* 
+    /**
      * Saves all '/etc/modules.conf' entries
+     * @param cards list of cards with modules.conf info
+     * @param system list with system dependent (i.e. ALSA) modules
+     * @return boolean success
      */
     define SaveModulesEntry (list cards, list system) ``{
 
@@ -95,8 +111,11 @@
     }
 
 
-    /*
+    /**
      * Sets volume for all channels
+     * @param cards list of cards to set the volume of
+     * @param command command that is used for settting up the volume
+     * @return boolean success
      */
     define SetAllChannels (list cards, string command) ``{
 	if (contains (maplist (`e, cards, ``(maplist(`ch, `v, lookup (e, "volume", $[]), ``(SetVolume (command, ch, v, 
@@ -108,8 +127,12 @@
 	return true;
     }
 
-    /*
-     * Save volume (for alsa it's alsactl store
+    /**
+     * Save volume (for alsa it's alsactl store)
+     * @param function function name to call
+     * @param mixer_command command user for volume setting
+     * @param cards list of cards to set the volume of
+     * @return integer shell return value
      */
     define SaveVolume (string function, string mixer_command, list cards) ``{
 	
@@ -118,8 +141,9 @@
 	return SCR(`Execute(.target.bash, function, $[]));
     }
 
-    /*
+    /**
      * Additional hack to enable ALSA joystick support
+     * @return integer shell return value
      */
     define EnableJoystick () ``{
 	string tmpdir = SCR(`Read(.target.tmpdir));
@@ -130,8 +154,9 @@
 	
     }
 	
-    /*
+    /**
      * function to finish ALSA instalation
+     * @return void
      */
     define AlsaFinish () ``{
 
@@ -139,6 +164,11 @@
     }
 
 
+    /**
+     * Saves rc.config values
+     * @param rc map with variables
+     * @return void
+     */
     define SaveRCValues (map rc) ``{
 	
 	if (contains (maplist (`k, `v, rc, ``(SCR(`Write(topath(sformat(".rc.system.%1", k)), v)))), false) ||

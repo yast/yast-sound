@@ -1,16 +1,28 @@
-/*
- * Module for manual selection of sound card from the database
- * Dan Veselý <dan@suse.cz>, 2000
+/**
+ * File:
+ *   sound_manual.ycp
+ *
+ * Module:
+ *   Sound
+ *
+ * Summary:
+ *   Module for manual selection of sound card from the database
+ *
+ * Authors:
+ *   Dan Vesely (dan@suse.cz)
  *
  * $Id$
  *
+ * Module for manual selection of sound card from the database
  */
 
 {
 
     textdomain "sound";
-    /*
+    /**
      * Used for searching
+     * @param name user entered part of sound card name
+     * @return integer possition of the nearest matching sound card (-1 when no success)
      */
     define search_card_id (string name) ``{
 	list all_cards = get_cards ("all");
@@ -25,8 +37,11 @@
     }
 
 
-    /*
-     * creates "libhd entry" from db info
+    /**
+     * creates such a "libhd entry" from db info
+     * @param module_name name of the ALSA module
+     * @param card_name name of the card
+     * @return map such as "libhd" entry
      */
     define get_card (string module_name, string card_name) ``{
 	map ret = $[];
@@ -74,8 +89,10 @@
 	return ret;
     }
 
-    /*
-     * returns list of sound cards
+    /**
+     * returns list of sound cards matching the module name from sound card database
+     * @param module_name anme of ALSA module
+     * @return list of matching databese entries (maps)
      */
     define get_cards (string module_name) ``{
 	list ret = [];
@@ -97,8 +114,11 @@
 	return sort(flatten(ret));
     }
 
-    /*
+    /**
      * Itemize list for selection box
+     * @param l list to be itemized
+     * @param default itemt to became default
+     * @return list with itemized elements
      */
     define itemize_list (list l, integer default) ``{
 	integer i = 0;
@@ -112,7 +132,10 @@
 	return itemized_list;
     };
 
-
+    /**
+     * Dialog for manual selection
+     * @return map with "ui" as user input 
+     */
     define ManualDialog () ``{
 
 	    // Help text - manual configuration 1/2
