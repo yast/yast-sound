@@ -22,7 +22,6 @@
     textdomain "sound";
 
     import "Arch";
-    include "misc_defines.ycp";
 
     include "wizard/sequencer.ycp";
     import  "Wizard_hw";

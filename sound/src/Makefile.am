@@ -36,8 +36,4 @@ modules_DATA = Sound.ycp
 
 bin_SCRIPTS = copyfonts
 
-EXTRA_DIST = \
-	$(modules_DATA) \
-	$(menu_DATA) \
-	$(include_DATA) \
-	$(bin_SCRIPTS)
+EXTRA_DIST = $(modules_DATA) $(menu_DATA) $(include_DATA) $(bin_SCRIPTS) $(clients_DATA)

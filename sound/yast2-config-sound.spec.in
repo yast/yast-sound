@@ -1,58 +1,32 @@
-#
-# spec file for package @RPMNAME@
-# 
-# Copyright  (c)  2000  SuSE GmbH  Nuernberg, Germany.
-#
-# please send bugfixes or comments to @MAINTAINER@
-#
+@HEADER-COMMENT@
 
 # neededforbuild  autoconf automake ydoc ycpdoc libycp-devel yast2-devtools yast2-base libycp liby2 libyui libscr yast2-core-wfm yast2-core-scr libycp-devel yast2-agent-system yast2-testsuite dejagnu expect tcl
 
-Vendor:       SuSE GmbH, Nuernberg, Germany
-Distribution: SuSE Linux 6.4 (i386)
-Name:         @RPMNAME@
-Release:      1
-Copyright:    (c) 2000 SuSE GmbH
-Group:        System Environment/YaST
+@HEADER@
+
 Requires:	yast2-trans-sound yast2-db-sound yast2 yast2-agent-any yast2-agent-audio yast2-agent-modules yast2-agent-system yast2-agent-rcconfig
-BuildArchitectures: noarch
+BuildArchitectures:     noarch
+Summary:	Configuration of sound
 
-Packager:     @MAINTAINER@
-
-Summary:      YaST2 Modules for installation
-Version:      @VERSION@
-Source0:      @RPMNAME@-@VERSION@.tar.bz2
-Provides:     y2c_snd
-Obsoletes:    y2c_snd
 
 %description
--
+This package is a part of YaST2. It contains the necessary scripts to
+configure sound.
 
-%prep
+@PREP@
 
-%setup -n @RPMNAME@-@VERSION@
+@BUILD-YCP@
 
-%build
+@INSTALL-YCP@
 
-./configure
-make
-
-%install
-
-make install
-
-%{?suse_check}
+@CLEAN@
 
 %files
-
-%dir @YAST2DIR@
-%dir @YAST2DIR@/clients
+%defattr(-,root,root)
 %dir @YAST2DIR@/include/sound
-%dir @YAST2DIR@/menuentries
-%dir @YAST2DIR@/bin
 @YAST2DIR@/include/sound/*.ycp
 @YAST2DIR@/clients/sound*.ycp
 @YAST2DIR@/menuentries/menu*.ycp
 @YAST2DIR@/bin/copyfonts
-@YAST2DIR@/modules/Example.ycp
+@YAST2DIR@/modules/Sound.ycp
 %doc @DOCDIR@
