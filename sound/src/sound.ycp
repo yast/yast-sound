@@ -18,8 +18,8 @@
  */
 
 {
-    Include (`misc_defines());
-    Include (`sound_routines());
+    include "misc_defines.ycp";
+    include "sound_routines.ycp";
 
 	  // Menuentry for the YaST2 menu
 	if (Args() == [ "get_menuentry" ]) 
