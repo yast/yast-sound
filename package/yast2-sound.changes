@@ -1,4 +1,15 @@
 -------------------------------------------------------------------
+Thu Feb 26 20:24:43 CET 2004 - jsuchome@suse.cz
+
+- hack for CS4236 on IBM Thinkpad 600E (#34462)
+- 2.9.9
+
+-------------------------------------------------------------------
+Thu Feb 26 08:59:10 CET 2004 - jsuchome@suse.cz
+
+- removed testsound (it was too big)
+
+-------------------------------------------------------------------
 Mon Feb 23 11:29:41 CET 2004 - jsuchome@suse.cz
 
 - new card database for kernel 2.6 (tiwai@suse.de)

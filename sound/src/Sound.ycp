@@ -157,6 +157,7 @@
     global define boolean snd_prefix_used ();
     global define void LoadDatabase (boolean use_ui);
     global define list CreateModprobeCommands();
+    global define string ProbeOldChip (string chip);
 
     // ----------- rest of included files:
 
@@ -658,6 +659,7 @@ could make your system unstable.
 	if (interactive && detected_cards == [] && modules_conf == [])
 	    DetectOldCards();
 
+
 	if (interactive && PollAbort()) return false;
 	// read rc.config values
 	Progress::NextStage ();
@@ -876,6 +878,22 @@ could make your system unstable.
 	    card["module"]:"" != "snd-nm256"));
 
 	modules_conf = recalc_save_entries(unconfigured_cards);
+
+	// card of Thinkpad 600E must be configured manually
+	modules_conf = filter (map card, modules_conf, ``{
+	    boolean ok = true;
+	    foreach (map c, detected_cards, ``{
+		if (c["unique_key"]:"" == card["unique_key"]:"" &&
+		    c["sub_device_id"]:0 == 69648 &&
+		    c["sub_vendor_id"]:0 == 69652 &&
+		    card["module"]:"" != "snd-cs4236")
+		{
+		    ok = false;
+		}
+	    });
+	    return ok;
+	});
+
 	rc_vars = $[
 	    "LOAD_ALSA_SEQ": "yes"
 	];

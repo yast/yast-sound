@@ -76,7 +76,11 @@
 	string model	= Sound::save_entry["model"]:"";
 	map res	= quickConfig (model, "snd-card-0", Sound::card_id, has_joy);
 
-	return (symbol) (res["ui"]:nil);
+	symbol ui = res["ui"]:`back;
+	if (ui == `quick || ui == `normal)
+	    Thinkpad600E_cs4236_hack (0);
+
+	return ui;
     }
 
     /**
@@ -384,7 +388,6 @@ define symbol SoundSequence () ``{
 	    return `back;
 	}
     }
-
     string initial = "intro";
 
     // when running this module as non-root, go to complex-dialog
