@@ -32,7 +32,7 @@
     map STRINGS=STRINGS_();
 
     global define defWidget() ``{
-	return `Label("");
+	return `Label(UI(_("Possible value:\nnot known")));
     }
 
     global define gen_list(string tail, string default) ``{
