@@ -1,6 +1,6 @@
 [
     // id's for powermacs:
-    ["snd-pmac",	    "0x30401",	"0x30010"],
-    ["snd-pmac",	    "0x30401",	"0x30011"],
-    ["snd-pmac",	    "0x30401",	"0x30012"]
+    ["snd-powermac",	    "0x30401",	"0x30010"],
+    ["snd-powermac",	    "0x30401",	"0x30011"],
+    ["snd-powermac",	    "0x30401",	"0x30012"]
 ]
