@@ -488,12 +488,6 @@ could make your system unstable.
 	detected_cards = [];
 	unconfigured_cards = [];
 
-	// import values
-	if (lookup(settings, "modules_conf", nil) == nil)
-	{
-	    y2error("Import error: 'modules_conf' key is missing");
-	    return false;
-	}
 	Set(settings);
 
 	return true;
