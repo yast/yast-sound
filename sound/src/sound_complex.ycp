@@ -203,7 +203,23 @@
 		    }
 		}
 		integer card_id = UI(`QueryWidget (`id(`configured_table), `CurrentItem));
-		if (contains (SCR(`Read(.modules.alias)), sformat ("snd-card-%1", card_id))) 
+
+		string modname=lookup(select(save_info, card_id), "name", "");
+
+//		save_info=remove_module(save_info, modname);
+//		configured_unique=remove(configured_unique, card_id);
+  
+		list rem=get_indices_for_removal(save_info, modname);
+		save_info=remove_save_entries(save_info, rem);
+		configured_unique=remove_uniques(configured_unique, rem);
+
+		save_tmp_modules_conf(save_info);
+
+		SCR(`Execute (.target.bash, "/etc/init.d/alsasound stop ", $[]));
+		alsasound_start_tmp();
+		
+
+/*		if (contains (SCR(`Read(.modules.alias)), sformat ("snd-card-%1", card_id))) 
 		{
 		    // card in modules.conf
 		    string mod = SCR(`Read(.modules.alias, sformat ("snd-card-%1", card_id)));
@@ -231,14 +247,14 @@
 			SCR(`Execute(.target.modprobe, sformat ("-r %1", mod), ""));
 			to_delete = add (to_delete, mod);
 		    }
-		    configured_unique=remove(configured_unique, card_id);
 		}
 		else 
 		{
 		    // error popup message
 		    UI (`MessagePopup (_("Cannot delete this entry!")));
 		}
-
+*/
+		cards=order_cards_by_uniques(cards, configured_unique);
 		conf_cards = get_running_cards ();
 		cc = maplist (`e, conf_cards, 
 		    ``(`item(`id(lookup (e, "number", 0)), sformat ("   [%1]", lookup (e, "number", 0)), lookup (e, "line1")))); 
@@ -287,6 +303,10 @@
 		UI(`ChangeWidget(`id(`next), `Label, _("&Finish")));
 
 		UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
+		conf_cards = get_running_cards ();
+                cc = maplist (`e, conf_cards,
+                    ``(`item(`id(lookup (e, "number", 0)), sformat ("   [%1]", lookup (e, "number", 0)), lookup (e, "line1"))));
+		UI(`ChangeWidget (`id(`configured_table), `Items, cc));
 		UI(`ChangeWidget(`id(`configured_table), `CurrentItem, 0));
 	    }
 	    else if (ui == `b_fonts)
@@ -457,10 +477,7 @@
     list save_info = Args(1);
     list configured_unique = Args(2);
 
-//    BrowseTree(save_info);
-
     cards=order_cards_by_uniques(cards, configured_unique);
-    
 
     list to_delete = [];
     boolean config_mode = false;

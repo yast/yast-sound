@@ -22,6 +22,8 @@
     include "misc_defines.ycp";
     include "lan/lan_routines.ycp";
 
+    include "browser.ycp";
+
   /**
    * reads variables listed in 'vars' from rc.config
    * @return list
@@ -1207,7 +1209,7 @@
     global define get_tmp_modules_conf() ``{
 	string tmpdir=SCR (`Read (.target.tmpdir));
 	// TODO: move this file to yast tmp dir
-	return "/tmp/modules.conf.tmp";
+	return "/tmp/modules.conf";
     }
 
     /**
@@ -1221,9 +1223,24 @@
 	string cmd="depmod -C "+get_tmp_modules_conf();
 	SCR(`Execute(.target.bash, cmd, $[]));
 
-	string cmd=sformat("/bin/grep \"alias.*snd-card-[0-9]\" %1 | cut -f 3 | sort | uniq | while read A ;do modprobe -C %2 $A; done", get_tmp_modules_conf(), get_tmp_modules_conf());
-	SCR(`Execute(.target.bash, cmd, $[]));	
-	SCR(`Execute(.target.bash, "/usr/sbin/alsactl restore", $[]));
+	list als=SCR(`Read(.tmp.modules.alias));
+
+	
+	string modname="";
+	integer pos=0;
+	while(contains(als, sformat("snd-card-%1", pos)))
+	{
+	    modname=SCR(`Read(.tmp.modules.alias, sformat("snd-card-%1", pos)));
+	    cmd=sformat("/sbin/modprobe -C %1 %2", get_tmp_modules_conf(), modname);
+	    y2error("executing "+cmd);
+	    SCR(`Execute(.target.bash, cmd, $[]));
+	    pos=pos+1;
+	}
+
+
+//	string cmd=sformat("/bin/grep \"alias.*snd-card-[0-9]\" %1 | cut -f 3 | sort | uniq | while read A ;do modprobe -C %2 $A; done", get_tmp_modules_conf(), get_tmp_modules_conf());
+//	SCR(`Execute(.target.bash, cmd, $[]));	
+//	SCR(`Execute(.target.bash, "/usr/sbin/alsactl restore", $[]));
     }
  
     /** 
@@ -1444,6 +1461,105 @@
 	    string name2=mergestring(splitstring(hardware_name(select(s2, 0)), "\n"), " ");
 	    UI(`MessagePopup(sformat(lookup(STRINGS, "opl3sa_nm256_warn", ""), name1, name2)));
 	}
+    }
+
+    /**
+     * saves module entry to temporary modules conf.
+     *
+     */
+
+    global define save_single_tmp_modules_conf(string entry_name, map entry) ``{
+	 y2error("Saving entry "+entry_name);
+	 if (haskey (entry, "alias"))
+            {
+                SCR(`Write(.tmp.modules.alias, entry_name, lookup(entry, "alias")));
+                if (haskey (entry, "options"))
+                    {
+                        SCR(`Write(.tmp.modules.options, lookup(entry, "options"), entry_name));
+                    }
+            }
+    }
+
+    /**
+     * saves module entries to temporary modules conf.
+     *
+     */
+
+    global define save_tmp_modules_conf(list save_info) ``{
+	integer i=0;
+	list als=SCR(`Read(.tmp.modules.alias));
+	while(i<16)
+	{
+	    if(contains(als, sformat("snd-card-%1", i)))
+	    {
+		SCR(`Write(.tmp.modules.alias, nil, sformat("snd-card-%1", i)));
+	    }
+	    i=i+1;
+	}
+	maplist (`e, save_info, ``(save_single_tmp_modules_conf(lookup (e, "name", ""), lookup (e, "modules", $[]))));  
+	y2error("Saving...");
+	SCR(`Write(.tmp.modules, nil));
+    }
+    
+    /**
+     *	when user wants to delete a card, all cards using given module must be removed.
+     *  this function returns list of positions of cards using the module
+     *  @param	save_info 
+     *	@param	module_name
+     *  @return list of integers
+     */
+
+    global define get_indices_for_removal(list save_info, string mod_name)
+    ``{
+	list ret=[];
+	integer pos=0;
+	maplist(`e, save_info, 
+	``{  
+	    if(lookup(e, "name", "")==mod_name)
+	    {
+		ret=add(ret, pos);
+	    }
+	    pos=pos+1;
+	});
+	return ret;
+    }
+
+    /**
+     * removes entries from save_info listed by indices in id_list 
+     *
+     *
+     */
+
+    global define remove_save_entries(list save_info, list id_list)
+    ``{
+	id_list=sort(`x, `y, id_list, ``(x>=y));
+//	save_info=filter(`e, save_info, ``(lookup(e, "name", "")!=mod_name));
+
+	maplist(`e, id_list, ``{if(e<size(save_info)) save_info=remove(save_info, e); });
+
+	integer pos=0;
+	save_info=maplist(`e, save_info, 
+	``{
+	    map opts=lookup(lookup(e, "modules", $[]), "options", []);
+	    opts=add(opts, "snd_index", sformat("%1", pos));
+	    opts=add(opts, "snd_id", sformat("card%1", pos+1));
+	    e=add(e, "modules", $["alias": sformat("snd-card-%1", pos), "options": opts]);
+	    pos=pos+1;
+	    return e;
+	});
+	return save_info;
+    }
+
+    /**
+     * removes unique keys from key_list listed by position in id_list
+     *
+     */
+
+    global define remove_uniques(list key_list, list id_list) ``{
+	id_list=sort(`x, `y, id_list, ``(x>=y));
+	    y2error(sformat("%1", id_list));
+	maplist(`e, id_list, ``{if(e<size(id_list)) key_list=remove(key_list, e); });
+	return key_list;
     }
 
 }
