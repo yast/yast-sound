@@ -287,7 +287,7 @@ configure an other card than the one that is displayed on the right.</p>"));
 
 		if (id == size (dialog)) 
 		    success = lookup (result, "return", false);
-		else {
+		else if (act_dialog == ``(CallModule ("sound_options", [card]))) {
 
 		    // UI(`DebugDialog(maplist (`e, lookup (lookup (card, "module"), "params"), ``(lookup (e, "value", "none")))));
 		    card = lookup (result, "return");
@@ -377,7 +377,9 @@ configure an other card than the one that is displayed on the right.</p>"));
     // get all the apropriate information from the database
     sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
 
-    list|void already = SCR (`Read(.var.lib.yast.unique));
+    list|void already = nil;
+    if (SCR(`Read(.target.size, "/var/lib/YaST/unique.inf")) > 0)
+	already = SCR (`Read(.var.lib.yast.unique));
     if (!is(already, void)) {
 	already = maplist (`k, lookup (select (filter (`e, already, ``(lookup (e, "section") == "sound")), 0, $[]), "contents", []),
 			   ``(lookup (k, "unique")));
