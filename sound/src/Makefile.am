@@ -18,7 +18,8 @@ modules_DATA = 	\
 	sound_write.ycp		\
 	sound_complex.ycp	\
 	sound_options.ycp	\
-	sound_volume.ycp     	
+	sound_volume.ycp     	\
+	sound_summary.ycp
 
 menu_DATA = menuentry_sound.ycp
 

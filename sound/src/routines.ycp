@@ -460,7 +460,7 @@
 	    if (ret==nil) ret = [];
 	    return ret;
 	}
-	return [$["baseclass"    : "Multimedia controller", 
+	return [$[//"baseclass"  : "Multimedia controller", 
 		 "bus"           : "PCI", 
 		 "device"        : "ES1371 [AudioPCI-97]", 
 		 "device_id"     : 70513, 
@@ -471,11 +471,11 @@
 		 "sub_device_id" : 70513, 
 		 "sub_vendor"    : "Ensoniq", 
 		 "sub_vendor_id" : 70260, 
-		 "subclass"      : "Multimedia audio controller", 
+		 //"subclass"    : "Multimedia audio controller", 
 		 "vendor"        : "Ensoniq", 
 		 "vendor_id"     : 70260,
 		 "unique_key"    : "test.test"],
-	  $["baseclass"    : "Multimedia controller", 
+	  $[//"baseclass"  : "Multimedia controller", 
 	   "bus"           : "PCI", 
 	   "device"        : "ES1371 [AudioPCI-97]", 
 	   "device_id"     : 98309, 
@@ -486,7 +486,7 @@
 	   "sub_device_id" : 70513, 
 	   "sub_vendor"    : "Ensoniq", 
 	   "sub_vendor_id" : 70260, 
-	   "subclass"      : "Multimedia audio controller", 
+	   //"subclass"    : "Multimedia audio controller", 
 	   "vendor"        : "Ensoniq", 
 	   "vendor_id"     : 69832,
 	   "unique_key"    : "test2.test2"]];
@@ -537,7 +537,7 @@
 			 "module": mod, 
 			 "params": lookup(fmod, "params"),
 			 "libhd": [],
-			 "cards": [lookup(card, "subclass")]];
+			 "cards": ["Multimedia audio controller"]];
 	    }
 	}
 	
@@ -796,7 +796,7 @@
                   // more cards
             if (no_alsa)
             {
-                Shell(sformat("%1 %2 &", play_cmd, audio_file), $[]);
+                SCR(`Execute (.target.bash_background, sformat("%1 %2", play_cmd, audio_file)));
             }
             else
             {

@@ -2,7 +2,7 @@
 # Makefile.am for y2c_snd/doc
 #
 
-SUBDIRS = autodocs implementation
+SUBDIRS = autodocs # implementation
 
 docdir = @DOCDIR@
 htmldir = $(docdir)/y2c_snd
