@@ -41,7 +41,7 @@
 
 	term con = `VBox ();
 
-//	term con = `VBox (`VSquash(`Tree(`id(`tree), `opt(`hstretch), "Select", tree)));
+//	TERM Con = `VBox (`VSquash(`Tree(`id(`tree), `opt(`hstretch), "Select", tree)));
 
 	con = add (con, `VBox
 	    (

@@ -104,7 +104,7 @@
 	    }
 	    if(tmp==1)
 	    {
-		ouput=`next;
+		output=`next;
 	    }
 	    if(tmp==3)
 	    {
@@ -115,7 +115,6 @@
 		output=`quick;
 	    }
 	}
-	    y2error(sformat("================> %1", output));
 	return $["ui" : output];
     }
 

@@ -337,8 +337,8 @@
 	list obs=get_obsoletes();
 	integer i=size(obs)-1;
 
-	y2error(sformat("all keys: %1", keys));
-	y2error(sformat("keys for removal: %1", obs));
+//	y2error(sformat("all keys: %1", keys));
+//	y2error(sformat("keys for removal: %1", obs));
 	while(i>=0)
 	{
 	    keys=remove(keys, select(obs, i));
@@ -843,13 +843,13 @@
             {
 		SCR (`Execute (.target.bash, sformat("/sbin/insmod -C %1 %2 %3", dumbconf, module_name, module_options), $[]));
 //                SCR (`Execute (.target.insmod, module_name, module_options));
-		y2error(sformat("insmod  %1 %2", module_name, module_options));
+//		y2error(sformat("insmod  %1 %2", module_name, module_options));
             }
             else
             {
 		SCR(`Execute(.target.bash, sformat("/sbin/modprobe -C %1 %2 %3", dumbconf, module_name, module_options), $[]));
 //                SCR(`Execute (.target.modprobe, module_name, module_options));
-		y2error(sformat("modprobe -C %3 %1 %2", module_name, module_options, dumbconf));
+//		y2error(sformat("modprobe -C %3 %1 %2", module_name, module_options, dumbconf));
             }
         }
 

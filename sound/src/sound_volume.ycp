@@ -280,7 +280,7 @@ boolean need_restart=true;
 
     UI(`ChangeWidget (`id(`next), `Label, _("&Next")));
 
-    y2error("Leaving volume");
+    //y2error("Leaving volume");
 
     
     return $["ui" : ui, "return" : size (err_msg) == 0];

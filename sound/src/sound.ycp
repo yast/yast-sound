@@ -214,7 +214,7 @@
     {
 	// first remove alias
 	pth=sformat("snd-card-%1", obs_pos);
-	y2error("removing alias", pth);
+//	y2error("removing alias", pth);
 	SCR(`Write(.modules.alias, nil, pth));	
 //	pth=sformat(".modules.
     
@@ -246,7 +246,7 @@
   //  list already=read_unique_keys();
     list already=get_present_unique_keys();
     
-    y2error(sformat("alredy configured: %1", already));
+//    y2error(sformat("alredy configured: %1", already));
     configured_unique=already;
 	// filter out cards that had been already configured
     sound_cards = filter (`e, sound_cards, ``(!contains (already, lookup (e, "unique_key"))));
