@@ -103,8 +103,8 @@
      */
     global define get_module_names() ``{
 	list ret=[];
-	if(db==nil) return [];
-	foreach(`e, db, 
+	if(sound_db==nil) return [];
+	foreach(`e, sound_db, 
 	``{
 	    ret=add(ret, `item(`id(lookup(lookup(e, "module", $[]), "name", "")), lookup(e, "name", _("Unknown module name"))));
 	});
@@ -124,7 +124,7 @@
 	if(modname=="all")
 	{
 	    list cards=[];
-	    foreach(`e, db,
+	    foreach(`e, sound_db,
 	    ``{
 		cards=add(cards, lookup(e, "cards", []));
 	    });
@@ -133,7 +133,7 @@
 	    return sort(cards);
 	}
 
-	list mods=filter(`e, db, 
+	list mods=filter(`e, sound_db, 
 	``(lookup(lookup(e, "module", $[]), "name", "")==modname));
 	if(size(mods)==0)
 	{
@@ -148,7 +148,7 @@
      */
 
     global define get_module_by_cardname(string cardname) ``{
-	list mod=filter(`e, db,
+	list mod=filter(`e, sound_db,
 	``(contains(lookup(e, "cards"), cardname))
 	);
 	return lookup(lookup(select(mod, 0), "module", $[]), "name", "unknown");
@@ -162,7 +162,7 @@
 
     global define get_module_params(string modname) ``{
 	// database must be read some elsewhere
-	list mod=filter(`e, db, ``(lookup(lookup(e, "module", $[]), "name", "")==modname));
+	list mod=filter(`e, sound_db, ``(lookup(lookup(e, "module", $[]), "name", "")==modname));
 	if(size(mod)>0)
 	{
 	    return lookup(select(mod, 0), "params", []);
@@ -310,11 +310,11 @@
      */
 
     global define GetCardDatabase() ``{
-	any database=SCR(`Read (.target.yast2, "sndcards.ycp"));
 	textdomain "sound_db";
-	database = UI (database);
+	y2error("Reading card database");
+	sound_db=SCR(`Read (.target.yast2, "sndcards.ycp"));
 	textdomain "sound";
-	return database;
+//	return database;
     }
 
     /**
@@ -350,7 +350,7 @@
 
         if (tolower(module_name) == "all")
         {	// copy the whole database
-        maplist (`e, db,
+        maplist (`e, sound_db,
             ``{
                 if (size (lookup (e, "cards", [])) > 0) ret = add (ret, lookup (e, "cards"));
                 else ret = add (ret, [lookup (e, "name", "")]);
@@ -358,7 +358,7 @@
         }
         else
         {	// filter by name 
-            ret = maplist (`c, filter (`e, db, ``(lookup (e, "name", "") == module_name)), ``(lookup (c, "cards", [])));
+            ret = maplist (`c, filter (`e, sound_db, ``(lookup (e, "name", "") == module_name)), ``(lookup (c, "cards", [])));
             ret = filter (`e, ret, ``(size(e) > 0));
 
             if (size (ret) == 0)
@@ -561,7 +561,7 @@
      * @return map
      */
     global define get_module (map card) ``{
-	if (db == nil)
+	if (sound_db == nil)
 	{
 	    return $[];
 	}
@@ -589,13 +589,13 @@
 */	
 	if (tolower (bus) == "pci") 
 	{
-	    fc = filter (`d, db, 
+	    fc = filter (`d, sound_db, 
 			 ``(filter(`c, lookup (d, "libhd", []), ``((lookup (c, "vendor_id", 0) == vendor_id - offset) && 
 							       (contains(lookup(c, "device_id", 0), device_id - offset)))) != []));
 	}
 	else 
 	{
-	    fc = filter (`d, db, 
+	    fc = filter (`d, sound_db, 
 		   ``(filter(`c, lookup (d, "libhd", []), ``((lookup (c, "vendor_id", 0) == vendor_id - offset) &&
 							 (lookup (c, "device_id", 0) == device_id - offset))) != []));
 	}
@@ -613,7 +613,7 @@
      * @return any
      */
     global define SetVolume (string group, integer cardid, integer value) ``{
-	string p=sformat(".audio.alsa.%1.%2.volume", cardid, group);
+	string p=sformat(".audio.alsa.cards.%1.channels.%2.volume", cardid, group);
 
 	SCR(`Write(topath(p), value));
     }
@@ -634,13 +634,17 @@
     global define unmute(list devices, integer card_id) ``{
 	foreach(`dev, devices,
 	``{
-	    SCR(`Write(topath(sformat(".audio.alsa.%1.%2.mute", card_id, dev)), false));
+	    SCR(`Write(topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, dev)), false));
 	});
     }
 
     global define storeVolume(integer card_id) ``{
+	if(card_id==-1)
+	{
+	    SCR(`Execute(.audio.alsa.store, 0, 0));
+	}   
 	string p=sformat(".audio.alsa.cards.%1.store", cardid);
-	SCR(`Execute(topath(p)));
+	SCR(`Execute(topath(p), 0, 0));
     }
 
     /**
@@ -802,9 +806,10 @@ module parameters, including invalid IO or IRQ parameters.")), mod_name);
             return "";
         }
 
-        integer i = 1;
-        term format = ``(sformat (select(msg, 0)));
+//        term format = ``(sformat (select(msg, 0)));
+	term format=``(sformat());
 
+        integer i = 0;
         while (i < size (msg))
         {
             format = add (format, select (msg, i));
@@ -947,33 +952,10 @@ module parameters, including invalid IO or IRQ parameters.")), mod_name);
 
 	if(restore)
 	{
-	    SCR(`Execute(.audio.alsa.restore));
+	    SCR(`Execute(.audio.alsa.restore, 0, 0));
 	}
     }
 
-    /** 
-     * creates temporary modules.conf.
-     * it will be used for starting sound modules
-     *
-     */
-
-    global define CreateTmpModulesConf() ``{
-	string cmd="";
-
-
-	cmd="/bin/echo alias char-major-116 snd > "+get_tmp_modules_conf();
-	SCR(`Execute(.target.bash, cmd, $[]));
-	cmd="/bin/echo options snd snd_cards_limit=16 snd_major=116 >> "+get_tmp_modules_conf();
-	SCR(`Execute(.target.bash, cmd, $[]));
-	
-	cmd=sformat("/bin/grep \"^alias.snd-card-[0-9]*\" /etc/modules.conf >> %1", get_tmp_modules_conf());
-	SCR(`Execute(.target.bash, cmd, $[]));
-	
-	cmd=sformat("/bin/grep \"^options.snd-card-\" /etc/modules.conf >> %1", get_tmp_modules_conf());
-	SCR(`Execute(.target.bash, cmd, $[]));
-    }
-
-    
     /** 
      *	@return true if the fonts have already been installed
      *	

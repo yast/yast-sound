@@ -28,6 +28,7 @@
     include "sound/read_routines.ycp";
     include "sound/alsa_routines.ycp";
     include "sound/card_wizard.ycp";
+    include "sound/write_routines.ycp";
 
     include "browser.ycp";
 
@@ -88,7 +89,7 @@
 
     list save_info    = read_save_info ();
  
-    CreateTmpModulesConf();
+//    CreateTmpModulesConf();
  
     map rc_vars       = $[];
     integer card_id   = 0;
@@ -101,7 +102,7 @@
     list configured_unique = []; // list of unique keys, that was configured
 
     boolean exit = false;
-    list db = nil;
+    list sound_db = nil;
 
     if(!fileexist("/usr/lib/YaST2/sndcards.ycp"))
     {
@@ -111,10 +112,11 @@
     }
 
     sound_cards=filter_configured(save_info, sound_cards);
+
+    GetCardDatabase(); // loads the database to sound_db
     
     if(size(sound_cards)>0)
     {
-	db=GetCardDatabase();
 	// get all the apropriate information from the database
 	sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
 
@@ -132,7 +134,9 @@
 	UI(`CloseDialog ());
 	return;
     }
-
+    
+    SCR(`Execute(.target.bash, "rm /tmp/modules.conf; touch /tmp/modules.conf", $[]));
+    SaveModulesEntry(save_info, [], true);
 
     boolean skipped = false;
     if(all_cards_num == 1)

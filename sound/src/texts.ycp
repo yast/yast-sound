@@ -42,7 +42,7 @@
 
 
 	    "ComplexDialog":
-	    UI(_("<p>The complete sound cards list. Use the <b>Finish</b> button to save sound card information.</p><p>Use <b>Delete</b> button to remove configured sound card. <b>Add soundcard</b> button can be used for adding sound card.</p><p>Use the <b>start ALSA</b> check button to enable (resp. disable) ALSA start-up during boot time. Check the <b>start sequencer</b> if you want to load modules for playing MIDI files during boot-time (these modules can be loaded on demand).</p>")),
+	    UI(_("<p>The complete sound cards list. Use the <b>Finish</b> button to save sound card information.</p><p>Use <b>Delete</b> button to remove configured sound card. <b>Add sound card</b> button can be used for adding sound card.</p><p>Use the <b>start ALSA</b> check button to enable (resp. disable) ALSA start-up during boot time. Check the <b>start sequencer</b> if you want to load modules for playing MIDI files during boot-time (these modules can be loaded on demand).</p>")),
 
 	      // To translators: To reset the sound configuration these programs must be terminated
 	      // To translators: label message
@@ -51,7 +51,7 @@
 
 
 	    "OptionsDialog":
-	    UI(_("<p>Here, you can modify the options for the sound modules.\n If you are not <b>absolutely sure</b> what you are doing, please leave this dialog untouched. </p><p>Choose the option you want to set, use the <b>Set</b> button to enable new value. You can reset all values by pressing <b>Reset</b>. Numeric values can be entered as decimal or hexadecimal (hexadecimal with a <b>0x</b> prefix).</p>")),
+	    UI(_("<p>Here, you can modify the options for the sound modules.\n If you are not <b>absolutely sure</b> what you are doing, please leave this dialog untouched. </p><p>Choose the option you want to set, use the <b>Set</b> button to enable new value. If there are known possible values for given option, you can choose it in <B>Possible value</B> combo box .You can reset all values by pressing <b>Reset</b>. Numeric values can be entered as decimal or hexadecimal (hexadecimal with a <b>0x</b> prefix).</p>")),
 
 	    "VolumeDialog":
 	    UI(_("<p>Please adjust the volume.</p><p>You can test your sound card by pressing the <b>Test</b> button.</p><p>After the configuration is done you can use <b>amixer</b> (or any program of your choice) for adjusting the volume.</p><p><b>WARNING/SPECIAL NOTE:</b>Please start testing your sound card with <b>very</b> low volume settings to prevent an accident with too much loud noise.</p>")),
@@ -121,7 +121,7 @@
 	    UI(_("Would you like to change the CD and retry ?")),
 
 	    "opl3sa_nm256_warn":
-	    UI(_("'%1' and '%2' sound cards were autodetected on your system. For proper functionality, please skip the '%1' soundcard and configure only the '%2'.")),
+	    UI(_("'%1' and '%2' sound cards were autodetected on your system. For proper functionality, please skip the '%1' sound card and configure only the '%2'.")),
 
 	    "selectHardware":
 	    UI(_("<P>Hardware detection found new sound card. To configure it, select the appropraite 

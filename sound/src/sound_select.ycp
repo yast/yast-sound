@@ -40,19 +40,10 @@
     repeat
     {
 	ui=UI(`UserInput());
-/*	if(ui==`nh)
-	{
-	    UI(`ChangeWidget(`id(`action), `CurrentButton, `new));
-	}
-	else if(ui==`ch)
-	{
-	    UI(`ChangeWidget(`id(`action), `CurrentButton, `configured));
-	}
-	else if(ui==`abort && ReallyAbort())
-	{
+	if((ui==`abort || ui==`cancel) && ReallyAbort())
+        {
 	    return $["ui": `abort];
 	}
-*/
     } until(ui==`back || ui==`next ||  ui==`edit_button || ui==`configure_button);
 
     symbol type=nil;

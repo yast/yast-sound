@@ -72,10 +72,10 @@
 	integer i = 0;
 
 	list sound_cards  = get_audio ();
-	if(db==nil)
-	{
-	    db=GetCardDatabase();
-	}
+//	if(db==nil)
+//	{
+//	    db=GetCardDatabase();
+//	}
 
 
 	sound_cards = maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
@@ -225,8 +225,8 @@ Try to restart sound system?"))))
 		SCR(`Execute(.target.bash, "/etc/init.d/alsasound stop", $[]));
 		alsasound_start_tmp(true);
 
-		SCR(`Execute (.target.bash, "/etc/init.d/alsasound restart", $[]));
-		y2error("alsa restarted");
+//		SCR(`Execute (.target.bash, "/etc/init.d/alsasound restart", $[]));
+//		y2error("alsa restarted");
 	    }
 	}
 
@@ -260,7 +260,7 @@ Try to restart sound system?"))))
 
 	repeat 
 	{
-	    SCR(`Execute(.audio.alsa.restore));
+	    SCR(`Execute(.audio.alsa.restore, 0, 0));
 
 	    ui = UI (`UserInput ());
 	    if (ui == `b_delete && UI(`YesNoPopup(_("Really delete this entry?")))) 
@@ -380,10 +380,10 @@ Try to restart sound system?"))))
 	    
 		    if(size(cards)!=0)
 		    {
-			if(db==nil)
-			{
-			    db=GetCardDatabase();
-			}
+//			if(sound_db==nil)
+//			{
+//			    sound_db=GetCardDatabase();
+//			}
 
 			cards = maplist(`e, cards, ``(add (e, "module", get_module (e))));
 			cards = filter(`e, cards, ``(lookup(e, "module", $[])!=$[]));
@@ -478,7 +478,7 @@ Try to restart sound system?"))))
 // ===== MAIN =====
 
     // read the db if needed
-    list db=nil;
+  //  list db=nil;
 
     list save_info = Args(0);
     list configured_unique = Args(1);

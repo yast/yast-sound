@@ -194,7 +194,8 @@
      * @return map return struct: $["return": integer, "err_msg": string]
      */
     global define SaveVolume () ``{
-	SCR(`Execute(.target.bash, "/usr/sbin/alsactl store", $[]));
+	SCR(`Execute(.audio.alsa.store, 0, 0));
+//	SCR(`Execute(.target.bash, "/usr/sbin/alsactl store", $[]));
     }
 
     /**
