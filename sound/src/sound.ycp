@@ -103,6 +103,13 @@
     boolean exit = false;
     list db = nil;
 
+    if(!fileexist("/usr/lib/YaST2/sndcards.ycp")))
+    {
+	UI(`MessagePopup(UI(_("Sound card database not found. Please check your installation."))));
+	UI(`CloseDialog());
+	return;			
+    }
+
     sound_cards=filter_configured(save_info, sound_cards);
     
     if(size(sound_cards)>0)
