@@ -36,9 +36,9 @@
     // comment for JOYSTICK_MODULE section in sysconfig
     string module_comment = "";
 
-    global string generic_joystick = "Generic analog joystick";
+    global string generic_joystick = "Generic Analog Joystick";
     // database entry
-    global string generic_joystick_translated = _("Generic analog joystick");
+    global string generic_joystick_translated = _("Generic Analog Joystick");
 
     /**
      * Read all joystick settings from the SCR
@@ -52,7 +52,7 @@
 	// values for test mode
 	if (Mode::test == true)
 	{
-	    joystick = [$["GAMEPORT_MODULE":"ns558", "JOYSTICK_CONTROL":"Joystick", "JOYSTICK_CONTROL_PORT":"", "JOYSTICK_MODULE":"analog", "JOYSTICK_MODULE_OPTION":"", "model":"Generic analog joystick"], $["GAMEPORT_MODULE":"", "JOYSTICK_CONTROL":"", "JOYSTICK_CONTROL_PORT":"", "JOYSTICK_MODULE":"", "JOYSTICK_MODULE_OPTION":"", "model":""], $["GAMEPORT_MODULE":"", "JOYSTICK_CONTROL":"", "JOYSTICK_CONTROL_PORT":"", "JOYSTICK_MODULE":"", "JOYSTICK_MODULE_OPTION":"", "model":""], $["GAMEPORT_MODULE":"", "JOYSTICK_CONTROL":"", "JOYSTICK_CONTROL_PORT":"", "JOYSTICK_MODULE":"", "JOYSTICK_MODULE_OPTION":"", "model":""]];
+	    joystick = [$["GAMEPORT_MODULE":"ns558", "JOYSTICK_CONTROL":"Joystick", "JOYSTICK_CONTROL_PORT":"", "JOYSTICK_MODULE":"analog", "JOYSTICK_MODULE_OPTION":"", "model":"Generic Analog Joystick"], $["GAMEPORT_MODULE":"", "JOYSTICK_CONTROL":"", "JOYSTICK_CONTROL_PORT":"", "JOYSTICK_MODULE":"", "JOYSTICK_MODULE_OPTION":"", "model":""], $["GAMEPORT_MODULE":"", "JOYSTICK_CONTROL":"", "JOYSTICK_CONTROL_PORT":"", "JOYSTICK_MODULE":"", "JOYSTICK_MODULE_OPTION":"", "model":""], $["GAMEPORT_MODULE":"", "JOYSTICK_CONTROL":"", "JOYSTICK_CONTROL_PORT":"", "JOYSTICK_MODULE":"", "JOYSTICK_MODULE_OPTION":"", "model":""]];
 	    joystick_backup = joystick;
 
 	    return true;

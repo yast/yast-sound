@@ -142,11 +142,12 @@
 	string name = db_modules["snd-"+chip,"description"]:chip;
 
 	// yes/no popup text, %1 is chip name
-	if (Crash::AskRun(command, sformat (_("It is looks like probing the chip
+	if (Crash::AskRun(command, sformat (_("It looks like probing the chip
 %1
 failed last time.
 
-Probe the chip now?"), name)))
+Probe the chip now?
+"), name)))
 	{
 	    Crash::Run(command);
 	    map out = SCR::Execute(.target.bash_output, command);
@@ -198,14 +199,15 @@ Probe the chip now?"), name)))
 	    `VSpacing(0.5),
 	    // label
 	    `Label (`id(`l), _("No card was found.
-Do you want to let YaST look for presence of some old chips?
+Attempt to detect the presence some old chips?
 
 Warning: The probe procedure can take some time and
-could make your system unstable.")),
+could make your system unstable.
+")),
 	    `VSpacing(),
 	    `MultiSelectionBox(`id(`probelist),
 		// selection box label
-		_("&Select the drivers to probe"), probelist),
+		_("&Select the Drivers to Probe"), probelist),
 	    `HBox(
 		// button label
 		`PushButton(`id(`ok),`opt(`key_F10, `default),_("&Yes, Probe")),
@@ -253,7 +255,7 @@ could make your system unstable.")),
 		    list returned = splitstring (ret, "\n");
 		    y2milestone ("probed with alsaconf: %1", returned);
 		    // label (%1 is name of the chip)
-		    string default_name = sformat (_("Card with %1 chip"),
+		    string default_name = sformat (_("Card with %1 Chip"),
 			db_modules[chip, "description"]:chip);
 		    string model = returned[1]:default_name;
 		    if (model == "")
@@ -393,15 +395,15 @@ could make your system unstable.")),
     global define boolean Read (boolean interactive) ``{
 
 	// sound Read dialog caption:
-	string caption = _("Initializing sound configuration");
+	string caption = _("Initializing Sound Configuration");
 
 	integer steps = 5;
 
 	Progress::New( caption, " ", steps, [
 		// progress stage
-		_("Read cards database"),
+		_("Read card database"),
 		// progress stage
-		_("Read previous saved configuration"),
+		_("Read previously saved configuration"),
 		// progress stage
 		_("Detect sound cards"),
 		// progress stage
@@ -410,7 +412,7 @@ could make your system unstable.")),
 		_("Read volume settings"),
 	    ], [
 		// progress step label
-		_("Reading cards database..."),
+		_("Reading card database..."),
 		// progress step label
 		_("Reading previously saved configuration..."),
 		// progress step label
