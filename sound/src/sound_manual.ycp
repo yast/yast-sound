@@ -167,7 +167,10 @@
 	    
 	    if (ui == `sel_drv) {
 		string drv = UI (`QueryWidget (`id(`sel_drv), `CurrentItem));
-		card_names = get_cards (drv);
+		if (drv == UI(_("All")))
+		    card_names = get_cards ("all");
+		else
+		    card_names = get_cards (drv);
 
 		UI(`ReplaceWidget (`id(`rep_mod),
 				// To translators: selection box title
