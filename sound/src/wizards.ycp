@@ -346,8 +346,8 @@ define symbol SoundSequence () ``{
 
     Sound::use_ui = true;
 
-    Wizard::SetDesktopIcon("sound");
     Wizard::CreateDialog();
+    Wizard::SetDesktopIcon("sound");
 
     if (!Mode::config && !Sound::installation)
     {
