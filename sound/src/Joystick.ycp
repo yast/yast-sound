@@ -38,6 +38,9 @@
 
     list joystick_backup = [];
 
+    // comment for JOYSTICK_MODULE section in sysconfig
+    string module_comment = "";
+
     /**
      * Read all joystick settings from the SCR
      * @param abort A block that can be called by Read to find
@@ -63,7 +66,65 @@
 	    });
 
 	    // read model comment
-	    j = add(j, "model", SCR::Read(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%2.comment", pos))));
+	    string model = SCR::Read(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment", pos)));
+
+	    y2debug("Read comment: %1", model);
+
+	    // remove trailing newline character
+	    if (size(model) > 0 && substring(model, size(model) - 1, 1) == "\n")
+	    {
+		model = substring(model, 0, size(model) - 1);
+	    }
+
+
+	    // if comment has more lines get last line as model name
+	    list lines = splitstring(model, "\n");
+
+	    // select last line from comment
+	    if (size(lines) > 1)
+	    {
+		model = select(lines, size(lines) - 1, "");
+
+		// store global comment for joystick modules - it is before first module
+		if (pos == 0)
+		{
+		    lines = remove(lines, size(lines) - 1);
+		    module_comment = mergestring(lines, "\n");
+
+		    y2debug("global comment: %1", module_comment);
+		}
+	    }
+
+
+	    // set model
+	    if (SCR::Read(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1", pos))) == "" || model == nil)
+	    {
+		model = "";
+	    }
+	    else
+	    {
+
+		// remove comment char
+		if (substring(model, 0, 1) == "#")
+		{
+                    if (size(model) > 1)
+		    {
+			model = substring(model, 1);
+		    }
+		    else
+		    {
+			model = "";
+		    }
+		}
+
+		// remove new line char
+		if (size(model) > 1 && substring(model, size(model) - 1, 1) == "\n")
+		{
+		    model = substring(model, 0, size(model) - 1);
+		}
+	    }
+
+	    j = add(j, "model", model);
 
 	    joystick = add(joystick, j);
 
@@ -99,34 +160,62 @@
 	    // first remove old settings
 	    maplist(`e, vars, ``(SCR::Write(topath(sformat(".sysconfig.joystick.%1_%2", e, pos)), "")));
 
+	    // delete old model
+	    SCR::Write(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment", pos)), "");
+
 	    j = select(joystick, pos, $[]);
 
 	    foreach(`v, vars, ``{
 		SCR::Write(topath(sformat(".sysconfig.joystick.%1_%2", v, pos)), lookup(j, v, ""));
+
 		if (lookup(j, v, "") != "")
                 {
-			// if there is variable with value != "" enable joystick service
-                        start = "enable";
+		    // if there is variable with value != "" enable joystick service
+		    start = "enable";
                 }
 
-		// write model comment
-		string model = lookup(j, "model", nil);
+	    });
 
-		if (model != nil)
+
+	    // write model comment
+	    string model = lookup(j, "model", nil);
+
+	    // add comment before first model
+	    if (pos == 0)
+	    {
+		if (size(model) > 0)
 		{
-		    SCR::Write(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment", pos)), "#" + model + "\n");
+		    model = module_comment + "\n#" + model + "\n";
 		}
 		else
 		{
-		    // delete old model
-		    SCR::Write(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment", pos)), nil);
+		    model = module_comment + "\n#\n";
 		}
-	    });
+	    }
+	    else
+	    {
+		if (size(model) > 0)
+		{
+		    model = "#" + model + "\n";
+		}
+	    }
+
+	    y2milestone("Model: %1", model);
+
+	    if (size(model) > 0)
+	    {
+		SCR::Write(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment", pos)), model);
+	    }
+
+
 	    pos = pos + 1;
 	}
 
 	// flush config to file
 	SCR::Write(.sysconfig.joystick, nil);
+
+	// restart joystick service
+	SCR::Execute(.target.bash, "/etc/init.d/joystick restart", $[]);
 
 	// enable/disable service
         Runlevel::ServiceAdjust("joystick", start);
