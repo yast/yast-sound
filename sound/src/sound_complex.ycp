@@ -1,5 +1,7 @@
 {
 
+textdomain "sound";
+
 include "misc_defines.ycp";
 include "sound/sound_routines.ycp";
 include "lan_routines.ycp";
@@ -11,7 +13,6 @@ define get_not_yet () ``{
     list all = get_audio (test_mode, config_mode);
     list not_yet = get_unique_not (all, ["configured"], "sound", false);
 
-    
     return not_yet;
 
 }
@@ -23,6 +24,13 @@ define get_running_cards () ``{
     return [];
 }
 
+/*
+ * reads variables from rc.config
+ */
+define read_rc_vars (list vars) ``{
+    
+    return listmap (`k, vars, ``([k, SCR(`Read(topath(sformat (".rc.system.%1", k))))]));
+}
 
 /*
  * marks cards in save_info to "off"
@@ -46,26 +54,102 @@ define mark_off (list to_delete) ``{
 
 }
 
+/*
+ * just decides which way to go
+ * manual or autodetected
+ */
+define WhichDialog () ``{
+
+    // help text 1/3
+    string helptext = UI (_("<p>Please select what kind of card you want to configure.</p>"));
+    // help text 2/3
+    helptext = helptext + UI (_("<p>If the list contains <b>autodetected</b> (and not yet configured) cards, select one and go ahead. "));
+    // help text 3/3
+    helptext = helptext + UI (_("Otherwise use <b>manual selection</b>.</p>"));
+
+    list nc = [];
+    integer i = 0;
+
+    list not_yet = get_not_yet ();
+
+    maplist (`e, not_yet, ``{
+	nc = add (nc, `item(`id(i), mergestring(splitstring(hardware_name (e), "\n"), " ")));
+  	i = i + 1;
+    });
+    
+
+    term con = `HSquash(
+	`Frame(`id(`frame), _("Select"), 
+	       `HBox (`HSpacing (1), `VBox (
+		   `RadioButtonGroup (`id(`rg), `VBox (
+		       `VSpacing (1),
+		       `Left(`VBox(
+			   `Left(`RadioButton(`id(`auto), `opt (`notify), _("&Autodetected"), (size (nc) > 0))),
+			   `VSquash(`SelectionBox(`id(`sel), _("List of autodetected"), nc))
+			   )),
+		       `VSpacing (1),
+		       `Left(`RadioButton (`id(`manual), `opt(`notify), _("&Manual selection"), (size (nc) == 0))),
+		       `VSpacing (1)
+		       ))),
+		      `HSpacing (1))));
+
+
+
+
+    UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
+    UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
+
+    if (size (nc) == 0) {
+	UI(`ChangeWidget (`id(`sel), `Enabled, false));
+	UI(`ChangeWidget (`id(`auto), `Enabled, false));
+    }
+    else
+	UI(`ChangeWidget(`id(`sel), `CurrentItem, 0));
+
+    any ui = nil;
+
+
+    repeat {
+	
+	ui = UI(`UserInput ());
+	
+	if (ui == `manual)
+	    UI(`ChangeWidget (`id(`sel), `Enabled, false));
+	else if (ui == `auto)
+	    UI(`ChangeWidget (`id(`sel), `Enabled, true));
+	
+	
+
+
+    } until ((((ui == `back) || (ui == `next) || ui == `cancel))); 
+
+
+    return $["ui" : ui,
+	    "way" : UI(`QueryWidget (`id(`rg), `CurrentButton)),
+	    "id"  : UI(`QueryWidget(`id(`sel), `CurrentItem))];
+
+}
+
+
 
 define ComplexDialog () ``{
     
-    // help text 1/3
-    string helptext = UI(_("<p>The complete sound cards list. Use the <i>Finish</i> button \
+    // help text 1/4
+    string helptext = UI(_("<p>The complete sound cards list. Use the <b>Finish</b> button \
 to save sound card information.</p>"));
-    // help text 2/3
-    helptext = helptext + UI(_("<p>Use <i>Delete</i> button to remove configured sound card. \
-<i>Manual</i> button can be used for adding sound card that was not autodetected.</p>"));
 
+    // help text 2/4
+    helptext = helptext + UI(_("<p>Use <b>Delete</b> button to remove configured sound card. \
+<b>Configure</b> button can be used for adding sound card.</p>"));
+
+    // help text 3/4
+    helptext = helptext + UI(_("<p>Use the <b>start ALSA</b> check button to enable (resp. disable) \
+ALSA start-up during boot time. Check the <b>start sequencer</b> if you want to load modules \
+for playing MIDI files during boot-time (these modules can be loaded on demand).</p>"));
     
 
     list conf_cards = get_running_cards ();
     list cc = maplist (`e, conf_cards, ``(`item(`id(lookup (e, "number", 0)), sformat ("   [%1]", lookup (e, "number", 0)), lookup (e, "line1")))); 
-    list nc = [];
-    integer i = 0;
-    maplist (`e, get_not_yet (), ``{
-	nc = add (nc, `item(`id(i), mergestring(splitstring(hardware_name (e), "\n"), " ")));
-	i = i + 1;
-    });
     
     term con = `VBox (
 	`Table (`id(`configured_table), `opt (`notify, `immediate), 
@@ -73,19 +157,13 @@ to save sound card information.</p>"));
 	`PushButton(`id(`b_delete), _("Delete"))
 	);
 
-    term config_buttons = `HBox (`PushButton(`id(`b_manual), _("Manual")));
+    term config_buttons = `VBox (`PushButton(`id(`b_conf2), _("Configure")));
 
-    if (size (nc) > 0) {
-	helptext = helptext + UI(_("<p>You can choose autodeted sound card from the list \
-and using <i>Configue</i> button configure this card</p>"));
+    term alsa_buttons   = `VBox (`Left(`CheckBox(`id(`b_alsa), `opt(`notify), _("Start ALSA"), (lookup (rc_vars, "START_ALSA", "no") == "yes"))),
+				 `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("Start sequencer"), (lookup (rc_vars, "START_ALSA_SEQ", "no") == "yes"))));
 
-	config_buttons = add (config_buttons, `PushButton(`id(`b_conf), _("Configure")));
-	con = add (con, `SelectionBox (`id(`not_configured), `opt(`notify), _("Not configured yet"), nc));
-	con = add (con, add (`VCenter (), config_buttons));
-    }
-    else {
-	con = add (con, config_buttons);
-    }
+    con = add (con, `HBox(`HStretch (), config_buttons, alsa_buttons));
+
 
     UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
     UI(`ChangeWidget(`id(`next), `Label, _("&Finish")));
@@ -96,6 +174,10 @@ and using <i>Configue</i> button configure this card</p>"));
     }
     else 
 	UI(`ChangeWidget(`id(`configured_table), `CurrentItem, 0));
+
+    if (lookup (rc_vars, "START_ALSA") != "yes")
+	UI(`ChangeWidget(`id(`b_seq), `Enabled, false));
+
 
     repeat {
 	
@@ -159,36 +241,77 @@ and using <i>Configue</i> button configure this card</p>"));
 		UI(`ChangeWidget(`id(`configured_table), `CurrentItem, 0));
 	    
 	}
-	else if (ui == `b_manual) {
-	    list dialog = [``CallModule ("sound_manual", [])];
-	    map result  = $[];
-	    integer id  = 0;
-	    any ui      = nil;
+	else if (ui == `b_alsa) {
+	    string value = condition(UI(`QueryWidget(`id(`b_alsa), `Value)), "yes", "no");
+	    rc_vars = add(rc_vars, "START_ALSA", value);
+	    UI (`ChangeWidget(`id(`b_seq), `Enabled, value == "yes"));
 
-	    while ((id >= 0) && (id < size (dialog))) {
-		
-		result = eval (select (dialog, id));
-		ui     = lookup (result, "ui", `cancel);
+	}
+	else if (ui == `b_seq) {
+	    string value = condition(UI(`QueryWidget(`id(`b_seq), `Value)), "yes", "no");
+	    rc_vars = add(rc_vars, "START_ALSA_SEQ", value);
+	}
+	else if (ui == `b_conf2) {
 
-		if (ui == `back) {
-		    dialog = filter (`e, dialog, ``(e == ``CallModule ("sound_manual", [])));
-		    id = id - 1;
-		}
-		else if ((ui == `cancel) || (ui == `skip))
-		    break;
-		else if (ui == `next) {
+	    repeat {
 
-		    if (id == 0)
-			dialog = add (dialog, ``OneCardWizard (lookup (result, "return"), size (save_info), ui));
-		    if (id == 1) {
+		map result = WhichDialog ();
+
+		ui = lookup (result, "ui", `cancel);
+
+		if (ui == `next) {
+		    if (lookup (result, "way") == `auto) {
+
+			integer i = lookup (result, "id");
+			map card = select (get_not_yet (), i, $[]);
+		    
+			if (size (card) > 0) {
+			    map result = OneCardWizard (card, size (save_info), ui);
+			    any ui     = lookup (result, "ui", `cancel); 
+			    if (ui == `next)
+				save_info = add (save_info, lookup (result, "return"));
+			}
 			
-			save_info = add (save_info, lookup (result, "return"));
-			
+			if (ui == `back) ui = nil;
 		    }
-		    id = id + 1;
-		}
-	    }
+		    else if (lookup (result, "way") == `manual) {
 
+			list dialog = [``CallModule ("sound_manual", [])];
+			integer id      = 0;
+
+			while ((id >= 0) && (id < size (dialog))) {
+		
+			    result = eval (select (dialog, id));
+			    ui     = lookup (result, "ui", `cancel);
+
+			    if (ui == `back) {
+				dialog = filter (`e, dialog, ``(e == ``CallModule ("sound_manual", [])));
+				id = id - 1;
+			    }
+			    else if ((ui == `cancel) || (ui == `skip))
+				break;
+			    else if (ui == `next) {
+
+				if (id == 0)
+				    dialog = add (dialog, ``OneCardWizard (lookup (result, "return"), size (save_info), ui));
+				if (id == 1) {
+			
+				    save_info = add (save_info, lookup (result, "return"));
+			
+				}
+				id = id + 1;
+			    }
+			}
+
+			if (ui == `back) ui = nil;
+		    }
+		}
+		else if (ui == `cancel)
+		    break;
+
+	    } until ((((ui == `back) || (ui == `next) || ui == `cancel)));
+	    
+	    ui = nil;
 
 	    conf_cards = get_running_cards ();
 	    cc = maplist (`e, conf_cards, ``(`item(`id(lookup (e, "number", 0)), sformat ("   [%1]", lookup (e, "number", 0)), lookup (e, "line1")))); 
@@ -202,18 +325,9 @@ and using <i>Configue</i> button configure this card</p>"));
 	    }
 	    else
 		UI(`ChangeWidget(`id(`configured_table), `CurrentItem, 0));
-	}
-	else if (ui == `b_conf) {
-	    integer i = UI(`QueryWidget(`id(`not_configured), `Value));
-	    map card = select (get_not_yet (), i, $[]);
 	    
-	    if (size (card) > 0) {
-		map result = OneCardWizard (card, size (save_info), ui);
-		any ui     = lookup (result, "ui", `cancel); 
-		if (ui == `next)
-		    save_info = add (save_info, lookup (result, "return"));
-	    }
 	}
+	
 	
     } until (((ui == `back) || (ui == `next) || ui == `cancel));
     
@@ -222,8 +336,9 @@ and using <i>Configue</i> button configure this card</p>"));
     if (size (to_delete) > 0)
 	save_info = mark_off (to_delete);
 
-    return $["ui" : ui,
-	    "save_info" : save_info];
+    return $["ui"       : ui,
+	    "save_info" : save_info,
+	    "rc"        : rc_vars];
 }
 
 // ===== MAIN =====
@@ -232,8 +347,18 @@ list cards     = Args(0);
 list save_info = Args(1);
 list to_delete = [];
 
+map rc_vars = read_rc_vars (["START_ALSA", "START_ALSA_SEQ"]);
+
+
+if (size(lookup (rc_vars, "START_ALSA")) == 0)
+    rc_vars = add (rc_vars, "START_ALSA", "yes");
+
+if (size (lookup (rc_vars, "START_ALSA_SEQ")) == 0)
+    rc_vars = add (rc_vars, "START_ALSA_SEQ", "yes");
+
 return ComplexDialog ();
 
 
 }
+
 

@@ -13,6 +13,8 @@
 
 {
 
+    textdomain "sound";
+	
     include "misc_defines.ycp";
     include "sound/sound_routines.ycp";
 

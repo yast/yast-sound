@@ -19,6 +19,8 @@
 
 {
 
+    textdomain "sound";
+
     include "misc_defines.ycp";
     include "sound/sound_routines.ycp";
 
@@ -265,6 +267,7 @@
 
     list sound_cards  = get_audio (test_mode, config_mode);
     list save_info    = read_save_info ();
+    map rc_vars       = $[];
     integer card_id   = 0;
     integer n_cards   = 0;
     map result        = $[];
@@ -324,6 +327,7 @@
 	    cont = !(UI (`YesOrNo (_("Sound volume and the configuration\nfor the sound card will be saved now."), _("&Yes"), _("&No"))));
 	    
 	    save_info = lookup (result, "save_info");
+	    rc_vars   = lookup (result, "rc", $[]);
 	}
 	else if (ui == `back) card_id = card_id - 1;
     
@@ -348,7 +352,8 @@
 								       "snd_major"        : "116"]]]);
 
 	    save_map = add (save_map, "cards",  save_info);
-	    save_map = add (save_map, "system", $["modules" : alsa_oss (n_cards)]);
+	    save_map = add (save_map, "system", $["modules" : alsa_oss (n_cards),
+						 "rc"       : rc_vars]);
 	    save_map = add (save_map, "other",  ``AlsaFinish ());
 	
 
@@ -368,10 +373,13 @@
 	
     }    
     
-    if (ui == `next)
+    if (ui == `next) {
 	// always save unique keys 
 	save_unique_keys (sound_cards);
 
+	if (lookup (rc_vars, "START_ALSA") == "no")
+	    SCR(`Execute (.bin.bash, "/sbin/init.d/alsasound stop", $[]));
+    }
 
 
     UI(`CloseDialog ());

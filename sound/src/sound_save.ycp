@@ -28,19 +28,23 @@
  *                                                                     (must include $CHANNEL and $VOLUME substrings, i.e:
  *                                                                      "/usr/bin/amixer set \"$CHANNEL\" $VOLUME% unmute")
  *                                                      // "store" ... function to call to store the info.
+ *                                   "rc"      : <map>  // map with rc.config entries (i.e. START_ALSA, START_ALSA_SEQ entry etc ...)
  *                 
  *
  *        2nd ... boolean - testmode
  *
  * Steps:
  *        1. save '/etc/modules/conf'
- *        2. save volume
- *        3. call function to provide some additional work
+ *        2. save '/etc/rc.config'
+ *        3. save volume
+ *        4. call function to provide some additional work
  *
  * Return boolean true on success, false if failed
  */
 
 {
+
+    textdomain "sound";
 
     /*
      * Saves one '/etc/modules.conf' entry
@@ -129,6 +133,16 @@
 	EnableJoystick ();
     }
 
+
+    define SaveRCValues (map rc) ``{
+	
+	if (contains (maplist (`k, `v, rc, ``(SCR(`Write(topath(sformat(".rc.system.%1", k)), v)))), false) ||
+	    !SCR(`Write(.rc.system, nil)))
+	    err_msg = err_msg + UI (sformat (_("Error while saving file: %1 \n"), "/etc/rc.config"));
+
+    }
+
+
     // ==== MAIN ====
 
     boolean test_mode = false;
@@ -151,12 +165,16 @@
     string mixer_command = lookup (lookup (lookup (sound_info, "system", $[]), "volume", $[]), "mixer", "");
     string function      = lookup (lookup (lookup (sound_info, "system", $[]), "volume", $[]), "store", "");
 
-    // Step TWO: save volume
+    // Step TWO: save '/etc.rc.config'
+    if (!test_mode && size(lookup(lookup (sound_info, "system", $[]), "rc", $[])) > 0)
+	SaveRCValues (lookup(lookup (sound_info, "system", $[]), "rc", $[]));
+
+    // Step THREE: save volume
     if (!test_mode && (size (function) > 0) && (size (mixer_command) > 0))
 	SaveVolume (function, mixer_command, lookup (sound_info, "cards", []));
 
 
-    // Step THREE: call "other" function to handle some additional workaround
+    // Step FOUR: call "other" function to handle some additional workaround
     if (!test_mode)
 	eval (lookup (sound_info, "other"));
 
