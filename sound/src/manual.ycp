@@ -41,37 +41,40 @@
 	list card_names	    = get_card_names(initial);
 	term con	    = `VBox ();
 
-//	module_names = prepend(module_names, `item(`id("all"), _("All")));
-
-	con = add (con, `VBox
-	    (
-		`HBox
-		(
-		    `ReplacePoint (`id (`rep_drv),
-			    // To translators: selection box title
-			       `SelectionBox (`id (`sel_drv), `opt(`notify), _("Sound card &driver"), module_names)
-		    ),
-		    `ReplacePoint(`id(`rep_mod),
-			    // To translators: selection box title
-			      `SelectionBox (`id (`sel_mod), `opt(`notify), _("Sound card &model"), card_names)
+	con = add (con, `VBox (
+	    `HBox (
+		`ReplacePoint (`id (`rep_drv),
+		    `SelectionBox (`id (`sel_drv), `opt(`notify),
+		    // selection box title
+		    _("Sound card &driver"), module_names)
+		),
+		`ReplacePoint(`id(`rep_mod),
+		    `SelectionBox (`id (`sel_mod), `opt(`notify),
+		    // selection box title
+		    _("Sound card &model"), card_names)
 		    )
 		),
 		`VSpacing (),
-			    // textetry label
+		// textetry label
 		`TextEntry (`id(`search), `opt(`notify), _("&Search")),
 		`VSpacing ()
-	    ));
-			    // To translators: text entry label
+	));
 
-	    // dialog title
-	Wizard::SetContents (_("Manual sound card selection"), con, helptext, true, true);
-	UI::ChangeWidget(`id(`sel_drv), `CurrentItem, select(select (module_names, 0, []), 1, "")); //!!!
-	UI::ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0, ""));
-	    // Next - button label
-	UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
+	// dialog title
+	Wizard::SetContentsButtons (_("Manual sound card selection"), con,
+	    helptext, Label::BackButton(), Label::NextButton());
 
+	// set current item here
+	if (Sound::curr_driver == "")
+	    Sound::curr_driver = select(module_names[0]:[], 1, "");
+	if (Sound::curr_model == "")
+	    Sound::curr_model = card_names[0]:"";
+
+	UI::ChangeWidget(`id(`sel_drv), `CurrentItem, Sound::curr_driver);
+	UI::ChangeWidget(`id(`sel_mod), `CurrentItem, Sound::curr_model);
+
+	UI::SetFocus (`id(`sel_drv));
 	symbol ui = nil;
-
 	do
 	{
 	    ui = UI::UserInput ();
@@ -81,26 +84,34 @@
 		string drv = UI::QueryWidget (`id(`sel_drv), `CurrentItem);
 		card_names = get_card_names (drv);
 
-		UI::ReplaceWidget (`id(`rep_mod),
-				// To translators: selection box title
-		    `SelectionBox (`id (`sel_mod), _("Sound card &model"), card_names));
+		UI::ReplaceWidget (`id(`rep_mod), `SelectionBox (`id (`sel_mod),
+		    // To translators: selection box title
+		    _("Sound card &model"), card_names));
 
-		UI::ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0, ""));
+		if (contains (card_names, Sound::curr_model))
+		    UI::ChangeWidget(`id(`sel_mod), `CurrentItem,
+			Sound::curr_model);
+		else
+		    UI::ChangeWidget(`id(`sel_mod), `CurrentItem,
+			card_names[0]:"");
 	    }
 	    else if (ui == `search)
 	    {
 		string entry = UI::QueryWidget (`id(`search), `Value);
 		integer card_id = search_card_id (entry);
 		card_names = get_card_names ("all");
-		// always "all" field
-		UI::ChangeWidget(`id(`sel_drv), `CurrentItem, select (module_names, 0, ""));
+		// always "all" field in drivers list
+		UI::ChangeWidget(`id(`sel_drv),`CurrentItem,
+		    select(module_names[0]:[], 1, ""));
 		if (card_id >= 0)
 		{
 		    UI::ReplaceWidget (`id(`rep_mod),
-				// To translators: selection box title
-				       `SelectionBox (`id (`sel_mod), _("Sound card &model"), card_names));
+			// To translators: selection box title
+			`SelectionBox (`id (`sel_mod), _("Sound card &model"),
+			    card_names));
 
-		    UI::ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, card_id, ""));
+		    UI::ChangeWidget(`id(`sel_mod), `CurrentItem,
+			card_names[card_id]:"");
 		}
 	    }
 	    else if (ui == `abort || ui == `cancel)
@@ -114,7 +125,6 @@
 
 	} while (!contains([`next, `back], ui));
 
-
 	map ret = $["ui" : ui];
 
 	string model   = UI::QueryWidget (`id(`sel_mod), `CurrentItem);
@@ -122,6 +132,9 @@
 
 	if (ui == `next)
 	{
+	    Sound::curr_driver = modname;
+	    Sound::curr_model = model;
+
 	    if (modname == "all")
 	    {
 		modname = get_module_by_cardname(model);

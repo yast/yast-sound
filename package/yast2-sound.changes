@@ -1,4 +1,15 @@
 -------------------------------------------------------------------
+Wed Aug  6 16:30:54 CEST 2003 - jsuchome@suse.de
+
+- remebered cards table focus (bug #28058)
+
+-------------------------------------------------------------------
+Mon Aug  4 17:01:08 CEST 2003 - jsuchome@suse.de
+
+- fixed testsuite, added hwinfo to needforbuild
+- fixed typo in Makefile
+
+-------------------------------------------------------------------
 Mon Aug  4 10:56:03 CEST 2003 - jsuchome@suse.de
 
 - updated sound card database (takashi@suse.de)

@@ -36,7 +36,7 @@ config_DATA = \
 	joystick.y2cc
 
 desktop_DATA = \
-	sound.desktop
+	sound.desktop	\
 	joystick.desktop
 
 module_DATA = Sound.ycp	\

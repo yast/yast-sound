@@ -295,7 +295,6 @@
      * @return Summary of the configuration.
      */
     global define string Summary () ``{
-	// TODO FIXME: your code here...
 	return _("Summary of the joystick configuration...");
     }
 
