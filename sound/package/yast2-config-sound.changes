@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue May  7 09:32:13 CEST 2002 - lslezak@suse.cz
+
+- menu entries moved to config dir
+- version 2.6.4
+
+-------------------------------------------------------------------
 Mon Apr 29 11:44:00 CEST 2002 - lslezak@suse.cz
 
 - allow joystick configuration even in quick mode
