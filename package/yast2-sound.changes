@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Oct 24 15:36:21 CEST 2003 - jsuchome@suse.cz
+
+- initial support for two types of module parameters naming (#32632)
+- fix: reseting values of parameters to defaults
+- fix: check the possible values of parameters
+- 2.9.2
+
+-------------------------------------------------------------------
 Tue Oct 21 11:27:43 CEST 2003 - jsuchome@suse.cz
 
 - dialog with sound cards has list of vendors now (#11024)

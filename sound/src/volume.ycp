@@ -260,7 +260,7 @@ its parameters using the 'Advanced setup'.");
 	if (!Mode::config)
 	{
 	    sound_stop();
-	    sound_start_tmp(true/*, size(new_save)*/);
+	    sound_start_tmp(true);
 	    err_msg = check_module(save_entry, card_id);
 	}
     }

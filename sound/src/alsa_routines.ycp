@@ -27,6 +27,43 @@
     global list all_card_names = [];
 
     /**
+     * Is "snd_" prefix used for sound module parameter names?
+     * Variable must be nil for first, will be initialized when needed
+     */
+    global boolean use_snd_prefix = nil;
+
+    /**
+     * Checks (via 'modinfo snd') if "snd_" prefix is used for module parameters
+     * @return true/false
+     */
+    global define boolean snd_prefix_used () ``{
+
+	if (use_snd_prefix == nil)
+	{
+	    use_snd_prefix = false; // default for new kernels
+	    map modinfo = SCR::Read (.modinfo.kernel.kernel.sound.core.snd);
+
+	    foreach (string key, string desc, modinfo, ``{
+		// check only parameters, ignore other keys returned by modinfo
+		if (key != "module_author" && key != "module_description" &&
+		    key != "module_filename" && substring (key, 0, 4) == "snd_")
+		    use_snd_prefix = true;
+	    });
+	}
+	return use_snd_prefix;
+    }
+
+    /**
+     * Returns current prefix of module parameters
+     * @return "snd_" or empty string
+     */
+    global define string snd_prefix () ``{
+
+	return snd_prefix_used () ? "snd_" : "";
+    }
+
+
+    /**
      * sets volume in percents (0..100) for given card and card_id
      * @param group channel
      * @param cardid card id
@@ -85,7 +122,9 @@
      */
 
     global define void sound_start_tmp(boolean restore) ``{
-	string snd = sformat("/sbin/modprobe snd snd_cards_limit=%1 snd_major=116", size(Sound::modules_conf));
+
+	string snd = sformat ("/sbin/modprobe snd %1cards_limit=%2 %1major=116",
+	    snd_prefix (), size(Sound::modules_conf));
 
 	// get the list of commands needed for start
 	list cmds = Sound::CreateModprobeCommands();
@@ -178,8 +217,19 @@
 
     global define map get_module_params(string modname) ``{
 	Sound::LoadDatabase();
-	map mod = lookup(Sound::db_modules, modname, $[]);
-	return lookup(mod, "params", $[]);
+	map params = Sound::db_modules[modname, "params"]:$[];
+	boolean prefix_used = snd_prefix_used();
+
+	// change the names of parameters if necessary
+	// TODO: should be done during initial read?
+	params = mapmap (string parname, map parsettings, params, ``{
+	    if (substring (parname, 0, 4) == "snd_" && !prefix_used)
+		parname = substring (parname, 4);
+	    else if (prefix_used && substring (parname, 0, 4) != "snd_")
+		parname = sformat ("snd_%1", parname);
+	    return [ parname, parsettings ];
+	});
+	return params;
     }
 
 
@@ -313,11 +363,10 @@
      *  @return map modified save_entry
      */
     global define map add_common_options(map entry, integer card_id) ``{
-	map opts = lookup(entry, "options", $[]);
-	opts = add(opts, "snd_index", sformat("%1", card_id));
-//        opts = add(opts, "snd_id", sformat("card%1", card_id+1));
+	map opts = entry["options"]:$[];
 
-	opts = add(opts, "snd_enable", "1");
+	opts = add (opts, snd_prefix() + "index", sformat ("%1",card_id));
+	opts = add (opts, snd_prefix() + "enable", "1");
 
 	entry = add(entry, "options", opts);
 	return entry;

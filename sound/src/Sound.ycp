@@ -643,10 +643,8 @@ could make your system unstable.
     global define map CollectOptions(string modname) ``{
 	// first filter out entries with other module
 	list mod_entries = filter(`e, modules_conf, ``(lookup(e, "module", "off") == modname));
-
 	// create list of options (list of maps)
 	list mod_opts = maplist(`e, mod_entries, ``(lookup(e, "options", $[])));
-
 	list opts = [];
 
 	foreach(`a, mod_opts,
@@ -657,7 +655,7 @@ could make your system unstable.
 	    });
 	});
 	opts = toset(opts);
-	opts = filter(`e, opts, ``(e != "snd_id"));
+	opts = filter(`e, opts, ``(e != "snd_id"));//already should not be there
 
 	map res = $[];
 	// for each option collect their values
@@ -680,7 +678,6 @@ could make your system unstable.
 	});
 
 	return res;
-
     }
 
     /**
@@ -691,8 +688,8 @@ could make your system unstable.
     global define list CreateModprobeCommands() ``{
 	list outlist = [];
 	// create distinct list of all modules
-        list mods = toset(maplist(`e, modules_conf, ``(lookup(e, "module", "off"))));
-	maplist(`modname, mods, ``{
+        list mods = toset (maplist (map e, modules_conf,``(e["module"]:"off")));
+	maplist (string modname, mods, ``{
 	    map opts = CollectOptions(modname);
 	    string optstr = "";
 	    maplist(`k, `v, opts, ``{
