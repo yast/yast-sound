@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Oct 27 11:35:24 CEST 2004 - lslezak@suse.cz
+
+- adapted to new Mode:: API
+- version 2.11.1
+
+-------------------------------------------------------------------
 Wed Oct 13 10:34:54 CEST 2004 - lslezak@suse.cz
 
 - set volume of Master Mono channel (#46555)

@@ -80,7 +80,7 @@
     global define boolean Read (block<boolean> abort) ``{
 
 	// values for test mode
-	if (Mode::test == true)
+	if (Mode::test() == true)
 	{
 	    joystick = [$["GAMEPORT_MODULE":"ns558", "JOYSTICK_CONTROL":"Joystick", "JOYSTICK_CONTROL_PORT":"", "JOYSTICK_MODULE":"analog", "JOYSTICK_MODULE_OPTION":"", "model":"Generic Analog Joystick"], $["GAMEPORT_MODULE":"", "JOYSTICK_CONTROL":"", "JOYSTICK_CONTROL_PORT":"", "JOYSTICK_MODULE":"", "JOYSTICK_MODULE_OPTION":"", "model":""], $["GAMEPORT_MODULE":"", "JOYSTICK_CONTROL":"", "JOYSTICK_CONTROL_PORT":"", "JOYSTICK_MODULE":"", "JOYSTICK_MODULE_OPTION":"", "model":""], $["GAMEPORT_MODULE":"", "JOYSTICK_CONTROL":"", "JOYSTICK_CONTROL_PORT":"", "JOYSTICK_MODULE":"", "JOYSTICK_MODULE_OPTION":"", "model":""]];
 	    joystick_backup = joystick;
@@ -282,7 +282,7 @@
      */
     global define boolean Write (block<boolean> abort) ``{
 	// do not write anything in the test mode and if nothing was changed
-	if (Mode::test == true || !modified)
+	if (Mode::test() == true || !modified)
 	{
 	    return true;
 	}

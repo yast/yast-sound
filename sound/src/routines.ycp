@@ -85,7 +85,7 @@
     define list get_running_cards () ``{
 
 	// return empty list in autoyast config mode
-	if (Mode::config)
+	if (Mode::config())
 	{
 	    return [];
 	}
@@ -312,7 +312,7 @@
 	    return true;
 
 	// during autoinstallation, vol_settings list looks different... :-(
-	if (Mode::autoinst)
+	if (Mode::autoinst())
 	{
 	    vol_settings = maplist (any it, vol_settings, ``{
 		if (it == nil)
@@ -579,7 +579,7 @@
      * @return void
      */
     define void unmute(list devices, integer card_id) ``{
-	if (Mode::config)
+	if (Mode::config())
 	{
 	    return;
 	}
@@ -655,7 +655,7 @@ module parameters, including invalid IO or IRQ parameters."), modname);
      */
 
     define boolean HasFonts(map save_entry) ``{
-	if (Mode::config)
+	if (Mode::config())
 	{
 	    // don't install sound fonts during autoinstallation config
 	    return false;

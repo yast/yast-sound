@@ -41,7 +41,7 @@ while (arg_n >= 0)
 {
     if (WFM::Args(arg_n) == .test)
     {
-        Mode::test = true;
+        Mode::SetTest("test");
     }
     arg_n = arg_n - 1;
 }
