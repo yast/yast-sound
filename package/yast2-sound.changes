@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Mar  8 18:04:19 CET 2004 - jsuchome@suse.cz
+
+- more type fixes
+- set desktop icon
+- 2.9.11
+
+-------------------------------------------------------------------
 Mon Mar  1 18:54:28 CET 2004 - jsuchome@suse.cz
 
 - configuration now stored in /etc/modprobe.d/sound (new agent)

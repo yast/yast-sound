@@ -388,7 +388,7 @@
      * @param cards detected cards
      * @return `auto/`manual
      */
-    define map WhichDialog (list cards) ``{
+    define map WhichDialog (list<string> cards) ``{
 
         string helptext = Sound::STRINGS["WhichDialog"]:"";
         list nc		= [];

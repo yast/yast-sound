@@ -204,7 +204,7 @@ and press some of its buttons several times.
     // get the number of axes and buttons from the initial jstest output line
     list test_output	= (list)SCR::Read(.background.newout);
     string last_output	= test_output[0]:"";
-    list listed_output	= splitstring (last_output," ");
+    list<string> listed_output	= splitstring (last_output," ");
     integer axes	= 2;
     integer buttons	= 2;
     i = 0;
@@ -350,7 +350,7 @@ and press some of its buttons several times.
 
 	// find card name
 	string cardname = "";
-	foreach (map card, jcards, ``{
+	foreach (map<string,any> card, (list<map<string,any> >)jcards, ``{
 	    if (card["card_no"]:-1 == card_id)
 		cardname = card["name"]:"";
 	});
@@ -395,12 +395,12 @@ before pressing <B>Test</B> or <B>Next</B>.</P>");
 	    mod = nonejoy;
 	}
 
-	joylist = maplist(string modname, list models, JoystickDB, ``(
+	joylist = maplist(string modname, list<string> models, JoystickDB, ``(
 	    maplist(string model, models, ``([modname, model]))
 	));
 	joylist = flatten ((list<list>)joylist);
 
-	joylist = sort (list j1, list j2, joylist, ``( j1[1]:"" < j2[1]:""));
+	joylist = sort (list j1, list j2, (list<list<any> >) joylist, ``( j1[1]:"" < j2[1]:""));
 
 	joylist = prepend (joylist,
 	    ["analog", Joystick::generic_joystick_translated]);
@@ -412,7 +412,7 @@ before pressing <B>Test</B> or <B>Next</B>.</P>");
 	integer index = 0;
 	list boxitems = [];
 
-	foreach (list l, joylist, ``{
+	foreach (list l, (list<list<any> >) joylist, ``{
 
 	    string model = l[1]:"";
 	    if (mod == model)

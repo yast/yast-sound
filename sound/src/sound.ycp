@@ -256,7 +256,7 @@ define boolean ShowCardHandler (map options) ``{
     string out = sformat (_("Parameters of card '%1' (using module %2):\n"),
 	save_entry["model"]:"", modname);
 
-    foreach (string optname, map option, params, ``{
+    foreach (string optname, map option, (map<string,map>) params, ``{
 	out = out + sformat ("\n%1", optname) + "\n\t"
 	    + getDescr (option["descr"]:_("No description available"));
 	if (option["default"]:"" != "")
@@ -304,7 +304,7 @@ define boolean SetParametersHandler (map options) ``{
 
 define boolean ListModulesHandler (map options) ``{
 
-    foreach (term it, get_module_names(), ``{
+    foreach (term it, (list<term>) get_module_names(), ``{
 	string id	= (string) select (select (it, 0, `Empty()), 0, "all");
 	string name	= select (it, 1, id);
 	if (id == "all")

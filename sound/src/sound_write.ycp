@@ -85,7 +85,7 @@
 	return true;
     }
 
-    list stones = [
+    list<string> stones = [
 	    // progress bar item
 	    _("Save module configuration"),
 	    // progress bar item
@@ -169,7 +169,7 @@
     if (SCR::Read(.target.size, "/etc/asound.state") == -1)
     {
 	integer i = 0;
-	maplist (map e, save_info, ``{
+	maplist (map e, (list<map>) save_info, ``{
 	    Sound::InitMixer (i, e["module"]:"");
 	    i = i + 1;
 	});

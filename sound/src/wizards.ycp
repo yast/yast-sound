@@ -15,6 +15,7 @@
 
     import "Mode";
     import "Popup";
+    import "Sequencer";
     import "Wizard";
     import "Sound";
     import "Joystick";
@@ -127,7 +128,7 @@
      * @return symbol next dialog
      */
     define symbol _snd_add() ``{
-	list nh	= maplist (map card, Sound::unconfigured_cards, ``(
+	list<string> nh	= maplist (map card, Sound::unconfigured_cards, ``(
 	    card["model"]:""));
 
 	map res		= WhichDialog(nh);
@@ -331,7 +332,7 @@ define symbol MainSequence(string initial) ``{
 		],
     ];
 
-    return WizardSequencer(m_aliases, m_sequence);
+    return Sequencer::Run (m_aliases, m_sequence);
 }
 
 // TODO create AutoSequence (used also for installation?)
@@ -345,6 +346,7 @@ define symbol SoundSequence () ``{
 
     Sound::use_ui = true;
 
+    Wizard::SetDesktopIcon("sound");
     Wizard::CreateDialog();
 
     if (!Mode::config && !Sound::installation)

@@ -163,7 +163,7 @@ define map mixerDialog (integer card_id) ``{
     // get list of muted channels
     if (Sound::use_alsa)
     {
-	foreach(string channel, channels, ``{
+	foreach(string channel, (list<string>) channels, ``{
 	    path pth2 = topath(sformat(".audio.alsa.cards.%1.channels.%2.mute",
 		card_id, channel));
 	    if ((boolean) SCR::Read(pth2))
@@ -177,7 +177,7 @@ define map mixerDialog (integer card_id) ``{
 	// put 'Master', 'PCM' to list head
 	if (contains(channels, "PCM"))
 	{
-	    channels = filter (string ch, channels, ``(ch !="PCM"));
+	    channels = filter (string ch, (list<string>) channels, ``(ch !="PCM"));
 	    channels = prepend (channels, "PCM");
 	}
 
@@ -186,11 +186,12 @@ define map mixerDialog (integer card_id) ``{
 
 	if (modname != "" && contains(channels, master_channel))
 	{
-	    channels = filter (string ch, channels, ``(ch !=master_channel));
+	    channels = filter (string ch, (list<string>) channels, ``(ch !=master_channel));
 	    channels = prepend (channels, master_channel);
 	}
 
-	channels = maplist(string ch, channels, ``{
+	channels = (list<list<string> >)
+	maplist(string ch, (list<string>) channels, ``{
 	    if (contains(muted, ch))
 	    {
 		return [ch, 0];

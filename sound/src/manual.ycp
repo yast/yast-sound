@@ -44,7 +44,7 @@
 	}
 
 	integer i = -1;
-	foreach (integer module_index, list names, Sound::db_cards, ``{
+	foreach (integer module_index, list names, (map<integer,list>)Sound::db_cards, ``{
 	    if (contains (names, cardname))
 	    {
 		i = module_index;
@@ -82,7 +82,7 @@
 	    return [];
 
 	Sound::LoadDatabase(true);
-	list items = maplist (string v, list cs, Sound::db_vendors, ``{
+	list items = maplist (string v, list cs, (map<string,list>)Sound::db_vendors, ``{
 	    if (v == "other")
 		// table entry (vendor was not defined)
 		return `item(`id(v), _("Other"));

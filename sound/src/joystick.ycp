@@ -113,7 +113,7 @@
 	}
 	else					// more sound cards
 	{
-	    list tcont = maplist (map card, filtered, ``{
+	    list tcont = maplist (map card, (list<map>) filtered, ``{
 	        map jconf	= Joystick::joystick[ card["card_no"]:0 ]:$[];
 	        string jmodel	= jconf["model"]:"";
 
@@ -211,6 +211,7 @@
     ];
 
     // create wizard dialog
+    Wizard::SetDesktopIcon("joystick");
     Wizard::CreateDialog();
 
     // read sound card configuration

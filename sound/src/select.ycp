@@ -34,9 +34,9 @@ include "sound/ui.ycp"; // ReallyAbort
  * @param save_info save info
  */
 define string ConfCardsRT(list save_info) ``{
-    list retlist = [];
-    list conflist = [];
-    foreach(map card, save_info, ``{
+    list<string> retlist = [];
+    list<string> conflist = [];
+    foreach(map card, (list<map>) save_info, ``{
         conflist = add (conflist, card["model"]:"");
     });
     integer i = 0;
@@ -58,7 +58,7 @@ define string ConfCardsRT(list save_info) ``{
  */
 define void selectHardware (list newHw, string confHw) ``{
     integer index = -1;
-    newHw = maplist (string cardname, newHw, ``{
+    newHw = maplist (string cardname, (list<string>) newHw, ``{
         index = index + 1;              // select first item
         return `item(`id(index), cardname, index == 0);
     });
