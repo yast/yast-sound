@@ -24,10 +24,10 @@ modules_DATA = 	\
 
 menu_DATA = menuentry_sound.ycp
 
-bin_DATA = copyfonts
+bin_SCRIPTS = copyfonts
 
 EXTRA_DIST = \
 	$(modules_DATA) \
 	$(menu_DATA) \
 	$(include_DATA) \
-	$(bin_DATA)
+	$(bin_SCRIPTS)

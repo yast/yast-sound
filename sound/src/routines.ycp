@@ -1297,7 +1297,6 @@
      */
 
     global define HasFonts(map card) ``{
-	return false;
 	if(lookup(card, "sub_vendor_id", "0")==69890)
 	{
 	    return true;
@@ -1360,5 +1359,11 @@
     
 	}
     }
+
+    /** 
+     *  
+     *
+     *
+     */
 
 }
