@@ -558,7 +558,7 @@
 	integer device_id = lookup (card, "device_id", 0);
 
 	list fc = [];
-
+/*
 	if(size(lookup(card, "module", [])) > 0)
 	{
 	    map mod=select(lookup(card, "module", []), 0);
@@ -572,7 +572,7 @@
 			 "cards": ["Multimedia audio controller"]];
 	    }
 	}
-	
+*/	
 	if (tolower (bus) == "pci") 
 	{
 	    fc = filter (`d, db, 
@@ -590,6 +590,7 @@
 	{
 	    if (size (fc) > 0) return select (fc, 0);
 	}
+
 	return $[];
     }
 
@@ -1228,11 +1229,16 @@
 	
 	string modname="";
 	integer pos=0;
+	map res=$[];
 	while(contains(als, sformat("snd-card-%1", pos)))
 	{
 	    modname=SCR(`Read(.tmp.modules.alias, sformat("snd-card-%1", pos)));
 	    cmd=sformat("/sbin/modprobe -C %1 %2", get_tmp_modules_conf(), modname);
-	    SCR(`Execute(.target.bash, cmd, $[]));
+	    res=SCR(`Execute(.target.bash_output, cmd, $[]));
+	    if(lookup(res, "stderr", "")!="")
+	    {
+		y2error("modprobe error output: \n"+lookup(res, "stderr", ""));
+	    }
 	    pos=pos+1;
 	}
 
@@ -1567,32 +1573,23 @@
 
     global define stop_programs() ``{
 	integer fuser = SCR(`Execute (.target.bash, "/bin/fuser /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]));
-	y2error("###1");
 
 	if (fuser == 0)
         {
-	y2error("###2");
                   // To translators: To reset the sound configuration these programs must be terminated
                   // To translators: label message
 	    string msg=lookup(STRINGS, "WhichDialogMsg");
-	y2error("###3");
                   // Yes, No - button labels
             boolean terminate = UI(`YesNoPopup (msg));
-	y2error("###4");
             if (terminate)
             {
-	y2error("###5");
 		SCR(`Execute (.target.bash, "/bin/fuser -k /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]));
-	y2error("###6");
             }
             else
             {
-	y2error("###7");
 		return false;
-	y2error("###8");
             }
         }
-	y2error("###9");
 	return true;
     }
 
