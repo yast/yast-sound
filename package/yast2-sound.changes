@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Dec 13 18:56:38 CET 2002 - jsuchome@suse.de
+
+- updated for new modules agent interface
+- 2.7.1 
+
+-------------------------------------------------------------------
 Fri Oct 25 15:14:46 CEST 2002 - jsuchome@suse.cz
 
 - dialog for joystick testing (works with the new version of jstest)
