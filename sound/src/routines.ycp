@@ -183,15 +183,20 @@
 	    entry = add(entry, "options", opts);
 	    return entry;
 	}
-// FIXME: check parameters existence!!! - they are currently not in database
-// (filtered out during generation: index, enable, id)
-// Solution:
-// 1. include params in database, but don't show in YaST (just add automatically
-// when present
-// 2. check their existence with modinfo
-	opts = add (opts, Sound::snd_prefix() + "index",sformat ("%1",card_id));
-	opts = add (opts, Sound::snd_prefix() + "enable", "1");
+	// check existence of 'common' parameters: 'enable' and 'index'
+	string modname = entry["module"]:"";
+	foreach (string key, string value, (map<string,string>) SCR::Read (
+	    topath (sformat(".modinfo.kernel.drivers.sound.%1", modname))), ``{
 
+	    if (key == Sound::snd_prefix() + "enable")
+	    {
+		opts [key] = "1";
+	    }
+	    if (key == Sound::snd_prefix() + "index")
+	    {
+		opts [key] = sformat ("%1",card_id);
+	    }
+	});
 	entry["options"]	= opts;
 	return entry;
     }
