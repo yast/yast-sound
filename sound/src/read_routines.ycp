@@ -118,13 +118,15 @@
 	    ``{
 		position = position + 1;
 		map entry = $[];
-		string modname = SCR::Read(.modules.alias, e);
+//		string modname = SCR::Read(.modules.alias, e);
+		string modname = SCR::Read(add (.modules.alias, e));
 
 		integer opt_pos = lookup(mod_occur, modname, 0);
 
 		mod_occur = add(mod_occur, modname, lookup(mod_occur, modname, 0) + 1);
 
-		map options = SCR::Read(.modules.options, modname);
+//		map options = SCR::Read(.modules.options, modname);
+		map options = SCR::Read(add (.modules.options, modname));
 		options = mapmap(`k, `v, options,
 		``{
 		    list vals = splitstring(v, ",");
@@ -136,7 +138,8 @@
 		}
 		);
 
-		string comment = SCR::Read(.modules.alias.comment, e);
+//		string comment = SCR::Read(.modules.alias.comment, e);
+		string comment = SCR::Read(add (add (.modules.alias, e), "comment"));
 		// first remove trash from the end and beginning of the comment string
 		string uniq = "";
 		string model = "";

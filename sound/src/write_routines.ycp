@@ -41,20 +41,25 @@
      * @return boolean success/failure
      */
     global define boolean SaveOneModulesEntry (map entry) ``{
-	path mod		= .modules;
-        path mod_alias		= .modules.alias;
-        path mod_options	= .modules.options;
-        path mod_alias_comment	= .modules.alias.comment;
+//        path mod_alias		= .modules.alias;
+        path mod_alias		= add (.modules.alias, entry ["alias"]:"off");
+//        path mod_alias_comment	= .modules.alias.comment;
+        path mod_alias_comment	=
+            add ( add (.modules.alias, entry ["alias"]:"off"), "comment");
 
         boolean ret = true;
         if (haskey (entry, "alias"))
-            {
-                ret = ret && SCR::Write(mod_alias, lookup(entry, "module", "off"),
-		    lookup(entry, "alias", "off"));
-		string comment = createAliasComment(lookup(entry, "model", ""), lookup(entry, "unique_key", ""));
+        {
+//                ret = ret && SCR::Write(mod_alias, lookup(entry, "module", "off"),
+//		    lookup(entry, "alias", "off"));
+            ret = ret && SCR::Write(mod_alias, entry["module"]:"off");
+
+		    string comment = createAliasComment( entry ["model"]: "",
+                entry ["unique_key"]:"");
 		// comment="# "+lookup(entry, "unique_key", "")+":"+lookup(entry, "model", "")+"\n";
-		ret = ret && SCR::Write(mod_alias_comment, comment, lookup(entry, "alias", "off"));
-            }
+//		ret = ret && SCR::Write(mod_alias_comment, comment, lookup(entry, "alias", "off"));
+	        ret = ret && SCR::Write(mod_alias_comment, comment);
+        }
         return ret;
     }
 
@@ -75,7 +80,8 @@
 	``{
 	    map res = Sound::CollectOptions(modname);
 
-	    SCR::Write(mod_options, res, modname);
+//	    SCR::Write(mod_options, res, modname);
+	    SCR::Write( add (mod_options, modname ), res);
 	});
     }
 
@@ -92,7 +98,8 @@
 		issubstring(e, "sound-service-") ||
 		issubstring(e, "sound-slot-"))
 		{
-		    SCR::Write(mod_alias, nil, e);
+//		    SCR::Write(mod_alias, nil, e);
+		    SCR::Write( add (mod_alias, e), nil);
 		}
 	});
 
@@ -122,28 +129,40 @@
 
 	removeOldEntries(als);
 
-	SCR::Write(mod_alias, "off", "char-major-14");
-	SCR::Write(mod_alias, "off", "char-major-116");
+//	SCR::Write(mod_alias, "off", "char-major-14");
+	SCR::Write(add (mod_alias, "char-major-14"), "off");
+//	SCR::Write(mod_alias, "off", "char-major-116");
+	SCR::Write(add (mod_alias,"char-major-116"), "off");
 
 	if (size(save_info) >0)
 	{
 	    if (Sound::use_alsa)
 	    {
+        /*
 		SCR::Write(mod_alias, "snd", "char-major-116");
-		SCR::Write(mod_alias_comment, "\n# Alsa sound support. \n# Warning: please don't modify comments over "+
-		    "aliases 'snd-card-#'", "char-major-116");
+		SCR::Write(mod_alias_comment, "\n# Alsa sound support. \n# Warning: please don't modify comments over "+ "aliases 'snd-card-#'", "char-major-116");
 		SCR::Write(mod_options, $["snd_cards_limit": sformat ("%1", size(save_info)),
 					     "snd_major":"116"], "snd");
 		SCR::Write(mod_alias, "off", "char-major-14");
+        */
+		SCR::Write(add (mod_alias, "char-major-116"), "snd");
+		SCR::Write(add (mod_alias_comment, "char-major-116"), "\n# Alsa sound support. \n# Warning: please don't modify comments over " +
+		    "aliases 'snd-card-#'");
+		SCR::Write(add (mod_options, "snd"),
+            $["snd_cards_limit": sformat ("%1", size(save_info)),
+              "snd_major":"116"]);
+		SCR::Write(add (mod_alias, "char-major-14"), "off");
 	    }
 	    else
 	    {
 		if (Arch::sparc)
 		{
 		    string modname = lookup(select(save_info, 0, $[]), "module", "off");
-		    SCR::Write(mod_alias, "sound-slot-0", "sound");
+//		    SCR::Write(mod_alias, "sound-slot-0", "sound");
+		    SCR::Write(add (mod_alias, "sound"), "sound-slot-0");
 		}
-		SCR::Write(mod_alias, "sound", "char-major-14");
+//		SCR::Write(mod_alias, "sound", "char-major-14");
+		SCR::Write( add (mod_alias, "char-major-14"), "sound");
 	    }
 	}
 
@@ -160,9 +179,12 @@
 	    list oss_aliases = alsa_oss(size(save_info));
 	    foreach(`e, oss_aliases,
 	    ``{
-		SCR::Write(mod_alias, lookup(e, "module", ""), lookup(e, "alias", ""));
+//		SCR::Write(mod_alias, e["module"]:""), e["alias"]:"");
+		SCR::Write(add (mod_alias, e["alias"]:""), e["module"]:"");
 	    });
-	    SCR::Write(mod_alias_comment, "\n\n\n# YaST2: sound system dependent part\n#\n", "sound-slot-0");
+//	    SCR::Write(mod_alias_comment, "\n\n\n# YaST2: sound system dependent part\n#\n", "sound-slot-0");
+	    SCR::Write(add (mod_alias_comment, "sound-slot-0"),
+            "\n\n\n# YaST2: sound system dependent part\n#\n");
 	}
 	SCR::Write(mod, nil);
         return $["return" : true, "err_msg" : ""];
