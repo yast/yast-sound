@@ -20,7 +20,7 @@
         }
 
 
-        string second = select(l, 1);
+        string second = select(l, 1, "");
         string token = "";
 
 	list output = [];
@@ -33,11 +33,11 @@
 	    ``{
 		if (size(e) > 1)
 		{
-		    return select(e, 1)+", "+select(e, 0);
+		    return select(e, 1, "")+", "+select(e, 0, "");
 		}
 		else
 		{
-		    return select(e, 0);
+		    return select(e, 0, "");
 		}
 	    });
 	}
@@ -49,7 +49,7 @@
 
     // let's open input file...
     string kernel_ver = lookup(SCR::Execute(.target.bash_output, "uname -r", $[]), "stdout", "");
-    kernel_ver = select(splitstring(kernel_ver, "\n"), 0);
+    kernel_ver = select(splitstring(kernel_ver, "\n"), 0, "");
     string s = SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.generic_string");
 
     list l = splitstring(s, "\n");
@@ -61,13 +61,13 @@
     maplist(`e, l,
     ``{
 	toks = regexptokenize(e, "(snd-[^ \t]*)[\t ]*info_devices=");
-	if (lookup(index, select(toks, 0), -1) == -1)
+	if (lookup(index, select(toks, 0, " "), -1) == -1)
 	{
 	    return;
 	}
 	if (size(toks) > 0)
 	{
-	    output = add (output, lookup(index, select(toks, 0), -1), get_card_list(e));
+	    output = add (output, lookup(index, select(toks, 0, " "), -1), get_card_list(e));
 	}
 
     });
@@ -76,12 +76,12 @@
     list ladd = SCR::Read(.target.ycp, "./addons/card_addons.ycp");
     foreach(`e, ladd,
     ``{
-	integer i = lookup(index, select(e, 0), -1);
+	integer i = lookup(index, select(e, 0, ""), -1);
 	if (i == -1)
 	{
-	    y2error("module %1 not defined in module_index.ycp file!", select(e,0));
+	    y2error("module %1 not defined in module_index.ycp file!", select(e, 0, ""));
 	}
-	string cardname = select(e, 1);
+	string cardname = select(e, 1, "");
 	if (haskey(output, i))
 	{
 	    list oldlist = lookup(output, i, []);
