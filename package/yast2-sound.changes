@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Feb  3 11:14:26 CET 2003 - jsuchome@suse.cz
+
+- added zero values (#19602) up to sound-slot/service 3
+
+-------------------------------------------------------------------
 Wed Jan 29 13:39:45 CET 2003 - jsuchome@suse.cz
 
 - merged proofreaded texts
