@@ -103,10 +103,14 @@
 		}
 	});
     // seting off-values due to kdm log (bug #19602)
-    SCR::Write (.modules.alias."sound-slot-0", "off");
-    SCR::Write (.modules.alias."sound-slot-1", "off");
-    SCR::Write (.modules.alias."sound-service-0-0", "off");
-    SCR::Write (.modules.alias."sound-service-1-0", "off");
+    integer i=0;
+    while (i<4)
+    {
+        SCR::Write(add (.modules.alias, sformat ("sound-slot-%1", i)), "off");
+        SCR::Write(add (.modules.alias, sformat ("sound-service-%1-0", i)),
+            "off");
+        i = i + 1;
+    }
     }
 
     /**
