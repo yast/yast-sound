@@ -25,7 +25,7 @@
 //    include "sound/texts.ycp";
 //    include "sound/alsa_routines.ycp";
 
-    map STRINGS=STRINGS_();
+    map STRINGS = STRINGS_();
 
     /**
      * create special comment for given model
@@ -34,7 +34,7 @@
      */
 
     global define createAliasComment(string model, string uniq_key) ``{
-	string comment="# "+uniq_key+":"+model+"\n";
+	string comment = "# " + uniq_key + ":" + model + "\n";
 	return comment;
     }
 
@@ -43,23 +43,23 @@
      * @return boolean
      */
     global define SaveOneModulesEntry (map entry, boolean tmp) ``{
-	path mod=.modules;
-        path mod_alias=.modules.alias;
-        path mod_options=.modules.options;
-        path mod_alias_comment=.modules.alias.comment;
-        if(tmp)
+	path mod		= .modules;
+        path mod_alias		= .modules.alias;
+        path mod_options	= .modules.options;
+        path mod_alias_comment	= .modules.alias.comment;
+        if (tmp)
         {
-            mod=.tmp.modules;
-            mod_alias=.tmp.modules.alias;
-            mod_options=.tmp.modules.options;
-            mod_alias_comment=.tmp.modules.alias.comment;
+            mod			= .tmp.modules;
+            mod_alias		= .tmp.modules.alias;
+            mod_options		= .tmp.modules.options;
+            mod_alias_comment	= .tmp.modules.alias.comment;
         }
         boolean ret = true;
         if (haskey (entry, "alias")) 
             {
                 ret = ret && SCR::Write(mod_alias, lookup(entry, "module", "off"), 
 		    lookup(entry, "alias", "off"));
-		string comment=createAliasComment(lookup(entry, "model", ""), lookup(entry, "unique_key", ""));
+		string comment = createAliasComment(lookup(entry, "model", ""), lookup(entry, "unique_key", ""));
 		// comment="# "+lookup(entry, "unique_key", "")+":"+lookup(entry, "model", "")+"\n";
 		ret = ret && SCR::Write(mod_alias_comment, comment, lookup(entry, "alias", "off"));
             }
@@ -69,47 +69,47 @@
 
     global define SaveModulesOptions(list save_info, boolean tmp)
     ``{
-	path mod_options=.modules.options;
-	if(tmp)
+	path mod_options = .modules.options;
+	if (tmp)
 	{
-	    mod_options=.tmp.modules.options;
+	    mod_options = .tmp.modules.options;
 	}
 
 	// create distinct list of all modules
-	list mods=toset(maplist(`e, save_info, ``(lookup(e, "module", "off"))));
+	list mods = toset(maplist(`e, save_info, ``(lookup(e, "module", "off"))));
 	foreach(`modname, mods, 
 	``{
-	    list si=filter(`e, save_info, ``(lookup(e, "module", "off")==modname));
-	    si=maplist(`e, si, ``(lookup(e, "options", $[])));
+	    list si = filter(`e, save_info, ``(lookup(e, "module", "off") == modname));
+	    si = maplist(`e, si, ``(lookup(e, "options", $[])));
 	    // create a set of at least once used option
-	    list opts=[];
+	    list opts = [];
 	    foreach(`a, si, 
 	    ``{ 
 		foreach(`b, `c, a, 
 		``{
-		    opts=add(opts, b);
+		    opts = add(opts, b);
 		});
 	    });
-	    opts=toset(opts);
-	    opts=filter(`e, opts, ``(e!="snd_id"));
+	    opts = toset(opts);
+	    opts = filter(`e, opts, ``(e != "snd_id"));
 
-	    map res=$[];
+	    map res = $[];
 	    // for each option collect their values
 	    foreach(`opname, opts,
 	    ``{
-		boolean coma=false;
-		string value="";
+		boolean coma = false;
+		string value = "";
 		foreach(`s, si,
 		``{
-		    if(coma)
+		    if (coma)
 		    {
-			value=value+",";
+			value = value + ",";
 		    }
-		    value=value+lookup(s, opname, "");
+		    value = value + lookup(s, opname, "");
 
-		    coma=true;
+		    coma = true;
 		});
-		res=add(res, opname, value);
+		res = add(res, opname, value);
 	    });
 	    // write result to modules.conf
 	    
@@ -125,7 +125,7 @@
     global define removeOldEntries(list save_info) ``{
 	maplist(`e, als, 
 	``{
-	    if(	is_snd_alias(e) ||
+	    if (is_snd_alias(e) ||
 		issubstring(e, "sound-service-") ||
 		issubstring(e, "sound-slot-"))
 		{
@@ -143,11 +143,11 @@
      * @return map return struct: $["return": boolean, "err_msg": string]
      */
     global define SaveModulesEntry (list save_info, list system, boolean tmp) ``{
-	path mod=.modules;
-	path mod_alias=.modules.alias;
-	path mod_options=.modules.options;
-	path mod_alias_comment=.modules.alias.comment;
-	if(tmp)
+	path mod		= .modules;
+	path mod_alias		= .modules.alias;
+	path mod_options	= .modules.options;
+	path mod_alias_comment	= .modules.alias.comment;
+	if (tmp)
 	{
 	    mod=.tmp.modules;
 	    mod_alias=.tmp.modules.alias;
@@ -156,24 +156,32 @@
 	}
 	SaveModulesOptions(save_info, tmp);
 
-        string err_msg="";
-	list als=SCR::Read(mod_alias);
+        string err_msg = "";
+	list als = SCR::Read(mod_alias);
 	// remove old entries
 
 	removeOldEntries(save_info);
-	
-	if(size(save_info)>0)
+
+	SCR::Write(mod_alias, "off", "char-major-14");
+	SCR::Write(mod_alias, "off", "char-major-116");	
+
+	if (size(save_info) >0)
 	{
-	    SCR::Write(mod_alias, "snd", "char-major-116");
-	    SCR::Write(mod_alias_comment, "\n# Alsa sound support. \n# Warning: please don't modify comments over "+
-"aliases 'snd-card-#'", "char-major-116");
-	    SCR::Write(mod_options, $["snd_cards_limit": sformat ("%1", size(save_info)),
+	    if (size(save_info) > 0 && use_alsa)
+	    {
+		SCR::Write(mod_alias, "snd", "char-major-116");
+		SCR::Write(mod_alias_comment, "\n# Alsa sound support. \n# Warning: please don't modify comments over "+
+		    "aliases 'snd-card-#'", "char-major-116");
+		SCR::Write(mod_options, $["snd_cards_limit": sformat ("%1", size(save_info)),
 					     "snd_major":"116"], "snd");
+		SCR::Write(mod_alias, "off", "char-major-14");
+	    }
+	    else
+	    {
+		SCR::Write(mod_alias, "sound", "char-major-14");
+	    }
 	}
-	else
-	{
-	    SCR::Write(mod_alias, "off", "char-major-116");
-	}
+
         if ((contains(maplist (`e, save_info, 
 		``(SaveOneModulesEntry (e, tmp))), false))) 
         {
@@ -181,10 +189,10 @@
             err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry"); 
             return $["return": false, "err_msg": err_msg];
         }
-	if(size(save_info)>0)
+	if (size(save_info) > 0 && use_alsa)
 	{
 	    
-	    list oss_aliases=alsa_oss(size(save_info));
+	    list oss_aliases = alsa_oss(size(save_info));
 	    foreach(`e, oss_aliases, 
 	    ``{
 		SCR::Write(mod_alias, lookup(e, "module", ""), lookup(e, "alias", ""));
@@ -192,7 +200,7 @@
 	    SCR::Write(mod_alias_comment, "\n\n\n# YaST2: sound system dependent part\n#\n", "sound-slot-0");
 	}
 	SCR::Write(mod, nil);
-        return $["return": true, "err_msg": ""];
+        return $["return" : true, "err_msg" : ""];
     }
 
     /**
@@ -200,7 +208,7 @@
      * @return map return struct: $["return": boolean, "err_msg": string]
      */
     global define SetAllChannels (list cards, string command) ``{
-	string err_msg="";
+	string err_msg = "";
 //        if (contains (maplist (`e, cards, ``(maplist(`ch, `v, lookup (e, "volume", $[]), ``(SetVolume (command, ch, v,
 //        tointeger(lookup(lookup(lookup (e, "modules", $[]), "options", $[]), "snd_index", 0))))))), false))
             {
@@ -225,9 +233,9 @@
      */
     global define EnableJoystick () ``{
         string tmpdir = SCR::Read(.target.tmpdir);
-        return SCR::Execute(.target.bash, "/usr/sbin/alsactl -f "+tmpdir+"/asound.conf store;\
-                /usr/bin/sed /\"Joystick\"/s/false/true/ "+tmpdir+"/asound.conf >/etc/asound.conf;\
-                /bin/rm -f "+tmpdir+"/asound.conf;\
+        return SCR::Execute(.target.bash, "/usr/sbin/alsactl -f " + tmpdir + "/asound.conf store;\
+                /usr/bin/sed /\"Joystick\"/s/false/true/ " + tmpdir + "/asound.conf >/etc/asound.conf;\
+                /bin/rm -f " + tmpdir + "/asound.conf;\
                 /usr/sbin/alsactl restore", $[]);
     }
 
@@ -245,7 +253,7 @@
 
     global define SaveRCValues (map rc) ``{
 	y2error(rc);
-        string err_msg="";
+        string err_msg = "";
 	if (contains (maplist (`k, `v, rc, ``(SCR::Write(topath(sformat(".rc.system.%1", k)), v))), false) ||
             !SCR::Write(.rc.system, nil))
             {

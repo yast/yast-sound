@@ -18,6 +18,163 @@
  */
 
 {
+
+    /**
+     * here the test sound is played, by
+     * default ist alsa whistle sound, but
+     * if snd_au package is installed,
+     * than it's Linus Torvals voice, the
+     * if the test file cannot be found,
+     * the message is displayed
+     *
+     * @return string returns empty string on succes, otherwise error string 
+     */
+
+    global define PlayTest (integer card_id) ``{
+    
+	string fname = "/usr/share/sounds/alsa/test.wav";
+        if (SCR::Read(.target.size, fname) == -1)
+        {
+
+                  // To translators: just one file will be displayed
+                  // To translators: if the test audio file can not be found this message is displayed
+                  // To translators: This is just popup message, shouldn't be too long
+            string msg = sformat (_("Cannot find file:\n %1\n\n(test audio file)"), fname);
+
+            return msg;
+        }
+        else
+        {
+            SCR::Execute (.target.bash_background, sformat("aplay -c %1 %2 > /dev/null 2>&1", card_id, fname));
+        }
+        return "";
+    }
+
+
+    /**
+     * sound_start_tmp starts alsa using temporary modules.conf
+     * @param restore true - call alsactl restore, false - don't
+     *
+     *
+     */
+
+    global define sound_start_tmp(boolean restore) ``{
+        string cmd = "/sbin/depmod -C " + get_tmp_modules_conf() + " /dev/null 2>&1";
+        SCR::Execute(.target.bash, cmd, $[]);
+
+        list als = SCR::Read(.tmp.modules.alias);
+
+        
+        string modname = "";
+        integer pos = 0;
+        map res = $[];
+        while (contains(als, sformat("snd-card-%1", pos)))
+        {   
+            modname = SCR::Read(.tmp.modules.alias, sformat("snd-card-%1", pos));
+            cmd     = sformat("/sbin/modprobe -C %1 %2 ", get_tmp_modules_conf(), modname);
+            res     = SCR::Execute(.target.bash_output, cmd, $[]);
+            if (lookup(res, "stderr", "") != "")
+            {
+                y2error("modprobe error output: \n" + lookup(res, "stderr", ""));
+            }
+            pos = pos + 1;
+        }
+
+
+        if (restore)
+        {
+            SCR::Execute(.audio.alsa.restore, 0, 0);
+        }
+    }
+
+    global define sound_stop() ``{
+	SCR::Execute (.target.bash, "/etc/init.d/alsasound stop > /dev/null 2>&1", $[]);
+    }
+    
+    /** returns card models list 
+     *
+     * @param modname if "all" returns all models
+     * @return list with sound cards driven by given module
+     *
+     *
+     */
+
+    global define get_card_names(string modname) ``{
+        read_db();
+        if (modname == "all")
+        {
+            list cards = [];
+            foreach(`e, sound_db,
+            ``{
+                cards = add(cards, lookup(e, "cards", []));
+            });
+
+            cards = flatten(cards);
+            return sort(cards);
+        }
+
+        list mods = filter(`e, sound_db,
+        ``(lookup(lookup(e, "module", $[]), "name", "") == modname));
+        if (size(mods) == 0)
+        {
+            return [];
+        }
+        return sort(lookup(select(mods, 0), "cards", []));
+    }
+
+    /**  
+     * returns module name for a given card model
+     * @param string card name
+     * @return modules name
+     *
+     */
+
+    global define get_module_by_cardname(string cardname) ``{
+        read_db();
+        list mod = filter(`e, sound_db,
+        ``(contains(lookup(e, "cards"), cardname))
+        );
+        return lookup(lookup(select(mod, 0), "module", $[]), "name", "unknown");
+    }
+
+    /**
+     * returns the 'params' section from sndcards.ycp of the given module
+     * @param modname module name
+     * @return list with params and their descriptions
+     */
+
+    global define get_module_params(string modname) ``{
+        // database must be read some elsewhere
+        read_db();
+        list mod = filter(`e, sound_db, ``(lookup(lookup(e, "module", $[]), "name", "") == modname));
+        if (size(mod) > 0)
+        {
+            return lookup(select(mod, 0), "params", []);
+        }
+        return [];
+    }
+
+
+    /** 
+     * creates a list of sound modules for selection box
+     * @return list of items: [`item(`id(module_name), "module label")]
+     */
+    global define get_module_names() ``{
+        list ret = [];
+        read_db();
+        foreach(`e, sound_db,
+        ``{
+            ret = add(ret, `item(`id(lookup(lookup(e, "module", $[]), "name", "")),
+                    lookup(e, "name", _("Unknown module name"))));
+        });
+        ret = sort(`a, `b, ret, ``(select(a, 1) < select(b, 1)));
+
+	ret = prepend(ret,  `item(`id("all"), _("All")));
+
+        return ret;
+    }
+
+
     /**
      * get_vol_settings
      * creates a list of stored values of volume and mute for each channel
@@ -30,20 +187,20 @@
      */
 
     global define get_vol_settings() ``{
-	integer bound=size(SCR::Dir(.audio.alsa.cards));
-	integer i=0;
-	list retlist=[];
-	while(i<bound)
+	integer bound	= size(SCR::Dir(.audio.alsa.cards));
+	integer i	= 0;
+	list retlist	= [];
+	while (i < bound)
 	{
-	    list sublist=[];
+	    list sublist = [];
 	    foreach(`e, SCR::Dir(topath(sformat(".audio.alsa.cards.%1.channels", i))),
 	    ``{
-		path pth1=topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", i, e));	
-		path pth2=topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", i, e));
-		sublist=add(sublist, [e, SCR::Read(pth1), SCR::Read(pth2)]);
+		path pth1 = topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", i, e));	
+		path pth2 = topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", i, e));
+		sublist = add(sublist, [e, SCR::Read(pth1), SCR::Read(pth2)]);
 	    });
-	    retlist=add(retlist, sublist);
-	    i=i+1;
+	    retlist = add(retlist, sublist);
+	    i = i + 1;
 	}
 	y2error(sformat("%1", retlist));
 	return retlist;
@@ -51,20 +208,40 @@
     }
 
     global define set_vol_settings(list vol_settings) ``{
-	integer i=0;
+	integer i = 0;
 	foreach(`e, vol_settings,
 	``{
 	    foreach(`f, e, 
 	    ``{
-		path pth1=topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", i, select(f, 0)));
-		path pth2=topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", i, select(f,0)));
+		path pth1 = topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", i, select(f, 0)));
+		path pth2 = topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", i, select(f,0)));
 		SCR::Write(pth1, select(f, 1));
 		SCR::Write(pth2, select(f, 2));
 	    });
-	    i=i+1;
+	    i = i + 1;
 	});
 	SCR::Execute(.audio.alsa.store, nil);
     }
+
+    /**
+     *  Returns list of already running cards
+     *  @return list
+     *  
+     *
+     */
+
+    global define get_running_cards () ``{
+        if (SCR::Read(.target.size, "/proc/asound/cards") != -1) //fileexist("/proc/asound/cards"))
+        {
+            list asound = SCR::Read(.proc.asound.cards);
+            if (is(select (asound, 0), map))
+            {
+                return asound;
+            }
+        }
+        return [];
+    }
+
 
     /**
      * fliters out already configured cards
@@ -74,15 +251,15 @@
      */
     
     global define filter_configured(list save_info, list cards) ``{
-	cards=filter(`e, cards,
+	cards = filter(`e, cards,
 	``{
-	    string uniq=lookup(e, "unique_key", "");
-	    boolean retval=true;
+	    string uniq	    = lookup(e, "unique_key", "");
+	    boolean retval  = true;
 	    foreach(`s, save_info,
 	    ``{
-		if(lookup(s, "unique_key", "")==uniq)
+		if (lookup(s, "unique_key", "") == uniq)
 		{
-		    retval=false;
+		    retval = false;
 		}
 	    });
 	    return retval;
@@ -98,16 +275,16 @@
     global define convert_to_save_info(list cards) ``{
 	cards = maplist(`e, cards,
 	``{
-	    list options=lookup(e, "options", []);
-	    map opts=$[];
+	    list options = lookup(e, "options", []);
+	    map opts = $[];
 	    maplist(`op, options,
 	    ``{
-		if(lookup(op, "default", "")!="")
+		if (lookup(op, "default", "") != "")
 		{
-		    opts=add(opts, lookup(op, "name", ""), lookup(op, "default", ""));
+		    opts = add(opts, lookup(op, "name", ""), lookup(op, "default", ""));
 		}
 	    });
-	    map entry=$[
+	    map entry = $[
 		"model"     : get_card_label(e),
 		"module"    : lookup(lookup(lookup(e, "module", $[]),"module", $[]),"name", ""),
 		"unique_key": lookup(e, "unique_key", ""),
@@ -131,21 +308,21 @@
      */
 
     global define add_common_options(map entry, integer card_id) ``{
-	map opts=lookup(entry, "options", $[]);
-	opts=add(opts, "snd_index", card_id);
-        opts=add(opts, "snd_id", sformat("card%1", card_id+1));
+	map opts = lookup(entry, "options", $[]);
+	opts = add(opts, "snd_index", card_id);
+        opts = add(opts, "snd_id", sformat("card%1", card_id+1));
 
-	list parms=get_module_params(lookup(entry, "module", ""));
-	if (size(parms)!=0)
+	list parms = get_module_params(lookup(entry, "module", ""));
+	if (size(parms) != 0)
 	{
-	    list enab=filter(`e, parms, ``(lookup(e, "name", "") == "snd_enable"));
-	    if (size(enab)!=0)
+	    list enab = filter(`e, parms, ``(lookup(e, "name", "") == "snd_enable"));
+	    if (size(enab) != 0)
 	    {
 		opts = add(opts, "snd_enable", "1");
 	    }
 	}
 
-	entry=add(entry, "options", opts);
+	entry = add(entry, "options", opts);
 	return entry;
     }
 
@@ -169,11 +346,11 @@
 
         while (i < number)
         {
-            modules=add(modules, $[ "alias": sformat ("sound-slot-%1", i),
+            modules = add(modules, $[ "alias": sformat ("sound-slot-%1", i),
                                     "module": sformat ("snd-card-%1", i)]);
             foreach(`k, `v, oss_list,
             ``{
-                modules=add(modules, $[ "alias": sformat("sound-service-%1-%2",i, k),
+                modules = add(modules, $[ "alias": sformat("sound-service-%1-%2",i, k),
                                         "module": v]);
             });
             i = i + 1;
@@ -181,5 +358,26 @@
         return modules;
     }
 
+        /**
+     * 
+     *
+     */
+
+    global define getConfigurableCards(list save_info) ``{
+        list snd = get_audio();
+        snd = filter_configured(save_info, snd);
+        if (size(snd) > 0)
+        {
+            // get all the apropriate information from the database
+            snd =  maplist(`e, snd, ``(add (e, "module", get_module (e))));
+
+            // filter out modules with unspecified module name (sound card not supported by alsa / no module found)
+            snd = filter(`e, snd, ``(lookup(e, "module", $[])!=$[]));
+            // create save_info entries
+            snd = convert_to_save_info(snd);
+        }
+        return snd;
+    }
+ 
 
 }

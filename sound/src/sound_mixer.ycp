@@ -23,7 +23,7 @@
     textdomain "sound";    
 
     global define volElement(string label, integer value, boolean spec) ``{
-	if(spec)
+	if (spec)
 	{
 	    return `Slider(`id(label), `opt(`notify), label, 0, 100, value);
 	}
@@ -34,135 +34,131 @@
     }
 
     global define mixerWidget(list channels) ``{
-        any widget=`VBox();
+        any widget = `VBox();
 
 
-        boolean spec=UI::HasSpecialWidget(`Slider);
+        boolean spec = UI::HasSpecialWidget(`Slider);
 
-	integer nchan=size(channels)-2;	 // don't count in 'Master' and 'PCM'
-	integer ncols=4; //tointeger(tofloat(nchan) / 4.0 + 0.999);	 // how many columns will we have?
+	integer nchan = size(channels)-2;	 // don't count in 'Master' and 'PCM'
+	integer ncols = 4; //tointeger(tofloat(nchan) / 4.0 + 0.999);	 // how many columns will we have?
 
 	y2error("### %1 columns", ncols);
 
-	integer chansPerCol=tointeger(tofloat(nchan) / tofloat(ncols) +0.999); // how many channels per column
+	integer chansPerCol = tointeger(tofloat(nchan) / tofloat(ncols) +0.999); // how many channels per column
 
 	y2error("### %1 chans per column", chansPerCol);
 
-	term mainGroup=`Frame(_("&Master volume"));
+	term mainGroup = `Frame(_("&Master volume"));
 
 	// group first two elements to one Frame
 
-	integer pos=0;
+	integer pos = 0;
 
-	term ttmp=nil;
-	if(spec)
+	term ttmp = nil;
+	if (spec)
 	{
-	    ttmp=`VBox();
+	    ttmp = `VBox();
 	}
 	else
 	{
-	    ttmp=`HBox();
+	    ttmp = `HBox();
 	}
 
 	
 
-	while(pos<2 && pos<size(channels))
+	while (pos < 2 && pos < size(channels))
 	{
-	    string lab=select(select(channels, pos), 0);
-	    integer vol=select(select(channels, pos), 1);
+	    string lab	= select(select(channels, pos), 0);
+	    integer vol = select(select(channels, pos), 1);
 	    
-	    ttmp=add(ttmp, volElement(lab, vol, spec));
-	    pos=pos+1;
+	    ttmp = add(ttmp, volElement(lab, vol, spec));
+	    pos = pos + 1;
 	}
 
-	ttmp=add(ttmp, `VSpacing(1));	
+	ttmp = add(ttmp, `VSpacing(1));	
 
-	mainGroup=`Frame(_("&Master volume"), `HBox(`HSpacing(3), ttmp, `HSpacing(3)));
+	mainGroup = `Frame(_("&Master volume"), `HBox(`HSpacing(3), ttmp, `HSpacing(3)));
 
 	// now group elements to columns
 
-        integer counter=0;
-        any col=`HBox(`HSpacing(2));
+        integer counter = 0;
+        any col = `HBox(`HSpacing(2));
 
-	while(pos<size(channels))
+	while (pos < size(channels))
 	{
-	    if(ncols==counter)
+	    if (ncols == counter)
 	    {
-		widget=add(widget, `Top(col));	
-		if(spec)
-                {
-//                    widget=add(widget, `HSpacing(2));
-                }
-                else
+		widget = add(widget, `Top(col));	
+		if (!spec)
                 {
                     widget=add(widget, `HStretch());
                 }
 
-                col=`HBox(`HSpacing(2));
-                counter=0;
+                col = `HBox(`HSpacing(2));
+                counter = 0;
 	    }
 
-	    string lab=select(select(channels, pos), 0);
-	    integer vol=select(select(channels, pos), 1);
+	    string lab = select(select(channels, pos), 0);
+	    integer vol = select(select(channels, pos), 1);
 
-	    col=add(col, `HWeight(1, volElement(lab, vol, false)));
-	    col=add(col, `HSpacing(2));
+	    col = add(col, `HWeight(1, volElement(lab, vol, false)));
+	    col = add(col, `HSpacing(2));
 
-	    pos=pos+1;
-	    counter=counter+1;
+	    pos = pos + 1;
+	    counter = counter + 1;
 	}
 
-	while(counter<ncols)
+	while (counter < ncols)
 	{
-	    col=add(col, `HWeight(1, `Label(" ")));
-	    col=add(col, `HSpacing(2));
-	    counter=counter+1;
+	    col = add(col, `HWeight(1, `Label(" ")));
+	    col = add(col, `HSpacing(2));
+	    counter = counter + 1;
 	}
 
-        widget=add(widget, `Top(col));
+        widget = add(widget, `Top(col));
 
         return `VBox(mainGroup, `Frame(_("&Other channels"), widget));
     }
 
-    integer card_id=Args(0);
 
     // show the dialog
 
-    path pth=topath(sformat(".audio.alsa.cards.%1.channels", card_id));
-    list channels=SCR::Dir(pth);
+    integer card_id	= Args(0);
+    path pth		= topath(sformat(".audio.alsa.cards.%1.channels", card_id));
+    list channels	= SCR::Dir(pth);
+    string card_name	= SCR::Read(pth);
+    list muted		= [];
 
-    pth=topath(sformat(".audio.alsa.cards.%1.name", card_id));
-    string card_name=SCR::Read(pth);
+    pth = topath(sformat(".audio.alsa.cards.%1.name", card_id));
 
     // get list of muted channels
-    list muted=[];
     foreach(`e, channels, 
     ``{
-	path pth2=topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, e));
-	if(SCR::Read(pth2))
+	path pth2 = topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, e));
+	if (SCR::Read(pth2))
 	{
-	    muted=add(muted, e);
+	    muted = add(muted, e);
 	}
     });
 
-    y2error(sformat("%1", muted));
+    y2debug(sformat("%1", muted));
 
     // put 'Master', 'PCM' to list head
-    if(contains(channels, "PCM"))
+    if (contains(channels, "PCM"))
     {
-	channels=filter(`e, channels, ``(e!="PCM"));
-	channels=prepend(channels, "PCM");
+	channels = filter(`e, channels, ``(e!="PCM"));
+	channels = prepend(channels, "PCM");
     }
 
-    if(contains(channels, "Master"))
+    if (contains(channels, "Master"))
     {
-        channels=filter(`e, channels, ``(e!="Master"));
-        channels=prepend(channels, "Master");
+        channels = filter(`e, channels, ``(e!="Master"));
+        channels = prepend(channels, "Master");
     }
 
-    channels=maplist(`e, channels, 
+    channels = maplist(`e, channels, 
     ``{
-	if(contains(muted, e))
+	if (contains(muted, e))
 	{
 	    return [e, 0];
 	}
@@ -172,49 +168,51 @@
 	}
     });
 
-    string help=_("<P>With this dialog you can set volume for each channel of the selected sound card. 
+    string help = _("<P>With this dialog you can set volume for each channel of the selected sound card. 
 Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the original settings.</P>");
 
-    term con=mixerWidget(channels);
+    term con = mixerWidget(channels);
     UI::SetWizardContents (sformat(_("Volume settings for card '%1'"), card_name),con, help, true, true);
     UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
 
-    path pth=nil;
-    any ui=nil;
+    path    pth = nil;
+    any	    ui = nil;
+    integer value = 0;
+    
     repeat
     {
-	ui=UI::UserInput();
+	ui = UI::UserInput();
 
-	if(is(ui, string))
+	if (is(ui, string))
 	{
 	    // unmute if neccessary
-	    if(contains(muted, ui))
+	    if (contains(muted, ui))
 	    {
-		path pth3=topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, ui));
+		path pth3 = topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, ui));
 		SCR::Write(pth3, false);
 	    }
 	    // set volume
-	    pth=topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", card_id, ui));
-	    integer value=UI::QueryWidget(`id(ui), `Value);
+	    pth = topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", card_id, ui));
+	    value = UI::QueryWidget(`id(ui), `Value);
 	    SCR::Write(pth, value);
 	}
-	else if(ui==`abort && ReallyAbort())
+	else if (ui == `abort && ReallyAbort())
 	{
 	    return $["ui": `abort];
 	}
 
-    } until(ui==`back || ui==`next);
+    } until (ui == `back || ui == `next);
 
-    if(ui==`next)
+    if (ui == `next)
     {
 	// store volume settings
-	path pth=topath(sformat(".audio.alsa.cards.%1.store", card_id));
+	path pth = topath(sformat(".audio.alsa.cards.%1.store", card_id));
 	SCR::Execute(pth, 0, 0);
     }
     else
     {
 	// restore volume settings
-        path pth=topath(sformat(".audio.alsa.cards.%1.restore", card_id));
+        path pth = topath(sformat(".audio.alsa.cards.%1.restore", card_id));
         SCR::Execute(pth, 0, 0);
     }
 

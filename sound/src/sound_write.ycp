@@ -58,18 +58,18 @@
 //    include "sound/texts.ycp";
 
 
-    map STRINGS=STRINGS_();
+    map STRINGS = STRINGS_();
 
 //    include "sound/write_routines.ycp";
 
       // ==== MAIN ====
 
-    boolean test_mode = false;
-    list save_info = Args (0);
-    map rc_vars=$[];
+    boolean test_mode	= false;
+    list save_info	= Args (0);
+    map rc_vars		= $[];
 
-    string helptext = "";
-    string err_msg = "";
+    string helptext	= "";
+    string err_msg	= "";
 
       
     if (size (Args ()) > 1)
@@ -87,65 +87,6 @@
 
     SaveModulesEntry(save_info, [], false);
     SaveRCValues(rc_vars);
-/*
-      // Step ONE: save '/etc/modules.conf'
-    if (!test_mode)
-    {
-	map result=SaveModulesEntry (lookup (sound_info, "cards", []), lookup (lookup (sound_info, "system", $[]), "modules", []), false);
-	err_msg=err_msg+lookup(result, "err_msg", "");
-    }
-
-    string mixer_command = lookup (lookup (lookup (sound_info, "system", $[]), "volume", $[]), "mixer", "");
-    string function      = lookup (lookup (lookup (sound_info, "system", $[]), "volume", $[]), "store", "");
-
-      // Step TWO: save '/etc.rc.config'
-    if (!test_mode && size(lookup(lookup (sound_info, "system", $[]), "rc", $[])) > 0)
-    {
-	err_msg=err_msg+SaveRCValues (lookup(lookup (sound_info, "system", $[]), "rc", $[]));
-    }
-
-      // Step THREE: save volume
-    if (!test_mode && (size (function) > 0) && (size (mixer_command) > 0))
-    {
-	map res=SaveVolume (function, mixer_command, lookup (sound_info, "cards", []));
-	err_msg=err_msg+lookup(res, "err_msg", "");
-    }
-
-
-      // Step FOUR: call "other" function to handle some additional workaround
-    if (!test_mode)
-    {
-	eval (lookup (sound_info, "other"));
-    }
-
-      // Finally let's display message
-
-    string final_msg = "";
-    if (size (err_msg) > 0)
-    {
-				  // Error popup message	
-	  final_msg = sformat (lookup(STRINGS, "saveFinal1"), err_msg);
-    }
-    else 
-    {	
-	final_msg="";
-	if (size(filter (`e, lookup (sound_info, "cards", []), 
-	    ``((size (e) > 0) && (lookup (e, "name") != "off")))) == 0)
-	{
-	    final_msg="";
-	}
-
-    }
-
-    if (test_mode)
-    {
-	  // message displayed just in the test mode
-	  final_msg = final_msg + " " + UI(_("(TEST MODE)"));
-    }
-    if(final_msg!="")      
-    {
-        UI(`MessagePopup (final_msg));
-    }
-*/
+    
     return (size (err_msg) == 0);
 }
