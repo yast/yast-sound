@@ -1,7 +1,6 @@
+
 #include <math.h>
 #include "AlsaAudio.h"
-
-#define y2log_component "ag_audio"
 
 #include <Y2.h>
 #include <scr/SCRAgent.h>

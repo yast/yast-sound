@@ -2,7 +2,7 @@
 # Makefile.am for y2a_audio/src
 #
 
-AM_CXXFLAGS = -Wall
+AM_CXXFLAGS = -DY2LOG=\"agent-audio\" -Wall
 
 plugin_LTLIBRARIES = libpy2ag_audio.la
 noinst_LTLIBRARIES = liby2ag_audio.la
@@ -22,4 +22,3 @@ libpy2ag_audio_la_LDFLAGS = -version-info 2:0
 libpy2ag_audio_la_LIBADD = @LIBASOUND@
 
 INCLUDES = -I$(includedir)
-
