@@ -283,7 +283,7 @@ its parameters using the 'Advanced setup'.");
 	err_msg = check_module(save_entry, card_id);
     }
 // #################################
-    any ui = nil;
+    symbol ui = nil;
 
     if (size (err_msg) > 0)
     {

@@ -235,7 +235,7 @@
 	{
 	    save_entry = select(sound_cards, card_id);
 	}
-	map res = OneCardWizard(save_entry, size(save_info), false, 15, false, save_info);
+	map res = OneCardWizard(save_entry, size(save_info), 15, false, save_info);
 
         symbol ui = lookup(res, "ui", nil);
         if (ui == `next)
@@ -345,7 +345,6 @@ in order to configure sound cards."));
     integer card_id   = 0;
     integer n_cards   = 0;
     map result        = $[];
-//    any ui            = nil;
     boolean cont      = true;
 
     list configured_unique = []; // list of unique keys, that was configured

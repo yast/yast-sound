@@ -34,7 +34,7 @@
     }
 
     global define mixerWidget(list channels) ``{
-        any widget = `VBox();
+        term widget = `VBox();
 
 
         boolean spec = UI::HasSpecialWidget(`Slider);
@@ -78,7 +78,7 @@
 	// now group elements to columns
 
         integer counter = 0;
-        any col = `HBox(`HSpacing(2));
+        term col = `HBox(`HSpacing(2));
 
 	while (pos < size(channels))
 	{
@@ -182,7 +182,8 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
     UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
 
     path    pth = nil;
-    any	    ui = nil;
+    any	    ui = nil;	// 'any' is essential here- value can be `next `abort... or string (channel name, 
+			//  whose name is dynamical) 
     integer value = 0;
     
     repeat

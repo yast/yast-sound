@@ -491,7 +491,7 @@
 	    // to translators: the full meaning of message is: "Add other not detected soundcard"
 	newHw = add(newHw, `item(`id(-1), _("Other (not detected)"), size(newHw) == 0));
 
-	any widget=HwCreateDetectedContent(_("&Sound cards to configure"), newHw, false, 
+	symbol widget=HwCreateDetectedContent(_("&Sound cards to configure"), newHw, false, 
 					sformat(_("<P><B>Already configured sound cards:</B>%1</P>"), confHw));
 	
 	string helptext = lookup(STRINGS, "selectHardware", "");
@@ -532,7 +532,7 @@
             UI::ChangeWidget(`id(`sel), `CurrentItem, 0);
         }
 
-        any ui = nil;
+        symbol ui = nil;
 
 	do
         {
