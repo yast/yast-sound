@@ -45,6 +45,8 @@ make install
 
 %dir @YAST2DIR@
 %dir @YAST2DIR@/clients
+%dir @YAST2DIR@/include/sound
 %dir @YAST2DIR@/menuentries
+@YAST2DIR@/include/sound/*.ycp
 @YAST2DIR@/clients/sound*.ycp
 @YAST2DIR@/menuentries/menu*.ycp
