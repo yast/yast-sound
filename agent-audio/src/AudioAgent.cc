@@ -32,6 +32,8 @@ AudioAgent::~AudioAgent() {
 /**
  */
 
+typedef vector<string> svect;
+
 YCPValue AudioAgent::Read(const YCPPath &path, const YCPValue& arg) {
     if(path->length()==0)
     {
@@ -39,49 +41,43 @@ YCPValue AudioAgent::Read(const YCPPath &path, const YCPValue& arg) {
 	return YCPVoid();
     }
 
-    int card_id=-1;
-    string s_system="";
-    string channel="";
-    string action=""; // "volume"/"mute"
-
     // fetch parameters
-    switch(path->length())
+
+    svect args;
+    for(int i=0; i<path->length(); i++)
     {
-	case 4:
-	    action=path->component_str(3).c_str();
-	case 3:
-	    channel=path->component_str(2).c_str();
-	case 2:
-	    card_id=atoi(path->component_str(1).c_str());
-	case 1:
-	    s_system=path->component_str(0).c_str();
+	args.push_back(path->component_str(i));
     }
-    
-    if(s_system=="alsa")
+
+    if(args[0]=="alsa")
     {
 	switch(path->length())
 	{
-	    case 1:
-		return alsaRestore(-1);
-	    case 2:
-		return alsaRestore(card_id);
-	    case 3:
-		// undefined
-		y2error("attempt to read '.audio.alsa.#chan', whose value is undefined");
-		return YCPVoid();
+	    // snd cards name
 	    case 4:
-		if(action=="mute")
+		if(args[1]=="cards" && args[3]=="name")
 		{
-		    return alsaGetMute(card_id, channel.c_str());
+		    return YCPString("cardname"); // alsaCardName(atoi(args[2].c_str())))
 		}
-		else if(action=="volume")
+		break;
+	    // volume reading
+	    case 6:
+		if(args[1]=="cards" && args[3]=="channels")
 		{
-		    return alsaGetVolume(card_id, channel.c_str());
+		    if(args[5]=="volume")
+		    {
+			return alsaGetVolume(atoi(args[2].c_str()), args[4].c_str());
+		    }
+		    else if(args[5]=="mute")
+		    {
+			return alsaGetMute(atoi(args[2].c_str()), args[4].c_str());
+		    }
+		    break;
 		}
-		return YCPVoid();
-	}
-	return YCPVoid();
-
+	} 
+	// wrong path
+	y2error("attempt to read %s, whose value is undefined", path->toString().c_str());
+	return YCPBoolean(false);
     }
     /*
     else if(s_system=="oss" || s_system=="common")
@@ -103,54 +99,41 @@ YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCP
         // do nothing
         return YCPBoolean(false);
     }
+    
+        // fetch parameters
 
-    int card_id=-1;
-    string s_system="";
-    string channel="";
-    string action=""; // "volume"/"mute"
-
-    // fetch parameters
-    switch(path->length())
+    svect args;
+    for(int i=0; i<path->length(); i++)
     {
-        case 4:
-            action=path->component_str(3).c_str();
-        case 3:
-            channel=path->component_str(2).c_str();
-        case 2:
-            card_id=atoi(path->component_str(1).c_str());
-        case 1:
-            s_system=path->component_str(0).c_str();
+        args.push_back(path->component_str(i));
     }
 
-    if(s_system=="alsa")
+
+    if(args[0]=="alsa")
     {
         switch(path->length())
         {
-            case 1:
-                return alsaStore(-1);
-            case 2:
-                return alsaStore(card_id);
-            case 3:
-                // undefined
-                y2error("attempt to write to '.audio.alsa.#card.channel', whose value is undefined");
-                return YCPVoid();
-            case 4:
-                if(action=="mute")
-                {
-		    return alsaSetMute(card_id, channel.c_str(), value->asBoolean()->value());
-                }
-                else if(action=="volume")
-                {
-                    return alsaSetVolume(card_id, channel.c_str(), value->asInteger()->value());
-                }
-                return YCPVoid();
+	    case 6:
+		if(args[1]=="cards" &&
+		   args[3]=="channels")
+		{
+		    if(args[5]=="volume")
+		    {
+			return alsaSetVolume(atoi(args[2].c_str()), args[4].c_str(), value->asInteger()->value());
+		    }
+		    else if(args[5]=="mute")
+		    {
+			return alsaSetMute(atoi(args[2].c_str()), args[4].c_str(), value->asBoolean()->value());
+		    }
+		}
+		break;
         }
-        return YCPVoid();
-
+	y2error("attempt to write to %s", path->toString().c_str());
+	return YCPBoolean(false);
     }
-    else if(s_system=="oss" || s_system=="common")
+    else if(args[0]=="oss" || args[0]=="common")
     {
-
+	//TODO
     }
 
     y2error("Wrong path '%s' in Write().", path->toString().c_str());
@@ -163,18 +146,10 @@ YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCP
 YCPValue AudioAgent::Dir(const YCPPath& path) {
     YCPList list;
 
-    string channel;
-    int card_id=-1;
-    string s_system;    
-
-    switch(path->length())
+    svect args;
+    for(int i=0; i<path->length(); i++)
     {
-	case 3:
-	    channel=path->component_str(2).c_str();
-	case 2:
-	    card_id=atoi(path->component_str(1).c_str());
-	case 1:
-	    s_system=path->component_str(0);
+        args.push_back(path->component_str(i));
     }
 
     switch(path->length())
@@ -185,35 +160,62 @@ YCPValue AudioAgent::Dir(const YCPPath& path) {
 	    list->add(YCPString("common"));
 	    return list;
 	case 1:
-	    if(s_system=="alsa")
+	    list->add(YCPString("cards"));
+	    list->add(YCPString("restore"));
+	    list->add(YCPString("store"));
+	    return list;
+	case 2:
+	    if(args[0]=="alsa" && args[1]=="cards")
 	    {
 		return alsaGetCards();
 	    }
-	    else if(s_system=="oss" || s_system=="common")
+	    else if(args[0]=="oss" || args[0]=="common")
 	    {
+		
+		// TODO
 		return list;
 	    }
-	case 2:
-	    if(s_system=="alsa")
+	    break;
+	case 3:
+	    if(args[1]=="cards")
 	    {
-		return alsaGetChannels(card_id);
+		list->add(YCPString("channels"));
+		list->add(YCPString("name"));
+		list->add(YCPString("store"));
+		list->add(YCPString("restore"));
+		return list;
+	    }
+	    break;
+
+	case 4:
+	    if(args[0]=="alsa")
+	    {
+		if(args[1]=="cards" && args[3]=="channels")
+		{
+		    return alsaGetChannels(atoi(args[2].c_str()));  
+		}
+	    }
+	    break;
+	case 5:
+	    if(args[0]=="alsa")
+	    {
+		if(args[1]=="cards" && args[3]=="channels")
+                {   
+		    list->add(YCPString("volume"));
+		    list->add(YCPString("mute"));
+		    return list;
+                }
 	    }
 	    /*
 	    else if(s_system=="oss" || s_system=="common")
 	    {
-		return list;
+		// TODO
 	    }
 	    */
-	case 3:
-	    if(s_system=="alsa")
-	    {
-		list->add(YCPString("mute"));
-		list->add(YCPString("volume"));
-		return list;
-	    }
 	    /*
 	    else if(s_system=="oss" || s_system=="common")
 	    {
+		list->add(YCPString("volume"));
 		return list;
 	    }
 	    */

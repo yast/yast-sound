@@ -26,21 +26,69 @@ flags in brackets mean:
     w- writeable
     x- executable
 
+.audio                                     # (d) root
+      .alsa                                # (d) access type
+           .cards                          # (d) card crossroad
+                 .0                        # (d)
+                   .channels               # (d) channels available for card
+                            .PCM           # (d)
+                                .volume    # (rw) integer [0..100]
+                                .mute      # (rw) boolean (true if muted)
+                            .Line          ...
+                                 .volume
+                                 .mute
+                   .name                   # (r) description
+                   .store                  # (x) store values for card #0
+                   .restore                # (x) restore values for card #0
+                 .1
+                 .2
+           .restore                        # (x) restore values for all cards
+           .store                          # (x) store values for all cards
+      .oss                                 # (d)
+          .cards
+                    .... same as in alsa section
+      .common         
+
+Tree nodes explanation
+======================
+
 .audio
-      .alsa			   # (drw) w-store/r-restore values for all cards
-           .0                      # (drw) w-store values, r-restore
-             .PCM		   # (d)
-                 .volume	   # (rw) integer [0..100]
-                 .mute		   # (rw) boolean
-             .Master
-                    .volume
-                    .mute
-           .1
-             ...
-      .oss
-          .0
-            .volume
-      .common (alias to 'oss' for beginning)
+
+  non-writable, non-readable node. no special meaning.
+  Dir(.audio) returns ["alsa", "oss", "common"]
+
+.audio.alsa
+ 
+  non-writable, non-readable node. no special meaning.
+  Dir(.audio.alsa) returns ["cards", "restore", "store"]
+
+.audio.alsa.store
+  
+  executable. stores volume setting of all cards to /etc/asound.conf
+
+.audio.alsa.restore
+
+  executable. load volume settings from /etc/asound.conf to snd cards.
+
+.audio.alsa.cards
+
+  dir-able. return value is list of currently *running* cards on alsa sound
+  system. cards are accessed via .audio.alsa.cards.#card_number
+
+.audio.alsa.cards.#
+
+  subpaths: "name"  description of the card
+	    "store" execute to store volume settings for this card
+	    "restore" execute ro restore settings from disk
+	    
+.audio.alsa.cards.#.channels
+
+  dir-able. returns list of accessible channels for givan card. 
+  eg. ["PCM", "Master"]
+
+.audio.alsa.cards.#.chanels.CHANNEL
+  dir-able. subpaths: ["mute", "volume"]
+  volume range is [0..100], mute is true/false
 
 
 Examples for first tree desing:
@@ -49,15 +97,17 @@ Examples for first tree desing:
 * Dir
   ===
 
-  Dir(.audio.[alsa/oss]) 
+  
+
+  Dir(.audio.[alsa/oss].cards) 
     => ["0", "1", "2"]  
     indices of running cards
 
-  Dir(.audio.alsa.1)
+  Dir(.audio.alsa.cards.1.channels)
     => ["PCM", "Line", "Phone", "Master Mono"]
     list of mixer channels for a given card
 
-  Dir(.audio.alsa.1.PCM)
+  Dir(.audio.alsa.cards.1.channels.PCM)
     => ["mute", "value"]
     properties for channel PCM. same for all channels
 
@@ -66,11 +116,11 @@ Examples for first tree desing:
 * Read
   ====
 
-  Read(.audio.alsa.0.PCM.volume)
+  Read(.audio.alsa.cards.0.channels.PCM.volume)
     => 40 (integer)
     volume in percents for card #0, channel PCM
 
-  Read(.audio.alsa.0.PCM.mute)
+  Read(.audio.alsa.cards.0.channels.PCM.mute)
     => true
     channel PCM is muted
 
@@ -79,11 +129,20 @@ Examples for first tree desing:
 * Write
   =====
 
-  Write(.audio.alsa.1.Phone.volume, 40)
+  Write(.audio.alsa.cards.1.channels.Phone.volume, 40)
     set volume of 'Phone' channel to 40% of it's range
 
-  Write(.audio.alsa.1.Phone.mute, false)
+  Write(.audio.alsa.cards.1.channels.Phone.mute, false)
     unmute channel 'Phone'
 
+
+* Execute
+  =======
+
+  Execute(.audio.alsa.store)	# store volume settings of all cards
+  Execute(.audio.alsa.restore)  # restore volume settings of all cards
+  Execute(.audio.alsa.cards.1.store) # restore vol. settings for card 1
+  Execute(.audio.alsa.cards.1.restore) # restore volume settings for card 1
+  
 
 </pre></body></html>
