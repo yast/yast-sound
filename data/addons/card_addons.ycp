@@ -4,6 +4,7 @@
     ["snd-powermac",	    "iMac, Apple"],
     ["snd-powermac",	    "iBook, Apple"],
     ["snd-fm801",	    "512i Digital, TerraTec"],
+    ["snd-cmipci",	    "Aureon 5.1 Fun, TerraTec"],
     ["snd-fm801",	    "AU10, Abit"],
     ["snd-fm801",	    "ASONIC-8738, ASOUND"],
     ["snd-ad1816a",	    "FX-3D Plus, AOpen"],
@@ -75,5 +76,7 @@
     ["snd-cmipci",	    "Nightingale, Zoltrix"],
     ["snd-ali5451",         "M1535(D), ALI"],
     ["snd-ice1712",         "Delta 410, MidiMan M Audio"],
-    ["snd-intel8x0",        "NForce3 Audio, NVidia"]
+    ["snd-intel8x0",        "nForce3 Audio, NVidia"],
+    ["snd-intel8x0",        "ICH5, Intel"],
+    ["snd-via82xx",         "VIA8235, VIA"]
 ]

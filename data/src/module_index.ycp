@@ -67,8 +67,8 @@ $[
     46	: "snd-sgalaxy",
     47	: "snd-sonicvibes",
     48	: "snd-trident",
-    49	: "snd-via686",
-    50	: "snd-via8233",
+    49	: "snd-via82xx",
+    50	: "snd-vx222",
     51	: "snd-virmidi",
     52	: "snd-wavefront",
     53	: "snd-ymfpci",
@@ -80,6 +80,10 @@ $[
     59  : "snd-rme32",
     60  : "snd-hdsp",
     61  : "snd-msnd-pinnacle",
+    62  : "snd-ice1724",
+    63  : "snd-vxpocket",
+    64  : "snd-vxp440",
+    65  : "snd-mixart",
 
     100 : "snd-powermac"
 ]
