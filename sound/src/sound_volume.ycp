@@ -193,8 +193,10 @@
 
 	    next = true;
 				// let's unmute all devices to 90%
-	    if (!test_mode)
+	    if (!test_mode) {
 		unmute_all (90);
+		set_volume ("Master", vol);
+	    }
 	    
 	    
 				// TODO: add some other device ajusting here (stereo, other devices like CD, etc ...)???
