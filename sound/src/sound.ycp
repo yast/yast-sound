@@ -224,6 +224,9 @@
 
 	    list|void snd_database = ReadY2 (database_name);
 
+	    if (isPPCexception ($["bus" : bus, "vendor_id" : vendor_id, "device_id" : device_id]))
+		return select(filter (`d, snd_database, ``(lookup(lookup (d, "module", $[]), "name", "") == "snd-card-cs4232")), 0);
+
 	    integer offset = condition ((tolower (bus) == "isa"), 0x20000, 0x10000);
 
 	    list|void fc = [];
@@ -329,11 +332,11 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 
 
 	    list simulation = [
-		$["vendor_id" : 0x1274 + 0x10000,
-		 "device_id" : 0x5000 + 0x10000,
+		$["vendor_id" : 263169,
+		 "device_id" : 262160,
 		 "bus" : "pci",
-		 "vendor" : "Ensoniq Audio PCI",
-		 "device" : "ES1371"]
+		 "vendor" : "Apple Computer, Inc.",
+		 "device" : "Integrated Sound (awacs)"]
 	    ];
 	    
 //		$["vendor_id" : 0x1275 + 0x10000,
@@ -590,6 +593,19 @@ Do you want to select the driver manually?"),
 
 
 		    module = lookup (ret, "module");
+
+		    if ((size (found) == 1)
+			&& isPPCexception (select (found, 0)))
+			options_entered = $["snd_port"    : "0x534",
+					   "snd_cport"    : "0x538",
+					   "snd_irq"      : "5",
+					   "snd_mpu_port" : "0x330",
+					   "snd_mpu_irq"  : "9",
+					   "snd_fm_port"  : "0x388",
+					   "snd_dma1"     : "1",
+					   "snd_dma2"     : "3",
+					   "snd_isapnp"   : "0"];
+
 		    map|void options = CallFunction (`sound_options (hardware_name (ret),
 									 lookup (module, "params", []),
 									 options_entered, 0));
@@ -688,6 +704,16 @@ Do you want to select the driver manually?"),
 	};
 
 
+	define isPPCexception (map snd_info) ``{
+	    if (tolower(lookup(snd_info, "bus", "")) == "pci"
+		&& lookup (snd_info, "device_id", 0) == 262160
+		&& lookup (snd_info, "vendor_id", 0) == 263169)
+		return true;
+
+	    return false;
+	}
+
+
 	    // ===== main =====
 
 	integer arg_n = size(Args()) - 1;
@@ -720,6 +746,7 @@ Do you want to select the driver manually?"),
 
 	list found = FindCard ();
 	map options_entered = $[];
+
 
 	any already = CallFunction (`sound_already ());
 
