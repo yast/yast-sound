@@ -19,9 +19,9 @@ Obsoletes:	y2a_audio
 
 @PREP@
 
-@BUILD-AGENT@
+@BUILD-PROGRAM@
 
-@INSTALL-AGENT@
+@INSTALL-PROGRAM@
 
 @CLEAN@
 
