@@ -20,7 +20,7 @@
      */
     global list joystick = [];
 
-    list vars = [   "GAMEPORT_MODULE",
+    list<string> vars = [   "GAMEPORT_MODULE",
                     "JOYSTICK_MODULE",
                     "JOYSTICK_MODULE_OPTION",
                     "JOYSTICK_CONTROL",

@@ -176,7 +176,7 @@
 	if (use_snd_prefix == nil)
 	{
 	    use_snd_prefix = false; // default for new kernels
-	    map modinfo =(map)SCR::Read (.modinfo.kernel.kernel.sound.core.snd);
+	    map<string,string> modinfo =(map<string,string>)SCR::Read (.modinfo.kernel.kernel.sound.core.snd);
 
 	    foreach (string key, string desc, modinfo, ``{
 		// check only parameters, ignore other keys returned by modinfo
@@ -255,7 +255,7 @@ Probe the chip now?
      */
     global define boolean DetectOldCards() ``{
 
-	list chips = ["opl3sa2", "cs4236", "cs4232", "cs4231", "es18xx", "es1688", "sb16", "sb8"];
+	list<string> chips = ["opl3sa2", "cs4236", "cs4232", "cs4231", "es18xx", "es1688", "sb16", "sb8"];
 
 	string command = "/usr/sbin/alsaconf -P";
 	map out = (map) SCR::Execute(.target.bash_output, command);
@@ -310,7 +310,7 @@ could make your system unstable.
 	symbol ret = (symbol) UI::UserInput();
 	if (ret == `ok)
 	{
-	    chips = (list) UI::QueryWidget(`id(`probelist),`SelectedItems);
+	    chips = (list<string>) UI::QueryWidget(`id(`probelist),`SelectedItems);
 
 	    UI::OpenDialog(`HBox(
 		`VSpacing(7),
@@ -483,7 +483,7 @@ could make your system unstable.
 	    if (!use_alsa)
 	    {
 		snd = maplist(map card, snd, ``{
-		    list options = card["options"]:[];
+		    list<map<string,any> > options = card["options"]:[];
 		    map opts = $[];
 		    maplist(map op, options, ``{
 			if (op["default"]:"" != "")
@@ -784,10 +784,10 @@ could make your system unstable.
 	list mod_entries = filter (map e, modules_conf, ``(
 	    e["module"]:"off" == modname));
 	// create list of options (list of maps)
-	list mod_opts = maplist (map e, mod_entries, ``(e["options"]:$[]));
-	list opts = [];
+	list<map<string,string> > mod_opts = maplist (map e, (list<map>) mod_entries, ``(e["options"]:$[]));
+	list<string> opts = [];
 
-	foreach (map card_opts, mod_opts, ``{
+	foreach (map<string,string> card_opts, mod_opts, ``{
 	    foreach(string name, string val, card_opts, ``{
 	        opts = add (opts, name);
 	    });
@@ -823,10 +823,10 @@ could make your system unstable.
 	list outlist = [];
 	// create distinct list of all modules
         list mods = toset (maplist (map e, modules_conf,``(e["module"]:"off")));
-	maplist (string modname, mods, ``{
+	maplist (string modname, (list<string>) mods, ``{
 	    map opts = CollectOptions(modname);
 	    string optstr = "";
-	    maplist(string k, string v, opts, ``{
+	    maplist(string k, string v, (map<string,string>) opts, ``{
 		optstr = optstr+ sformat(" %1=%2", k, v);
 	    });
 	    // we need to tell 'modprobe' not to look into modules.conf now,
@@ -955,7 +955,7 @@ could make your system unstable.
 	else
 	{
 	    path cards_path	= .audio.alsa.cards;
-	    list cards_numbers	= SCR::Dir(cards_path);
+	    list<string> cards_numbers	= (list<string>) SCR::Dir(cards_path);
 	    list cards		= [];
 
 	    if (cards_numbers != nil)
@@ -1002,10 +1002,10 @@ could make your system unstable.
 	}
 	volume_settings = [];
 	path p = nil;
-	list cards = SCR::Dir(.audio.alsa.cards);
+	list<string> cards = (list<string>) SCR::Dir(.audio.alsa.cards);
 	maplist(string c, cards, ``{
 	    p = topath(sformat(".audio.alsa.cards.%1.channels", c));
-	    list channels = SCR::Dir(p);
+	    list<string> channels = (list<string>) SCR::Dir(p);
 	    maplist(string ch, channels, ``{
 		p = topath (sformat(
 		    ".audio.alsa.cards.%1.channels.%2.mute", c, ch));
@@ -1069,7 +1069,7 @@ could make your system unstable.
 	}
         list devs2 = [];
 
-        foreach (string dev, integer vol, devs, ``{
+        foreach (string dev, integer vol, (map<string,integer>)devs, ``{
 	    SetVolume (c_id, dev, vol);
 	    devs2 = add (devs2, dev);
 	});
@@ -1113,7 +1113,7 @@ could make your system unstable.
 	list filtered = [];
 
 	// remove cards without joystick support
-	foreach(map card, cards, ``{
+	foreach(map card, (list<map<string,any> >)cards, ``{
 
 	    integer cid	= card["card_no"]:-2;
 	    if (cid != -2 && HasJoystick(cid) == true)

@@ -45,7 +45,7 @@
 	map result = nil;
 
 	// split to lines
-	list comment_lines = splitstring (comment, "\n");
+	list<string> comment_lines = splitstring (comment, "\n");
 
 	// find last line with a ":"
 	string line_with_uk = "";
@@ -112,7 +112,7 @@
 
 	    mod_occur	= add (mod_occur, modname, mod_occur[modname]:0 + 1);
 
-	    map opts = (map) SCR::Read(add (.modules.options, modname));
+	    map<string,string> opts = (map<string,string>) SCR::Read(add (.modules.options, modname));
 	    map options = $[];
 	    foreach (string name, string val, opts, ``{
 		list vals = splitstring(val, ",");
