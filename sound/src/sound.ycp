@@ -497,7 +497,9 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 			UI(`ChangeWidget(`id(`next), `Enabled, false));
 			UI(`ChangeWidget(`id(`options), `Enabled, false));
 
-			if (UI (`YesOrNo (_("There is no available driver for selected card.\nDo you want to select the driver manually?"),
+			if (UI (`YesOrNo (_("\
+There is no available driver for the selected card.
+Do you want to select the driver manually?"),
 					  _("&Yes"), _("&No"))))
 			{
 			    
@@ -528,7 +530,7 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 
 				    // help text 2/2
 				help_text = help_text + UI (_("<p>You
- can change option values that are passed to the module by pressing
+ can change options that are passed to the module by pressing
  the <i>Options</i> button.</p>"));
 
 
