@@ -300,6 +300,7 @@
      */
 
     global define list filter_configured(list save_info, list cards) ``{
+	if (cards == nil) return [];
 	cards = filter(`e, cards,
 	``{
 	    string uniq	    = lookup(e, "unique_key", "");
