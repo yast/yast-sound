@@ -10,6 +10,8 @@
  *
  * Authors: 
  * Dan Vesely <dan@suse.cz>
+ *
+ * String corrections by Christian Steinruecken <cstein@suse.de>, 2001/08/01
  * 
  * 
  * $Id$
@@ -214,10 +216,10 @@
 	if(size(save_info) != size(SCR(`Dir(.audio.alsa.cards)))) //get_running_cards()))
 	{
 //	    y2error("size(save_info)=%1 size(Dir)=%2", size(save_info), size(Dir(.audio.alsa.cards)));
-//	    if(UI(`YesNoPopup(_("There is configured sound card, but is not functional at
-// the moment, because the kernel modules are not present. Try to load them?"))))
-	    if(UI(`YesNoPopup(_("Number of currently running cards doesn't match 
-the number of configured cards in configureation files. 
+//	    if(UI(`YesNoPopup(_("There is a configured sound card, but is not functional at
+// the moment, because the kernel modules are not present. Shall we try to load them?"))))
+	    if(UI(`YesNoPopup(_("The number of currently running cards doesn't match 
+the number of configured cards in your configuration files. 
 Try to restart sound system?"))))
  
 	    {
@@ -262,7 +264,7 @@ Try to restart sound system?"))))
 	    SCR(`Execute(.audio.alsa.restore, 0, 0));
 
 	    ui = UI (`UserInput ());
-	    if (ui == `b_delete && UI(`YesNoPopup(_("Really delete this entry?")))) 
+	    if (ui == `b_delete && UI(`YesNoPopup(_("Do you really want to delete this entry?")))) 
 	    {
 		boolean terminate=stop_programs();
 		if(terminate==false)
