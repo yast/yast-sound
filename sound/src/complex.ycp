@@ -151,7 +151,7 @@ Try to restart sound system?")))
         // dialog title
 	Wizard::SetContents (_("Sound configuration"), con, helptext,true,true);
 	// Finish - button label
-	UI::ChangeWidget(`id(`next), `Label, Label::FinishButton());
+	Wizard::SetNextButton(`next, Label::FinishButton() );
 
 	if (size (cc) == 0)
 	{
@@ -223,7 +223,7 @@ Restart sound system now?
 		{
 		    return $["ui" : `abort];
 		}
-		UI::ChangeWidget(`id(`next), `Label, Label::FinishButton());
+		Wizard::SetNextButton(`next, Label::FinishButton() );
 
 		// dialohg header
 		Wizard::SetContents (_("Sound configuration"), con, helptext, true, true);
@@ -241,7 +241,7 @@ Restart sound system now?
                     return $["ui": `abort];
                 }
 
-		UI::ChangeWidget(`id(`next), `Label, Label::FinishButton());
+		Wizard::SetNextButton(`next, Label::FinishButton() );
 
 		// dialog header
                 Wizard::SetContents (_("Sound configuration"), con, helptext, true, true);

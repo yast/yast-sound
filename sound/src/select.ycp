@@ -94,7 +94,7 @@ define map sound_select (list sound_cards, list save_info) ``{
 
     selectHardware (sound_cards, confhw);
 
-    UI::ChangeWidget(`id(`next), `Label, Label::FinishButton());
+    Wizard::SetNextButton(`next, Label::FinishButton() );
 
     symbol ui = nil;
     do

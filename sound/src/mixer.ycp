@@ -221,7 +221,7 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
     // dialog header
     Wizard::SetContents (sformat(_("Volume settings for card '%1'"), card_name),
 	con, help, true, true);
-    UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
+    Wizard::RestoreNextButton();
 
     any	ui = nil; // value can be `next `abort... or string (channel name)
     integer value = 0;

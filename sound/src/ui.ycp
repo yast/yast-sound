@@ -132,7 +132,7 @@
 	    flagc = flagc * 2;
 	}
 
-	UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
+	Wizard::RestoreNextButton();
 
 	symbol input = `quick;
 
@@ -240,7 +240,7 @@
 	// dialog header
         Wizard::SetContents (_("Sound card configuration"), con,
 	    helptext, true, true);
-        UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
+        Wizard::RestoreNextButton();
 
 	symbol input = `quick;
 
@@ -404,7 +404,7 @@
 	// dialog title
         Wizard::SetContents (_("Configure a sound card"), con, helptext,
 	    true, true);
-        UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
+        Wizard::RestoreNextButton();
 
         if (size (nc) == 0)
         {
