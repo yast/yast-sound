@@ -46,7 +46,7 @@
 	    integer ret = Shell ("/usr/bin/amixer set \"$DEV\" $VOL% unmute 2>/dev/null", $["DEV" : device, "VOL" : v]);
 	    if (ret == 127){
 				// To translators: This is just popup message, shouldn't be too long
-		UI (`DisplayMessage (_("Cannot find program 'amixer'.\nPlease install the package 'ALSA' from the 'snd' series")));
+		UI (`DisplayMessage (_("Cannot find program 'amixer'.\nPlease install the 'ALSA' package from the 'snd' series")));
 	    }
 	    return ret;
 	};
@@ -121,11 +121,11 @@
 		    Shell("/sbin/modprobe snd-pcm-oss"); // backwards OSS compatibility
 		    if (!haskey (pm, module_name))
 			    // To translators: label to error popup
-			return sformat (UI(_("The kernel module %1 for sound support\ncannot be loaded.")), module_name);
+			return sformat (UI(_("The kernel module %1 for sound support\ncould not be loaded.")), module_name);
 		}
 
 		    // To translators: label to error popup
-		return sformat (UI(_("The kernel module %1 for sound support\ncannot be loaded.")), module_name);
+		return sformat (UI(_("The kernel module %1 for sound support\ncould not be loaded.")), module_name);
 	    }
 
 	    return "";
@@ -190,16 +190,16 @@
 				// Help text - intenal YaST2 error 1/3
 	    help_text = UI(_("<p>An error has occured. </p>"));
 				// Help text - intenal YaST2 error 2/3
-	    help_text = help_text + UI(_("<p>Check that you have\
- installed the correct <b>ALSA</b> package (series 'snd') and that\
+	    help_text = help_text + UI(_("<p>You should check that you have\
+ correctly installed the <b>ALSA</b> package (from the series 'snd') and that\
  you are running this as a root.</p>"));
 	
 				// Help text - intenal YaST2 error 3/3
 	    help_text = help_text + UI (_("<p>If the the problem\
  persists, you can try to pass some <b>options</b> to the ALSA module.\
- If you still cannot get the sound card working, try\
+ If you still can't get your sound card working, you can try\
  <i>OSS/Free</i> or another module.</p>\
- <p>However <b>YaST2</b>\
+ <p>However, <b>YaST2</b>\
  sound configuration currently only supports ALSA.</p>"));
 	
 	

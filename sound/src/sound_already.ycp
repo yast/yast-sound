@@ -27,7 +27,7 @@
 		
 				// To translators: To reset the sound configuration these programs must be terminated
 				// To translators: label message
-		string msg = UI (_("There are programs running which are using some audio device.\n"));
+		string msg = UI (_("There are programs running that are currently using the audio device.\n"));
 				// To translators: label message
 		msg = msg + UI (_("To reset the configuration these programs must be terminated. Proceed?"));
 		
@@ -81,7 +81,7 @@
     help_text = help_text + UI(_("<p>You can reset the configuration\
  process by pressing the <i>Reset</i> button and try to configure the\
  card again. Please refer to the <b>SuSE</b> help system, section\
- 'package description', series 'snd1', <b>alsa</b> package for more\
+ 'package description', series 'snd', <b>alsa</b> package for more\
  information."));
 
 
@@ -145,13 +145,9 @@
 			con = `HVCenter(`Label(_("The previous configuration cannot be reset.")));
 
 			    // Help text 1/2 when removing kernel modules were unsuccessfull
-			help_text = UI (_("<p>Removing of sound kernel modules were unsuccessful.</p>"));
+			help_text = UI (_("<p>Removal of kernel sound modules was unsuccessful.</p>"));
 			    // Help text 2/2 when removing kernel modules were unsuccessfull
-			help_text = help_text + UI (_("<p>This might\
- be because there are in use by some program or you don't have\
- privileges to do that.</p>"));
-			
-			
+			help_text = help_text + UI (_("<p>It is probably because these modules are in use by some other program OR you don't have root privileges to remove them.</p>"));
 			
 			unsuccess = true;
 		    }

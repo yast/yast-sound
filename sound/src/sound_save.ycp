@@ -148,7 +148,7 @@
 	    
 	    if (Shell("/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`") == 127)
 		    // To translators: error popup message
-		return UI (_("Cannot make a list of module dependencies.\nProgram 'depmod' missing,\nplease check 'modules' package (series 'a')."));
+		return UI (_("Cannot make a list of module dependencies.\nProgram 'depmod' missing,\nplease check to see if the 'modules' package from series 'a' is installed."));
 	    
 	    err = ConfModules (modules_conf);
 
@@ -157,7 +157,7 @@
 
 	    if (Shell("/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`") == 127)
 		    // To translators: error popup message
-		return UI (_("Cannot make a list of module dependencies.\nProgram 'depmod' missing,\nplease check 'modules' package (series 'a')."));
+		return UI (_("Cannot make a list of module dependencies.\nProgram 'depmod' missing,\nplease check to see if the 'modules' package from series 'a' is installed."));
 
 		//if (Shell ("/usr/sbin/alsactl store") == 127)
 		//return UI(_("Cannot find 'alsactl'\nPlease check your installation of ALSA package (series 'snd1')"));
@@ -175,7 +175,7 @@
 	string modules_conf = "/etc/modules.conf";
 	
 				// Help text - saving configuration/volume 1/2
-	string help_text = UI(_("<p>The previously adjusted <b>volume</b> will be <b>stored</b> now for later use.</p>"));
+	string help_text = UI(_("<p>The previously adjusted <b>volume</b> will be <b>stored</b> for later use.</p>"));
 				// Help text - saving configuration/volume 2/2
 	help_text = help_text + UI(_("<p>The configuration of the sound card will be <b>saved</b>.</p>"));
 
@@ -211,7 +211,7 @@
 	    
 	    UI(`ChangeWidget(`id(`back), `Enabled, true));
 		// To translators: error label message
-	    UI(`ReplaceWidget(`id(`la), `Label(sformat (UI(_("The sound card configuration cannot be saved,\n due to following error:\n%1")),
+	    UI(`ReplaceWidget(`id(`la), `Label(sformat (UI(_("The sound card configuration could not be saved\n due to following error:\n%1")),
 							err))));
 
 	    repeat {
@@ -227,7 +227,7 @@
 	else {
 
 		// To translators: label message
-	    UI (`DisplayMessage (_("The sound card was succesfully configured and\nyou can now use it.")));
+	    UI (`DisplayMessage (_("The sound card was succesfully configured.\nYou can now use it immediately.")));
 	}
 
 	return `next;
