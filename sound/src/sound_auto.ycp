@@ -69,7 +69,7 @@
 		ret =  WFM::CallFunction(`sound());
 	}
 	/* Return actual state */
-	else if (func == "Result") {
+	else if (func == "Export") {
 		ret = Sound::Export();
 	}
 	else if (func == "Read") {
