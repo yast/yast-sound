@@ -866,6 +866,8 @@ could make your system unstable.
 	opts = filter (string e, opts, ``(e != "snd_id"));// not neccessary?
 
 	map res = $[];
+	// get the default module parameters from database
+	map params      = get_module_params (modname);
 	// for each option collect their values
 	foreach (string opname, opts, ``{
 	    boolean coma = false;
@@ -875,11 +877,17 @@ could make your system unstable.
 	        {
 	            value = value + ",";
 	        }
-	        value = value + card_opts[opname]:"";
+		if (card_opts[opname]:"" != params[opname,"default"]:"")
+		{
+		    value = value + card_opts[opname]:"";
+		}
 		if (card_opts[opname]:"" != "")
 		    coma = true;
 	    });
-	    res = add (res, opname, value);
+	    if (value != "")
+	    {
+		res = add (res, opname, value);
+	    }
 	});
 	return res;
     }
