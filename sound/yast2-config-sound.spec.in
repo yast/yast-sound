@@ -4,7 +4,7 @@
 
 @HEADER@
 
-Requires:	yast2-trans-sound yast2-db-sound yast2 yast2-agent-any yast2-agent-audio yast2-agent-modules yast2-agent-system yast2-agent-rcconfig
+Requires:	yast2-trans-sound yast2-db-sound yast2 yast2-agent-any yast2-agent-audio yast2-agent-modules yast2-agent-system
 BuildArchitectures:     noarch
 Summary:	Configuration of sound
 
