@@ -54,4 +54,5 @@ make install
 @YAST2DIR@/clients/sound*.ycp
 @YAST2DIR@/menuentries/menu*.ycp
 @YAST2DIR@/bin/copyfonts
+@YAST2DIR@/modules/Example.ycp
 %doc @DOCDIR@

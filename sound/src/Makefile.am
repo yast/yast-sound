@@ -3,8 +3,9 @@
 #
 
 menudir = $(YAST2DIR)/menuentries
-modulesdir = $(YAST2DIR)/clients
+clientsdir = $(YAST2DIR)/clients
 includedir = $(YAST2DIR)/include/sound
+modulesdir = $(YAST2DIR)/modules
 bindir = $(YAST2DIR)/bin
 
 include_DATA = \
@@ -24,12 +25,14 @@ include_DATA = \
 	manual.ycp
 
 
-modules_DATA = 	\
+clients_DATA = 	\
 	sound.ycp 		\
 	sound_write.ycp		\
 	sound_summary.ycp
 
 menu_DATA = menuentry_sound.ycp
+
+modules_DATA = Sound.ycp
 
 bin_SCRIPTS = copyfonts
 

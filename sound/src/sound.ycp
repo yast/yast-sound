@@ -5,15 +5,15 @@
  *   sound.ycp
  *
  * Module:
- *   Sound 	 
+ *   Sound
  *
  * Authors:
- *   Dan Meszaros <dmeszar@suse.cz>
+ *   Dan Vesely <dan@suse.cz> Dan Meszaros <dmeszar@suse.cz>
  *
  * $Id$
  *
  * Installation of the sound card. If the sound card was not auto-detected ask user.
- *		     
+ *
  *
  */
 
@@ -47,7 +47,7 @@
     if (size(Args()) > 0 && Args(0)==.oss)
     {
 	use_alsa=false;
-    }	
+    }
 
     if (use_alsa)
     {
@@ -59,15 +59,26 @@
     }
     include "sound/texts.ycp";
 
+
+    // check for database existence
+
+    if (use_alsa && SCR::Read(.target.size, "/usr/lib/YaST2/sndcards.ycp")==-1)
+    {
+        UI::MessagePopup(_("Sound card database not found. Please check your installation."));
+        UI::CloseDialog();
+        return;
+    }
+
+    import "Sound";
     // text constants for sound module
     map STRINGS=STRINGS_();
-    float oldf=0.0; 
+    float oldf=0.0;
 
     // just cover functions for wizard sequencer
-    // these global variables are used and modified: 
+    // these global variables are used and modified:
     //	  save_info
     //	  card_id
-    //    sound_cards  
+    //    sound_cards
 
 
     map save_entry = $[];
@@ -79,15 +90,16 @@
      */
 
     global define _snd_select() ``{
-	sound_cards = getConfigurableCards(save_info);
-	if ((size(sound_cards) == 0) && (!was_complex))
+	Sound::UpdateUnconfiguredCards();
+//#	sound_cards = getConfigurableCards(save_info);
+	if ((size(Sound::unconfigured_cards) == 0) && (!was_complex))
 	{
 	    return `detail;
 	}
-	list nh	    = maplist(`e, sound_cards, ``(lookup(e, "model", "")));
+	list nh	    = maplist(`e, Sound::unconfigured_cards, ``(lookup(e, "model", "")));
 
-        list ch	    = maplist(`e, save_info, ``(lookup(e, "model", ""))); 
-	map res	    = sound_select(nh, save_info);
+        list ch	    = maplist(`e, Sound::modules_conf, ``(lookup(e, "model", "")));
+	map res	    = sound_select(nh, Sound::modules_conf);
 	symbol ui   = lookup(res, "ui", `abort);
 
 	card_id = lookup(res, "id", 0);
@@ -104,12 +116,12 @@
      */
 
     global define _snd_quick() ``{
-	save_entry = select(sound_cards, 0);
+	save_entry = select(Sound::unconfigured_cards, 0);
 	card_id = 0;
-	string modelname    = lookup(save_entry, "model", "");
+	string modelname    = lookup(Sound::modules_conf, "model", "");
 	map res		    = quickConfig(modelname, "snd-card-0", card_id, 15);
 	symbol ui	    = lookup(res, "ui", nil);
-	return ui;	
+	return ui;
     }
 
     /**
@@ -118,13 +130,13 @@
      */
 
     global define _snd_quick2(boolean type) ``{
-	save_entry  = add_common_options(save_entry, 0);
+	save_entry  = add_common_options(Sound::modules_conf, 0);
 	save_entry  = add_alias(save_entry, 0);
 	map res	    = sound_volume(save_entry, 0, true, type, []);
 	symbol ui   = lookup(res, "ui", nil);
 	if (ui == `next)
 	{
-	    save_info = [save_entry];
+	    Sound::modules_conf = [save_entry];
 	}
 	return ui;
     }
@@ -137,12 +149,12 @@
     global define _snd_manual() ``{
 	map res = sound_manual();
 
-	// if user selects the soundcards that has been already autodetected, 
+	// if user selects the soundcards that has been already autodetected,
 	// use the detected card instead of manual selection (because it causes
 	// some problems with uniq. keys)
 
 	symbol ui = lookup(res, "ui", `abort);
-    
+
 	boolean override = false;
 	string uniq_k = "";
 	string label = "";
@@ -153,7 +165,7 @@
 	    uniq_k = isa_uniq();
 	    label = lookup(res, "model", "Sound card");
 
-	    list cds = filter(`e, sound_cards, ``(lookup(e, "module", "") == lookup(res, "module", nil)));
+	    list cds = filter(`e, Sound::unconfigured_cards, ``(lookup(e, "module", "") == lookup(res, "module", nil)));
 	    y2debug("%1", cds);
 	    if (size(cds) > 0)
 	    {
@@ -167,7 +179,7 @@
 		"unique_key" : uniq_k
 		];
 	    card_id = -1;
-	}	
+	}
 	if (ui == `back)
 	{
 	    save_entry = $[];
@@ -181,7 +193,7 @@
      */
 
     global define _snd_add() ``{
-	list nh     = maplist(`e, sound_cards, ``(lookup(e, "model", "")));
+	list nh     = maplist(`e, Sound::unconfigured_cards, ``(lookup(e, "model", "")));
 	map res	    = WhichDialog(nh);
 	symbol ui   = lookup(res, "ui", `back);
         card_id	    = lookup(res, "card_id", -1);
@@ -190,10 +202,10 @@
             return `manual;
         }
 
-	return ui;	
+	return ui;
     }
 
-    /** 
+    /**
      * sound card deletion
      *
      */
@@ -206,25 +218,26 @@
             {
                 return `next;
             }
-            string modname = lookup(select(save_info, card_id), "module", "");
+            string modname = lookup(select(Sound::modules_conf, card_id), "module", "");
 
             // we have to rember volume/mute settings because after a card removal
             // everything is muted and set to 0.
             list vol_settings = get_vol_settings();
 
-            list rem	    = get_indices_for_removal(save_info, modname, card_id);
-            save_info	    = remove_save_entries(save_info, rem);
+            list rem	    = get_indices_for_removal(Sound::modules_conf, modname, card_id);
+            Sound::modules_conf	    = remove_save_entries(Sound::modules_conf, rem);
             vol_settings    = multi_remove(vol_settings, rem);
 
-            SaveModulesEntry (save_info, [], true);
+            SaveModulesEntry (Sound::modules_conf, [], true);
 
 	    sound_stop();
             sound_start_tmp(true);
             y2debug(sformat("%1", vol_settings));
             set_vol_settings(vol_settings);
- 
+
 	    // now we have to update the unconfigured cards list
-	    sound_cards = getConfigurableCards(save_info); 
+	    Sound::UpdateUnconfiguredCards();
+//#	    sound_cards = getConfigurableCards(save_info);
 
 	}
 
@@ -239,22 +252,22 @@
     global define _snd_config() ``{
 	if (card_id >= 0)
 	{
-	    save_entry = select(sound_cards, card_id);
+	    save_entry = select(Sound::unconfigured_cards, card_id);
 	}
-	map res = OneCardWizard(save_entry, size(save_info), 15, false, save_info);
+	map res = OneCardWizard(save_entry, size(Sound::modules_conf), 15, false, Sound::modules_conf);
 
         symbol ui = lookup(res, "ui", nil);
         if (ui == `next)
         {
 	    // copy card_entry from unconfigured to configured list
-            save_info = add(save_info, lookup(res, "return", $[]));
+            Sound::modules_conf = add(Sound::modules_conf, lookup(res, "return", $[]));
 	    if (card_id >= 0)
 	    {
 		// if this this card was autodetedted
 		// remove card we've just configured from unconfigured card list.
-		sound_cards = remove(sound_cards, card_id);
+		Sound::unconfigured_cards = remove(Sound::unconfigured_cards, card_id);
 	    }
-	    if (size(sound_cards) == 0)
+	    if (size(Sound::unconfigured_cards) == 0)
 	    {
 		// no other detected && unconfigured cards remained
 		return `detail;
@@ -270,12 +283,12 @@
 
     global define _snd_complex() ``{
 	was_complex = true;
-	map res	    = sound_complex(save_info);
+	map res	    = sound_complex(Sound::modules_conf);
         symbol ui   = lookup(res, "ui", nil);
         if (ui == `next)
         {
-            save_info	= lookup(res, "save_info", []);
-            rc_vars	= lookup(res, "rc_vars", []);
+            Sound::modules_conf	= lookup(res, "save_info", []);
+            Sound::rc_vars	= lookup(res, "rc_vars", []);
             state	= `save;
         }
 	return ui;
@@ -306,7 +319,7 @@ in order to configure sound cards."));
 	UI::CloseDialog();
 	return;
     }
-    
+
 
     boolean test_mode     = false;
     boolean config_mode   = false;
@@ -315,17 +328,17 @@ in order to configure sound cards."));
     boolean from_menu     = false;
 
     integer arg_n = size (Args ()) - 1;
-    while (arg_n >= 0) 
+    while (arg_n >= 0)
     {
 	if (Args(arg_n) == .test)
-	{ 
+	{
 	    test_mode     = true;
 	}
-	if (Args(arg_n) == .autoinst_mode) 
+	if (Args(arg_n) == .autoinst_mode)
 	{
 	    autoinst_mode = true;
 	}
-	if (Args(arg_n) == .conf_mode)    
+	if (Args(arg_n) == .conf_mode)
 	{
 	    config_mode   = true;
 	}
@@ -335,37 +348,38 @@ in order to configure sound cards."));
 	}
 	arg_n = arg_n - 1;
     }
-    list sound_cards  = []; 
-    list save_info    = read_save_info ();
+
+//#    list save_info    = read_save_info ();
+    // module initialization
+    Sound::LoadDatabase(); // FIXME TODO read on demand
+//    Sound::DetectHardware();
+    Sound::Read();
 
     /*
-     * this variable will not be touched. 
-     * it's purpose is for checking whether 
+     * this variable will not be touched.
+     * it's purpose is for checking whether
      * changes were done to config.
      */
-    list save_info_backup = save_info; 
+    list save_info_backup = Sound::modules_conf;
 
 
-    map rc_vars       = read_rc_vars (["START_ALSA", "START_ALSA_SEQ"]);
-    map rc_vars_backup = rc_vars;
+//#    map rc_vars       = read_rc_vars (["START_ALSA", "START_ALSA_SEQ"]);
+    map rc_vars_backup = Sound::rc_vars;
     integer card_id   = 0;
     integer n_cards   = 0;
     map result        = $[];
     boolean cont      = true;
 
-    list configured_unique = []; // list of unique keys, that was configured
-
     boolean exit = false;
-    list sound_db = nil;
 
-    if (use_alsa && SCR::Read(.target.size, "/usr/lib/YaST2/sndcards.ycp")==-1) 
+    if (use_alsa && SCR::Read(.target.size, "/usr/lib/YaST2/sndcards.ycp")==-1)
     {
 	UI::MessagePopup(_("Sound card database not found. Please check your installation."));
 	UI::CloseDialog();
-	return;			
+	return;
     }
-    sound_cards = getConfigurableCards(save_info);
-    integer all_cards_num = size(sound_cards);
+//#    sound_cards = getConfigurableCards(save_info);
+    integer all_cards_num = size(Sound::unconfigured_cards);
 
     if (exit)
     {	// no sound cards database present, shutting down
@@ -373,12 +387,12 @@ in order to configure sound cards."));
 	return;
     }
     SCR::Execute(.target.bash, "/bin/rm /tmp/modules.conf > /dev/null 2>&1; /bin/touch /tmp/modules.conf > /dev/null 2>&1", $[]);
-    
-    nm256_opl3sa2_warn(flatten(add([save_info], sound_cards)));
+
+    nm256_opl3sa2_warn(flatten(add([Sound::modules_conf], Sound::unconfigured_cards)));
 
     symbol state = `card_select;
 
-    
+
 // test data
 //    save_info=[];
 //    sound_cards=[$["model":"Pokusna karta", "module": "snd-card-emu10k1", "unique_key":"kx", "options": []]];
@@ -386,12 +400,12 @@ in order to configure sound cards."));
     string initial = "intro";
 
     // when running this module as non-root, go to complex-dialog
-    if (size(sound_cards) == 1 && size(save_info) == 0)
+    if (size(Sound::unconfigured_cards) == 1 && size(Sound::modules_conf) == 0)
     {
 	card_id = 0;
 	initial = "quick";
     }
-    else if (size(sound_cards) == 0)
+    else if (size(Sound::unconfigured_cards) == 0)
     {
 	initial = "complex";
     }
@@ -502,21 +516,19 @@ in order to configure sound cards."));
     }
 
 			    // filter out empty enries
-    save_info = filter (`e, save_info, ``(size (e) > 0));
-    n_cards = size (save_info);
+    // save_info = filter (`e, save_info, ``(size (e) > 0)); FIXME: ?? needed ? i doubt
+    n_cards = size (Sound::modules_conf);
 
     map save_map = $[];
 
     if (true)
     {
-	y2error(sformat("%1", [save_info, rc_vars, true, true, get_vol_settings()]));
+	Sound::DumpToLog();
     }
 
-    if (ui == `finish && (save_info != save_info_backup || rc_vars != rc_vars_backup)) 
+    if (ui == `finish && (Sound::modules_conf != save_info_backup || Sound::rc_vars != rc_vars_backup))
     {
-	CallFunction (`sound_write(save_info, rc_vars));
-
-    // always save unique keys 
+	Sound::Write(); // CallFunction (`sound_write(Sound::modules_conf, Sound::rc_vars));
     }
 
     UI::CloseDialog ();
