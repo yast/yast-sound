@@ -19,6 +19,7 @@
     import "Crash";
     import "Progress";
     import "Label";
+    import "Confirm";
 
     include "sound/read_routines.ycp";
     include "sound/routines.ycp";
@@ -293,6 +294,7 @@ could make your system unstable.
      * @return boolean success/failure
      */
     global define boolean DetectHardware() ``{
+
 	if (Mode::test)
 	{
 	    autoinstallation = true;
@@ -354,6 +356,10 @@ could make your system unstable.
 	{
 	    detected_cards = [];
 	}
+
+	/* Confirmation: label text (detecting hardware: xxx) */
+	if (!Confirm::Detection (_("Sound cards")))
+	    detected_cards = [];
 
 	// do noop if cards were already detected
 	if (detected_cards != nil)
