@@ -14,6 +14,9 @@
 #include <scr/SCRAgent.h>
 #include <scr/SCRInterpreter.h>
 
+extern char *ossChannels[];
+extern int ossChannels_num;
+
 /** 
  *  volume setting
  *  @param card card id (default if empty)
