@@ -199,9 +199,10 @@ Try to restart sound system?")))
 		    });
 		    if (oldentry != entry)
 		    {
-			if (UI::YesNoPopup(_("To apply changes, sound system
+			if (UI::YesNoPopup(_("To apply changes, the sound system
 must be restarted.
-Restart sound system now?")))
+Restart sound system now?
+")))
 			{
 			    sound_stop();
 			    SaveModulesEntry(save_info, [], true);

@@ -320,7 +320,8 @@
     if (whoami() != "root")
     {
 	UI::MessagePopup(_("You need to be logged in as root 
-in order to configure sound cards."));
+to configure sound cards.
+"));
 	UI::CloseDialog();
 	return;
     }
