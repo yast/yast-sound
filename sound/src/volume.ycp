@@ -77,7 +77,7 @@
 
 	string master_elem = lookup(lookup(Sound::db_modules, modname, $[]), 
 	    "main_volume", "Master");
-        SetVolume (master_elem, card_id, vol);
+        setVolume (master_elem, card_id, vol);
 
 	do
 	{
@@ -86,7 +86,7 @@
 	    if (ui == `volume)
 	    {
 		vol = UI::QueryWidget(`id(`volume), `Value );
-		SetVolume(master_elem, card_id, vol);
+		setVolume(master_elem, card_id, vol);
 	    }
 	    else if (ui == `test)
 	    {
@@ -97,6 +97,21 @@
 		    {
 			UI::MessagePopup (msg);
 		    }
+		}
+	    }
+	    else if (ui == `next && conf_joystick)
+	    {
+		symbol ret = joy_dialog(card_id);
+		if (ret == `back)
+		{
+		    con = VolumeCon(save_entry, vol);
+		    Wizard::SetContents (_("Sound card volume"), con, help_text, true, true);
+		    continue;
+		}
+		else
+		{
+		    ui = ret;
+		    break;
 		}
 	    }
 	    else if (ui == `abort || ui == `cancel)
@@ -124,7 +139,7 @@
 	y2debug("%1", save_entry);
 	string help_text = lookup(STRINGS, "ErrorDialog", "");
 	string additional = "";
-	if (lookup(save_entry, "module", "") == "snd-card-cs461x")
+	if (lookup(save_entry, "module", "") == "snd-cs461x")
 	{
 	    additional = "\n\n" + _("Please try to configure this sound card manually 
 using the \"Cirrus Logic CS4232\" or \"Cirrus 
@@ -301,15 +316,20 @@ its parameters using the 'Advanced setup'.");
     else
     {
 
-	string modname = lookup(save_entry, "module", "snd-card-dummy");
-	map devs = lookup(lookup(Sound::db_modules, modname, $[]), "mixer",
-	    $["Master":70, "PCM":70, "CD":70, "Synth": 70]);
+	string modname = lookup(save_entry, "module", "snd-dummy");
+//	map devs = lookup(lookup(Sound::db_modules, modname, $[]), "mixer",
+//	    $["Master":70, "PCM":70, "CD":70, "Synth": 70]);
+//
+//	list devs2 = maplist(`k, `v, devs, ``(k));
+//
+//        foreach (`dev, `vol, devs, ``(SetVolume (dev, card_id, vol)));
 
-	list devs2 = maplist(`k, `v, devs, ``(k));
+//	unmute(devs2, card_id);
+	if (!Sound::autoinstallation)
+	{
+	    Sound::InitMixer(card_id, lookup(save_entry, "module", "snd-dummy"));
+	}
 
-        foreach (`dev, `vol, devs, ``(SetVolume (dev, card_id, vol)));
-
-	unmute(devs2, card_id);
 	if (!quick)
 	{
 	    while (true)
@@ -332,7 +352,7 @@ its parameters using the 'Advanced setup'.");
 	    string master_elem = lookup(lookup(Sound::db_modules, modname, $[]),
 		"main_volume", "Master");
 
-	    SetVolume (master_elem, card_id, 75);
+	    setVolume (master_elem, card_id, 75);
 	    ui = SuccessDialog(save_entry);
 	}
 	storeVolume(card_id);
@@ -358,6 +378,7 @@ its parameters using the 'Advanced setup'.");
 
     UI::ChangeWidget (`id(`next), `Label, UI::NextButtonLabel());
 
+    SCR::Execute(.target.bash, "/usr/bin/killall aplay", $[]);
 
     return $["ui" : ui, "return" : size (err_msg) == 0];
 

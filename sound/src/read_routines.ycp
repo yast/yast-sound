@@ -152,6 +152,9 @@
 		{
 		    // probably system upgrade
 		    list cards = Sound::detected_cards;
+		    // although the /var/lib/YaST/unique.inf is deprecated since 8.0,
+		    // sometimes (if it exists) can help to assign old configuration
+		    // to detected hardware (this applies only to upgrade)
 		    list keys = read_unique_keys();
 		    if (size(keys) <= position)
 		    {

@@ -50,7 +50,7 @@
      * @return map symbol of next dialog
      */
 
-    global define map DisplayName (string name, string cname, integer cpos, integer flags) ``{
+    global define map DisplayName (string name, string cname, integer cpos, integer flags, boolean has_joy) ``{
 	string helptext = lookup(STRINGS, "DisplayName", "");
 	term con = AutoconfDlg(name, cname, cpos);
 	Wizard::SetContents (_("Sound card configuration"), con, helptext, true, true);
@@ -58,6 +58,7 @@
 	integer flagc = 1;
 	integer flagp = 0;
 	boolean selected = false;
+
 	list flages = [`quick, `normal, `intro];
 	while (flagp < 3)
 	{
@@ -79,19 +80,25 @@
 		// Next button label
 	UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
 
-	symbol input = `cancel;
+	symbol input = `quick;
 
-	while (input == `abort || input == `cancel)
-	{
-	    input = UI::UserInput();
-	    if (input == `cancel || input == `abort)
+	do {
+	    if (contains([`quick, `normal, `options], input))
+	    {
+		boolean state = has_joy && UI::QueryWidget(`id(`joystick), `Value) && (input != `quick);
+		UI::ChangeWidget(`id(`joystick), `Value, state);
+		UI::ChangeWidget(`id(`joystick), `Enabled, has_joy && (input != `quick));
+	    }
+	    else if (input == `cancel || input == `abort)
 	    {
 		if (ReallyAbort())
 		{
 		    return $["ui" : `abort];
 		}
 	    }
-	}
+	    input = UI::UserInput();
+	} while (input != `next && input !=`back);
+
 	symbol output = input;
 	if (input == `next)
 	{
@@ -100,6 +107,8 @@
 	    {
 		output = `next;
 	    }
+	    // global variable conf_joystick
+	    conf_joystick = UI::QueryWidget(`id(`joystick), `Value);
 	}
 	return $["ui" : output];
     }
@@ -113,51 +122,37 @@
      * @return map symbol for next dialog
      */
 
-    global define map quickConfig(string name, string cname, integer cpos, integer flags) ``{
+    global define map quickConfig(string name, string cname, integer cpos, boolean has_joy) ``{
         string helptext = lookup(STRINGS, "quickConfig", "");
         term con = QuickconfDlg(name, cname, cpos);
         Wizard::SetContents (_("Sound card configuration"), con, helptext, true, true);
                 // dialog title
-        integer flagc = 1;
-        integer flagp = 0;
-        boolean selected = false;
-	list flages = [`quick, `normal, `intro];
-        while (flagp < 3)
-        {
-            if ((flagc & flags) == 0)
-            {
-                UI::ChangeWidget(`id(select(flages, flagp, 0)), `Enabled, false);
-            }
-            else
-            {
-                if (!selected)
-                {
-                    selected = true;
-                    UI::ChangeWidget(`id(`action), `CurrentButton, select(flages, flagp, 0));
-                }
-            }
-            flagp = flagp + 1;
-            flagc = flagc * 2;
-        }
                 // Next button label
         UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
 
-	        symbol input = `cancel;
+	symbol input = `quick;
 
-        while (input == `abort || input == `cancel)
-        {
-            input = UI::UserInput();
-            if (input == `cancel || input == `abort)
+        do {
+	    if (contains([`quick, `normal, `intro], input))
+            {
+                boolean state = has_joy && UI::QueryWidget(`id(`joystick), `Value) && (input == `normal);
+                UI::ChangeWidget(`id(`joystick), `Value, state);
+                UI::ChangeWidget(`id(`joystick), `Enabled, has_joy && (input == `normal));
+            }
+	    else if (input == `cancel || input == `abort)
             {
                 if (ReallyAbort())
                 {
                     return $["ui" : `abort];
                 }
             }
-        }
+            input = UI::UserInput();
+        } while (input != `next && input != `back);
+
         symbol output = input;
         if (input == `next)
         {
+	    conf_joystick = UI::QueryWidget(`id(`joystick), `Value);
             output = UI::QueryWidget(`id(`action), `CurrentButton);
         }
         return $["ui" : output];
@@ -266,7 +261,7 @@
 			`Label(""),
 			`HBox(
 			    `PushButton (`id (`set), _("&Set")),
-			    `PushButton (`id (`reset), _("&Reset all"))
+			    `PushButton (`id (`reset), _("R&eset all"))
 			)
 		    )
 
@@ -425,11 +420,13 @@
                 `HBox (`HSpacing (5), `RadioButtonGroup (
                     `id (`action),
                     `VBox (
-                        `RadioButton (`id (`quick), `opt (`hstretch), _("&Quick automatic setup"), true),
+                        `RadioButton (`id (`quick), `opt (`hstretch, `notify), _("&Quick automatic setup"), true),
                         `VSpacing (0.3),
-                        `RadioButton (`id (`normal), `opt (`hstretch), _("Normal &setup")),
+                        `RadioButton (`id (`normal), `opt (`hstretch, `notify), _("Normal &setup")),
                         `VSpacing (0.3),
-                        `RadioButton (`id (`options), `opt (`hstretch), _("Advanced setup with possibility to change &options"))
+                        `RadioButton (`id (`options), `opt (`hstretch, `notify), _("Advanced setup with possibility to change &options")),
+			`VSpacing (3),
+			`Left(`CheckBox(`id(`joystick), _("&Configure joystick")))
                         )
                     )),
                 `VStretch ()
@@ -469,11 +466,13 @@
                 `HBox (`HSpacing (5), `RadioButtonGroup (
                     `id (`action),
                     `VBox (
-                        `RadioButton (`id (`quick), `opt (`hstretch), _("&Quick automatic setup"), true),
+                        `RadioButton (`id (`quick), `opt (`hstretch, `notify), _("&Quick automatic setup"), true),
                         `VSpacing (0.3),
-                        `RadioButton (`id (`normal), `opt (`hstretch), _("Normal &setup")),
+                        `RadioButton (`id (`normal), `opt (`hstretch, `notify), _("Normal &setup")),
                         `VSpacing (0.3),
-                        `RadioButton (`id (`intro), `opt (`hstretch), _("&More detailed installation of sound cards"))
+                        `RadioButton (`id (`intro), `opt (`hstretch, `notify), _("&More detailed installation of sound cards")),
+			`VSpacing(3),
+			`Left(`CheckBox(`id(`joystick), _("Configure joystick")))
                         )
                     )),
                 `VStretch ()
@@ -489,7 +488,11 @@
 
     global define boolean ReallyAbort()
     ``{
-	return UI::ReallyAbortPopup(false);
+	if (Sound::ConfigChanged() || Joystick::Changed())
+	{
+	    return UI::ReallyAbortPopup(true);
+	}
+	return true;
     }
 
     /**

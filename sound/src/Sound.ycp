@@ -28,53 +28,149 @@
     include "sound/routines.ycp";
 
     import "Summary";
+    import "Mode";
 
 
-    // flag for letting the module know, that it's launched from then hardware
-    // installation screen
+    /**
+     * flag for letting the module know, that it's launched from then hardware
+     * installation screen
+     */
     global boolean installation = false;
 
-    // was the proposal already generated?
+    /**
+     * was the proposal already generated?
+     */
     global boolean proposal_created = false;
 
-    //
+    /**
+     * autoinstallation mode?
+     */
     global boolean autoinstallation = false;
-    // list for storing detected cards
+
+    /**
+     * list for storing detected cards
+     */
     global list detected_cards = nil;
 
-    // list of detected and unconfigured cards
+    /**
+     * list of detected and unconfigured cards
+     */
     global list unconfigured_cards = nil;
 
-    // settings to save to /etc/modules.conf (only those concerning to sound)
+    /**
+     * settings to save to /etc/modules.conf (only those concerning to sound)
+     */
     global list modules_conf = [];
 
-    // what sound system we're using (true=alsa, false=oss)
+    /**
+     * what sound system we're using (true=alsa, false=oss)
+     */
     global boolean use_alsa = true;
 
-    // settings to save using .audio.alsa ... mixer
+    /**
+     * settings to save using .audio.alsa ... mixer
+     */
     global list volume_settings = [];
 
-    // rc settings
+    /**
+     * rc settings
+     */
     global map rc_vars = $[];
 
-    // alsa sound card database
+    /**
+     * alsa sound card database
+     */
+
+    /**
+     * card list
+     */
     global map db_cards = nil;
+    /**
+     * module details
+     */
     global map db_modules = nil;
+    /**
+     *
+     */
     global map db_indices = nil;
+    /**
+     *
+     */
     global map db_module_index = nil;
 
-    // flag for showing/not showing ui stuff (eg when loading alsa database)
+    /**
+     * flag for showing/not showing ui stuff (eg when loading alsa database)
+     */
     global boolean use_ui = false;
 
     /**
      * do hardware detection
+     * @return boolean success/failure
      */
 
     global define boolean DetectHardware() ``{
+	if (Mode::test)
+	{
+	    autoinstallation = true;
+	    detected_cards = [$[
+		    "bus"	: "PCI",
+		    "class_id"	: 4,
+		    "device"	: "SB Live! EMU10000",
+		    "device_id"	:65538,
+		    "drivers"	:
+		    [
+			$[
+			    "active"	: false,
+			    "modprobe"	: true,
+			    "modules"	:
+			    [
+				[
+				    "emu10k1",
+				    ""
+				]
+			    ]
+			]
+		    ],
+		    "old_unique_key" : "LaV9.FfCiMJnnUxC",
+		    "resource"	:
+		    $[
+			"io":
+			[
+			    $[
+				"active"    : true,
+				"length"    : 0,
+				"mode"	    : "rw",
+				"start"	    : 49152
+			    ]
+			],
+			"irq":
+			[
+			    $[
+				"count"	    : 41833,
+				"enabled"   : true,
+				"irq":10
+			    ]
+			]
+		    ],
+		    "rev"	    : "7",
+		    "slot_id"	    : 5,
+		    "sub_class_id"  : 1,
+		    "sub_device"    : "CT4832 SBLive! Value",
+		    "sub_device_id" : 98343,
+		    "sub_vendor"    : "Creative Labs",
+		    "sub_vendor_id" : 69890,
+		    "unique_key"    : "CvwD.FfCiMJnnUxC",
+		    "vendor"	    : "Creative Labs",
+		    "vendor_id"	    : 69890
+		]];
+	    return true;
+	}
+
 	if (autoinstallation)
 	{
 	    detected_cards = [];
 	}
+
 	// do noop if cards were already detected
 	if (detected_cards != nil)
 	{
@@ -87,6 +183,7 @@
 
     /**
      * searches for sound alias in /etc/modules.conf
+     * @return void
      */
 
     global define void ReadModulesConf() ``{
@@ -95,23 +192,33 @@
 
     /**
      * update list of unconfigured cards (necessaty when deleting configured card)
+     * @return void
      */
 
     global define void UpdateUnconfiguredCards() ``{
-	if (autoinstallation)
-	{
-	    return;
-	}
+//	if (autoinstallation)
+//	{
+//	    return;
+//	}
 	unconfigured_cards = getConfigurableCards(modules_conf);
     }
 
     /**
      * Read all sound settings from the SCR
+     * @param _unused
      * @return boolean True on success
      */
     global define boolean Read(block _unused) ``{
 	// first detect sound cards
 	DetectHardware();
+
+	if (Mode::test)
+	{
+	    modules_conf = [];
+	    rc_vars = $[];
+	    UpdateUnconfiguredCards();
+	    return true;
+	}
 	// load data from /etc/modules.conf
 	ReadModulesConf();
 	// create list of unconfigured cards
@@ -126,7 +233,8 @@
 
     /**
      * Get all sound settings from the first parameter
-     * (For use by autoinstallation.)
+     * (For autoinstallation use.)
+     * @param settings settings to import
      * @return boolean True on success
      */
     global define boolean Import(map settings) ``{
@@ -151,6 +259,8 @@
 
     /**
      * Update the SCR according to sound settings
+     * @paran _unused
+     * @param _unused2
      * @return boolean True on success
      */
     global define boolean Write(block _unused, block _unused2) ``{
@@ -162,7 +272,7 @@
     }
 
     /**
-     * Dump the sound settings to a single map
+     * Dump the sound settings to a single map. self explaining
      * (For use by autoinstallation.)
      * @return map Dumped settings (later acceptable by Import())
      */
@@ -177,6 +287,7 @@
 
     /**
      * opens alsa sound cards database
+     * @return void
      */
 
     global define void LoadDatabase() ``{
@@ -207,6 +318,11 @@
 	y2error(sformat("%1", [Sound::modules_conf, rc_vars, true, true, get_vol_settings()]));
     }
 
+    /**
+     * returns html formated configuration summary
+     * @return string
+     */
+
     global define string Summary() ``{
 	list retlist    = [];       // return value of the module
 
@@ -232,7 +348,17 @@
     }
 
     /**
-     *
+     * this function converts options for modules from 'modules_conf' data structure
+     * to another- this is needed for writing options to modules conf.
+     * eg. we have these configured cards:
+     * [
+     *           $["model":"sblive", "module":"snd-emu10k1", "options":$["opt1": "a", "opt2": "b"]],
+     *           $["model":"sblive", "module":"snd-emu10k1", "options":$["opt2": "c"]],
+     *           $["model":"other", "module":"mod2", "options":$["opt1": "a", "opt2": "b"]]
+     * ]
+     * CollectOptions("snd-emu10k1") returns $["opt1":"a,b", "opt2":",c"]
+     * @param modname module name
+     * @return map
      *
      */
 
@@ -278,6 +404,12 @@
 
     }
 
+    /**
+     * creates list of command that will be used for sound system start (emulates 'rcalsasound start' somehow)
+     * @return list of shell commands
+     *
+     */
+
     global define list CreateModprobeCommands() ``{
 	list outlist = [];
 	// create distinct list of all modules
@@ -288,7 +420,11 @@
 	    maplist(`k, `v, opts, ``{
 		optstr = optstr+ sformat(" %1=%2", k, v);
 	    });
-	    string modprobe = sformat("modprobe %1 %2", modname, optstr);
+	    // we need to tell 'modprobe' not to look into modules.conf now, because
+	    // it may contain messed options for the module %1 that will break the module
+	    // loading. (modprobe will merge options specified in param %2 with those specified
+	    // in modules.conf)
+	    string modprobe = sformat("/sbin/modprobe -C /dev/null %1 %2", modname, optstr);
 	    outlist = add(outlist, modprobe);
 	});
 
@@ -297,12 +433,10 @@
     }
 
     /**
-     *
-     * reset settings
-     *
+     * reset settings. used at installation time when user invokes 'reset to original proposal'
      */
 
-    global define ForceReset() ``{
+    global define void ForceReset() ``{
 	modules_conf = [];
 	DetectHardware();
 	UpdateUnconfiguredCards();
@@ -310,9 +444,8 @@
     }
 
     /**
-     *
      * create a proposal
-     *
+     * @return boolean success/failure
      */
 
     global define Propose() ``{
@@ -322,7 +455,14 @@
 	}
 	ForceReset();
 
-	// TODO: fix for nm256/opl3sa2 hack
+	// fix for nm256 cards: see bug #10384: leave this card unconfigured.
+	// loading of this module fails under some notebooks, nm256 module
+	// also makes some problems on other notebooks: there are detected
+	// two cards on some machines, althrough there is a sinlge card.
+	// two cards are detected: one that use opl3sa module and second one
+	// that uses nm256. let's solve this problem by filtering the nm256 mofdule out.
+
+	unconfigured_cards = filter(`e, unconfigured_cards, ``(lookup(e, "module", "") != "snd-nm256"));
 
 	modules_conf = recalc_save_entries(unconfigured_cards);
 	rc_vars = $[
@@ -336,14 +476,22 @@
     /* settings' backup */
 
     list modules_conf_b = nil;
-    list rc_vars_b = nil;
+    map rc_vars_b = nil;
     list volume_settings_b = nil;
+
+    /**
+     * copy settings to backup variables
+     */
 
     global define void StoreSettings() ``{
 	modules_conf_b = modules_conf;
 	rc_vars_b = rc_vars;
 	volume_settings_b = volume_settings;
     }
+
+    /**
+     * restore settings from backup variables
+     */
 
     global define void RestoreSettings() ``{
 	if (modules_conf_b == nil)
@@ -353,6 +501,20 @@
 	modules_conf = modules_conf_b;
 	rc_vars = rc_vars_b;
 	volume_settings = volume_settings_b;
+    }
+
+    /**
+     * returns true if the config has changed
+     * @return boolean
+     */
+
+    global define boolean Changed() ``{
+	if (modules_conf != modules_conf_b ||
+	    rc_vars != rc_vars_b)
+	{
+	    return true;
+	}
+	return false;
     }
 
     /**
@@ -396,6 +558,28 @@
 	}
     }
 
+    /**
+     * stores unique keys. this function is not part of sound_write module
+     * because it should not be called during autoinstallation
+     *
+     */
+
+    global define void StoreUniqueKeys() ``{
+	UpdateUnconfiguredCards();
+	list conf = maplist(`e, modules_conf, ``(lookup(e, "unique_key", "")));
+	list unconf = maplist(`e, unconfigured_cards, ``(lookup(e, "unique_key", "")));
+	SaveUniqueKeys(conf, unconf);
+    }
+
+    global define map GetJoystickSettings(string modname) ``{
+	map mod = lookup(db_modules, modname, $[]);
+	return lookup(mod, "joystick", $[]);
+    }
+
+    /**
+     * store mixer settings
+     */
+
     global define void StoreMixer() ``{
 	if (size(SCR::Dir(.audio.alsa.cards)) == 0)
 	{
@@ -420,6 +604,64 @@
 	    });
 
 	});
+    }
+
+    /**
+     * sets the channel volume to value [0..100]
+     * @param card_id card #
+     * @param channel channel name
+     * @value volume [0..100]
+     */
+
+    global define void SetVolume(integer card_id, string channel, integer value) ``{
+	// two cases: we have sound system already running:
+	if (!autoinstallation && size(SCR::Dir(.audio.alsa.cards)) > card_id)
+	{
+            string p = sformat(".audio.alsa.cards.%1.channels.%2.volume", card_id, channel);
+	    string p2 = sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, channel);
+	    SCR::Write(topath(p2), false);
+            return SCR::Write(topath(p), value);
+	}
+	else
+	{
+	    // alsa is not running. probably autoinstallation or someone wants
+	    // to change proposed volume
+	    // store volume to Sound::volume_settings datastricure in autoinstallation
+            map oldmap = Sound::volume_settings[card_id]:$[];
+            Sound::volume_settings[card_id] = add(oldmap, channel, value);
+            return true;
+	}
+    }
+
+    /**
+     * initialises volume after adding a new card. unmutes and sets volume for some channels
+     * @param card_id card id.
+     * @param module_name
+     * @return boolean
+     */
+
+    global define boolean InitMixer(integer card_id, string modname) ``{
+        map devs = lookup(lookup(Sound::db_modules, modname, $[]), "mixer",
+            $["Master":70, "PCM":70, "CD":70, "Synth": 70]);
+
+	// now let's merge settings from volume_settings list
+	if (size(volume_settings) != 0)
+	{
+	    maplist(`k, `v, volume_settings[card_id]:$[],
+	    ``{
+		devs = add(devs, k, v);
+	    });
+	}
+
+        list devs2 = maplist(`k, `v, devs, ``(k));
+
+        foreach (`dev, `vol, devs, ``{
+	    SetVolume (card_id, dev, vol);
+	});
+
+        unmute(devs2, card_id);
+
+	// in addidtion, some other channels can be specified or some volumes may be overriden
     }
 
 }

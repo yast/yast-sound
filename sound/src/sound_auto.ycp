@@ -50,7 +50,9 @@
 
     Sound::Import ( settings );
 
-    CallFunction(`sound());
-
-    return Sound::Export ();
+    if (CallFunction(`sound()) != `back)
+    {
+        return Sound::Export ();
+    }
+    return $[];
 }

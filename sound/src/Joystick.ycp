@@ -30,11 +30,13 @@
      */
     global list joystick = [];
 
-    list vars = [   "JS_GAMEPORT_MODULE",
-                    "JS_DEVICE_MODULE",
-                    "JS_DEVICE_MODULE_OPTION",
-                    "JS_CONTROL",
-                    "JS_PORT"];
+    list vars = [   "GAMEPORT_MODULE",
+                    "JOYSTICK_MODULE",
+                    "JOYSTICK_MODULE_OPTION",
+                    "JOYSTICK_CONTROL",
+                    "JOYSTICK_CONTROL_PORT"];
+
+    list joystick_backup = [];
 
     /**
      * Read all joystick settings from the SCR
@@ -56,7 +58,7 @@
 
 	    // go thru 'vars' list and read all variable values
 	    foreach(`v, vars, ``{
-		tmp = SCR::Read(topath(sformat(".joystick.%1_%2", v, pos)));
+		tmp = SCR::Read(topath(sformat(".sysconfig.joystick.%1_%2", v, pos)));
 		j = add(j, v, tmp);
 	    });
 
@@ -64,6 +66,16 @@
 
 	    pos = pos + 1;
 	}
+
+	joystick_backup = joystick;
+    }
+
+    global define boolean Changed() ``{
+	if (joystick != joystick_backup)
+	{
+	    return true;
+	}
+	return false;
     }
 
     /**
@@ -80,9 +92,12 @@
 
 	while (pos < 4)
 	{
+	    // first remove old settings
+	    maplist(`e, vars, ``(SCR::Write(topath(sformat(".sysconfig.joystick.%1_%2", e, pos)), "")));
+
 	    j = select(joystick, pos, $[]);
 	    foreach(`v, vars, ``{
-		SCR::Write(topath(sformat(".joystick.%1_%2", v, pos)), lookup(j, v, ""));
+		SCR::Write(topath(sformat(".sysconfig.joystick.%1_%2", v, pos)), lookup(j, v, ""));
 	    });
 	    pos = pos + 1;
 	}
@@ -98,7 +113,6 @@
      */
     global define boolean Import (map settings) ``{
 	joystick = settings;
-	sleep (30);
 	return true;
     }
 
@@ -108,7 +122,6 @@
      * @return Dumped settings (later acceptable by Import ())
      */
     global define map Export () ``{
-	sleep (30);
 	return joystick;
     }
 

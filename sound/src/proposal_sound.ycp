@@ -50,8 +50,8 @@
 	// Fill return map
 	ret =
 	    $[ "preformatted_proposal" : proposal,
-	       "warning"               : _("This is just a proposal for the sound setup."),
-	       "warning_level"         : `notice
+	       "warning"               : nil, //_("Sound cards."),
+	       "warning_level"         : nil //`notice
 	    ];
     }
     // Run an interactive workflow

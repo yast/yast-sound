@@ -200,9 +200,8 @@ _("The sound configuration will be saved now."),
 	    _("Install Soundfonts"),
 
 	    "soundFontQuestion":
-_("Should YaST2 install the wavetable soundfonts from 
-your Soundblaster Live! or AWE driver CD?
-"),
+_("Should YaST2 install the wavetable sound fonts from 
+your Soundblaster Live! or AWE driver CD?\n"),
 
 	    "soundFontAppeal":
 _("Insert the driver CD for the Soundblaster Live! or AWE card

@@ -172,17 +172,37 @@
      *
      */
 
-    global define boolean save_unique_keys (list keys) ``{
-        list orig = SCR::Read(.var.lib.yast.unique);
-        if (orig == nil)
-        {
-            orig = [];
-        }
-        list keys = maplist (`e, keys, ``($["unique" : e, "state" : "configured"]));
-        orig = filter (`e, orig, ``(lookup(e, "section", "") != "sound"));
-	list final = add (orig, $["contents" : keys, "section" : "sound"]);
-        return SCR::Write(.var.lib.yast.unique, final);
+//    global define boolean save_unique_keys (list keys) ``{
+//        list orig = SCR::Read(.var.lib.yast.unique);
+//        if (orig == nil)
+//        {
+//            orig = [];
+//       }
+//        list keys = maplist (`e, keys, ``($["unique" : e, "state" : "configured"]));
+//        orig = filter (`e, orig, ``(lookup(e, "section", "") != "sound"));
+//	list final = add (orig, $["contents" : keys, "section" : "sound"]);
+//        return SCR::Write(.var.lib.yast.unique, final);
+//    }
+
+    /**
+     * saves uniq keys to .probe.status
+     * @param configured list of strings of configured cards uniq keys
+     * @param unconfigured list of string of unconfigured cards uniq keys
+     * @return boolean
+     */
+
+    global define boolean SaveUniqueKeys(list configured, list unconfigured) ``{
+        maplist(`e, configured, ``{
+            SCR::Write(.probe.status.configured, e, `yes);
+        });
+
+        maplist(`e, unconfigured, ``{
+            SCR::Write(.probe.status.configured, e, `no);
+        });
+
+        return true;
     }
+
 
 
     /**

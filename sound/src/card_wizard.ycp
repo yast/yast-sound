@@ -37,7 +37,14 @@ boolean finish	= false;
 global define symbol _showName()
 ``{
     string modelname = lookup(save_entry, "model", "");
-    map res = DisplayName(modelname, lookup(save_entry, "alias", ""), card_id, flags);
+    string modname = lookup(save_entry, "module", "");
+    boolean has_joy = false;
+    if (lookup(lookup(Sound::db_modules, modname, $[]), "joystick", $[]) != $[])
+    {
+	has_joy = true;
+    }
+
+    map res = DisplayName(modelname, lookup(save_entry, "alias", ""), card_id, flags, has_joy);
     symbol ui = lookup(res, "ui", nil);
     return ui;
 }
