@@ -49,15 +49,16 @@ while (arg_n >= 0)
     arg_n = arg_n - 1;
 }
 
-// check for database existence
+/* check for database existence
 if (Sound::use_alsa &&
     SCR::Read(.target.size, Directory::datadir + "/sndcards.ycp") == -1)
 {
     // popup error message
     Popup::Message(_("Sound card database not found. Please check your installation."));
     UI::CloseDialog();
-    return;
-}
+    return nil;
+}FIXME
+*/
 
 // --------------------------------------------------------------------------
 // --------------------------------- cmd-line handlers
@@ -332,38 +333,38 @@ map cmdline = $[
     "id"		: "sound",
     // translators: command line help text for Tv module
     "help"		: _("Sound card configuration module."),
-    "guihandler"	: ``(SoundSequence()),
-    "initialize"	: ``(SoundRead ()),
-    "finish"		: ``(SoundWrite ()),
+    "guihandler"	: SoundSequence,
+    "initialize"	: SoundRead,
+    "finish"		: SoundWrite,
     "actions"		: $[
 	"summary" :$[
-	    "handler"	: ``(SoundSummaryHandler()),
+	    "handler"	: SoundSummaryHandler,
 	    // translators: command line help text for summary action
 	    "help"	: _("Configuration summary of sound cards")
 	],
 	"add" :$[
-	    "handler"	: ``(AddCardHandler()),
+	    "handler"	: AddCardHandler,
 	    // translators: command line help text for add action
 	    "help"	: _("Add sound card. Without parameters, add first one detected."),
 // TODO	    "options"	: "non_strict" - for unknown parameter names
 	],
 	"remove" :$[
-	    "handler"	: ``(RemoveCardHandler()),
+	    "handler"	: RemoveCardHandler,
 	    // translators: command line help text for remove action
 	    "help"	: _("Remove sound card(s)")
 	],
 	"playtest" :$[
-	    "handler"	: ``(TestCardHandler()),
+	    "handler"	: TestCardHandler,
 	    // translators: command line help text for test action
 	    "help"	: _("Play test sound on given sound card")
 	],
 	"show": $[
-	    "handler"	: ``(ShowCardHandler()),
+	    "handler"	: ShowCardHandler,
 	    // translators: command line help text for test action
 	    "help"	: _("Show the information of given sound card")
 	],
 	"set": $[
-	    "handler"	: ``(SetParametersHandler()),
+	    "handler"	: SetParametersHandler,
 	    // translators: command line help text for set action
 	    "help"	: _("Set the new values for given card parameters")
 // TODO	    "options"	: "non_strict" - for unknown parameter names

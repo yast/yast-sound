@@ -24,7 +24,6 @@
 
 #include <Y2.h>
 #include <scr/SCRAgent.h>
-#include <scr/SCRInterpreter.h>
 
 using std::string;
 using std::vector;

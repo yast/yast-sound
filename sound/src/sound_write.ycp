@@ -65,7 +65,7 @@
 
     import "Progress";
     import "Wizard";
-    import "Runlevel";
+    import "Service";
 
     import "Sound";
     import "Joystick";
@@ -189,13 +189,13 @@
     if (size(configuredcards) > 0)
     {
 	// enable alsasound service in runlevels 2,3,5
-	Runlevel::ServiceFinetune("alsasound", ["2", "3", "5"]);
+	Service::Finetune("alsasound", ["2", "3", "5"]);
     }
     else
     {
 	// disable sound service - it's not needed, no soundcard is present
-	Runlevel::ServiceAdjust("joystick", "disable");
-	Runlevel::ServiceAdjust("alsasound", "disable");
+	Service::Adjust("joystick", "disable");
+	Service::Adjust("alsasound", "disable");
     }
 
     return true;// TODO return value!

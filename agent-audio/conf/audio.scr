@@ -20,5 +20,5 @@
 .audio
 
 `ag_audio(
-    `AudioAgent("")
+    `AudioAgent()
 )

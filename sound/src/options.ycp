@@ -42,7 +42,7 @@
      * returns error message, empty string if ok
      * @return string error message
      */
-    global define string check_value (string value, string type, list poss) ``{
+    global define string check_value (string value, string type, list<string> poss) ``{
         if (type == "int")
         {
             if (tolower(substring (value, 0, 2)) == "0x")	// hex number
@@ -188,7 +188,7 @@
      * @param input string
      * @return list of values
      */
-    global define list string2vallist(string input) ``{
+    global define list<string> string2vallist(string input) ``{
 	boolean parse_error	= false;
 	list l			= flatten ((list<list>)parse_bracket(input));
 
@@ -242,7 +242,7 @@
 		return [];
 	    }
 
-	    list outlist = [];
+	    list<string> outlist = [];
 
 	    while (from <= to)
 	    {
@@ -266,7 +266,7 @@
 	    y2debug("parse error: %1", input);
 	}
 
-	return l;
+	return (list<string>) l;
     }
 
     /**
@@ -432,14 +432,14 @@
 	    {
 		current_option =
 		    (integer) UI::QueryWidget (`id(`table), `CurrentItem);
-		current_option_name = (string) select ((list)
+		current_option_name = (string) select ((term)
 		    UI::QueryWidget(`id(`table), `Item(current_option)), 2, "");
 
 		UI::ChangeWidget(`id(`des), `Label,
 		    // name of currently selected option: eg. 'Option: snd_asdf'
 		    sformat ("%1 %2", _("&Option: "),current_option_name));
 
-		UI::ChangeWidget(`id(`des), `Value, select ((list)
+		UI::ChangeWidget(`id(`des), `Value, select ((term)
 		    UI::QueryWidget(`id(`table),`Item(current_option)), 3, ""));
 
 		// update possible values
@@ -454,14 +454,14 @@
 		    vals = optmap["allows"]:"";
 		}
 
-		updatePossibleValues (vals, (string) select((list)
+		updatePossibleValues (vals, (string) select((term)
 		    UI::QueryWidget(`id(`table),`Item(current_option)), 3, ""));
 	    }
 	    if (ui == `poss)
 	    {
 		current_option =
 		    (integer) UI::QueryWidget (`id(`table), `CurrentItem);
-                current_option_name = (string) select ((list)
+                current_option_name = (string) select ((term)
 		    UI::QueryWidget(`id(`table), `Item(current_option)), 2, "");
 
 		string value = sformat("%1",UI::QueryWidget(`id(`poss),`Value));
@@ -480,7 +480,7 @@
 		}
 
 		// Should the value be checked, if it is in 'possible values'?
-		list possible_values = string2vallist(
+		list<string> possible_values = string2vallist(
 		    origOptions [current_option_name, "allows"]:"");
 
 		string err = check_value (value,

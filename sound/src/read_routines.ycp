@@ -91,10 +91,10 @@
      *	]
      * @return list
      */
-    global define list read_save_info () ``{
+    global define list<map> read_save_info () ``{
 
-        list save	= [];			// structure to save
-	list aliases	= (list) SCR::Read(.modules.alias);
+        list<map> save	= [];			// structure to save
+	list<string> aliases	= (list<string>) SCR::Read(.modules.alias);
 
 	aliases = filter(string a, aliases, ``(is_snd_alias(a)));
 

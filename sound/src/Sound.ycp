@@ -14,7 +14,6 @@
 
     import "Arch";
     import "Mode";
-    import "Runlevel";
     import "Summary";
     import "Crash";
     import "Progress";
@@ -62,17 +61,17 @@
     /**
      * list for storing detected cards
      */
-    global list detected_cards = nil;
+    global list<map> detected_cards = nil;
 
     /**
      * list of detected and unconfigured cards
      */
-    global list unconfigured_cards = nil;
+    global list<map> unconfigured_cards = nil;
 
     /**
      * settings to save to /etc/modules.conf (only those concerning to sound)
      */
-    global list modules_conf = [];
+    global list<map> modules_conf = [];
 
     /**
      * settings to save using .audio.alsa ... mixer
@@ -142,7 +141,7 @@
     /**
      * backup structures for sound settings
      */
-    list modules_conf_b = nil;
+    list<map> modules_conf_b = nil;
     map rc_vars_b = nil;
     list volume_settings_b = nil;
 
@@ -452,7 +451,7 @@ could make your system unstable.
 	{
 	    return true;
 	}
-	detected_cards  = (list) SCR::Read(.probe.sound);
+	detected_cards  = (list<map>) SCR::Read(.probe.sound);
 	return true;
     }
 
@@ -472,9 +471,9 @@ could make your system unstable.
      * @param save_info list of already configured cards
      * @return list of unconfigured cards
      */
-    global define list getConfigurableCards(list save_info) ``{
+    global define list<map> getConfigurableCards(list<map> save_info) ``{
 
-        list snd = Sound::detected_cards;
+        list<map> snd = Sound::detected_cards;
         snd = filter_configured(save_info, snd);
 
         // create save_info entries
@@ -1096,8 +1095,8 @@ could make your system unstable.
 	// remove cards without joystick support
 	foreach(map card, cards, ``{
 
-	    integer cid	= card["card_no"]:nil;
-	    if (cid != nil && HasJoystick(cid) == true)
+	    integer cid	= card["card_no"]:-2;
+	    if (cid != -2 && HasJoystick(cid) == true)
 	    {
 		filtered = add (filtered, card);
 	    }

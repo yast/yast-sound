@@ -12,7 +12,6 @@
 
 #include <Y2.h>
 #include <scr/SCRAgent.h>
-#include <scr/SCRInterpreter.h>
 
 extern char *ossChannels[];
 extern int ossChannels_num;

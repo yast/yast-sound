@@ -17,7 +17,6 @@
 
 #include <Y2.h>
 #include <scr/SCRAgent.h>
-#include <scr/SCRInterpreter.h>
 
 #include "OSSAudio.h"
 

@@ -26,7 +26,7 @@
 
 
     // list of all card models (generated only once and cached)
-    global list all_card_names = [];
+    global list<string> all_card_names = [];
 
     // list of all sound modules (table items)
     global list all_module_items = [];
@@ -37,7 +37,7 @@
      * @param keys in which set is the key: "vendors" or "modules"
      * @return list with sound card models
      */
-    global define list get_card_names (string key, string keys) ``{
+    global define list<string> get_card_names (string key, string keys) ``{
 
 	Sound::LoadDatabase(true);
 
@@ -46,9 +46,9 @@
 	    if (all_card_names == [] || all_card_names == nil)
 	    {
 		// use card names from db_cards (they contain the vendor name)
-		all_card_names = maplist (integer k, list v, Sound::db_cards,
+		list<list<string> > all_card_names_list = (list<list<string> >) maplist (integer k, list v, Sound::db_cards,
 		    ``(v));
-		all_card_names = sort ((list)flatten (all_card_names));
+		all_card_names = sort ((list<string>) flatten (all_card_names_list));
 	    }
 	    return all_card_names;
         }
@@ -56,7 +56,7 @@
 	if (keys == "vendors")
 	{
 	    // names from db_vendors (vendor name not included - not necessary)
-	    return sort (Sound::db_vendors[key]:[]);
+	    return sort ((list<string>) (Sound::db_vendors[key]:[]));
 	}
 	else
 	{
@@ -66,7 +66,7 @@
 	    map mods = mapmap (integer k, string v, Sound::db_module_index,
 		``($[v : k]));
 	    integer index	= mods[key]:0;
-	    list cards		= sort (Sound::db_cards[index]:[]);
+	    list<string> cards		= sort ((list<string>) (Sound::db_cards[index]:[]));
 
 	    if (cards == [])
 	    {
@@ -390,7 +390,7 @@
      * @param cards autodetected cards
      * @return list of entries of not configured cards
      */
-    global define list filter_configured(list save_info, list cards) ``{
+    global define list<map> filter_configured(list<map> save_info, list<map> cards) ``{
 
         return filter(map det_card, cards, ``{
             string uniq     = det_card["unique_key"]:"";
@@ -796,7 +796,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      * @param save_info list
      * @return list new save_info
      */
-    global define list recalc_save_entries(list save_info) ``{
+    global define list<map> recalc_save_entries(list<map> save_info) ``{
 	integer pos = 0;
 	save_info = maplist(map card, save_info, ``{
 	    map opts	= card["options"]:$[];

@@ -76,7 +76,7 @@
 	string model	= Sound::save_entry["model"]:"";
 	map res	= quickConfig (model, "snd-card-0", Sound::card_id, has_joy);
 
-	return res["ui"]:nil;
+	return (symbol) (res["ui"]:nil);
     }
 
     /**
@@ -88,7 +88,7 @@
 	Sound::save_entry  = add_common_options(Sound::save_entry, 0);
 	Sound::save_entry  = add_alias(Sound::save_entry, 0);
 	map res	    = sound_volume(Sound::save_entry, 0, true, type, []);
-	symbol ui   = res["ui"]:nil;
+	symbol ui	= res["ui"]:`back;
 	if (ui == `next)
 	{
 	    Sound::modules_conf = [Sound::save_entry];
@@ -197,7 +197,7 @@
 	map res = OneCardWizard (Sound::save_entry, size(Sound::modules_conf),
 	    15, false, Sound::modules_conf);
 
-        symbol ui = res["ui"]:nil;
+	symbol ui	= res["ui"]:`back;
         if (ui == `next)
         {
 	    // copy card_entry from unconfigured to configured list
@@ -225,7 +225,7 @@
     global define symbol _snd_complex() ``{
 	was_complex = true;
 	map res	    = sound_complex();
-        return res["ui"]:nil;
+        return (symbol) (res["ui"]:nil);
     }
 
 

@@ -13,7 +13,7 @@
     textdomain "sound";
 
     import "Mode";
-    import "Runlevel";
+    import "Service";
 
     /**
      * joystick config datastructure (list of maps)
@@ -87,7 +87,7 @@
 	    }
 
 	    // if comment has more lines get last line as model name
-	    list lines = splitstring(model, "\n");
+	    list<string> lines = splitstring(model, "\n");
 
 	    // select last line from comment
 	    if (size(lines) > 1)
@@ -239,7 +239,7 @@
 
 	if (start == "enable")
 	    SCR::Execute(.target.bash, "/etc/init.d/joystick start", $[]);
-	Runlevel::ServiceAdjust("joystick", start);
+	Service::Adjust("joystick", start);
 	return true;
     }
 

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Dec  9 16:24:19 CET 2003 - jsuchome@suse.cz
+
+- SCR agents adapted for new interpreter
+
+-------------------------------------------------------------------
 Fri Dec  5 15:32:49 CET 2003 - jsuchome@suse.cz
 
 - Manual dialog: possibility to choose a card both by kernel and vendor
