@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Aug 13 17:05:23 CEST 2001 - dmeszar@suse.cz
+
+- stderr of 'execute' commands redirected to /dev/null
+  when running .target.bash
+
+-------------------------------------------------------------------
 Fri Aug 10 13:03:41 CEST 2001 - dmeszar@suse.cz
 
 - bug #5838 fixed
