@@ -1,0 +1,165 @@
+/**
+ *
+ *
+ * File:
+ *   sound_card_wizard.ycp
+ *
+ * Module:
+ *   Sound       
+ *
+ * Authors:
+ *   Dan Meszaros <dmeszar@suse.cz>
+ *
+ * $Id$
+ *
+ * Snd card setup wizard.
+ *                   
+ *
+ */
+{
+
+/*
+ * global variables
+ *
+ */
+
+include "wizard/sequencer.ycp";
+include "sound/routines.ycp";
+include "sound/alsa_routines.ycp";
+
+list save_entry=[];
+integer card_id=0;
+integer flag=0;
+any ui=nil;
+list save_info=[];
+boolean finish=false;
+
+global define _showName()
+``{
+    string modelname=lookup(save_entry, "model", "");
+    res=DisplayName(modelname, lookup(save_entry, "alias"), card_id, flags);
+    symbol ui=lookup(res, "ui", nil);
+    return ui;
+}
+
+global define _options()
+``{
+    res=CallModule ("sound_options", [save_entry]);
+    symbol ui=lookup(res, "ui", nil);
+    if(ui == `next)
+    {
+	save_entry=lookup(res, "return", $[]);
+        save_entry=add_common_options(save_entry, card_id);
+    }
+    return ui;
+}
+
+global define _quick()
+``{
+    res=CallModule ("sound_volume", [save_entry, card_id, finish, true, save_info]);
+    symbol ui=lookup(res, "ui", nil);
+    return ui;
+}
+
+global define _volume()
+``{
+    res=CallModule ("sound_volume", [save_entry, card_id, finish, false, save_info]);
+    symbol ui=lookup(res, "ui", nil);
+    return ui;
+}
+
+global define _optVolume()
+``{
+    return _volume();
+}
+
+global define AbortDialog() ``{
+    any ret = UI(`ReallyAbortPopup(true));
+    if(ret==true) return `yes;
+    return `back;
+
+}
+
+    /**
+     * Wizard steps: 1. displayname 
+     * <br>
+     * 2. modprobe and volume settings
+     * @param   card_info as returned by libhd
+     * @param   car_id index of configured car
+     * @param   ui 
+     * @param   flags defines which radioboxes has to be enabled (0x1 - first, 0x2 second, 0x4 third...)
+     * @param   finish true if no complex dialog is to be called (then the popup "Config will be saved.." will appear)
+     * @return  list with save info, as required by sound_write for one cards
+     */
+global define OneCardWizard (map save_entry, integer card_id, any ui, 
+			     integer flags, boolean finish, list save_info) ``{
+            // 3rd param for "sound_module" will be defined later
+            // TODO: add nm256hack
+	
+/*	save_entry=_save_entry;
+	card_id=_card_id;
+	ui=_ui;
+	flags=_flags;
+	finish=_finish;
+	save_info=_save_info;
+
+*/
+	map aliases=$[
+		"name"	    : ``(_showName()),
+		"options"   : ``(_options()),
+		"volume"    : ``(_volume()),
+		"optVolume" : ``(_optVolume()),
+		"quick"	    : ``(_quick())
+	    ];
+	
+
+	map sequence=$[
+	    "ws_start": "name",
+	    "abort":
+	    $[
+	        `yes: `abort
+	    ],
+	    "name":
+	    $[
+		`quick: "quick",
+	        `next:  "volume",
+//	        `back:  `back,
+	        `options: "options",
+		`abort:	`abort
+	    ],
+	    "options":
+	    $[
+	        `next: "optVolume",
+//	        `back: "name",
+	        `abort: `abort
+	    ],
+	    "volume":
+	    $[
+		`next: `next,
+//		`back: "name",
+		`abort: `abort
+	    ],
+	    "optVolume":
+	    $[
+		`next: `next,
+//		`back: "options",
+		`abort: `abort
+	    ],
+	    "quick":
+	    $[
+		`next: `next,
+		`abort: `abort
+	    ]
+	];
+
+    map opts=lookup(save_entry, "options", $[]);
+    save_entry=add_common_options(save_entry, card_id);
+    save_entry=add_alias(save_entry, card_id);
+    
+    any uy=WizardSequencer(aliases, sequence);
+    return $["ui": uy, "return": save_entry];
+    
+    }
+
+
+}
