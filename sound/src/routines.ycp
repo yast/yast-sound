@@ -294,8 +294,6 @@
 
 	already=output;
 
-//	already = maplist (`k, lookup (select (filter (`e, already, ``(lookup (e, "section") == "sound")), 0, $[]), "contents", []),
-//                           ``(lookup (k, "unique")));	
 	return already;
     }
 
@@ -330,9 +328,6 @@
      */
 
     global define get_obsoletes(list cards, list keys) ``{
-//	list keys=read_unique_keys();
-//      list cards=get_audio(false, false);
-	
 	list audio_keys=[];
         integer i=0;
         integer bound=size(cards);
@@ -357,12 +352,9 @@
      */
 
     global define get_present_unique_keys (list cards, list keys) ``{
-//	list keys=read_unique_keys();
 	list obs=get_obsoletes(cards, keys);
 	integer i=size(obs)-1;
 
-//	y2error(sformat("all keys: %1", keys));
-//	y2error(sformat("keys for removal: %1", obs));
 	while(i>=0)
 	{
 	    keys=remove(keys, select(obs, i));
@@ -391,7 +383,6 @@
         {
             // special warning message for in a special case
             string warn_text=lookup(STRINGS, "nm256hackWarning", "");
-//          return UI(`WarnDialog (warn_text));
 	    return UI(`YesNoPopup(warn_text));
         }
         return true;
@@ -671,7 +662,6 @@
      * @return any
      */
     global define SetVolume (string command, string channel, string value, integer card_num) ``{
-//	y2error(sformat("command: %1, channel: %2, volume: %3, card_num: %4", command, channel, value, card_num));
 	return SCR(`Execute (.target.bash, command, $["CHANNEL" : channel, "VOLUME" : value, "CARD_NUM" : card_num]));
     }
 
@@ -875,14 +865,10 @@
             if (!probe)
             {
 		SCR (`Execute (.target.bash, sformat("/sbin/insmod -C %1 %2 %3", dumbconf, module_name, module_options), $[]));
-//                SCR (`Execute (.target.insmod, module_name, module_options));
-//		y2error(sformat("insmod  %1 %2", module_name, module_options));
             }
             else
             {
 		SCR(`Execute(.target.bash, sformat("/sbin/modprobe -C %1 %2 %3", dumbconf, module_name, module_options), $[]));
-//                SCR(`Execute (.target.modprobe, module_name, module_options));
-//		y2error(sformat("modprobe -C %3 %1 %2", module_name, module_options, dumbconf));
             }
         }
 
@@ -1242,8 +1228,6 @@
 	}
 
 
-//	string cmd=sformat("/bin/grep \"alias.*snd-card-[0-9]\" %1 | cut -f 3 | sort | uniq | while read A ;do modprobe -C %2 $A; done", get_tmp_modules_conf(), get_tmp_modules_conf());
-//	SCR(`Execute(.target.bash, cmd, $[]));	
 	if(restore)
 	{
 	    SCR(`Execute(.target.bash, "/usr/sbin/alsactl restore", $[]));
@@ -1258,7 +1242,6 @@
 
     global define CreateTmpModulesConf() ``{
 	string cmd="";
-//	string tmpdir=SCR (`Read (.target.tmpdir));
 
 
 	cmd="/bin/echo alias char-major-116 snd > "+get_tmp_modules_conf();
@@ -1266,7 +1249,6 @@
 	cmd="/bin/echo options snd snd_cards_limit=16 snd_major=116 >> "+get_tmp_modules_conf();
 	SCR(`Execute(.target.bash, cmd, $[]));
 	
-//	cmd=sformat("/bin/grep \"^[^#].*snd-card-\" /etc/modules.conf >> %1", get_tmp_modules_conf());
 	cmd=sformat("/bin/grep \"^alias.snd-card-[0-9]*\" /etc/modules.conf >> %1", get_tmp_modules_conf());
 	SCR(`Execute(.target.bash, cmd, $[]));
 	

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon May 14 10:52:29 CEST 2001 - dmeszar@suse.cz
+
+- sound summary for non-pnp cards fixed (bug #8157)
+
+-------------------------------------------------------------------
 Fri May 11 13:27:28 CEST 2001 - dmeszar@suse.cz
 
 - soundblater awe card presence enhanced

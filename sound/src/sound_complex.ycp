@@ -28,8 +28,6 @@
     include "sound/ui.ycp";
     include "sound/texts.ycp";	
     
-//    include "browser.ycp";
-
     map STRINGS=STRINGS_();
 
 
@@ -225,6 +223,8 @@
 	    }
 	    else if (ui == `b_options)
 	    {
+
+
 		integer card_id = UI(`QueryWidget (`id(`configured_table), `CurrentItem));
 // cards are inherited from main \|/		list cards=get_audio (false,false);
 		map card=RestoreCardInfo(select(cards, card_id), save_info);
