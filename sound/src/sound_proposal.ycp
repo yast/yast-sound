@@ -1,23 +1,16 @@
 /**
- * File:
- *   clients/proposal_sound.ycp
- *
- * Package:
- *   Configuration of sound
- *
- * Summary:
- *   Proposal function dispatcher.
- *
- * Authors:
- *   Dan Meszaros <dmeszar@suse.cz>
+ * File:	clients/sound_proposal.ycp
+ * Package:	Configuration of sound
+ * Summary:	Proposal function dispatcher.
+ * Authors:	Dan Meszaros <dmeszar@suse.cz>
  *
  * $Id$
  *
  * Proposal function dispatcher for sound configuration.
- *
  */
 
 {
+
     textdomain "sound";
 
     import "Sound";
@@ -84,4 +77,6 @@
     }
 
     return ret;
+
+/* EOF */
 }
