@@ -1,0 +1,75 @@
+{
+    include "gen_routines.ycp";
+    include "browser.ycp";
+
+    string pattern = "(snd-card-[^ \t]*)[\t ]*(0x[0-9a-f]*)[\t ]*(0x[0-9a-f]*).*";
+
+    string kernel_ver = lookup(SCR::Execute(.target.bash_output, "uname -r", $[]), "stdout", "");
+    kernel_ver = select(splitstring(kernel_ver, "\n"), 0);
+    string s = SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.pcimap");
+
+    // pci map:
+    // ========
+    list lpci = splitstring(s, "\n");
+
+    lpci = maplist(`e, lpci, ``(regexptokenize(e, pattern)));
+    lpci = filter(`e, lpci, ``(e!=[]));
+
+    // now we have tripples: [modname, vendor_id, device_id]
+
+    // isapnp map:
+
+    s = SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.isapnpmap");
+    list lpnp = splitstring(s, "\n");
+
+    // we need those double dots to change the order of bytes (they are in LSB in modules.isapnpmap)
+    pattern = "(snd-card-[^ \t]*)[\t ]*0x(..)(..)[\t ]*0x(..)(..).*";
+
+    lpnp = maplist(`e, lpnp, ``(regexptokenize(e, pattern)));
+    lpnp = filter(`e, lpnp, ``(e!=[]));
+
+    // change LSB to MSB
+    lpnp = maplist(`e, lpnp, 
+	``([
+	    select(e, 0),
+	    "0x" + select(e, 2)+select(e, 1),
+	    "0x" + select(e, 4)+select(e, 3)
+	]));
+
+
+    // open the module index database
+    map mod_idx = SCR::Read(.target.ycp, "./module_index.ycp");
+
+    // we need 'reverse' map od module index:
+
+    map index = mapmap(`k, `v, mod_idx, ``([v, k]));
+
+    map output = $[];
+
+    integer vendor_id = 0;
+    integer device_id = 0;
+    integer mod_id = 0;
+
+    list l = flatten([lpci, lpnp]);
+
+    foreach(`e, l,
+    ``{
+	vendor_id = tointeger(select(e, 1));
+	device_id = tointeger(select(e, 2));
+	mod_id = lookup(index, select(e, 0), -1);
+	if (haskey(output, vendor_id))
+	{
+	    map oldmap = lookup(output, vendor_id, $[]);
+	    oldmap = add(oldmap, device_id, mod_id);
+	    output = add(output, vendor_id, oldmap);
+	}
+	else
+	{
+	    output = add(output, vendor_id, add($[], device_id, mod_id));
+	}
+    });
+
+    BrowseTree(output);
+
+    SCR::Write(.target.ycp, "./idlist.ycp", output);
+}

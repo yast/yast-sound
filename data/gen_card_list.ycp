@@ -1,0 +1,81 @@
+{
+
+    include "browser.ycp";
+    include "gen_routines.ycp";
+
+    map mod_idx = SCR::Read(.target.ycp, "./module_index.ycp");
+
+    // we need 'reverse' map od module index:
+
+    map index = mapmap(`k, `v, mod_idx, ``([v, k]));
+
+
+    global define get_card_list(string str) ``{
+        string pattern = "([^ \t]*)[\t ]*info_devices=[\{](.*)[\}]";
+        list l = regexptokenize ( str, pattern );
+
+        if (size(l) == 0)
+        {
+            return [];
+        }
+
+
+        string second = select(l, 1);
+        string token = "";
+
+	list output = [];
+
+	list cards = parse_bracket(second);
+
+//	BrowseTree(cards);
+	if (select(l, 0) == "snd-card-cs4232")
+	{
+	    BrowseTree(cards);
+	}
+
+	if (size(cards) > 0)
+	{
+	    output = maplist(`e, cards, 
+	    ``{
+		if (size(e) > 1)
+		{
+		    return select(e, 1)+", "+select(e, 0);
+		}
+		else
+		{
+		    return select(e, 0);
+		}
+	    });
+	}
+
+	output = toset(output);
+
+	return output;
+}
+
+    // let's open input file...
+    string kernel_ver = lookup(SCR::Execute(.target.bash_output, "uname -r", $[]), "stdout", "");
+    kernel_ver = select(splitstring(kernel_ver, "\n"), 0);
+    string s = SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.generic_string");
+
+    list l = splitstring(s, "\n");
+
+    map output = $[];
+
+    list toks = [];
+
+    foreach(`e, l,
+    ``{
+	toks = regexptokenize(e, "(snd-card-[^ \t]*)[\t ]*info_devices=");
+	if (size(toks) > 0)
+	{
+	    output = add (output, lookup(index, select(toks, 0), -1), get_card_list(e));
+	}
+
+    });
+
+    BrowseTree(output);
+
+    SCR::Write(.target.ycp, "./cardlist.ycp", output);
+
+}
