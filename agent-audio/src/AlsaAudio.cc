@@ -212,7 +212,7 @@ YCPValue alsaStore(int card=-1)
 	sprintf(tmp, "%d", card);
 	cmd+=tmp;
     }
-    cmd+=" > /dev/null";
+    cmd+=" > /dev/null 2>&1";
     y2error("executing '%s'", cmd.c_str());
     if(system(cmd.c_str())!=-1)
     {
@@ -232,7 +232,7 @@ YCPValue alsaRestore(int card=-1)
 	sprintf(tmp, "%d", card);
 	cmd+=tmp;
     }
-    cmd+=" > /dev/null";
+    cmd+=" > /dev/null 2>&1";
     y2error("executing '%s'", cmd.c_str());
     if(system(cmd.c_str()))
     {
