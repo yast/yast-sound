@@ -154,6 +154,14 @@
 		}
 
 	    }
+	    else if (ui == `abort || ui == `cancel)
+	    {
+		if(ReallyAbort())
+		{
+		    ui=`cancel;
+		    break;
+		}
+	    }
 		
 		
 	} until (((ui == `back) || (ui == `next) || ui == `cancel));

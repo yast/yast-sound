@@ -426,6 +426,23 @@
   }
 
     /**
+     * runs a perl script 'fetchmodule' and returns a sndcards-like module record    
+     * for a non-alsa module
+     * @param 1st modude name (eg. 'cs4231')
+     */
+
+    global define fetchmodule(string modname)
+    ``{
+	string tmpdir=SCR (`Read (.target.tmpdir));
+	SCR (`Execute (.target.bash, sformat ("/usr/bin/fetchmodule %1.o > %2/mod.ycp" , modname, tmpdir)));
+	{
+	    map out=SCR(`Read(.target.ycp, tmpdir+"/mod.ycp"));
+	    return UI(out);
+	}
+	return [];
+    }
+
+    /**
      * Looks up in the database for the module
      * @return map
      */
@@ -441,6 +458,20 @@
 	integer device_id = lookup (card, "device_id", 0);
 
 	list fc = [];
+
+	if(size(lookup(card, "module", [])) > 0)
+	{
+	    map mod=select(lookup(card, "module", []), 0);
+	    map fmod=fetchmodule(lookup(mod, "name", []));
+	    if(lookup(mod, "name", "") != "")
+	    {
+		return $["name": lookup(mod, "name", ""),
+			 "module": mod, 
+			 "params": lookup(fmod, "params"),
+			 "libhd": [],
+			 "cards": [lookup(card, "subclass")]];
+	    }
+	}
 	
 	if (tolower (bus) == "pci") 
 	{
@@ -454,6 +485,7 @@
 		   ``(filter(`c, lookup (d, "libhd"), ``((lookup (c, "vendor_id") == vendor_id - offset) &&
 							 (lookup (c, "device_id") == device_id - offset))) != []));
 	}
+
 	if (!isnil(fc))
 	{
 	    if (size (fc) > 0) return select (fc, 0);

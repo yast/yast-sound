@@ -112,8 +112,16 @@
 		    UI(`ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, card_id)));
 		}
 	    }
+	    else if (ui == `abort || ui == `cancel)
+	    {	
+		if(ReallyAbort())
+		{   
+		    ui=`cancel;
+		    break;
+		}
+	    }	
 
-	} until (((ui == `back) || (ui == `next) || ui == `cancel));
+	} until (((ui == `back) || (ui == `next) ));
 
 
 	map ret = $["ui" : ui];

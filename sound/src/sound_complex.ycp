@@ -103,13 +103,17 @@
 	    {
 		UI(`ChangeWidget (`id(`sel), `Enabled, false));
 	    }
-	    else 
+	    else if (ui == `auto)
 	    {
-		if (ui == `auto)
-		{
-		    UI(`ChangeWidget (`id(`sel), `Enabled, true));
-		}
+		UI(`ChangeWidget (`id(`sel), `Enabled, true));
 	    }	
+	    else if (ui == `abort || ui == `cancel)
+	    {
+		if(ReallyAbort())
+		{
+		    break;
+		}
+	    }
 	} until ((((ui == `back) || (ui == `next) || ui == `cancel))); 
 
 
@@ -267,6 +271,10 @@
 		    }
 		    save_info=new_save_info;
 		}
+		else if(lookup(res, "ui") == `abort || lookup(res, "ui") == `cancel)
+		{
+		    return $["ui": `abort];
+		}
 		UI(`ChangeWidget(`id(`next), `Label, _("&Finish")));
 
 		UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
@@ -318,6 +326,10 @@
 				{
 				    configured_unique = filter (`e, configured_unique, ``(lookup (card, "unique_key", "") != e));
 				}
+				else if(ui == `abort || ui == `cancel)
+				{
+				    return $["ui" : `abort];
+				}
 			    }
 			    if (ui == `back) 
 			    {
@@ -341,7 +353,11 @@
 				    dialog = filter (`e, dialog, ``(e == ``(CallModule ("sound_manual", []))));
 				    id = id - 1;
 				}
-				else if ((ui == `cancel) || (ui == `skip))
+				else if (ui == `cancel || ui == `abort)
+				{   
+				    return $["ui" : `abort];
+				}
+				else if (ui == `skip)
 				{
 				    break;
 				}
@@ -364,10 +380,15 @@
 			    {   
 				break;
 			    }
+			    else if(ui == `cancel || ui == `abort)
+			    {
+				return $["ui": `abort];
+			    }
 			}
 		    }
-		    else if (ui == `cancel)
+		    else if (ui == `cancel || ui == `abort)
 		    {
+			return $["ui" : `abort];
 			break;
 		    }
 		} until ((ui == `back) || (ui == `next) || (ui == `cancel) || (ui == `skip));
@@ -392,6 +413,13 @@
 		{
 		    UI(`ChangeWidget(`id(`configured_table), `CurrentItem, 0));
 		}
+	    }
+	    else if(ui == `cancel || ui == `abort)
+	    {
+		if(ReallyAbort())
+		{
+		    break;
+		}   
 	    }
 	
 	

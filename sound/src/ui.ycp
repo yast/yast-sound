@@ -80,9 +80,21 @@
 	}
 		// Next button label    
 	UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
-	symbol input=UI(`UserInput());
-	symbol output=`next;
-	if(input==`back) output=`back;
+
+	symbol input=`cancel;
+
+	while(input==`abort || input==`cancel)
+	{
+	    input=UI(`UserInput());
+	    if(input == `cancel || input == `abort)
+	    {
+		if(ReallyAbort())
+		{
+		    return `abort;
+		}
+	    }
+	} 
+	symbol output=input;
 	if(input==`next)
 	{
 	    integer tmp=UI(`QueryWidget(`id(`action), `CurrentButton));
@@ -103,6 +115,7 @@
 		output=`quick;
 	    }
 	}
+	    y2error(sformat("================> %1", output));
 	return $["ui" : output];
     }
 
@@ -114,56 +127,8 @@
      */
 
     global define OpenMainDialog() ``{
-/*
-	UI(`OpenDialog(`opt(`defaultsize), `VBox
-	  (
-	    `Image(`suseheader, "SuSE"),
-	    `HBox
-	    (
-	      `HWeight(30, `RichText(`id(`help), "")),
-	      `HWeight
-	      (70, `VBox
-		(
-		  `Left(`Heading(`id(`title), _("YaST2\nInitializing ..."))),
-		  `HVCenter(`ReplacePoint(`id(`contents), `Empty())),
-		  `HBox
-		  (
-			// back pushbutton: the user input is ignored and the last dialog is called
-		    `PushButton(`id(`back), `opt(`disabled), _("&Back")),
-		    `HStretch (),
-			// next pushbutton: the user input is checked and the next dialog is called
-		    `PushButton(`id(`next), `opt(`disabled, `default), _("&Next"))
-		  )
-		)
-	      )
-	    )
-	  )
-	));
-*/
 	UI(`CreateWizardDialog());
     }
-
-
-    UI(
-    ``{
-    /**
-     *  
-     *  SetWizardContents 
-     * 
-     * @return void
-     */
-	global define SetWizardContents(string title, term contents, string helptext,
-				       boolean has_back, boolean has_next) 
-	    ``{
-	      ChangeWidget(`id(`next), `Enabled, has_next);
-	      ChangeWidget(`id(`back), `Enabled, has_back);
-	      ChangeWidget(`id(`help), `Value, helptext);
-	      ChangeWidget(`id(`title), `Value, title);
-	      ReplaceWidget(`id(`contents), contents);
-	    }
-	}
-    );
-
 
     UI(
     ``{
@@ -379,7 +344,7 @@
 	}
 	else
 	{
-	    clab="\n"+sformat(select(lookup(STRING, "soundCard", ""), 3), cname);
+	    clab="\n"+sformat(select(lookup(STRINGS, "soundCard", ""), 3), cname, cpos+1);
     	}
 
 	term con=
@@ -405,5 +370,15 @@
                 `VStretch ()
                 );
 	return con;
+    }
+
+    /**
+     *  dialog to be displayed when user presses 'Abort' button
+     *
+     */
+
+    global define ReallyAbort()
+    ``{
+	return UI(`YesNoPopup(_("The installation will be aborted.")));
     }
 }

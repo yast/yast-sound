@@ -26,6 +26,8 @@
     include "sound/ui.ycp";
     include "sound/texts.ycp";
 
+    include "browser.ycp";
+
     // text constants for sound module
     map STRINGS=STRINGS_();
   
@@ -88,12 +90,11 @@
 	    }    
 	    result = eval(act_dialog);
 	    ui = lookup(result, "ui", `cancel);
-	    
-	    if ((ui == `cancel) || (ui == `skip))
+	   
+	    if (ui == `skip)
 	    {
 		break;
 	    }
-	    
 	      // case: next
 	    else if (ui == `next || ui == `quick) 
 	    {
@@ -138,6 +139,13 @@
 		});
 		dialog = nd;
 		id = id + 1;
+	    }
+	    else if (ui == `abort || ui == `cancel)
+	    {
+//		if(ReallyAbort())
+		{
+		    return $["ui": `abort];
+		}
 	    }
 	}
 
@@ -192,6 +200,8 @@
 	arg_n = arg_n - 1;
     }
     list sound_cards  = get_audio (test_mode, config_mode);
+//    list sound_cards = [$["baseclass":"Multimedia controller", "bus":"SBUS", "dev_name":"/dev/audio", "device":"CS4231 APC DMA", "device_id":270339, "module":[$["active":false, "modprobe":true, "name":"cs4232"]], "subclass":"Multimedia audio controller", "unique_key":"MM5G.9F/+i0wcq25", "vendor":"Sun Microsystems", "vendor_id":278529]];
+
     list save_info    = read_save_info ();
     
     map rc_vars       = $[];
@@ -210,7 +220,6 @@
 	UI(`MessagePopup ("The Sound card database cannot be found!!!"));
 	exit = true;
     }
-
 
     // get all the apropriate information from the database
     sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
@@ -247,9 +256,10 @@
 	    ui       = lookup (result, "ui", `cancel);
 	    use_alsa = lookup (result, "use_alsa", true);
 
-	    if (ui == `cancel)
+	    if (ui == `cancel || ui == `abort)
 	    {
-		break;
+		return;
+		//break;
 	    }
 	    if (ui == `skip) 
 	    {
@@ -274,6 +284,11 @@
     
 	}
 
+	if (ui == `abort || ui == `cancel) 
+	{
+	    return;
+	}
+
 	if (ui == `back) 
 	{   // exit module
 	    break;
@@ -289,6 +304,10 @@
 	}
 
 	ui = lookup (result, "ui", `cancel);
+	if(ui == `abort)
+	{
+	    return;
+	}
 
 	if (ui == `next && (size (sound_cards) != 1)) 
 	{

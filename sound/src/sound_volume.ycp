@@ -95,6 +95,14 @@
 		}
 		ui = `next;
 	    }
+	    else if (ui == `abort || ui == `cancel)
+	    {
+		if(ReallyAbort())
+		{
+		    ui=`cancel;
+		    break;
+		}
+	    }
 		      
 	} until ((ui == `back) || (ui == `next) || ui == `cancel);
 	return ui;
@@ -133,6 +141,14 @@
 	repeat 
 	{
 	    ui =  UI (`UserInput ());
+            if(ui == `cancel || ui == `abort)
+            {
+                if(ReallyAbort()) 
+                {
+                    return `abort;
+                }
+            }
+
 	} until ((ui == `back) || ui == `cancel);
 
 	return ui;
@@ -171,6 +187,13 @@
         repeat
         {
             ui =  UI (`UserInput ());
+	    if(ui == `cancel || ui == `abort)
+	    {
+		if(ReallyAbort()) 
+		{   
+		    return `abort;
+		}
+	    }
         } until ((ui == `back) || ui == `next);
 
         return ui;
@@ -242,7 +265,7 @@
 	}
     }
 
-    if (ui == `back)
+    if (ui == `back || ui == `cancel || ui == `abort)
     {
 	SCR(`Execute (.target.modprobe, sformat ("-r %1", lookup (lookup (module_map, "module", $[]), "name", "")), ""));
     }
