@@ -290,7 +290,7 @@ configure an other card than the one that is displayed on the right.</p>"));
 		else {
 
 		    // UI(`DebugDialog(maplist (`e, lookup (lookup (card, "module"), "params"), ``(lookup (e, "value", "none")))));
-		    // card = lookup (result, "return");
+		    card = lookup (result, "return");
 		    // UI(`DebugDialog(maplist (`e, lookup (lookup (card, "module"), "params"), ``(lookup (e, "value", "none")))));
 		}
 	    }
