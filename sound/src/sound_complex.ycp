@@ -188,7 +188,7 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
     UI(`ChangeWidget(`id(`next), `Label, _("&Finish")));
     
     if (size (cc) == 0) {
-	UI(`ChangeWidget(`id(`configured_table), `Enabled, false));
+	//UI(`ChangeWidget(`id(`configured_table), `Enabled, false));
 	UI(`ChangeWidget(`id(`b_delete), `Enabled, false));
     }
     else 
@@ -260,7 +260,7 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 		
 		SCR(`Execute (.target.bash, "/etc/init.d/alsasound stop", $[]));
 
-		UI(`ChangeWidget(`id(`configured_table), `Enabled, false));
+		//UI(`ChangeWidget(`id(`configured_table), `Enabled, false));
 		UI(`ChangeWidget(`id(`b_delete), `Enabled, false));
 	    }
 	    else 
@@ -350,7 +350,7 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 	    UI(`ChangeWidget(`id(`next), `Label, _("&Finish")));
 	    
 	    if (size (cc) == 0) {
-		UI(`ChangeWidget(`id(`configured_table), `Enabled, false));
+		//UI(`ChangeWidget(`id(`configured_table), `Enabled, false));
 		UI(`ChangeWidget(`id(`b_delete), `Enabled, false));
 	    }
 	    else
