@@ -1,0 +1,174 @@
+/**
+ * File:
+ *   modules/Example.ycp
+ *
+ * Package:
+ *   Configuration of example
+ *
+ * Summary:
+ *   Input and output functions.
+ *
+ * Authors:
+ *   My Name <mymail@suse>
+ *
+ * $Id$
+ *
+ * Representation of the configuration of example.
+ * Input and output routines.
+ *
+ */
+
+{
+    // Set the name of the module
+    module "Sound";
+
+    include "sound/read_routines.ycp";
+    include "sound/alsa_routines.ycp";
+    include "sound/routines.ycp";
+    include "misc_defines.ycp";
+
+    // list for storing detected cards
+    global list detected_cards = nil;
+
+    // list of detected and unconfigured cards
+    global list unconfigured_cards = nil;
+
+    // settings to save to /etc/modules.conf (only those concerning to sound)
+    global list modules_conf = [];
+
+    // what sound system we're using (true=alsa, false=oss)
+    global boolean use_alsa = true;
+
+    // settings to save using .audio.alsa ... mixer
+    global list volume_settings = [];
+
+    // rc settings
+    global map rc_vars = $[];
+
+    global list sound_db = nil;
+
+    /**
+     * do hardware detection
+     */
+
+    global define DetectHardware() ``{
+	// do noop if cards were already detected
+	if (detected_cards != nil)
+	{
+	    return true;
+	}
+	list ret = SCR::Read(.probe.sound);
+    }
+
+
+    /**
+     * searches for sound alias in /etc/modules.conf
+     */
+
+    global define ReadModulesConf() ``{
+	modules_conf = read_save_info();
+    }
+
+    /**
+     * update list of unconfigured cards (necessaty when deleting configured card)
+     */
+
+    global define UpdateUnconfiguredCards() ``{
+	unconfigured_cards = getConfigurableCards(modules_conf);
+    }
+
+    // Settings: Define all variables needed for configuration of exampleX
+    // TODO FIXME: Define all the variables necessary to hold
+    // TODO FIXME: the configuration here (with the appropriate
+    // TODO FIXME: description)
+    // TODO FIXME: For example:
+    //   // List of the configured cards
+    //   list cards = [];
+    //   // Some additional parameter needed for the confgiuration
+    //   boolean additional_parameter
+
+    /**
+     * Read all example settings from the SCR
+     * @return boolean True on success
+     */
+    global define Read() ``{
+	DetectHardware();
+	ReadModulesConf();
+	UpdateUnconfiguredCards();
+	rc_vars = read_rc_vars (["START_ALSA", "START_ALSA_SEQ"]);
+	volume_settings = get_vol_settings();
+	sleep(3);
+	return true;
+    }
+
+    /**
+     * Get all example settings from the first parameter
+     * (For use by autoinstallation.)
+     * @return boolean True on success
+     */
+    global define Import(map settings) ``{
+	// initialize these unneeded values
+	detected_cards = [];
+	unconfigured_cards = [];
+
+	// import values
+	if (lookup(settings, "modules_conf", nil) == nil)
+	{
+	    y2error("Import error: 'modules_conf' key is missing");
+	    return false;
+	}
+	modules_conf = lookup(settings, "modules_conf", []);
+
+	rc_vars = lookup(settings, "rc_vars", $[]);
+
+	volume_settings = lookup(settings, "volume_settings", []);
+
+	return true;
+    }
+
+    /**
+     * Update the SCR according to example settings
+     * @return boolean True on success
+     */
+    global define Write() ``{
+	CallFunction (`sound_write(modules_conf, rc_vars));
+	return true;
+    }
+
+    /**
+     * Dump the example settings to a single map
+     * (For use by autoinstallation.)
+     * @return map Dumped settings (later acceptable by Import())
+     */
+    global define Export() ``{
+	return $[
+		"modules_conf"	    : modules_conf,
+		"rc_vars"	    : rc_vars,
+		"volume_settings"   : volume_settings
+	    ];
+    }
+
+    /**
+     * opens alsa sound cards database
+     */
+
+    global define LoadDatabase() ``{
+	if (sound_db == nil || sound_db == [])
+	{
+	    textdomain "sound_db";
+	    y2error("Reading card database");
+	    sound_db = eval(SCR::Read (.target.yast2, "sndcards.ycp"));
+	    y2error("Database size = %1", size(sound_db));
+	    textdomain "sound";
+	}
+    }
+
+    /**
+     * just writes all variables to log. don't use in Master.
+     */
+
+    global define DumpToLog() ``{
+	y2error(sformat("%1", [Sound::module_conf, rc_vars, true, true, get_vol_settings()]));
+    }
+
+}
