@@ -225,7 +225,7 @@
      */
     global define string ProbeOldChip (string chip) ``{
 
-	string command = sformat ("/usr/bin/alsaconf -p %1", chip);
+	string command = sformat ("/usr/sbin/alsaconf -p %1", chip);
 	string name = db_modules["snd-"+chip,"description"]:chip;
 
 	// yes/no popup text, %1 is chip name
