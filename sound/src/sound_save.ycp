@@ -45,7 +45,9 @@
 	    if (l == nil) 
 		    // To translators: just one file will be displayed
 		return sformat (UI(_("Cannot find file: %1")), file);
-	
+
+	    l = add (l, "\n");
+	    
 	    list newl = [];
 
 	    integer length = size (l);
