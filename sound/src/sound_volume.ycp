@@ -139,14 +139,14 @@
 				// Help text - adjusting volume 2/4
 	help_text = help_text + UI(_("<p>You can test your sound card by pressing the <i>Test</i> button.</p>"));
 				// Help text - adjusting volume 3/4
-	help_text = help_text + UI(_("<p>After the configuration is
- done you can use <b>amixer</b> (or any program of your choice) for
+	help_text = help_text + UI(_("<p>After the configuration is\
+ done you can use <b>amixer</b> (or any program of your choice) for\
  adjusting the volume.</p>"));
 
 	    // Help text - adjusting volume 4/4
-	help_text = help_text + UI(_("<p><b>WARNING/SPECIAL
- NOTE:</b>Please start testing your sound card with <b>very</b> low
- volume settings to prevent an accident with too much loud
+	help_text = help_text + UI(_("<p><b>WARNING/SPECIAL\
+ NOTE:</b>Please start testing your sound card with <b>very</b> low\
+ volume settings to prevent an accident with too much loud\
  noise.</p>"));
 
 
@@ -187,16 +187,16 @@
 				// Help text - intenal YaST2 error 1/3
 	    help_text = UI(_("<p>An error has occured. </p>"));
 				// Help text - intenal YaST2 error 2/3
-	    help_text = help_text + UI(_("<p>Check that you have
- installed the correct <b>ALSA</b> package (series 'snd') and that
+	    help_text = help_text + UI(_("<p>Check that you have\
+ installed the correct <b>ALSA</b> package (series 'snd') and that\
  you are running this as a root.</p>"));
 	
 				// Help text - intenal YaST2 error 3/3
-	    help_text = help_text + UI (_("<p>If the the problem
- persists, you can try to pass some <b>options</b> to the ALSA module.
- If you still cannot get the sound card working, try
- <i>OSS/Free</i> or another module.</p>
- <p>However <b>YaST2</b>
+	    help_text = help_text + UI (_("<p>If the the problem\
+ persists, you can try to pass some <b>options</b> to the ALSA module.\
+ If you still cannot get the sound card working, try\
+ <i>OSS/Free</i> or another module.</p>\
+ <p>However <b>YaST2</b>\
  sound configuration currently only supports ALSA.</p>"));
 	
 	

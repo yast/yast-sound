@@ -217,20 +217,20 @@
 					// Help text for options 1/4
 	string help_text = UI(_("Here you can modify the options for the sound modules. "));
 				// Help text for options 2/4
-	help_text = help_text + UI(_("If you are not <b>absolutely
+	help_text = help_text + UI(_("If you are not <b>absolutely\
  sure</b> what you are doing, please leave this dialog untouched."));
 	
 
 				// Help text for options 3/4
-	help_text = help_text + UI (_("<p>Choose the option you want
- to set, use the <i>Set</i> button to enable new value. You can reset
- all values by pressing <i>Reset</i>. Number values can be entered as
+	help_text = help_text + UI (_("<p>Choose the option you want\
+ to set, use the <i>Set</i> button to enable new value. You can reset\
+ all values by pressing <i>Reset</i>. Number values can be entered as\
  decimal or hexadecimal (hexadecimal with a <b>0x</b> prefix).</p>"));
 	
 	
 				// Help text for options 4/4
-	help_text = help_text + UI (_("Please refer to the <b>SuSE</b>
- help system, section 'package description', series 'snd', <b>alsa</b>
+	help_text = help_text + UI (_("Please refer to the <b>SuSE</b>\
+ help system, section 'package description', series 'snd', <b>alsa</b>\
  package for more information."));
 	
 
