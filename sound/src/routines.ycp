@@ -22,6 +22,20 @@
 //    include "ui/summary.ycp";
 
     /**
+     * logtime- logs current time - used for performance 
+     * improvements
+     *
+     */    
+
+    global define logtime(string comment) ``{
+	string s=SCR::Read(.target.string, "/proc/uptime");
+	list l=splitstring(s, " ");
+	float f=tofloat(select(l, 0));
+	y2error("%1 %2 : %3", comment, select(l, 0), f-oldf);
+	oldf=f;
+    }	
+
+    /**
      * for a given card detected by libhd this function creates a 
      * label
      * @param map entry from .probe.audio
@@ -208,7 +222,7 @@
    * @return list
    */
     global define read_rc_vars (list vars) ``{
-        return listmap (`k, vars, ``([k, SCR(`Read(topath(sformat (".rc.system.%1", k))))]));
+        return listmap (`k, vars, ``([k, SCR::Read(topath(sformat (".rc.system.%1", k)))]));
     }
 
     
@@ -232,7 +246,7 @@
      */
 
     global define save_unique_keys (list keys) ``{
-        list orig = SCR(`Read(.var.lib.yast.unique));
+        list orig = SCR::Read(.var.lib.yast.unique);
         if (orig==nil)
         {
             orig = [];
@@ -240,7 +254,7 @@
         list keys = maplist (`e, keys, ``($["unique" : e, "state" : "configured"]));
         orig = filter (`e, orig, ``(lookup(e, "section", "") != "sound"));
 	list final=add (orig, $["contents" : keys, "section" : "sound"]);
-        SCR(`Write(.var.lib.yast.unique, final));
+        SCR::Write(.var.lib.yast.unique, final);
     }
 
 
@@ -252,7 +266,7 @@
     global define GetCardDatabase() ``{
 	textdomain "sound_db";
 	y2debug("Reading card database");
-	sound_db=eval(SCR(`Read (.target.yast2, "sndcards.ycp")));
+	sound_db=eval(SCR::Read (.target.yast2, "sndcards.ycp"));
 	textdomain "sound";
 //	return database;
     }
@@ -351,7 +365,7 @@
     global define get_running_cards () ``{
         if (fileexist("/proc/asound/cards"))
         {
-            list asound = SCR(`Read(.proc.asound.cards));
+            list asound = SCR::Read(.proc.asound.cards);
             if (is(select (asound, 0), map))
             {
                 return asound;
@@ -368,9 +382,9 @@
 
     global define read_unique_keys () ``{
 	list already = [];
-	if (SCR(`Read(.target.size, "/var/lib/YaST/unique.inf")) > 0)
+	if (SCR::Read(.target.size, "/var/lib/YaST/unique.inf") > 0)
 	{
-	    already = SCR (`Read(.var.lib.yast.unique));
+	    already = SCR::Read(.var.lib.yast.unique);
 	}
 	else
 	{
@@ -409,7 +423,7 @@
         {
             // special warning message for in a special case
             string warn_text=lookup(STRINGS, "nm256hackWarning", "");
-	    return UI(`YesNoPopup(warn_text));
+	    return UI::YesNoPopup(warn_text);
         }
         return true;
     }
@@ -480,15 +494,15 @@
      */
 
     global define get_audio() ``{
-        string tmpdir=SCR (`Read (.target.tmpdir));
+        string tmpdir=SCR::Read (.target.tmpdir);
         if(fileexist(tmpdir+"/audio.ycp"))
         {
-            return SCR(`Read(.target.ycp, tmpdir+"/audio.ycp"));
+            return SCR::Read(.target.ycp, tmpdir+"/audio.ycp");
         }
 
-        list ret = SCR(`Read(.probe.sound));
+        list ret = SCR::Read(.probe.sound);
         if (ret==nil) ret = [];
-        SCR(`Write(.target.ycp, tmpdir+"/audio.ycp", ret));
+        SCR::Write(.target.ycp, tmpdir+"/audio.ycp", ret);
         return ret;
     }
 
@@ -501,11 +515,11 @@
 
     global define fetchmodule(string modname)
     ``{
-	string tmpdir=SCR (`Read (.target.tmpdir));
-	SCR (`Execute (.target.bash, sformat ("/usr/bin/fetchmodule %1.o > %2/mod.ycp" , modname, tmpdir)));
+	string tmpdir=SCR::Read (.target.tmpdir);
+	SCR::Execute (.target.bash, sformat ("/usr/bin/fetchmodule %1.o > %2/mod.ycp" , modname, tmpdir));
 	{
-	    map out=SCR(`Read(.target.ycp, tmpdir+"/mod.ycp"));
-	    return UI(out);
+	    map out=SCR::Read(.target.ycp, tmpdir+"/mod.ycp");
+	    return eval(out);
 	}
 	return [];
     }
@@ -553,7 +567,7 @@
     global define SetVolume (string group, integer cardid, integer value) ``{
 	string p=sformat(".audio.alsa.cards.%1.channels.%2.volume", cardid, group);
 
-	SCR(`Write(topath(p), value));
+	SCR::Write(topath(p), value);
     }
 
     global define SetVolumeFast(integer cardid, integer value) ``{
@@ -566,13 +580,13 @@
 	{
 	    value=0;
 	}
-	SCR(`Write(p, value));
+	SCR::Write(p, value);
     }
 
     global define unmute(list devices, integer card_id) ``{
 	foreach(`dev, devices,
 	``{
-	    SCR(`Write(topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, dev)), false));
+	    SCR::Write(topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, dev)), false);
 	});
     }
 
@@ -585,10 +599,10 @@
     global define storeVolume(integer card_id) ``{
 	if(card_id==-1)
 	{
-	    SCR(`Execute(.audio.alsa.store, 0, 0));
+	    SCR::Execute(.audio.alsa.store, 0, 0);
 	}   
 	string p=sformat(".audio.alsa.cards.%1.store", cardid);
-	SCR(`Execute(topath(p), 0, 0));
+	SCR::Execute(topath(p), 0, 0);
     }
 
     /**
@@ -619,7 +633,7 @@
         {
             string audio_file = lookup (user_settings, "audio_file", "");
                   // more cards
-	    SCR(`Execute (.target.bash_background, sformat("aplay -c %1 %2 ", card_id, audio_file)));
+	    SCR::Execute (.target.bash_background, sformat("aplay -c %1 %2 ", card_id, audio_file));
         }
         return "";
     };
@@ -633,7 +647,7 @@
 
     global define check_module(map save_entry) ``{
 	// TODO: check by /proc/asound/cards
-	map pm = SCR(`Read(.proc.modules));
+	map pm = SCR::Read(.proc.modules);
 	string mod_name=lookup(save_entry, "module", "off");
         if (!haskey (pm, mod_name))
         {
@@ -859,7 +873,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      */
     
     global define get_tmp_modules_conf() ``{
-	string tmpdir=SCR (`Read (.target.tmpdir));
+	string tmpdir=SCR::Read (.target.tmpdir);
 	// TODO: move this file to yast tmp dir
 	return "/tmp/modules.conf";
     }
@@ -873,9 +887,9 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
     global define alsasound_start_tmp(boolean restore) ``{
 	string cmd="/sbin/depmod -C "+get_tmp_modules_conf();
-	SCR(`Execute(.target.bash, cmd, $[]));
+	SCR::Execute(.target.bash, cmd, $[]);
 
-	list als=SCR(`Read(.tmp.modules.alias));
+	list als=SCR::Read(.tmp.modules.alias);
 
 	
 	string modname="";
@@ -883,9 +897,9 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	map res=$[];
 	while(contains(als, sformat("snd-card-%1", pos)))
 	{
-	    modname=SCR(`Read(.tmp.modules.alias, sformat("snd-card-%1", pos)));
+	    modname=SCR::Read(.tmp.modules.alias, sformat("snd-card-%1", pos));
 	    cmd=sformat("/sbin/modprobe -C %1 %2", get_tmp_modules_conf(), modname);
-	    res=SCR(`Execute(.target.bash_output, cmd, $[]));
+	    res=SCR::Execute(.target.bash_output, cmd, $[]);
 	    if(lookup(res, "stderr", "")!="")
 	    {
 		y2error("modprobe error output: \n"+lookup(res, "stderr", ""));
@@ -896,7 +910,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
 	if(restore)
 	{
-	    SCR(`Execute(.audio.alsa.restore, 0, 0));
+	    SCR::Execute(.audio.alsa.restore, 0, 0);
 	}
     }
 
@@ -938,8 +952,8 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	}
 	else
 	{
-	    answer=UI(`YesNoHeadlinePopup(	lookup(STRINGS, "soundFontTitle", ""), 
-					lookup(STRINGS, "soundFontQuestion", "")));
+	    answer=UI::YesNoHeadlinePopup(	lookup(STRINGS, "soundFontTitle", ""), 
+					lookup(STRINGS, "soundFontQuestion", ""));
 	}
 	
 	if(!answer) 
@@ -952,27 +966,27 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	while(true)
 	{
     		// step 2: insert CD
-	    answer=UI(`ContinueCancelHeadlinePopup (lookup(STRINGS, "soundFontTitle", ""), 
-						    lookup(STRINGS, "soundFontAppeal", "")));
+	    answer=UI::ContinueCancelHeadlinePopup (lookup(STRINGS, "soundFontTitle", ""), 
+						    lookup(STRINGS, "soundFontAppeal", ""));
 	    if(!answer)
 	    {
 		return;
 	    }
 
 	    // step3: do something 
-	    map res=SCR (`Execute (.target.bash_output, "/usr/lib/YaST2/bin/copyfonts", $[] ));
+	    map res=SCR::Execute (.target.bash_output, "/usr/lib/YaST2/bin/copyfonts", $[] );
 	    integer cnt=tointeger(lookup(res, "stdout", 0));
 	    
 	    // step4: 
 	    if(cnt>0)
 	    {
-		UI(`MessagePopup(sformat(lookup(STRINGS, "soundFontFinal", ""), cnt, "/usr/share/sfbank/creative")));
+		UI::MessagePopup(sformat(lookup(STRINGS, "soundFontFinal", ""), cnt, "/usr/share/sfbank/creative"));
 		return;
 	    }
 	    else
 	    {
-		answer=UI(`YesNoHeadlinePopup(  lookup(STRINGS, "soundFontNotFound", ""),
-						lookup(STRINGS, "soundFontRetry", "")));
+		answer=UI::YesNoHeadlinePopup(  lookup(STRINGS, "soundFontNotFound", ""),
+						lookup(STRINGS, "soundFontRetry", ""));
 		if(!answer)
 		{
 		    return;
@@ -1015,7 +1029,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	{
 	    string name1=mergestring(splitstring(hardware_name(select(s1, 0)), "\n"), " ");
 	    string name2=mergestring(splitstring(hardware_name(select(s2, 0)), "\n"), " ");
-	    UI(`MessagePopup(sformat(lookup(STRINGS, "opl3sa_nm256_warn", ""), name1, name2)));
+	    UI::MessagePopup(sformat(lookup(STRINGS, "opl3sa_nm256_warn", ""), name1, name2));
 	}
     }
 
@@ -1090,7 +1104,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      */
 
     global define stop_programs() ``{
-	integer fuser = SCR(`Execute (.target.bash, "/bin/fuser /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]));
+	integer fuser = SCR::Execute (.target.bash, "/bin/fuser /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]);
 
 	if (fuser == 0)
         {
@@ -1098,10 +1112,10 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
                   // To translators: label message
 	    string msg=lookup(STRINGS, "WhichDialogMsg");
                   // Yes, No - button labels
-            boolean terminate = UI(`YesNoPopup (msg));
+            boolean terminate = UI::YesNoPopup (msg);
             if (terminate)
             {
-		SCR(`Execute (.target.bash, "/bin/fuser -k /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]));
+		SCR::Execute (.target.bash, "/bin/fuser -k /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]);
             }
             else
             {

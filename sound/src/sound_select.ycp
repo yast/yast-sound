@@ -34,12 +34,12 @@
     selectHardware( sound_cards, //maplist(`e, sound_cards, ``(lookup(e, "model", ""))),
                     confhw); //maplist(`e, save_info, ``(lookup(e, "model", ""))));
 
-    UI(`ChangeWidget(`id(`next), `Label, UI(`FinishButtonLabel())));
+    UI::ChangeWidget(`id(`next), `Label, UI::FinishButtonLabel());
 
     any ui=nil;
     repeat
     {
-	ui=UI(`UserInput());
+	ui=UI::UserInput();
 	if((ui==`abort || ui==`cancel) && ReallyAbort())
         {
 	    return $["ui": `abort];
@@ -48,12 +48,11 @@
 
     symbol type=nil;
     integer index=0;
-//    type=UI(`QueryWidget(`id(`action), `CurrentButton));
 
     if(ui==`configure_button)
     {
 	type=`new;
-	index=UI(`QueryWidget(`id(`detected_selbox), `CurrentItem));
+	index=UI::QueryWidget(`id(`detected_selbox), `CurrentItem);
 	ui=`configure;
     }
 

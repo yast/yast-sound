@@ -41,7 +41,7 @@
 	term con = `Label (sformat(_("Initializing ...")));
 	string helptext = "";
 	 // dialog title message
-	UI(`SetWizardContents (_("YaST2\nInitializing ..."), con, helptext, false, false));
+	UI::SetWizardContents (_("YaST2\nInitializing ..."), con, helptext, false, false);
 
 	return `next;
     };
@@ -57,7 +57,7 @@
     global define DisplayName (string name, string cname, integer cpos, integer flags) ``{
 	string helptext=lookup(STRINGS, "DisplayName");
 	term con=AutoconfDlg(name, cname, cpos);
-	UI(`SetWizardContents (_("Sound card configuration"), con, helptext, true, true));
+	UI::SetWizardContents (_("Sound card configuration"), con, helptext, true, true);
 		// dialog title
 	integer flagc=1;
 	integer flagp=0;
@@ -66,27 +66,27 @@
 	{
 	    if((flagc & flags) ==0)
 	    {
-		UI(`ChangeWidget(`id(flagp), `Enabled, false));
+		UI::ChangeWidget(`id(flagp), `Enabled, false);
 	    }
 	    else
 	    {
 		if(!selected)
 		{
 		    selected=true;
-		    UI(`ChangeWidget(`id(`action), `CurrentButton, flagp));
+		    UI::ChangeWidget(`id(`action), `CurrentButton, flagp);
 		}
 	    }
 	    flagp=flagp+1;
 	    flagc=flagc*2;
 	}
 		// Next button label    
-	UI(`ChangeWidget(`id(`next), `Label, UI(`NextButtonLabel())));
+	UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
 
 	symbol input=`cancel;
 
 	while(input==`abort || input==`cancel)
 	{
-	    input=UI(`UserInput());
+	    input=UI::UserInput();
 	    if(input == `cancel || input == `abort)
 	    {
 		if(ReallyAbort())
@@ -98,7 +98,7 @@
 	symbol output=input;
 	if(input==`next)
 	{
-	    integer tmp=UI(`QueryWidget(`id(`action), `CurrentButton));
+	    integer tmp=UI::QueryWidget(`id(`action), `CurrentButton);
 	    if(tmp==2)
 	    {
 		output=`options;
@@ -127,26 +127,8 @@
      */
 
     global define OpenMainDialog() ``{
-	UI(`CreateWizardDialog());
+	UI::CreateWizardDialog();
     }
-
-    UI(
-    ``{
-    /* 
-     *  
-     *  DebugDialog 
-     *
-     * @return void
-     */
-	global define DebugDialog(any str) 
-	``{
-	      // OK button user confirmation
-	    OpenDialog(`VBox(`RichText(sformat("%1",str)),`PushButton(OKButtonLabel())));
-	    any r = UserInput();
-	    CloseDialog();
-	}
-    }
-    );
 
 
     /**
@@ -160,7 +142,7 @@
     global define VolumeCon(map save_entry , integer vol) ``{
 	term slider = `IntField(`id(`volume), `opt(`notify), _("&Volume"), 0, 100, vol);
 
-	if (UI(`HasSpecialWidget(`Slider)))
+	if (UI::HasSpecialWidget(`Slider))
 	{
 	          // slider label
 	    slider = `Slider (`id(`volume), `opt(`notify), _("&Volume"), 0, 100, vol);
@@ -399,7 +381,7 @@
 
     global define ReallyAbort()
     ``{
-	return UI(`ReallyAbortPopup(false));
+	return UI::ReallyAbortPopup(false);
     }
 
         /**
@@ -426,7 +408,7 @@
 	string helptext=lookup(STRINGS, "selectHardware");
 
 
-	UI(`SetWizardContents (_("Sound card configuration"), widget, helptext, true, true));
+	UI::SetWizardContents (_("Sound card configuration"), widget, helptext, true, true);
 
     }
 

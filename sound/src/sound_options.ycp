@@ -86,7 +86,7 @@
     global define updatePossibleValues(string values, string default) ``{
 	if(values=="")
 	{
-	    UI(`ReplaceWidget(`id(`reppoint), defWidget()));
+	    UI::ReplaceWidget(`id(`reppoint), defWidget());
 	    return;
 	}
 	values=substring(values, 1, size(values)-2);
@@ -124,7 +124,7 @@
 	    }
 	}		
     
-	UI(`ReplaceWidget(`id(`reppoint), widg));
+	UI::ReplaceWidget(`id(`reppoint), widg);
 
     }
 
@@ -186,26 +186,26 @@
 
 
 		// dialog title
-	UI(`SetWizardContents (_("Sound card advanced options"), con, help_text, true, true));
+	UI::SetWizardContents (_("Sound card advanced options"), con, help_text, true, true);
 	if (size (itemized_descriptions) > 0) 
 	{
-	    UI(`ChangeWidget(`id(`table), `CurrentItem, 0));
+	    UI::ChangeWidget(`id(`table), `CurrentItem, 0);
 	}
 
 	any ui = nil;
 	    
 	repeat 
 	{
-	    ui = UI (`UserInput ());
+	    ui = UI::UserInput ();
 
 	    if (ui == `table) 
 	    {
-		current_option = UI (`QueryWidget (`id(`table), `CurrentItem));
-		current_option_name = select(UI(`QueryWidget(`id(`table), `Item(current_option))), 2);
+		current_option = UI::QueryWidget (`id(`table), `CurrentItem);
+		current_option_name = select(UI::QueryWidget(`id(`table), `Item(current_option)), 2);
 
 		    // to translators: name of currently selected option: eg. 'Option: snd_asdf'
-		UI(`ChangeWidget(`id(`des), `Label, sformat("%1 %2", _("Option: "),current_option_name)));
-		UI(`ChangeWidget(`id(`des), `Value, select(UI(`QueryWidget(`id(`table), `Item(current_option))), 3)));
+		UI::ChangeWidget(`id(`des), `Label, sformat("%1 %2", _("Option: "),current_option_name));
+		UI::ChangeWidget(`id(`des), `Value, select(UI::QueryWidget(`id(`table), `Item(current_option)), 3));
 
 		    // update possible values
 		list tmp=filter(`e, origOptions, ``(lookup(e, "name", "")==current_option_name));
@@ -219,26 +219,26 @@
 		    vals=lookup(select(tmp, 0), "values", "");
 		}
 	    
-		updatePossibleValues(vals, select(UI(`QueryWidget(`id(`table), `Item(current_option))), 3));
+		updatePossibleValues(vals, select(UI::QueryWidget(`id(`table), `Item(current_option)), 3));
 		      
 	    }
 	    if (ui == `poss)
 	    {
-		current_option = UI (`QueryWidget (`id(`table), `CurrentItem));
-                current_option_name = select(UI(`QueryWidget(`id(`table), `Item(current_option))), 2);
+		current_option = UI::QueryWidget (`id(`table), `CurrentItem);
+                current_option_name = select(UI::QueryWidget(`id(`table), `Item(current_option)), 2);
 
-		any value=sformat("%1", (UI(`QueryWidget(`id(`poss), `Value))));
+		any value=sformat("%1", (UI::QueryWidget(`id(`poss), `Value)));
 		y2error(sformat("%1", value));
 
-		UI(`ChangeWidget(`id(`des), `Value, value));
+		UI::ChangeWidget(`id(`des), `Value, value);
 	    }
 	    if (ui == `set) 	// ui ==`set) set button pressed
 	    {
-		string value = UI(`QueryWidget(`id(`des), `Value));
+		string value = UI::QueryWidget(`id(`des), `Value);
 
 		if (size (value) == 0)  // we don't care  about empty values
 		{
-		    UI (`ChangeWidget(`id(`table), `Item(current_option, 2), ""));
+		    UI::ChangeWidget(`id(`table), `Item(current_option, 2), "");
 		    continue;
 		}
 		    
@@ -250,14 +250,14 @@
 			
 		if (size (err) > 0)  // error - wrong value 
 		{
-		    UI(`MessagePopup (err));
-		    UI(`ChangeWidget(`id(`des), `Value, ""));
+		    UI::MessagePopup (err);
+		    UI::ChangeWidget(`id(`des), `Value, "");
 						  
 		}
 		else 		// value is correct
 		{
 
-		    UI (`ChangeWidget(`id(`table), `Item(current_option, 2), value));
+		    UI::ChangeWidget(`id(`table), `Item(current_option, 2), value);
 		    list tmp = [];
 		    maplist (`e, itemized_descriptions, ``{
 				  if (current_option == select(select (e, 0),0))
@@ -269,14 +269,14 @@
 		}
 			
 	    }
-	    else if (ui == `reset && UI(`YesNoPopup(_("Do you really want to reset all values?")))) 
+	    else if (ui == `reset && UI::YesNoPopup(_("Do you really want to reset all values?"))) 
 	    {
-		UI(`ChangeWidget(`id(`des), `Value, ""));
+		UI::ChangeWidget(`id(`des), `Value, "");
 			
 		integer i = 0;
 		while (i < size (itemized_descriptions)) 
 		{
-		  UI (`ChangeWidget(`id(`table), `Item(i, 2), lookup (select(options, i), "default", "")));
+		  UI::ChangeWidget(`id(`table), `Item(i, 2), lookup (select(options, i), "default", ""));
 		  i = i + 1;
 		}
 
@@ -311,7 +311,7 @@
 
     params=restore_mod_params(params, lookup(save_entry, "options", []));
 
-    UI(`ChangeWidget(`id(`next), `Label, UI(`NextButtonLabel())));
+    UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
 
     // now show the dialog 
     map result  = OptionsDialog (cardlabel, params);

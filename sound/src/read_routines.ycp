@@ -24,7 +24,7 @@
 
     global define read_card_name_from_alsa(integer card_id) ``{
 	string pth=topath(sformat(".audio.alsa.cards.%1.name", card_id));
-	string name=SCR(`Read(pth));
+	string name=SCR::Read(pth);
 	if(name==nil)
 	{
 	    return "Sound card";
@@ -101,8 +101,8 @@ nil
      */
     global define read_save_info () ``{
         string prefix = "";
-        list aliases  = SCR(`Read(topath (sformat ("%1.modules.alias", prefix))));
-        list options  = SCR(`Read(topath (sformat ("%1.modules.options", prefix))));
+        list aliases  = SCR::Read(topath (sformat ("%1.modules.alias", prefix)));
+        list options  = SCR::Read(topath (sformat ("%1.modules.options", prefix)));
         list save     = [];             // structure to save
         integer i     = 0;
 
@@ -114,7 +114,7 @@ nil
               // alsa modules
 	    map mod_occur=$[];
 
-	    list aliases=SCR(`Read(.modules.alias));
+	    list aliases=SCR::Read(.modules.alias);
 
 	    aliases=filter(`e, aliases, ``(is_snd_alias(e)));
 	    integer position=-1;
@@ -123,13 +123,13 @@ nil
 	    ``{
 		position=position+1;
 		map entry=$[];
-		string modname=SCR(`Read(.modules.alias, e));
+		string modname=SCR::Read(.modules.alias, e);
 
 		integer opt_pos=lookup(mod_occur, modname, 0);
 
 		mod_occur=add(mod_occur, modname, lookup(mod_occur, modname, 0)+1);		    
 
-		map options=SCR(`Read(.modules.options, modname));
+		map options=SCR::Read(.modules.options, modname);
 		options=mapmap(`k, `v, options, 
 		``{
 		    list vals=splitstring(v, ",");
@@ -141,7 +141,7 @@ nil
 		}
 		);
 
-		string comment=SCR(`Read(.modules.alias.comment, e));
+		string comment=SCR::Read(.modules.alias.comment, e);
 		// first remove trash from the end and beginning of the comment string
 		string uniq="";
 		string model="";
@@ -214,11 +214,11 @@ nil
                 if (contains (aliases, alias))
                 {
                     entry   = $[];
-                    module_name  = SCR (`Read(topath (sformat ("%1.modules.alias", prefix)), alias));
-                    comment = SCR (`Read(topath (sformat ("%1.modules.alias.comment", prefix)), alias));
+                    module_name  = SCR::Read(topath (sformat ("%1.modules.alias", prefix)), alias);
+                    comment = SCR::Read(topath (sformat ("%1.modules.alias.comment", prefix)), alias);
                     if (contains (options, module_name))
                     {
-                        option = SCR (`Read(topath (sformat ("%1.modules.options", prefix)), module_name));
+                        option = SCR::Read(topath (sformat ("%1.modules.options", prefix)), module_name);
                     }
                     else
                     {
