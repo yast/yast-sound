@@ -155,7 +155,7 @@ to save sound card information.</p>"));
 
     // help text 2/4
     helptext = helptext + UI(_("<p>Use <b>Delete</b> button to remove configured sound card. \
-<b>Configure</b> button can be used for adding sound card.</p>"));
+<b>Add soundcard</b> button can be used for adding sound card.</p>"));
 
     // help text 3/4
     helptext = helptext + UI(_("<p>Use the <b>start ALSA</b> check button to enable (resp. disable) \
