@@ -35,6 +35,7 @@
      */
 
     global define symbol joy_dialog(integer card_id, symbol button) ``{
+	// item in joystick types
 	string nonejoy = _("No joystick");
 
 	if (card_id == nil)
@@ -42,16 +43,20 @@
 	    return `back; /*FIXME: return value */
 	}
 
+	// dialog header
 	string caption = _("Joystick configuration") + sformat (" (snd-card-%1)", card_id);
 	string helptext =
+	// help text for joystick configuration 1/3
 _("<P>In this dialog, specify your joystick type. If your
 joystick type is not in the list, select <B>Generic analog joystick</B>.</P>
 ") +
 
+	// help text for joystick configuration 2/3
 _("<P>To remove the configured joystick from system
 or if you do not have a joystick, select <B>No joystick</B>.</P>
 ") +
 
+	// help text for joystick configuration 3/3
 _("<P><B>Note:</B> Connect your joystick to your computer
 before pressing <B>Next</B>.</P>");
 
@@ -115,6 +120,7 @@ before pressing <B>Next</B>.</P>");
 		`VSpacing(3),
 		`HBox(
 		    `HSpacing(6),
+		     // label above list of joystick types
 		    `SelectionBox(`id(`os), _("&Select your joystick type:"), boxitems),
 		    `HSpacing(6)
 		),
@@ -153,6 +159,7 @@ before pressing <B>Next</B>.</P>");
 
 	    if (s == `next && UI::QueryWidget(`id(`os), `CurrentItem) == nil)
 	    {
+		// warning message - user did not select any joystick type
 		UI::WarningPopup(_("Select the joystick type from the list
 before pressing Next.
 

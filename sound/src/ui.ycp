@@ -54,6 +54,7 @@
     global define map DisplayName (string name, string cname, integer cpos, integer flags, boolean has_joy) ``{
 	string helptext = lookup(STRINGS, "DisplayName", "");
 	term con = AutoconfDlg(name, cname, cpos, has_joy);
+	// dialog header
 	Wizard::SetContents (_("Sound card configuration"), con, helptext, true, true);
 		// dialog title
 	integer flagc = 1;
@@ -129,6 +130,7 @@
     global define map quickConfig(string name, string cname, integer cpos, boolean has_joy) ``{
         string helptext = lookup(STRINGS, "quickConfig", "");
         term con = QuickconfDlg(name, cname, cpos, has_joy);
+	// dialog header
         Wizard::SetContents (_("Sound card configuration"), con, helptext, true, true);
                 // dialog title
                 // Next button label
@@ -187,6 +189,7 @@
      */
 
     global define term VolumeCon(map save_entry , integer vol) ``{
+	// volume option label
 	term slider = `IntField(`id(`volume), `opt(`notify), _("&Volume"), 0, 100, vol);
 
 	if (UI::HasSpecialWidget(`Slider))
@@ -208,8 +211,8 @@
 		  `Left(`Label(_("Settings for sound card"))),
 		  `Label (`opt(`outputField), lookup(save_entry, "model", ""))
 			)),
-		    // To translators keep backlash here
 		  `Frame
+		  // frame label
 		  (_("Volume adjust and test"),
 		    `HBox
 		    (
@@ -257,8 +260,7 @@
                   `VSquash(`Top(`Label (`opt(`outputField), cardlabel))),
                   `VSpacing (),
                       // To translators: Table headers "description" -- option description, "option" -- option name, "value" -- value of an option
-                  `Table (`id(`table), `opt (`notify, `immediate), `header(_("Description"), _("Option"),
-                                                                                             `Right(_("Value"))), itemized_descriptions),
+                  `Table (`id(`table), `opt (`notify, `immediate), `header(_("Description"), _("Option"), `Right(_("Value"))), itemized_descriptions),
                   `VSpacing (0.5),
 		  `HBox
 		  (
@@ -267,7 +269,9 @@
 		    `VBox(
 			`Label(""),
 			`HBox(
+			    // push button label - set option value
 			    `PushButton (`id (`set), _("&Set")),
+			    // restore original option values
 			    `PushButton (`id (`reset), _("R&eset all"))
 			)
 		    )
@@ -292,8 +296,8 @@
     global define term WhichDlgCon(list nc) ``{
 	term con = `HBox(
             `HSpacing (3),
-        // frame label
             `Frame
+	    // frame label
             (`id(`frame), _("Select"),
                 `HBox
                 (
@@ -343,6 +347,7 @@
 	if  (Sound::use_alsa)
 	{
 	    alsabuts = `HBox(
+			// check box label
                          `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("&Start sequencer"), start_alsa_seq))
 //			 `PushButton(`id(`b_joy), _("&Joystick"))
 		    );
@@ -353,6 +358,7 @@
 			alsabuts,
                         `VBox
                         (
+			    // push button label
                             `PushButton (`id(`b_fonts), _("&Install soundfonts..."))
                         )
                     );
@@ -374,10 +380,14 @@
             // Delete - button label
                     `HBox
                     (
+			// push button label
                         `PushButton (`id(`b_conf2), _("Add sound &card")),
+			// push button label
 			`PushButton (`id(`b_options), _("&Options")),
+			// push button label
 			`PushButton (`id(`b_volume), _("&Volume")),
 			`HStretch (),
+			// push button label
                         `PushButton (`id(`b_delete), _("&Delete"))
                     ),
                     `VSpacing (0.5),
@@ -414,6 +424,7 @@
 	    clab = "\n" + sformat(select(lookup(STRINGS, "soundCount", ""), 3, ""), cname, cpos + 1, "");
 	}
 
+	// push button label
 	term jcheckbox = (has_joy == true) ? `Left(`CheckBox(`id(`joystick), _("&Configure joystick"))) : `Empty();
 
 	term con =
@@ -427,10 +438,13 @@
                 `HBox (`HSpacing (5), `RadioButtonGroup (
                     `id (`action),
                     `VBox (
+			 // radio button label - type of setup
                         `RadioButton (`id (`quick), `opt (`hstretch, `notify), _("&Quick automatic setup"), true),
                         `VSpacing (0.3),
+			 // radio button label - type of setup
                         `RadioButton (`id (`normal), `opt (`hstretch, `notify), _("Normal &setup")),
                         `VSpacing (0.3),
+			 // radio button label - type of setup
                         `RadioButton (`id (`options), `opt (`hstretch, `notify), _("Advanced setup with possibility to change &options")),
 			`VSpacing (3),
 			jcheckbox
@@ -463,6 +477,7 @@
             clab = "\n" + sformat(select(lookup(STRINGS, "soundCount", ""), 3, ""), cname, cpos + 1, "");
         }
 
+	// check box label
 	term jcheckbox = (has_joy == true) ? `Left(`CheckBox(`id(`joystick), _("&Configure joystick"))) : `Empty();
 
         term con =
@@ -476,10 +491,13 @@
                 `HBox (`HSpacing (5), `RadioButtonGroup (
                     `id (`action),
                     `VBox (
+			 // radio button label - type of setup
                         `RadioButton (`id (`quick), `opt (`hstretch, `notify), _("&Quick automatic setup"), true),
                         `VSpacing (0.3),
+			 // radio button label - type of setup
                         `RadioButton (`id (`normal), `opt (`hstretch, `notify), _("Normal &setup")),
                         `VSpacing (0.3),
+			 // radio button label - type of setup
                         `RadioButton (`id (`intro), `opt (`hstretch, `notify), _("&More detailed installation of sound cards")),
 			`VSpacing(3),
 			jcheckbox
@@ -523,12 +541,14 @@
 	    // to translators: the full meaning of message is: "Add other not detected soundcard"
 	newHw = add(newHw, `item(`id(-1), _("Other (not detected)"), size(newHw) == 0));
 
+	// label above list
 	term widget=Wizard_hw::DetectedContent(_("&Sound cards to configure"), newHw, false, 
+					// label above list
 					sformat(_("<P><B>Already configured sound cards:</B>%1</P>"), confHw));
 
 	string helptext = lookup(STRINGS, "selectHardware", "");
 
-
+	// dialog header
 	Wizard::SetContents (_("Sound card configuration"), widget, helptext, true, true);
 
     }

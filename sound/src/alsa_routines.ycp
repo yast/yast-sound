@@ -197,6 +197,7 @@
 
 	});
 
+	// item for all sound card models in sound card driver list
 	mods = prepend(mods,  `item(`id("all"), _("All")));
 	return mods;
     }

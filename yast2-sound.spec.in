@@ -4,7 +4,7 @@
 
 @HEADER@
 
-Requires:	yast2 yast2-core hwinfo
+Requires:	yast2 yast2-core hwinfo alsa
 Summary:	Yast2 - Sound configuration
 
 Provides:	yast2-config-sound yast2-agent-audio yast2-agent-audio-devel yast2-db-sound

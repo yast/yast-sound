@@ -73,6 +73,7 @@
 
     if (Sound::use_alsa && SCR::Read(.target.size, Directory::datadir + "/sndcards.ycp") == -1)
     {
+	// popup error message
         UI::MessagePopup(_("Sound card database not found. Please check your installation."));
         UI::CloseDialog();
         return;
@@ -242,6 +243,7 @@
      */
 
     global define symbol _snd_delete() ``{
+	// popup question
 	if (UI::YesNoPopup(_("Do you really want to delete this entry?")))
 	{
 	    boolean terminate = stop_programs();
@@ -421,6 +423,7 @@
 
     if (Sound::use_alsa && SCR::Read(.target.size, Directory::datadir + "/sndcards.ycp") == -1)
     {
+	// popup error message
 	UI::MessagePopup(_("Sound card database not found. Please check your installation."));
 	UI::CloseDialog();
 	return;

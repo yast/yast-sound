@@ -178,6 +178,7 @@
      */
 
     global define term defWidget() ``{
+	// label text
 	return `Label(_("Possible value:\nnot known"));
     }
 
@@ -190,7 +191,7 @@
 
     global define term gen_list(list vals, string default) ``{
 	vals = maplist(`e, vals, ``(`item(`id(e), sformat("%1", e), default == e)));
-
+	// combo box label
 	return `ComboBox(`id(`poss), `opt(`notify), _("&Possible value:"), vals);
     }
 
@@ -256,6 +257,7 @@
 				    // always omit these options -- they are assigned dynamically
 //	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_id"));
 //	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_index"));
+	// description of option is not available
 	list options = maplist (`e, `f, opts, ``($["description" : getDescr(lookup (f, "descr", _("No description available"))),
 						// if no option name is available
 						"name"         : e,
@@ -364,6 +366,7 @@
 		}
 
 	    }
+	    // popup question
 	    else if (ui == `reset && UI::YesNoPopup(_("Do you really want to reset all values?")))
 	    {
 		UI::ChangeWidget(`id(`des), `Value, "");

@@ -127,25 +127,39 @@
     }
 
     list stones = [
+	    // progress bar item
 	    _("Save module configuration"),
+	    // progress bar item
             _("Save sound card information"),
+	    // progress bar item
 	    _("Save sysconfig values"),
+	    // progress bar item
 	    _("Start sound card"),
+	    // progress bar item
 	    _("Store volume"),
+	    // progress bar item
 	    _("Store joystick settings")];
 
     list stones2 = [
+	    // progress bar item
 	    _("Saving sound card settings."),
+	    // progress bar item
 	    _("Saving card information..."),
+	    // progress bar item
 	    _("Saving sysconfig values..."),
+	    // progress bar item
 	    _("Starting sound card..."),
+	    // progress bar item
 	    _("Storing volume settings"),
+	    // progress bar item
 	    _("Storing joystick settings...")];
 
 
     if (!autoinstall)
     {
+	// progres bar label
 	Progress::New (_("Saving sound card settings."), " ", size(stones) - 1,
+		// progres bar label
 		stones, stones2, _("Saving sound card settings."));
         Wizard::DisableAbortButton();
     }

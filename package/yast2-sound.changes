@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Mon Aug  5 13:16:27 CEST 2002 - lslezak@suse.cz
+
+- added alsa to Requires
+- added help texts for translators
+- updated sound DB
+- version 2.6.13
+
+-------------------------------------------------------------------
 Wed Jul 31 10:58:49 CEST 2002 - arvin@suse.de
 
 - removed yast2-runlevel from neededforbuild and requires

@@ -108,6 +108,7 @@
 		if (ret == `back)
 		{
 		    con = VolumeCon(save_entry, vol);
+		    // dialog header
 		    Wizard::SetContents (_("Sound card volume"), con, help_text, true, true);
 		    continue;
 		}
@@ -144,6 +145,7 @@
 	string additional = "";
 	if (lookup(save_entry, "module", "") == "snd-cs461x")
 	{
+	    // error message
 	    additional = "\n\n" + _("Please try to configure this sound card manually 
 using the \"Cirrus Logic CS4232\" or \"Cirrus 
 Logic CS4236\" driver and configure 
