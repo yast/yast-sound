@@ -12,6 +12,7 @@ include_DATA = \
 	write_routines.ycp \
 	read_routines.ycp \
 	alsa_routines.ycp \
+	oss_routines.ycp \
 	ui.ycp \
 	texts.ycp \
 	card_wizard.ycp 

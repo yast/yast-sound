@@ -24,49 +24,49 @@
 //    include "sound/ui.ycp";
 //    include "sound/routines.ycp";
 
-    list sound_cards=Args(0);
-    list save_info=Args(1);
+    list sound_cards	= Args(0);
+    list save_info	= Args(1);
 
     // show the dialog
 
-    string confhw= ConfCardsRT(save_info);
+    string confhw = ConfCardsRT(save_info);
 
     selectHardware( sound_cards, //maplist(`e, sound_cards, ``(lookup(e, "model", ""))),
                     confhw); //maplist(`e, save_info, ``(lookup(e, "model", ""))));
 
     UI::ChangeWidget(`id(`next), `Label, UI::FinishButtonLabel());
 
-    any ui=nil;
-    repeat
+    any ui = nil;
+    do
     {
-	ui=UI::UserInput();
-	if((ui==`abort || ui==`cancel) && ReallyAbort())
+	ui = UI::UserInput();
+	if ((ui == `abort || ui == `cancel) && ReallyAbort())
         {
 	    return $["ui": `abort];
 	}
-    } until(ui==`back || ui==`next ||  ui==`edit_button || ui==`configure_button);
+    } while (!contains([`back, `next, `edit_button, `configure_button], ui)); //(ui==`back || ui==`next ||  ui==`edit_button || ui==`configure_button);
 
-    symbol type=nil;
-    integer index=0;
+    symbol type = nil;
+    integer index = 0;
 
-    if(ui==`configure_button)
+    if (ui == `configure_button)
     {
-	type=`new;
-	index=UI::QueryWidget(`id(`detected_selbox), `CurrentItem);
-	ui=`configure;
+	type = `new;
+	index = UI::QueryWidget(`id(`detected_selbox), `CurrentItem);
+	ui = `configure;
     }
 
-    if(ui==`configure && index<0)
+    if (ui == `configure && index < 0)
     {
-	type=`manual;
-	index=-1;
+	type = `manual;
+	index = -1;
     }
 
-    if(ui==`edit_button)
+    if (ui == `edit_button)
     {
-	ui=`detail;
+	ui = `detail;
     }
 
-    return $["ui": ui, "type":type, "id":index];
+    return $["ui" : ui, "type" : type, "id" : index];
 
 }

@@ -26,8 +26,8 @@
 //    include "sound/ui.ycp";
 //    include "sound/texts.ycp";
     
-    map STRINGS=STRINGS_();
-
+    map STRINGS = STRINGS_();
+ 
     /**
      *	dialog for manual settings
      *  @return list
@@ -35,14 +35,14 @@
 
 
     define ManualDialog () ``{
-	string helptext=lookup(STRINGS, "ManualDialog");
-	    // label if no module name found
-	list module_names=get_module_names();
-	module_names=prepend(module_names, `item(`id("all"), _("All")));
-	
-	list card_names = get_card_names("all");//get_cards ("All");
+	string helptext	    = lookup(STRINGS, "ManualDialog");
+	list module_names   = get_module_names();
 
-	term con = `VBox ();
+	string initial = use_alsa ? "all" : select(select(module_names, 0), 1);
+	list card_names	    = get_card_names(initial);//get_cards ("All");
+	term con	    = `VBox ();
+	
+//	module_names = prepend(module_names, `item(`id("all"), _("All")));
 
 	con = add (con, `VBox
 	    (
@@ -73,7 +73,7 @@
 
 	any ui = nil;
 
-	repeat 
+	do 
 	{
 	    ui = UI::UserInput ();
 	        
@@ -107,28 +107,29 @@
 	    }
 	    else if (ui == `abort || ui == `cancel)
 	    {	
-		if(ReallyAbort())
+		if (ReallyAbort())
 		{   
-		    ui=`abort;
+		    ui = `abort;
 		    break;
 		}
 	    }	
 
-	} until (((ui == `back) || (ui == `next) ));
+	} while (!contains([`next, `back], ui));
 
+	y2error("%1", ui);
 
 	map ret = $["ui" : ui];
 
-	any model=UI::QueryWidget (`id(`sel_mod), `CurrentItem);
-	any modname=UI::QueryWidget (`id(`sel_drv), `CurrentItem);
+	any model   = UI::QueryWidget (`id(`sel_mod), `CurrentItem);
+	any modname = UI::QueryWidget (`id(`sel_drv), `CurrentItem);
     
 	if (ui == `next) 
 	{
-	    if(modname=="all")
+	    if (modname == "all")
 	    {
-		modname=get_module_by_cardname(model);
+		modname = get_module_by_cardname(model);
 	    }
-	    ret=$["ui": `next, "module": modname, "model": model];
+	    ret = $["ui" : `next, "module" : modname, "model" : model];
 	}
 	return ret;
     }

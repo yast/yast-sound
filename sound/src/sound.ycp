@@ -21,6 +21,8 @@
 
     textdomain "sound";
 
+    include "browser.ycp";
+
     include "misc_defines.ycp";
 
     include "wizard/sequencer.ycp";
@@ -28,13 +30,28 @@
     include "ui/common_popups.ycp";
     include "ui/wizard_dialog.ycp";
 
-    include "sound/alsa_routines.ycp";
+//    include "sound/alsa_routines.ycp";
     include "sound/card_wizard.ycp";
     include "sound/read_routines.ycp";
     include "sound/routines.ycp";
     include "sound/texts.ycp";
     include "sound/ui.ycp";
     include "sound/write_routines.ycp";
+
+    boolean use_alsa=true;
+    if(Args(0)==.oss)
+    {
+	use_alsa=false;
+    }	
+
+    if(use_alsa)
+    {
+	include "sound/alsa_routines.ycp";
+    }
+    else
+    {
+	include "sound/oss_routines.ycp";
+    }
 
     // text constants for sound module
     map STRINGS=STRINGS_();
@@ -57,17 +74,18 @@
 
     global define _snd_select() ``{
 	sound_cards = getConfigurableCards(save_info);
-	if((size(sound_cards) == 0) && (!was_complex))
+	if ((size(sound_cards) == 0) && (!was_complex))
 	{
 	    return `detail;
 	}
-	list nh=maplist(`e, sound_cards, ``(lookup(e, "model", "")));
+	list nh	    = maplist(`e, sound_cards, ``(lookup(e, "model", "")));
 
-        list ch=maplist(`e, save_info, ``(lookup(e, "model", ""))); 
-	map res=CallFunction(`sound_select(nh, save_info));
-	symbol ui = lookup(res, "ui", `abort);
-	card_id=lookup(res, "id", 0);
-	if(card_id == -1)
+        list ch	    = maplist(`e, save_info, ``(lookup(e, "model", ""))); 
+	map res	    = CallFunction(`sound_select(nh, save_info));
+	symbol ui   = lookup(res, "ui", `abort);
+
+	card_id = lookup(res, "id", 0);
+	if (card_id == -1)
 	{
 	    return `manual;
 	}
@@ -80,22 +98,22 @@
      */
 
     global define _snd_quick() ``{
-	save_entry=select(sound_cards, 0);
-	card_id=0;
-	string modelname=lookup(save_entry, "model", "");
-	map res=quickConfig(modelname, "snd-card-0", card_id, 15);
-	symbol ui=lookup(res, "ui", nil);
+	save_entry = select(sound_cards, 0);
+	card_id = 0;
+	string modelname    = lookup(save_entry, "model", "");
+	map res		    = quickConfig(modelname, "snd-card-0", card_id, 15);
+	symbol ui	    = lookup(res, "ui", nil);
 	return ui;	
     }
 
     global define _snd_quick2(boolean type) ``{
-	save_entry=add_common_options(save_entry, 0);
-	save_entry=add_alias(save_entry, 0);
-	map res=CallFunction (`sound_volume(save_entry, 0, true, type, []));
-	symbol ui=lookup(res, "ui", nil);
-	if(ui==`next)
+	save_entry  = add_common_options(save_entry, 0);
+	save_entry  = add_alias(save_entry, 0);
+	map res	    = CallFunction (`sound_volume(save_entry, 0, true, type, []));
+	symbol ui   = lookup(res, "ui", nil);
+	if (ui == `next)
 	{
-	    save_info=[save_entry];
+	    save_info = [save_entry];
 	}
 	return ui;
     }
@@ -115,33 +133,33 @@
 	symbol ui = lookup(res, "ui", `abort);
     
 	boolean override = false;
-	string uniq_k="";
-	string label="";
+	string uniq_k = "";
+	string label = "";
 
 
-	if(ui == `next)
+	if (ui == `next)
 	{
 	    uniq_k = isa_uniq();
 	    label = lookup(res, "model", "Sound card");
 
 	    list cds = filter(`e, sound_cards, ``(lookup(e, "module", "") == lookup(res, "module", nil)));
-	    y2error("%1", cds);
+	    y2debug("%1", cds);
 	    if (size(cds) > 0)
 	    {
-		label = lookup(select(cds, 0), "model", "Sound card");
+		label  = lookup(select(cds, 0), "model", "Sound card");
 		uniq_k = lookup(select(cds, 0), "unique_key", isa_uniq());
 	    }
 
-	    save_entry=$[
-		"module"    : lookup(res, "module", ""),
-		"model"	    : label,
-		"unique_key": uniq_k
+	    save_entry = $[
+		"module"     : lookup(res, "module", ""),
+		"model"	     : label,
+		"unique_key" : uniq_k
 		];
-	    card_id=-1;
+	    card_id = -1;
 	}	
-	if(ui == `back)
+	if (ui == `back)
 	{
-	    save_entry=$[];
+	    save_entry = $[];
 	}
 	return ui;
     }
@@ -152,11 +170,11 @@
      */
 
     global define _snd_add() ``{
-	list nh=maplist(`e, sound_cards, ``(lookup(e, "model", "")));
-	map res=WhichDialog(nh);
-	symbol ui=lookup(res, "ui", `back);
-        card_id=lookup(res, "card_id", -1);
-        if(card_id == -1 && ui == `next)
+	list nh     = maplist(`e, sound_cards, ``(lookup(e, "model", "")));
+	map res	    = WhichDialog(nh);
+	symbol ui   = lookup(res, "ui", `back);
+        card_id	    = lookup(res, "card_id", -1);
+        if (card_id == -1 && ui == `next)
         {
             return `manual;
         }
@@ -170,30 +188,28 @@
      */
 
     global define _snd_delete() ``{
-	if(UI::YesNoPopup(_("Do you really want to delete this entry?")))
+	if (UI::YesNoPopup(_("Do you really want to delete this entry?")))
 	{
 	    boolean terminate = stop_programs();
-	    if(terminate == false)
+	    if (terminate == false)
             {
                 return `next;
             }
-//            integer card_id = UI::QueryWidget (`id(`configured_table), `CurrentItem);
-
             string modname = lookup(select(save_info, card_id), "module", "");
 
             // we have to rember volume/mute settings because after a card removal
             // everything is muted and set to 0.
             list vol_settings = get_vol_settings();
 
-            list rem = get_indices_for_removal(save_info, modname);
-            save_info = remove_save_entries(save_info, rem);
-            vol_settings = multi_remove(vol_settings, rem);
+            list rem	    = get_indices_for_removal(save_info, modname);
+            save_info	    = remove_save_entries(save_info, rem);
+            vol_settings    = multi_remove(vol_settings, rem);
 
             SaveModulesEntry (save_info, [], true);
 
-            SCR::Execute (.target.bash, "/etc/init.d/alsasound stop > /dev/null 2>&1", $[]);
-            alsasound_start_tmp(true);
-            y2error(sformat("%1", vol_settings));
+	    sound_stop();
+            sound_start_tmp(true);
+            y2debug(sformat("%1", vol_settings));
             set_vol_settings(vol_settings);
  
 	    // now we have to update the unconfigured cards list
@@ -212,17 +228,17 @@
     global define _snd_config( /* symbol finish_sym */) ``{
 	if (card_id >= 0)
 	{
-	    save_entry=select(sound_cards, card_id);
+	    save_entry = select(sound_cards, card_id);
 	}
-	map res=OneCardWizard(save_entry, size(save_info), false, 15, false, save_info);
+	map res = OneCardWizard(save_entry, size(save_info), false, 15, false, save_info);
 
-        symbol ui=lookup(res, "ui", nil);
-        if(ui == `next)
+        symbol ui = lookup(res, "ui", nil);
+        if (ui == `next)
         {
-            save_info=add(save_info, lookup(res, "return", $[]));
+            save_info = add(save_info, lookup(res, "return", $[]));
 	    if (card_id >= 0)
 	    {
-		sound_cards=remove(sound_cards, card_id);
+		sound_cards = remove(sound_cards, card_id);
 	    }
             // TODO: another dialog should be called
 	    if (size(sound_cards) == 0)
@@ -240,13 +256,13 @@
 
     global define _snd_complex() ``{
 	was_complex = true;
-	map res=CallFunction(`sound_complex(save_info));
-        symbol ui=lookup(res, "ui", nil);
-        if(ui==`next)
+	map res	    = CallFunction(`sound_complex(save_info));
+        symbol ui   = lookup(res, "ui", nil);
+        if (ui == `next)
         {
-            save_info=lookup(res, "save_info", []);
-            rc_vars=lookup(res, "rc_vars", []);
-            state=`save;
+            save_info	= lookup(res, "save_info", []);
+            rc_vars	= lookup(res, "rc_vars", []);
+            state	= `save;
         }
 	return ui;
     }
@@ -265,7 +281,7 @@
     boolean test_mode     = false;
     boolean config_mode   = false;
     boolean autoinst_mode = false;
-    boolean use_alsa      = true;	// default
+//    boolean use_alsa      = true;	// default
     boolean from_menu     = false;
 
     integer arg_n = size (Args ()) - 1;
@@ -289,24 +305,23 @@
 	}
 	arg_n = arg_n - 1;
     }
-    list sound_cards  = []; // get_audio ();
-
+    list sound_cards  = []; 
     list save_info    = read_save_info ();
- 
+
+
     map rc_vars       = $[];
     integer card_id   = 0;
-
     integer n_cards   = 0;
     map result        = $[];
-    any ui            = nil;
+//    any ui            = nil;
     boolean cont      = true;
-    boolean call_complex_dialog = false;	
+
     list configured_unique = []; // list of unique keys, that was configured
 
     boolean exit = false;
     list sound_db = nil;
 
-    if(SCR::Read(.target.size, "/usr/lib/YaST2/sndcards.ycp")==-1) //!fileexist("/usr/lib/YaST2/sndcards.ycp"))
+    if (SCR::Read(.target.size, "/usr/lib/YaST2/sndcards.ycp")==-1) //!fileexist("/usr/lib/YaST2/sndcards.ycp"))
     {
 	UI::MessagePopup(_("Sound card database not found. Please check your installation."));
 	UI::CloseDialog();
@@ -315,9 +330,9 @@
     
     sound_cards = getConfigurableCards(save_info);
 
-    integer all_cards_num=size(sound_cards);
+    integer all_cards_num = size(sound_cards);
 
-    if(exit)
+    if (exit)
     {	// no sound cards database present, shutting down
 	UI::CloseDialog ();
 	return;
@@ -326,27 +341,27 @@
     
     nm256_opl3sa2_warn(sound_cards);
 
-    symbol state=`card_select;
+    symbol state = `card_select;
 
     
 // test data
 //    save_info=[];
 //    sound_cards=[$["model":"Pokusna karta", "module": "snd-card-emu10k1", "unique_key":"kx", "options": []]];
 
-    string initial="intro";
+    string initial = "intro";
 
-    if(size(sound_cards)==1 && size(save_info)==0)
+    if (size(sound_cards) == 1 && size(save_info) == 0)
     {
-	card_id=0;
-	initial="quick";
+	card_id = 0;
+	initial = "quick";
     }
-    else if(size(sound_cards)==0)
+    else if (size(sound_cards) == 0)
     {
-	initial="complex";
+	initial = "complex";
     }
     
 
-    map m_aliases=$[
+    map m_aliases = $[
 	    "intro"	: ``(_snd_select()),
 
 	    "config1"	: ``(_snd_config()),
@@ -365,7 +380,7 @@
 	    "quick3"	: ``(_snd_quick2(false))
 	];
 
-    map m_sequence=$[
+    map m_sequence = $[
 	    "ws_start"	: initial,
 	    "quick"	:
 		$[
@@ -442,9 +457,9 @@
 		]
 	];
 
-    symbol ui=WizardSequencer(m_aliases, m_sequence);
+    symbol ui = WizardSequencer(m_aliases, m_sequence);
 
-    if(ui==`back || ui==`abort)
+    if (ui == `back || ui == `abort)
     {
 	UI::CloseDialog();
 	return;

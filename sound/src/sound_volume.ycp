@@ -29,6 +29,7 @@
 
     textdomain "sound";
 	
+//    files needed to be included: (commented because they're included some elsewhere)
 //    include "misc_defines.ycp";
 //    include "sound/routines.ycp";
 //    include "sound/ui.ycp";
@@ -36,7 +37,7 @@
 //    include "sound/write_routines.ycp";
 
 
-    map STRINGS=STRINGS_();
+    map STRINGS = STRINGS_();
 
     /**
      * This dialog sipmply reads user input and calls apropriate set funtion
@@ -49,11 +50,11 @@
 	    //unmute these devices
 	/* help text: adjusting volume */
 
-	string help_text=lookup(STRINGS, "VolumeDialog");
+	string help_text = lookup(STRINGS, "VolumeDialog");
 
 	integer vol = 10;
 
-	term con=VolumeCon(save_entry, vol);
+	term con = VolumeCon(save_entry, vol);
 	    // dialog title
 	UI::SetWizardContents (_("Sound card volume"), con, help_text, true, true);
 	if (finish)
@@ -62,7 +63,7 @@
 	}
 
 /* Sound fonts installation */
-	if(HasFonts(save_entry) && !FontsInstalled())
+	if (HasFonts(save_entry) && !FontsInstalled())
 	{
 	    InstallFonts("", false);
 	}
@@ -73,7 +74,7 @@
 
 	SetVolume ("Master", card_id, vol);
 
-	repeat 
+	do
 	{
 	    ui =  UI::UserInput ();
 
@@ -86,34 +87,23 @@
 	    {
 		if (!test_mode)
 		{
-		    string msg=PlayTest(user_settings, card_id);
-		    if(msg != "")
+		    string msg = PlayTest(card_id);
+		    if (msg != "")
 		    {
 			UI::MessagePopup (msg);
 		    }
 		}
 	    }
-//	    else if (ui == `next) 
-//	    {
-//		if (finish)
-//		{
-//		    if (!UI::YesNoPopup (_("The sound volume and the configuration\nfor the sound card will be saved now.")))
-//		    {
-//		      continue;
-//		    }
-//		}
-//		ui = `next;
-//	    }
 	    else if (ui == `abort || ui == `cancel)
 	    {
-		if(ReallyAbort())
+		if (ReallyAbort())
 		{
-		    ui=`abort;
+		    ui = `abort;
 		    break;
 		}
 	    }
 		      
-	} until ((ui == `back) || (ui == `next) || ui == `cancel);
+	} while (!contains([`back, `next, `cancel], ui)); 
 	return ui;
     }
 
@@ -125,12 +115,12 @@
     define ErrorDialog (map save_entry, string err) ``{
 				    // Help text - intenal YaST2 error 
     
-	y2error("%1", save_entry);
-	string help_text=lookup(STRINGS, "ErrorDialog");
-	string additional="";
-	if(lookup(save_entry, "module", "") == "snd-card-cs461x")
+	y2debug("%1", save_entry);
+	string help_text = lookup(STRINGS, "ErrorDialog");
+	string additional = "";
+	if (lookup(save_entry, "module", "") == "snd-card-cs461x")
 	{
-	    additional="\n\n"+_("Please try to configure this sound card manually 
+	    additional = "\n\n" + _("Please try to configure this sound card manually 
 using the \"Cirrus Logic CS4232\" or \"Cirrus 
 Logic CS4236\" driver and configure 
 its parameters using the 'Advanced setup'.");
@@ -145,7 +135,7 @@ its parameters using the 'Advanced setup'.");
 	      `VSpacing (),
 	      `Label (`opt(`outputField), lookup(save_entry, "model", "")),
 	      `VSpacing (),
-	      `Label (err+additional)
+	      `Label (err + additional)
 	    )
 	  );
 	    
@@ -159,9 +149,9 @@ its parameters using the 'Advanced setup'.");
 	repeat 
 	{
 	    ui =  UI::UserInput ();
-            if(ui == `cancel || ui == `abort)
+            if (ui == `cancel || ui == `abort)
             {
-                if(ReallyAbort()) 
+                if (ReallyAbort()) 
                 {
                     return `abort;
                 }
@@ -180,7 +170,7 @@ its parameters using the 'Advanced setup'.");
     define SuccessDialog (map save_entry) ``{
                                     // Help text - intenal YaST2 error 
 
-        string help_text=lookup(STRINGS, "SuccessDialog");
+        string help_text = lookup(STRINGS, "SuccessDialog");
 
         term con = `HVCenter
           (
@@ -205,9 +195,9 @@ its parameters using the 'Advanced setup'.");
         repeat
         {
             ui =  UI::UserInput ();
-	    if(ui == `cancel || ui == `abort)
+	    if (ui == `cancel || ui == `abort)
 	    {
-		if(ReallyAbort()) 
+		if (ReallyAbort()) 
 		{   
 		    return `abort;
 		}
@@ -227,11 +217,11 @@ its parameters using the 'Advanced setup'.");
        *        2. on succes unmute and volume dialog
        *        3. on fail display error message
        */
-    boolean need_restart=true;
-    map save_entry = Args (0);
-    integer card_id = Args (1);
-    boolean finish = false;
-    boolean test_mode=false;
+    boolean need_restart    = true;
+    map save_entry	    = Args (0);
+    integer card_id	    = Args (1);
+    boolean finish	    = false;
+    boolean test_mode	    = false;
 
     boolean quick = false;
 
@@ -247,28 +237,23 @@ its parameters using the 'Advanced setup'.");
 	quick= Args (3);
     }
     
-    list save_info=[];
-    if (size (Args())>4)
+    list save_info = [];
+    if (size (Args()) > 4)
     {
 	save_info=Args(4);
     }
 
-    map user_settings = $["audio_file"  : "/usr/share/sounds/alsa/test.wav"];
-
-//			  "play_cmd"    : "/usr/bin/aplay",
-//			  "mixer"       : "/usr/bin/amixer -c $CARD_NUM set \"$CHANNEL\" $VOLUME% unmute"];
-      
     string err_msg = "";
 
     stop_programs();    
 
     if (!test_mode)
     {
-	SCR::Execute(.target.bash, "/etc/init.d/alsasound stop > /dev/null 2>&1", $[]);
-	list new_save=add(save_info, save_entry);
+	sound_stop();
+	list new_save = add(save_info, save_entry);
 	y2error("storing save info:%1", new_save);
 	SaveModulesEntry (new_save, [], true);
-	alsasound_start_tmp(true);
+	sound_start_tmp(true);
 	err_msg = check_module(save_entry, card_id);
     }
     any ui = nil;
@@ -282,7 +267,7 @@ its parameters using the 'Advanced setup'.");
         maplist (`dev, ["Master", "PCM", "PCM,1", "Wave", "Master Digital", "Synth"],
     		    ``(SetVolume (dev, card_id, 70)));
 	unmute(["Master", "PCM", "PCM,1", "Wave", "Master Digital", "Synth"], card_id);
-	if(!quick)
+	if (!quick)
 	{
 	    ui = VolumeDialog ();
 	}
@@ -297,10 +282,10 @@ its parameters using the 'Advanced setup'.");
     if (ui == `back || ui == `cancel || ui == `abort)
     {
 	SaveModulesEntry(save_info, [], true);
-	alsasound_start_tmp(true);	
+	sound_start_tmp(true);	
     }
     
-    if(ui==`next)
+    if (ui == `next)
     {
 	y2error("Storing volume");
 //	storeVolume(-1);

@@ -1,5 +1,4 @@
-/*
- * File:
+/** File:
  *   routines.ycp
  * 
  * Module:
@@ -21,25 +20,29 @@
     include "lan/lan_routines.ycp";
 //    include "ui/summary.ycp";
 
+
     /**
-     * 
-     *
+     * fliters out already configured cards
+     * @param save_info info from modules.conf
+     * @cards autodetected cards
+     * @return list of entries of not configured cards
      */
 
-    global define getConfigurableCards(list save_info) ``{
-	list snd = get_audio();
-	snd = filter_configured(save_info, snd);
-	if (size(snd) > 0)
-	{ 
-	    // get all the apropriate information from the database
-	    snd =  maplist(`e, snd, ``(add (e, "module", get_module (e))));
-
-	    // filter out modules with unspecified module name (sound card not supported by alsa / no module found)
-	    snd = filter(`e, snd, ``(lookup(e, "module", $[])!=$[]));
-	    // create save_info entries
-	    snd = convert_to_save_info(snd);
-	}
-	return snd;
+    global define filter_configured(list save_info, list cards) ``{
+        cards = filter(`e, cards,
+        ``{
+            string uniq     = lookup(e, "unique_key", "");
+            boolean retval  = true;
+            foreach(`s, save_info,
+            ``{
+                if (lookup(s, "unique_key", "") == uniq)
+                {
+                    retval = false;
+                }
+            });
+            return retval;
+        });
+        return cards;
     }
 
 
@@ -50,11 +53,11 @@
      */    
 
     global define logtime(string comment) ``{
-	string s=SCR::Read(.target.string, "/proc/uptime");
-	list l=splitstring(s, " ");
-	float f=tofloat(select(l, 0));
+	string s    = SCR::Read(.target.string, "/proc/uptime");
+	list l	    = splitstring(s, " ");
+	float f	    = tofloat(select(l, 0));
 	y2error("%1 %2 : %3", comment, select(l, 0), f-oldf);
-	oldf=f;
+	oldf = f;
     }	
 
     /**
@@ -66,8 +69,8 @@
      */
     global define get_card_label(map card)
     ``{
-        list lab=splitstring(hardware_name(card),"\n");
-        if(size(lab)==1 || select(lab, 1)=="")
+        list lab = splitstring(hardware_name(card),"\n");
+        if (size(lab) == 1 || select(lab, 1) == "")
         {
             return select(lab, 0);
         }
@@ -83,104 +86,28 @@
      */
 
     global define is_snd_alias(string alias) ``{
-	if(find(alias, "snd-card-")!=0)
+	string al = use_alsa ? "snd-card-" : "sound-slot-";
+	
+	if (find(alias, al) != 0)
 	{
 	    return false;
 	}   	
-	integer i=size("snd-card-");
-        if(i==size(alias))
+	integer i = size(al);
+        if (i == size(alias))
         {
             return false;
         }
-        while(i<size(alias))
+        while (i < size(alias))
         {
-            if(!contains(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], substring(alias, i, 1)))
+            if (!contains(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], substring(alias, i, 1)))
             {
                  return false;
             }
-            i=i+1;
+            i = i + 1;
         }
         return true;	
     }
 
-    /** 
-     * creates a list of sound modules for selection box
-     * @return list of items: [`item(`id(module_name), "module label")]
-     */
-    global define get_module_names() ``{
-	list ret=[];
-	read_db();
-	foreach(`e, sound_db, 
-	``{
-	    ret=add(ret, `item(`id(lookup(lookup(e, "module", $[]), "name", "")), lookup(e, "name", _("Unknown module name"))));
-	});
-	ret=sort(`a, `b, ret, ``(select(a, 1)<select(b, 1)));
-
-	return ret;
-    }
-
-    /** returns card models list 
-     *
-     * @param modname if "all" returns all models
-     * @return list with sound cards driven by given module
-     *
-     *
-     */
-
-    global define get_card_names(string modname) ``{
-	read_db();
-	if(modname=="all")
-	{
-	    list cards=[];
-	    foreach(`e, sound_db,
-	    ``{
-		cards=add(cards, lookup(e, "cards", []));
-	    });
-
-	    cards=flatten(cards);
-	    return sort(cards);
-	}
-
-	list mods=filter(`e, sound_db, 
-	``(lookup(lookup(e, "module", $[]), "name", "")==modname));
-	if(size(mods)==0)
-	{
-	    return [];
-	}
-	return sort(lookup(select(mods, 0), "cards", []));
-    }
-
-    /**  
-     * returns module name for a given card model
-     * @param string card name
-     * @return modules name
-     *
-     */
-
-    global define get_module_by_cardname(string cardname) ``{
-	read_db();
-	list mod=filter(`e, sound_db,
-	``(contains(lookup(e, "cards"), cardname))
-	);
-	return lookup(lookup(select(mod, 0), "module", $[]), "name", "unknown");
-    }
-
-    /**
-     * returns the 'params' section from sndcards.ycp of the given module
-     * @param modname module name
-     * @return list with params and their descriptions
-     */
-
-    global define get_module_params(string modname) ``{
-	// database must be read some elsewhere
-	read_db();
-	list mod=filter(`e, sound_db, ``(lookup(lookup(e, "module", $[]), "name", "")==modname));
-	if(size(mod)>0)
-	{
-	    return lookup(select(mod, 0), "params", []);
-	}
-	return [];
-    }
 
     /**
      * unique key for non-pci/pnp cards or virtual cards	
@@ -221,13 +148,13 @@
 
     global define save_unique_keys (list keys) ``{
         list orig = SCR::Read(.var.lib.yast.unique);
-        if (orig==nil)
+        if (orig == nil)
         {
             orig = [];
         }
         list keys = maplist (`e, keys, ``($["unique" : e, "state" : "configured"]));
         orig = filter (`e, orig, ``(lookup(e, "section", "") != "sound"));
-	list final=add (orig, $["contents" : keys, "section" : "sound"]);
+	list final = add (orig, $["contents" : keys, "section" : "sound"]);
         SCR::Write(.var.lib.yast.unique, final);
     }
 
@@ -240,9 +167,8 @@
     global define GetCardDatabase() ``{
 	textdomain "sound_db";
 	y2debug("Reading card database");
-	sound_db=eval(SCR::Read (.target.yast2, "sndcards.ycp"));
+	sound_db = eval(SCR::Read (.target.yast2, "sndcards.ycp"));
 	textdomain "sound";
-//	return database;
     }
 
     /** 
@@ -253,7 +179,7 @@
      */
 
     global define read_db() ``{
-	if(sound_db==nil || size(sound_db)==0)
+	if (sound_db == nil || size(sound_db) == 0)
 	{
 	    GetCardDatabase();
 	}
@@ -330,26 +256,6 @@
 
 
     /**
-     *  Returns list of already running cards
-     *  @return list
-     *  
-     *
-     */
-
-    global define get_running_cards () ``{
-        if (SCR::Read(.target.size, "/proc/asound/cards") != -1) //fileexist("/proc/asound/cards"))
-        {
-            list asound = SCR::Read(.proc.asound.cards);
-            if (is(select (asound, 0), map))
-            {
-                return asound;
-            }
-        }
-        return [];
-    }
-
-
-    /**
      * Returns list of keys read from /var/lib/YaST/unique.inf
      * @return list with unique keys
      */
@@ -366,22 +272,22 @@
 	}
 	// select the sound section
 
-	list output=[];
+	list output = [];
 
-	already = filter(`e, already, ``(lookup(e, "section", "")=="sound"));
-	if(size(already)==0) return [];
+	already = filter(`e, already, ``(lookup(e, "section", "") == "sound"));
+	if (size(already) == 0) return [];
 	already = lookup(select(already, 0), "contents", []);
 	already = maplist(`e, already, 
 	``{
-	    if(lookup(e, "state", "")=="configured")
+	    if (lookup(e, "state", "") == "configured")
 	    {
-		output=add(output, lookup(e, "unique", nil));
+		output = add(output, lookup(e, "unique", nil));
 	    }
 	}
 
 	);
 
-	already=output;
+	already = output;
 
 	return already;
     }
@@ -396,7 +302,7 @@
         if (modname == "snd-card-nm256")
         {
             // special warning message for in a special case
-            string warn_text=lookup(STRINGS, "nm256hackWarning", "");
+            string warn_text = lookup(STRINGS, "nm256hackWarning", "");
 	    return UI::YesNoPopup(warn_text);
         }
         return true;
@@ -468,15 +374,15 @@
      */
 
     global define get_audio() ``{
-        string tmpdir=SCR::Read (.target.tmpdir);
+        string tmpdir = SCR::Read (.target.tmpdir);
         if (SCR::Read(.target.size, tmpdir+"/audio.ycp") != -1) // fileexist(tmpdir+"/audio.ycp"))
         {
             return SCR::Read(.target.ycp, tmpdir+"/audio.ycp");
         }
 
         list ret = SCR::Read(.probe.sound);
-        if (ret==nil) ret = [];
-        SCR::Write(.target.ycp, tmpdir+"/audio.ycp", ret);
+        if (ret == nil) ret = [];
+        SCR::Write(.target.ycp, tmpdir + "/audio.ycp", ret);
         return ret;
     }
 
@@ -489,10 +395,10 @@
 
     global define fetchmodule(string modname)
     ``{
-	string tmpdir=SCR::Read (.target.tmpdir);
+	string tmpdir = SCR::Read (.target.tmpdir);
 	SCR::Execute (.target.bash, sformat ("/usr/bin/fetchmodule %1.o > %2/mod.ycp" , modname, tmpdir));
 	{
-	    map out=SCR::Read(.target.ycp, tmpdir+"/mod.ycp");
+	    map out = SCR::Read(.target.ycp, tmpdir + "/mod.ycp");
 	    return eval(out);
 	}
 	return [];
@@ -526,7 +432,7 @@
 			   (lookup (c, "device_id", 0) == device_id - offset))) != []));
 	}
 
-	if (fc!=nil)
+	if (fc != nil)
 	{
 	    if (size (fc) > 0) return select (fc, 0);
 	}
@@ -539,20 +445,20 @@
      * @return any
      */
     global define SetVolume (string group, integer cardid, integer value) ``{
-	string p=sformat(".audio.alsa.cards.%1.channels.%2.volume", cardid, group);
+	string p = sformat(".audio.alsa.cards.%1.channels.%2.volume", cardid, group);
 
 	SCR::Write(topath(p), value);
     }
 
     global define SetVolumeFast(integer cardid, integer value) ``{
-	string p=sformat(".target.volume.%1", cardid);
-	if(value>=100)
+	string p = sformat(".target.volume.%1", cardid);
+	if (value >= 100)
 	{
-	    value=99;
+	    value = 99;
 	}
-	if(value<0)
+	if (value < 0)
 	{
-	    value=0;
+	    value = 0;
 	}
 	SCR::Write(p, value);
     }
@@ -571,47 +477,14 @@
      */
 
     global define storeVolume(integer card_id) ``{
-	if(card_id==-1)
+	if (card_id == -1)
 	{
 	    SCR::Execute(.audio.alsa.store, 0, 0);
 	}   
-	string p=sformat(".audio.alsa.cards.%1.store", card_id);
+	string p = sformat(".audio.alsa.cards.%1.store", card_id);
 
 	SCR::Execute(topath(p), 0, 0);
     }
-
-    /**
-     * here the test sound is played, by
-     * default ist alsa whistle sound, but
-     * if snd_au package is installed,
-     * than it's Linus Torvals voice, the
-     * if the test file cannot be found,
-     * the message is displayed
-     *
-     * @return string returns empty string on succes, otherwise error string 
-     */
-
-    global define PlayTest (map user_settings, integer card_id) ``{
-
-        if (SCR::Read(.target.size, lookup (user_settings, "audio_file", "")) == -1) //!fileexist(lookup (user_settings, "audio_file", "")))
-        {
-            string file = lookup (user_settings, "audio_file", "");
-
-                  // To translators: just one file will be displayed
-                  // To translators: if the test audio file can not be found this message is displayed
-                  // To translators: This is just popup message, shouldn't be too long
-            string msg = sformat (_("Cannot find file:\n %1\n\n(test audio file)"), file);
-
-            return msg;
-        }
-        else
-        {
-            string audio_file = lookup (user_settings, "audio_file", "");
-                  // more cards
-	    SCR::Execute (.target.bash_background, sformat("aplay -c %1 %2 > /dev/null 2>&1", card_id, audio_file));
-        }
-        return "";
-    };
 
 
     /**
@@ -646,16 +519,16 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
     global define create_table (list lm, list lk)
     ``{
-	list res=[];
-	integer pos=0;
+	list res = [];
+	integer pos = 0;
 	foreach(`m, lm, 
 	``{
-	    res=add(res, `item(`id(pos), 
+	    res = add(res, `item(`id(pos), 
 		lookup(m, select(lk, 0), ""),
 		lookup(m, select(lk, 1), ""),
 		lookup(m, select(lk, 2), "")
 		));
-	    pos=pos+1;
+	    pos = pos + 1;
 	});
 	return res;
     }
@@ -837,8 +710,8 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
     global define restore_mod_params(list params, map values) ``{
 	return maplist(`e, params,
 	``{
-	    string pname=lookup(e, "name", "");
-	    e=add(e, "value", lookup(values, pname, ""));
+	    string pname = lookup(e, "name", "");
+	    e = add(e, "value", lookup(values, pname, ""));
 	    return e;
 	});
 
@@ -848,45 +721,9 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      */
     
     global define get_tmp_modules_conf() ``{
-	string tmpdir=SCR::Read (.target.tmpdir);
+	string tmpdir = SCR::Read (.target.tmpdir);
 	// TODO: move this file to yast tmp dir
 	return "/tmp/modules.conf";
-    }
-
-    /**
-     * alsasound_start_tmp starts alsa using temporary modules.conf
-     * @param restore true - call alsactl restore, false - don't
-     *
-     *
-     */
-
-    global define alsasound_start_tmp(boolean restore) ``{
-	string cmd="/sbin/depmod -C "+get_tmp_modules_conf()+" /dev/null 2>&1";
-	SCR::Execute(.target.bash, cmd, $[]);
-
-	list als=SCR::Read(.tmp.modules.alias);
-
-	
-	string modname="";
-	integer pos=0;
-	map res=$[];
-	while(contains(als, sformat("snd-card-%1", pos)))
-	{
-	    modname=SCR::Read(.tmp.modules.alias, sformat("snd-card-%1", pos));
-	    cmd=sformat("/sbin/modprobe -C %1 %2 ", get_tmp_modules_conf(), modname);
-	    res=SCR::Execute(.target.bash_output, cmd, $[]);
-	    if(lookup(res, "stderr", "")!="")
-	    {
-		y2error("modprobe error output: \n"+lookup(res, "stderr", ""));
-	    }
-	    pos=pos+1;
-	}
-
-
-	if(restore)
-	{
-	    SCR::Execute(.audio.alsa.restore, 0, 0);
-	}
     }
 
     /** 
@@ -895,21 +732,17 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      */
 
     global define FontsInstalled() ``{
-	return SCR::Read(.target.size, "/usr/share/sfbank/creative") >=0; // fileexist("/usr/share/sfbank/creative");
+	return SCR::Read(.target.size, "/usr/share/sfbank/creative") >= 0; // fileexist("/usr/share/sfbank/creative");
     }
 
     /** @return true if the sound card supports sound fonts
      */
 
     global define HasFonts(map save_entry) ``{
-	if(lookup(save_entry, "module", "")=="snd-card-emu10k1")
+	if (contains(["snd-card-emu10k1", "snd-card-sbawe", "emu10k1"], lookup(save_entry, "module", "")))
 	{
 	    return true;
 	}
-	if(lookup(save_entry, "module", "")=="snd-card-sbawe")
-        {
-            return true;
-        }   
 	return false;
     }
 
@@ -918,51 +751,51 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      */
 
     global define InstallFonts(string symlink, boolean dontask) ``{
-	boolean answer=false;
+	boolean answer = false;
 
 	// step 1: want install?
-	if(dontask)
+	if (dontask)
 	{   
-	    answer=true;
+	    answer = true;
 	}
 	else
 	{
-	    answer=UI::YesNoHeadlinePopup(	lookup(STRINGS, "soundFontTitle", ""), 
+	    answer = UI::YesNoHeadlinePopup(	lookup(STRINGS, "soundFontTitle", ""), 
 					lookup(STRINGS, "soundFontQuestion", ""));
 	}
 	
-	if(!answer) 
+	if (!answer) 
 	{
 	    return;
 	}
 
-	boolean succes=false;
+	boolean succes = false;
 
-	while(true)
+	while (true)
 	{
     		// step 2: insert CD
-	    answer=UI::ContinueCancelHeadlinePopup (lookup(STRINGS, "soundFontTitle", ""), 
+	    answer = UI::ContinueCancelHeadlinePopup (lookup(STRINGS, "soundFontTitle", ""), 
 						    lookup(STRINGS, "soundFontAppeal", ""));
-	    if(!answer)
+	    if (!answer)
 	    {
 		return;
 	    }
 
 	    // step3: do something 
-	    map res=SCR::Execute (.target.bash_output, "/usr/lib/YaST2/bin/copyfonts 2>/dev/null", $[] );
-	    integer cnt=tointeger(lookup(res, "stdout", 0));
+	    map res = SCR::Execute (.target.bash_output, "/usr/lib/YaST2/bin/copyfonts 2>/dev/null", $[] );
+	    integer cnt = tointeger(lookup(res, "stdout", 0));
 	    
 	    // step4: 
-	    if(cnt>0)
+	    if (cnt > 0)
 	    {
 		UI::MessagePopup(sformat(lookup(STRINGS, "soundFontFinal", ""), cnt, "/usr/share/sfbank/creative"));
 		return;
 	    }
 	    else
 	    {
-		answer=UI::YesNoHeadlinePopup(  lookup(STRINGS, "soundFontNotFound", ""),
+		answer = UI::YesNoHeadlinePopup(  lookup(STRINGS, "soundFontNotFound", ""),
 						lookup(STRINGS, "soundFontRetry", ""));
-		if(!answer)
+		if ( !answer )
 		{
 		    return;
 		}
@@ -979,12 +812,12 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
     global define uniq_order(string key1, string key2, list uniques) ``{
 
 
-	integer i=0;
-	while(i<size(uniques))
+	integer i = 0;
+	while (i < size(uniques))
 	{
-	    if(select(uniques, i)==key2) return false;
-	    if(select(uniques, i)==key1) return true;
-	    i=i+1;
+	    if (select(uniques, i) == key2) return false;
+	    if (select(uniques, i) == key1) return true;
+	    i = i + 1;
 	}
 	return true;
     }
@@ -995,15 +828,15 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      */
     
     global define nm256_opl3sa2_warn(list sound_cards) ``{
-	list s1=filter(`e, sound_cards, 
-	    ``(lookup(lookup(lookup(e, "module", $[]), "module", $[]), "name", "")=="snd-card-nm256"));
-	list s2=filter(`e, sound_cards, 
-	    ``(lookup(lookup(lookup(e, "module", $[]), "module", $[]), "name", "")=="snd-card-opl3sa2"));
+	list s1 = filter(`e, sound_cards, 
+	    ``(lookup(lookup(lookup(e, "module", $[]), "module", $[]), "name", "") == "snd-card-nm256"));
+	list s2 = filter(`e, sound_cards, 
+	    ``(lookup(lookup(lookup(e, "module", $[]), "module", $[]), "name", "") == "snd-card-opl3sa2"));
 
-	if(size(s1)>0 && size(s2)>0)
+	if (size(s1) > 0 && size(s2) > 0)
 	{
-	    string name1=mergestring(splitstring(hardware_name(select(s1, 0)), "\n"), " ");
-	    string name2=mergestring(splitstring(hardware_name(select(s2, 0)), "\n"), " ");
+	    string name1 = mergestring(splitstring(hardware_name(select(s1, 0)), "\n"), " ");
+	    string name2 = mergestring(splitstring(hardware_name(select(s2, 0)), "\n"), " ");
 	    UI::MessagePopup(sformat(lookup(STRINGS, "opl3sa_nm256_warn", ""), name1, name2));
 	}
     }
@@ -1019,15 +852,15 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
     global define get_indices_for_removal(list save_info, string mod_name)
     ``{
-	list ret=[];
-	integer pos=0;
+	list ret = [];
+	integer pos = 0;
 	maplist(`e, save_info, 
 	``{  
-	    if(lookup(e, "module", "")==mod_name)
+	    if (lookup(e, "module", "") == mod_name)
 	    {
-		ret=add(ret, pos);
+		ret = add(ret, pos);
 	    }
-	    pos=pos+1;
+	    pos = pos + 1;
 	});
 	return ret;
     }
@@ -1039,8 +872,8 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      */
 
     global define multi_remove(list input, list id_list) ``{
-	id_list=sort(`x, `y, id_list, ``(x>=y));
-	maplist(`e, id_list, ``{if(e<size(input)) input=remove(input, e); });
+	id_list = sort(`x, `y, id_list, ``(x >= y));
+	maplist(`e, id_list, ``{if (e < size(input)) input = remove(input, e); });
 	return input;
     }
 
@@ -1052,21 +885,19 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 
     global define remove_save_entries(list save_info, list id_list)
     ``{
-//	id_list=sort(`x, `y, id_list, ``(x>=y));
+	save_info = multi_remove(save_info, id_list);
 
-//	maplist(`e, id_list, ``{if(e<size(save_info)) save_info=remove(save_info, e); });
-
-	save_info=multi_remove(save_info, id_list);
-
-	integer pos=0;
-	save_info=maplist(`e, save_info, 
+	integer pos = 0;
+	save_info = maplist(`e, save_info, 
 	``{
-	    map opts=lookup(/* lookup(e, "module", $[]) */ e, "options", $[]);
-	    opts=add(opts, "snd_index", sformat("%1", pos));
-	    opts=add(opts, "snd_id", sformat("card%1", pos+1));
-	    e=add(e, "alias", sformat("snd-card-%1", pos));
-	    e=add(e, "options", opts);
-	    pos=pos+1;
+	    map opts = lookup(e, "options", $[]);
+//	    opts = add(opts, "snd_index", sformat("%1", pos));
+//	    opts = add(opts, "snd_id", sformat("card%1", pos + 1));
+	    e = add_alias(e, pos);
+	    e = add_common_options(e, pos);
+//	    e = add(e, "alias", sformat("snd-card-%1", pos));
+//	    e = add(e, "options", opts);
+	    pos = pos + 1;
 	    return e;
 	});
 	return save_info;
@@ -1085,7 +916,7 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
         {
                   // To translators: To reset the sound configuration these programs must be terminated
                   // To translators: label message
-	    string msg=lookup(STRINGS, "WhichDialogMsg");
+	    string msg = lookup(STRINGS, "WhichDialogMsg");
                   // Yes, No - button labels
             boolean terminate = UI::YesNoPopup (msg);
             if (terminate)
@@ -1108,18 +939,18 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      */
 
     global define ConfCardsRT(list save_info) ``{
-	list retlist=[];
-	list conflist=[];
+	list retlist = [];
+	list conflist = [];
 	foreach(`entry, save_info,
 	``{
-	    conflist=add(conflist, lookup(entry, "model", ""));
+	    conflist = add(conflist, lookup(entry, "model", ""));
 	});
-	integer i=0;
+	integer i = 0;
 	foreach(`card, conflist,
 	``{
 	    // to translators: '(sound card is) Configured as snd-card-1'
-	    retlist=add(retlist, summaryDevice(card, sformat(_("Configured as snd-card-%1."), i)));
-	    i=i+1;
+	    retlist = add(retlist, summaryDevice(card, sformat(_("Configured as snd-card-%1."), i)));
+	    i = i + 1;
 	});
 
 	return summaryDevicesList(retlist);

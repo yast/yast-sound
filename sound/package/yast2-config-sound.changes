@@ -1,4 +1,15 @@
 -------------------------------------------------------------------
+Wed Aug 22 17:54:10 CEST 2001 - dmeszar@suse.cz
+
+- oss support added, alpha version
+- volume setting for oss not implemented so far
+
+-------------------------------------------------------------------
+Mon Aug 20 17:41:31 CEST 2001 - dmeszar@suse.cz
+
+- fixed shortcuts
+
+-------------------------------------------------------------------
 Mon Aug 20 13:47:44 CEST 2001 - dmeszar@suse.cz
 
 - bug #8335 fixed, options restoring when deleting card fixed

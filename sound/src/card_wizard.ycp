@@ -27,44 +27,44 @@
 // include "sound/routines.ycp";
 // include "sound/alsa_routines.ycp";
 
-list save_entry=[];
-integer card_id=0;
-integer flag=0;
-any ui=nil;
-list save_info=[];
-boolean finish=false;
+list save_entry	= [];
+integer card_id	= 0;
+integer flag	= 0;
+any ui		= nil;
+list save_info	= [];
+boolean finish	= false;
 
 global define _showName()
 ``{
-    string modelname=lookup(save_entry, "model", "");
-    map res=DisplayName(modelname, lookup(save_entry, "alias"), card_id, flags);
-    symbol ui=lookup(res, "ui", nil);
+    string modelname = lookup(save_entry, "model", "");
+    map res = DisplayName(modelname, lookup(save_entry, "alias"), card_id, flags);
+    symbol ui = lookup(res, "ui", nil);
     return ui;
 }
 
 global define _options()
 ``{
-    map res=CallFunction (`sound_options(save_entry));
-    symbol ui=lookup(res, "ui", nil);
-    if(ui == `next)
+    map res = CallFunction (`sound_options(save_entry));
+    symbol ui = lookup(res, "ui", nil);
+    if (ui == `next)
     {
-	save_entry=lookup(res, "return", $[]);
-        save_entry=add_common_options(save_entry, card_id);
+	save_entry = lookup(res, "return", $[]);
+        save_entry = add_common_options(save_entry, card_id);
     }
     return ui;
 }
 
 global define _quick()
 ``{
-    map res=CallFunction (`sound_volume(save_entry, card_id, finish, true, save_info));
-    symbol ui=lookup(res, "ui", nil);
+    map res = CallFunction (`sound_volume(save_entry, card_id, finish, true, save_info));
+    symbol ui = lookup(res, "ui", nil);
     return ui;
 }
 
 global define _volume()
 ``{
-    map res=CallFunction (`sound_volume(save_entry, card_id, finish, false, save_info));
-    symbol ui=lookup(res, "ui", nil);
+    map res = CallFunction (`sound_volume(save_entry, card_id, finish, false, save_info));
+    symbol ui = lookup(res, "ui", nil);
     return ui;
 }
 
@@ -75,7 +75,7 @@ global define _optVolume()
 
 global define AbortDialog() ``{
     any ret = UI::ReallyAbortPopup(true);
-    if(ret==true) return `yes;
+    if (ret == true) return `yes;
     return `back;
 
 }
@@ -95,16 +95,7 @@ global define OneCardWizard (map save_entry, integer card_id, any ui,
 			     integer flags, boolean finish, list save_info) ``{
             // 3rd param for "sound_module" will be defined later
             // TODO: add nm256hack
-	
-/*	save_entry=_save_entry;
-	card_id=_card_id;
-	ui=_ui;
-	flags=_flags;
-	finish=_finish;
-	save_info=_save_info;
-
-*/
-	map aliases=$[
+	map aliases = $[
 		"name"	    : ``(_showName()),
 		"options"   : ``(_options()),
 		"volume"    : ``(_volume()),
@@ -113,7 +104,7 @@ global define OneCardWizard (map save_entry, integer card_id, any ui,
 	    ];
 	
 
-	map sequence=$[
+	map sequence = $[
 	    "ws_start": "name",
 	    "abort":
 	    $[
@@ -124,26 +115,22 @@ global define OneCardWizard (map save_entry, integer card_id, any ui,
 		`quick: "quick",
 		`skip : `back,
 	        `next:  "volume",
-//	        `back:  `back,
 	        `options: "options",
 		`abort:	`abort
 	    ],
 	    "options":
 	    $[
 	        `next: "optVolume",
-//	        `back: "name",
 	        `abort: `abort
 	    ],
 	    "volume":
 	    $[
 		`next: `next,
-//		`back: "name",
 		`abort: `abort
 	    ],
 	    "optVolume":
 	    $[
 		`next: `next,
-//		`back: "options",
 		`abort: `abort
 	    ],
 	    "quick":
@@ -153,11 +140,11 @@ global define OneCardWizard (map save_entry, integer card_id, any ui,
 	    ]
 	];
 
-    map opts=lookup(save_entry, "options", $[]);
-    save_entry=add_common_options(save_entry, card_id);
-    save_entry=add_alias(save_entry, card_id);
+    map opts = lookup(save_entry, "options", $[]);
+    save_entry = add_common_options(save_entry, card_id);
+    save_entry = add_alias(save_entry, card_id);
     
-    any uy=WizardSequencer(aliases, sequence);
+    any uy = WizardSequencer(aliases, sequence);
     return $["ui": uy, "return": save_entry];
     
     }
