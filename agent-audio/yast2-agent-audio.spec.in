@@ -37,35 +37,30 @@ Obsoletes:	y2a_audio
 -
 
 %prep
-
 %setup -n @RPMNAME@-@VERSION@
 
 %build
-
 export CXXFLAGS="$RPM_OPT_FLAGS -DNDEBUG"
 %{?suse_update_config:%{suse_update_config -f}}
 ./configure
 make
 
 %install
-
 make install-strip
 strip --strip-debug @YAST2DIR@/plugin/libpy2ag_audio.so.2.0.0
 
 %{?suse_check}
 
 %files
-
 %dir @YAST2DIR@/plugin
 @YAST2DIR@/plugin/libpy2ag_audio.so.*
 %dir @YAST2DIR@/scrconf
 @YAST2DIR@/scrconf/*.scr
 
 %files devel
-
 %dir @YAST2DIR@/plugin
 @YAST2DIR@/plugin/libpy2ag_audio.so
 @YAST2DIR@/plugin/libpy2ag_audio.la
-%dir @YAST2DOC@
-@YAST2DOC@/*
+%dir @DOCDIR@
+@DOCDIR@/*
 
