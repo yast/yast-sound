@@ -100,7 +100,7 @@
 	    integer step = 1;
 	    if (size(e) == 3)
 	    {
-		step = tointeger(select(e, 2));
+		step = tointeger(select(e, 2, 1));
 	    }
 	    if (step < 1)
 	    {
@@ -109,27 +109,27 @@
 	    }
 
 	    boolean hex = false;
-	    if (regexpmatch(select(e, 1), "^-[0-9]*$") || regexpmatch(select(e, 1), "^[0-9]*$"))
+	    if (regexpmatch(select(e, 1, ""), "^-[0-9]*$") || regexpmatch(select(e, 1, ""), "^[0-9]*$"))
 	    {
 		hex = false;
 		y2error("Hex=false");
 	    }
-	    else if (regexpmatch(select(e, 1), "^-0x[0-9a-fA-F]*")
-			|| regexpmatch(select(e, 1), "^0x[0-9a-fA-F]*"))
+	    else if (regexpmatch(select(e, 1, ""), "^-0x[0-9a-fA-F]*")
+			|| regexpmatch(select(e, 1, ""), "^0x[0-9a-fA-F]*"))
 	    {
 		hex = true;
 		y2error("Hex=true");
 	    }
 	    else
 	    {
-		if (contains(["Disabled", "Enabled"], select(e, 1)))
+		if (contains(["Disabled", "Enabled"], select(e, 1, "")))
 		{
-		    return [select(e, 0)];
+		    return [select(e, 0, "")];
 		}
 	    }
 
-	    integer from = tointeger(select(e, 0));
-	    integer to = tointeger(select(e, 1));
+	    integer from = tointeger(select(e, 0, ""));
+	    integer to = tointeger(select(e, 1, ""));
 
 	    if (((to - from) / step) > 50)
 	    {
@@ -183,7 +183,7 @@
      */
 
     global define term gen_list(list vals, string default) ``{
-	vals = maplist(`e, vals, ``(`item(`id(e), sformat("%1", e))));
+	vals = maplist(`e, vals, ``(`item(`id(e), sformat("%1", e), default == e)));
 
 	return `ComboBox(`id(`poss), `opt(`notify), _("&Possible value:"), vals);
     }
