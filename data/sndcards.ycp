@@ -1184,6 +1184,12 @@
     "snd-azt3328" : $[
       "description" : "Aztech AZF3328 (PCI168)",
       "params" : $[
+        "joystick" : $[
+          "allows" : "{{0,Disabled},{1,Enabled}}",
+          "default" : "0",
+          "descr" : _("Enable joystick."),
+          "dialog" : "check"
+        ]
       ]
     ],
     "snd-bt87x" : $[
@@ -1279,8 +1285,7 @@
     "snd-cmipci" : $[
       "description" : "C-Media CMI8x38 PCI",
       "joystick" : $[
-        "GAMEPORT_MODULE" : "ns558",
-        "JOYSTICK_CONTROL" : "Joystick"
+        "GAMEPORT_MODULE" : "ns558"
       ],
       "params" : $[
         "fm_port" : $[
@@ -1693,8 +1698,7 @@
     "snd-ens1370" : $[
       "description" : "Ensoniq AudioPCI ES1370",
       "joystick" : $[
-        "GAMEPORT_MODULE" : "ns558",
-        "JOYSTICK_CONTROL" : "Joystick Enable"
+        "GAMEPORT_MODULE" : "ns558"
       ],
       "params" : $[
         "joystick" : $[
@@ -1708,9 +1712,7 @@
     "snd-ens1371" : $[
       "description" : "Ensoniq/Creative AudioPCI ES1371+",
       "joystick" : $[
-        "GAMEPORT_MODULE" : "ns558",
-        "JOYSTICK_CONTROL" : "Joystick Enable",
-        "JOYSTICK_CONTROL_PORT" : "0x200"
+        "GAMEPORT_MODULE" : "ns558"
       ],
       "params" : $[
         "joystick_port" : $[
@@ -1853,8 +1855,7 @@
     "snd-es1968" : $[
       "description" : "ESS Maestro",
       "joystick" : $[
-        "GAMEPORT_MODULE" : "ns558",
-        "JOYSTICK_CONTROL" : "Joystick"
+        "GAMEPORT_MODULE" : "ns558"
       ],
       "params" : $[
         "clock" : $[
@@ -3277,6 +3278,12 @@
           "descr" : _("Support for DXS channels (0 = auto, 1 = enable, 2 = disable, 3 = 48k only, 4 = no VRA)"),
           "dialog" : "list"
         ],
+        "joystick" : $[
+          "allows" : "{{0,Disabled},{1,Enabled}}",
+          "default" : "0",
+          "descr" : _("Enable joystick."),
+          "dialog" : "check"
+        ],
         "mpu_port" : $[
           "allows" : "{{0,0xffff}}",
           "base" : "16",
@@ -3418,9 +3425,7 @@
     "snd-ymfpci" : $[
       "description" : "Yamaha DS-XG PCI",
       "joystick" : $[
-        "GAMEPORT_MODULE" : "ns558",
-        "JOYSTICK_CONTROL" : "Joystick",
-        "JOYSTICK_CONTROL_PORT" : "0x201"
+        "GAMEPORT_MODULE" : "ns558"
       ],
       "mixer" : $[
         "CD" : 80,
