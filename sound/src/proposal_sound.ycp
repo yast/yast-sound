@@ -1,0 +1,73 @@
+/**
+ * File:
+ *   clients/proposal_sound.ycp
+ *
+ * Package:
+ *   Configuration of sound
+ *
+ * Summary:
+ *   Proposal function dispatcher.
+ *
+ * Authors:
+ *   Dan Meszaros <dmeszar@suse.cz>
+ *
+ * $Id$
+ *
+ * Proposal function dispatcher for sound configuration.
+ *
+ */
+
+{
+    textdomain "sound";
+
+    import "Sound";
+    import "Progress";
+
+    string func  = Args(0);
+    map    param = Args(1);
+    map    ret   = $[];
+
+    // Make proposal for installation/configuration...
+    if ( func == "MakeProposal" )
+    {
+	boolean force_reset = param["force_reset"]:false;
+
+	// Do not show any progress during Read()
+	Progress::off ();
+	boolean success = Sound::Read ( ``{ return false; } );
+	Progress::on ();
+
+	string proposal = Sound::Summary ();
+
+	// Fill return map
+	ret =
+	    $[ "preformatted_proposal" : proposal,
+	       "warning"               : _("This is just a sound proposal!"),
+	       "warning_level"         : `blocker
+	    ];
+    }
+    // Run an interactive workflow
+    else if ( func == "AskUser" )
+    {
+	boolean has_next = param["has_next"]:false;
+
+	any sequence = CallFunction ( `sound () );
+
+	// Fill return map
+	ret =
+	    $[ "workflow_sequence" : sequence
+	    ];
+    }
+    // Return human readable titles for the proposal
+    else if ( func == "Description" )
+    {
+	// Fill return map
+	ret =
+	    $[ "rich_text_title" : _( "Sound" ),
+	       "menu_title"      : _( "&Sound" ),
+	       "id"              : "sound_conf"
+	    ];
+    }
+
+    return ret;
+}
