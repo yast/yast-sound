@@ -196,7 +196,7 @@
 	}
 	else {
 
-	    UI (`DisplayMessage (_("The sound card was succesfully configured and\nyou can use it right now."), 0, ""));
+	    UI (`DisplayMessage (_("The sound card was succesfully configured and\nyou can use it right now.")));
 	}
 
 	return `next;

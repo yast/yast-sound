@@ -31,7 +31,7 @@
 		    // To translators: This is just popup message, shouldn't be too long
 		string msg = sformat (UI (_("Cannot find file:\n %1\n\n(test audio file)")), file);
 		
-		UI (`DisplayMessage (msg, 0, ""));
+		UI (`DisplayMessage (msg));
 	    }
 	    else
 		Shell ("/bin/cat $AUDIO > /dev/audio &", $["AUDIO" : lookup (user_settings, "audio_file")]);
@@ -46,9 +46,7 @@
 	    integer ret = Shell ("/usr/bin/amixer set $DEV $VOL% unmute 2>/dev/null", $["DEV" : device, "VOL" : v]);
 	    if (ret == 127){
 				// To translators: This is just popup message, shouldn't be too long
-		UI (`DisplayMessage (_("Cannot find program 'amixer'"), 0,
-				// To translators: This is just popup message, shouldn't be too long
-				     _("Please install the package 'ALSA' from the 'snd' series")));
+		UI (`DisplayMessage (_("Cannot find program 'amixer'.\nPlease install the package 'ALSA' from the 'snd' series")));
 	    }
 	    return ret;
 	};
@@ -246,7 +244,7 @@
 	    } until ((ui == `back) || (ui == `next) || ui == `cancel);
 
 	    if (ui == `next) {
-		volume_continue = UI(`DisplayYesNo (_("Sound volume and the configuration\nfor the sound card will be saved now."), true));
+		volume_continue = UI(`YesOrNo (_("Sound volume and the configuration\nfor the sound card will be saved now."), _("&Yes"), _("&No")));
 	    }
 	    else
 		volume_continue = true;

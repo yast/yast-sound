@@ -319,7 +319,7 @@
 					  []); //possible_values);
 		
 		if (size (err) > 0) { // error - wrong value
-		    UI(`DisplayMessage (err, 0, ""));
+		    UI(`DisplayMessage (err));
 		    UI(`ChangeWidget(`id(`des), `Value, ""));
 		    entered_options = add (entered_options, current_option_name, ""); // clear it
 					   

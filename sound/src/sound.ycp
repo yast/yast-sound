@@ -35,19 +35,27 @@
 	UI(``{
 
 		// The main dialog. Copied from installation.ycp.
-	    OpenDialog(`opt(`defaultsize),
-		       `VBox(`Image(`suseheader, "SuSE"),
-			     `HBox(`HWeight(30, `RichText(`id(`help), "")),
-				   `HWeight(70, `VBox(
-				       `Left(`Heading(`id(`title), _("YaST2\nInitializing ..."))),
-				       `HVCenter(`ReplacePoint(`id(`contents), `Empty())),
-				       `HBox(
-					       // back pushbutton: the user input is ignored and the last dialog is called
-					   `PushButton(`id(`back), `opt(`disabled), _("&Back")),
-					   `HStretch(),
-					       // next pushbutton: the user input is checked and the next dialog is called
-					   `PushButton(`id(`next), `opt(`disabled), _("&Next"))))))));
-    
+      OpenDialog(
+		 `opt(`defaultsize),
+		 `VBox(
+		       `ReplacePoint( `id(`image ), `Image( `suseheader, "SuSE") ),
+		       `HBox(
+			     `HWeight( 30, `ReplacePoint( `id(`helpSpace), `RichText(`id(`help), ""))),
+			     `HSpacing(1),
+			     `HWeight( 70, `VBox(
+						 `VSpacing(0.2),
+						 `Left(`Heading(`id(`title), _("YaST2\nInitializing ..."))),
+						 `HVCenter(`ReplacePoint(`id(`contents), `Empty())),
+						 `HBox(
+						       // "back" button: Return to the previous dialog
+						       `PushButton(`id(`back), _("&Back")),
+						       `HStretch (),
+						       // "next" button: Proceed to the next dialog
+						       `ReplacePoint( `id(`rep_next), `PushButton(`id(`next), _("&Next")) )
+						       ),
+						 `VSpacing(0.2))),
+			     `HSpacing(1))));
+      
 	    define SetContents(string title, term contents, string helptext,
 			       boolean has_back, boolean has_next) ``{
 		ChangeWidget(`id(`next), `Enabled, has_next);
@@ -62,20 +70,48 @@
 	    
 	    
 		// This is a popup dialog for displaying (usually) error messages      
-	    define DisplayMessage(string message, integer code, string stack) ``{
+	    define DisplayMessage(string message) ``{
 		    // ok pushbutton: confirm the dialog
-		term t = `VBox();
-		t = add(t, `Left(`Label(message)));
-		if (code != 0)
-			// optional warning dialog text
-		    t = add(t, `Left(`Label(sformat(_("Error code %1"), code))));
-		if (stack != "") 
-		    t = add(t, `Left(`Label(stack)));
-		OpenDialog(`opt(`decorated), add(t, `PushButton(_("&OK"))));
+		OpenDialog(
+		    `opt(`decorated),
+		    `HBox(
+			`HSpacing(1),
+			`VBox(
+			    `VSpacing(0.2),
+			    `Label(message),
+			    `PushButton(`opt(`default), _("&OK")),
+			    `VSpacing(0.2)
+			    ),
+			`HSpacing(1)
+			)
+		    );
 		UserInput();
 		CloseDialog();
 	    };
 
+	    define YesOrNo(any message, string yes_button_message, string no_button_message) ``{
+		OpenDialog(
+		    `opt(`decorated),
+		    `HBox(
+			`HSpacing(1),
+			`VBox(
+			    `VSpacing(0.2),
+			    `Label(message),
+			    `HBox(
+				`HWeight(3, `PushButton(`id(`yes), `opt(`default), yes_button_message) ),
+				`HWeight(2, `HStretch() ),
+				`HWeight(3, `PushButton( no_button_message ) )
+				),
+			    `VSpacing(0.2)
+			    ),
+			`HSpacing(1)
+			)
+		    );
+		any ret = UserInput();
+		CloseDialog();
+		return (ret == `yes);
+	    };
+	    
 
 	        // This is a popup dialog with Yes/No question
 	    define DisplayYesNo(string message, boolean d) ``{
@@ -231,9 +267,8 @@
 		
 		if (ret == 127) {
 			// To translators: This is just popup message, shouldn't be too long
-		    UI (`DisplayMessage (_("Cannot execute the program \"rpm\"."), 0,
-					     // To translators: This is just popup message, shouldn't be too long
-					 _("Please check if the 'rpm' package from the series 'a1' is installed.")));
+		    UI (`DisplayMessage (_("Cannot execute the program \"rpm\".\nPlease check if the 'rpm' package from the series 'a1' is installed.")));
+
 		}
 		
 				// if this package not installed, we have to use alsa au file
@@ -441,7 +476,8 @@
 			UI(`ChangeWidget(`id(`next), `Enabled, false));
 			UI(`ChangeWidget(`id(`options), `Enabled, false));
 
-			if (UI (`DisplayYesNo (_("There is no available driver for selected card.\nDo you want to select the driver manually?"), true)))
+			if (UI (`YesOrNo (_("There is no available driver for selected card.\nDo you want to select the driver manually?"),
+					  _("&Yes"), _("&No"))))
 			{
 			    
 			    options_entered = $[]; // clear options
@@ -453,7 +489,7 @@
 
 			    if (manual == nil) {
 				message = sformat (UI(_("Can not find module: %1")), "sound_manual");
-				UI (`DisplayMessage (message, 0, ""));
+				UI (`DisplayMessage (message));
 			    }
 		    
 			    else if (size (manual) > 0) {
@@ -520,7 +556,7 @@
 
 		    if (options == nil) {
 			message = sformat (UI(_("Can not find module: %1")), "sound_options");
-			UI (`DisplayMessage (message, 0, ""));
+			UI (`DisplayMessage (message));
 		    }
 		    else if (size (options) > 0) {
 				// according to the SCR
@@ -546,7 +582,7 @@
 
 		    if (manual == nil) {
 			message = sformat (UI(_("Can not find module: %1")), "sound_manual");
-			UI (`DisplayMessage (message, 0, ""));
+			UI (`DisplayMessage (message));
 		    }
 		    
 		    else if (size (manual) > 0) {
