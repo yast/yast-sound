@@ -55,12 +55,12 @@
 
 
     textdomain "sound";
-    include "sound/texts.ycp";
+//    include "sound/texts.ycp";
 
 
     map STRINGS=STRINGS_();
 
-    include "sound/write_routines.ycp";
+//    include "sound/write_routines.ycp";
 
       // ==== MAIN ====
 

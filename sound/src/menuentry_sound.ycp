@@ -27,7 +27,7 @@
     $[
      ////////////////////////////////////////////////////////////////////////////////
      // name of the entry, shon in curses menu and ycc                             //
-	`menuentry    : UI(_("Sound")),
+	`menuentry    : _("Sound"),
      
      ////////////////////////////////////////////////////////////////////////////////
      //leave blank,  experts only ;-)
@@ -39,18 +39,18 @@
    
      ////////////////////////////////////////////////////////////////////////////////
      // Icon used in y2contolcenter                                                //
-	`icon         : UI(_("soundcard.png")),
+	`icon         : _("soundcard.png"),
      
       ////////////////////////////////////////////////////////////////////////////////
       // explanation of yast2 menueentry in ncurses menu                            //                 
 	`widget       : `RichText(
-			       UI(_("Launch this module to configure your sound card."))
+			       _("Launch this module to configure your sound card.")
 			       +
-			       UI(_("<p>You need to be logged in as <i>root</i> in order to do this.</p>"))),
+			       _("<p>You need to be logged in as <i>root</i> in order to do this.</p>")),
      
       ////////////////////////////////////////////////////////////////////////////////
       // explanation in YaST2 Control Center                                         //
-	`helptext     : UI(_("Configure your sound card")),
+	`helptext     : _("Configure your sound card"),
    
       ////////////////////////////////////////////////////////////////////////////////
       // leaf nil, experts only ;-)

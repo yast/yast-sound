@@ -23,15 +23,14 @@
 
     textdomain "sound";
 
-    include "misc_defines.ycp";
-    include "sound/routines.ycp";
-    include "sound/ui.ycp";
-    include "sound/texts.ycp";	
-    include "sound/alsa_routines.ycp";
-    include "sound/write_routines.ycp";
-    include "sound/card_wizard.ycp";
+//    include "misc_defines.ycp";
+//    include "sound/routines.ycp";
+//    include "sound/ui.ycp";
+//    include "sound/texts.ycp";	
+//    include "sound/alsa_routines.ycp";
+//    include "sound/write_routines.ycp";
+//    include "sound/card_wizard.ycp";
 
-    include "browser.ycp";
 
     map STRINGS=STRINGS_();
 
@@ -159,14 +158,14 @@
 	    if(size(filter(`f, runn, ``(lookup(f, "number", -1)==pos)))!=0)
 	    {
 		// to translators: "(The card is) running
-		state=UI(_("Running"));
+		state=_("Running");
 	    }
 	    else
 	    {
 		if(lookup(e, "unique_key", "")==isa_uniq())
 		// card was not autodetected
 		{
-		    state=UI(_("Not running"));
+		    state=_("Not running");
 		}
 		else
 		// card was autodetected	
@@ -175,12 +174,12 @@
 		    audio=filter(`g, audio, ``(lookup(g, "unique_key", "")==lookup(e, "unique_key", "")));
 		    if(size(audio)!=0)
 		    {
-			state=UI(_("Not running"));
+			state=_("Not running");
 		    }
 		    else
 		    {
 			// to translators: sound card has been removed from the machine
-			state=UI(_("Card removed"));
+			state=_("Card removed");
 		    }
 		}
 	    }
@@ -380,11 +379,6 @@ Try to restart sound system?"))))
 	    
 		    if(size(cards)!=0)
 		    {
-//			if(sound_db==nil)
-//			{
-//			    sound_db=GetCardDatabase();
-//			}
-
 			cards = maplist(`e, cards, ``(add (e, "module", get_module (e))));
 			cards = filter(`e, cards, ``(lookup(e, "module", $[])!=$[]));
 			cards = filter_configured(save_info, cards);
@@ -471,7 +465,7 @@ Try to restart sound system?"))))
 
 	return $["ui"       : ui,
 		"save_info" : save_info,
-		"configured_unique" : configured_unique,
+//		"configured_unique" : configured_unique,
 			   "rc"        : rc_vars];
     }
 
@@ -481,7 +475,7 @@ Try to restart sound system?"))))
   //  list db=nil;
 
     list save_info = Args(0);
-    list configured_unique = Args(1);
+  //  list configured_unique = Args(1);
 
     list to_delete = [];
     boolean config_mode = false;

@@ -19,9 +19,9 @@
 
     textdomain "sound";
 
-    include "sound/routines.ycp";
-    include "sound/ui.ycp";
-    include "sound/texts.ycp";
+//    include "sound/routines.ycp";
+//    include "sound/ui.ycp";
+//    include "sound/texts.ycp";
     
     map STRINGS=STRINGS_();
 

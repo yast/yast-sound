@@ -23,9 +23,9 @@
  *
  */
 
-include "wizard/sequencer.ycp";
-include "sound/routines.ycp";
-include "sound/alsa_routines.ycp";
+// include "wizard/sequencer.ycp";
+// include "sound/routines.ycp";
+// include "sound/alsa_routines.ycp";
 
 list save_entry=[];
 integer card_id=0;

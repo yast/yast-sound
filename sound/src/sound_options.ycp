@@ -22,24 +22,24 @@
 
     textdomain "sound";
 
-    include "misc_defines.ycp";
-    include "sound/routines.ycp";
-    include "sound/ui.ycp";
-    include "sound/texts.ycp";
+//    include "misc_defines.ycp";
+//    include "sound/routines.ycp";
+//    include "sound/ui.ycp";
+//    include "sound/texts.ycp";
 
-    include "browser.ycp";
+//  include "browser.ycp";
 
     map STRINGS=STRINGS_();
 
     global define defWidget() ``{
-	return `Label(UI(_("Possible value:\nnot known")));
+	return `Label(_("Possible value:\nnot known"));
     }
 
     global define gen_list(string tail, string default) ``{
 	list vals=splitstring(tail, ",");
 	vals=maplist(`e, vals, ``(`item(`id(e), sformat("%1", e))));
 
-	return `ComboBox(`id(`poss), `opt(`notify), UI(_("&Possible value:")), vals);
+	return `ComboBox(`id(`poss), `opt(`notify), _("&Possible value:"), vals);
     }
 
     global define gen_intfield(string tail, string default) ``{
@@ -52,24 +52,24 @@
 	integer upper=100;
 	lower=tointeger(select(rng, 0));
 	upper=tointeger(select(rng, 1));
-	return `IntField(`id(`poss), `opt(`notify), UI(_("&Possible value:")), lower, upper, tointeger(default));
+	return `IntField(`id(`poss), `opt(`notify), _("&Possible value:"), lower, upper, tointeger(default));
     }
 
     global define gen_bool(string default) ``{
-	return `ComboBox(`id(`poss), `opt(`notify), UI(_("&Possible value:")), [`item(`id("0"), "0", default=="0"), 
+	return `ComboBox(`id(`poss), `opt(`notify), _("&Possible value:"), [`item(`id("0"), "0", default=="0"), 
 	    `item(`id("1"), "1", default=="1")]);
     }
     
     global define gen_irq(string default) ``{
 	list irqs=["3", "5", "7", "9", "10", "11", "12", "15"];
 	irqs=maplist(`e, irqs, ``(`item(`id(e), e, default==e)));
-	return `ComboBox(`id(`poss), `opt(`notify), UI(_("&Possible value:")), irqs);
+	return `ComboBox(`id(`poss), `opt(`notify), _("&Possible value:"), irqs);
     }
 
     global define gen_dma(string default) ``{
 	list dmas=["-1", "0", "1", "3", "5", "6", "7"];
 	dmas=maplist(`e, dmas, ``(`item(`id(e), e, default==e)));
-        return `ComboBox(`id(`poss), `opt(`notify), UI(_("&Possible value:")), dmas);
+        return `ComboBox(`id(`poss), `opt(`notify), _("&Possible value:"), dmas);
     }
 
     global define gen_dma_size(string default) ``{
@@ -201,7 +201,7 @@
 		current_option_name = select(UI(`QueryWidget(`id(`table), `Item(current_option))), 2);
 
 		    // to translators: name of currently selected option: eg. 'Option: snd_asdf'
-		UI(`ChangeWidget(`id(`des), `Label, sformat("%1 %2", UI(_("Option: ")),current_option_name)));
+		UI(`ChangeWidget(`id(`des), `Label, sformat("%1 %2", _("Option: "),current_option_name)));
 		UI(`ChangeWidget(`id(`des), `Value, select(UI(`QueryWidget(`id(`table), `Item(current_option))), 3)));
 
 		    // update possible values

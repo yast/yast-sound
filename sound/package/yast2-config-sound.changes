@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Jul 30 16:40:33 CEST 2001 - dmeszar@suse.cz
+
+- speed improvements
+
+-------------------------------------------------------------------
 Wed Jul 25 10:52:02 CEST 2001 - dmeszar@suse.cz
 
 - first dialog unified with printconf and tvconf modules
