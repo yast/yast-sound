@@ -57,14 +57,17 @@
 
 
 				// unmute all devices to vol
-	define unmute_all (integer vol) ``{
-	    list|void devices = SCR(`Read(.usr.bin.amixer));
+	define unmute_all (integer vol, list devices) ``{
+	    list|void existing_devices = SCR(`Read(.usr.bin.amixer));
 
-	    if (devices != nil) {
-		foreach (`d, devices, ``{
-		    set_volume (lookup (d, "device", "Master"), vol);
+	    if (existing_devices != nil) {
+		
+		list ud = filter (`v, devices, ``(contains (maplist(`e, existing_devices, ``(lookup (e, "device", ""))), v)));
+		foreach (`d, ud, ``{
+		    set_volume (d, vol);
 		});
-
+		
+		// always set "Master" device
 		set_volume ("Master", vol);
 	    }
 	
@@ -215,9 +218,9 @@
 	else {
 
 	    next = true;
-				// let's unmute all devices to 90%
+				// let's unmute all listed devices to 90%
 	    if (!test_mode) {
-		unmute_all (90);
+		unmute_all (90, ["PCM", "PCM,1", "Wave", "Master Digital", "Synth"]);
 		set_volume ("Master", vol);
 	    }
 	
