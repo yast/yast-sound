@@ -8,6 +8,7 @@
  *
  *
  * parameters: 1st: module, Map, map of card
+ *             2nd: card_id, integer
  *
  */
 
@@ -46,8 +47,11 @@
 	    
 	    string play_cmd = lookup (user_settings, "play_cmd", "");
 	    string audio_file = lookup (user_settings, "audio_file", "");
-	    UI (`DisplayMessage (sformat("%1 %2 &", play_cmd, audio_file)));
-	    SCR(`Execute (.target.bash, sformat("%1 %2 &", play_cmd, audio_file), $[]));
+	    // more cards
+	    if (no_alsa)
+		SCR(`Execute (.target.bash, sformat("%1 %2 &", play_cmd, audio_file), $[]));
+	    else
+		SCR(`Execute (.target.bash, sformat("%1 -c %2 %3 &", play_cmd, card_id, audio_file), $[]));
 
 	}
     };
@@ -217,6 +221,8 @@
      */
 
     map card = Args (0);
+    integer card_id = Args (1);
+
     map module_map = lookup (card, "module", $[]);
 
     map user_settings = $["audio_file" : "/usr/share/sounds/alsa/test.wav",

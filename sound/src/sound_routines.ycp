@@ -222,6 +222,7 @@ define read_save_info () ``{
     list aliases  = SCR(`Read(topath (sformat ("%1.modules.alias", prefix))));
     list options  = SCR(`Read(topath (sformat ("%1.modules.options", prefix))));
     list save     = [];		// structure to save
+    integer i     = 0;
 
     if (contains (aliases, "char-major-116")) {
 	// alsa modules
@@ -233,7 +234,7 @@ define read_save_info () ``{
 	    integer cards   = tointeger (lookup (SCR(`Read(topath (sformat ("%1.modules.options", prefix)), "snd")), "snd_cards_limit", 1));
 	    map entry       = $[];
 	    map mod_entry   = $[];
-	    integer i       = 0;
+
 	    string alias    = "";
 	    string module_name   = "";
 	    string comment  = "";
@@ -286,15 +287,15 @@ define read_save_info () ``{
 		if (contains (options, module_name)) option = SCR (`Read(topath (sformat ("%1.modules.options", prefix)), module_name));
 		else option = $[];
 
-		if ((module_name == "off") || (module_name == "null")) { i = i + 1; continue; }
+		if ((module_name != "off") && (module_name != "null")) {
 
-		if (size (module_name) > 0) {
-		    entry = add (entry, "alias", alias);
-		    entry = add (entry, "name", module_name);
-		    if (size (option) > 0) entry = add (entry, "options", option);
-		    if (size (comment) > 0) entry = add (entry, "comment", comment);
+		    if (size (module_name) > 0) {
+			entry = add (entry, "alias", alias);
+			entry = add (entry, "name", module_name);
+			if (size (option) > 0) entry = add (entry, "options", option);
+			if (size (comment) > 0) entry = add (entry, "comment", comment);
+		    }
 		}
-		
 		if (size (entry) > 0) save = add (save, entry);
 	    }
 	});

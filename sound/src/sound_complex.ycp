@@ -208,6 +208,7 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 
 	    integer card_id = UI(`QueryWidget (`id(`configured_table), `CurrentItem));
 
+
 	    if (contains (SCR(`Read(.modules.alias)), sformat ("snd-card-%1", card_id))) {
 		// card in modules.conf
 		string mod = SCR(`Read(.modules.alias, sformat ("snd-card-%1", card_id)));
@@ -216,9 +217,15 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 
 		to_delete = add (to_delete, mod);
 	    }
-	    else if (size (cards) > card_id) {
+	    else if (size (conf_cards) > card_id) {
 		// card just in the internal structure
-		string mod = lookup (lookup (select (cards, card_id, $[]), "module", $[]), "name", "");
+
+		list m = filter (`e, save_info, ``(lookup (lookup (e, "modules", $[]), "alias", "") == sformat ("snd-card-%1", card_id)));
+		string mod = "";
+
+		if (size (m) > 0)
+		    mod = lookup (select (m, 0), "name", "");
+
 		if (size (mod) > 0) {
 		    SCR(`Execute(.target.modprobe, sformat ("-r %1", mod), ""));
 		    to_delete = add (to_delete, mod);

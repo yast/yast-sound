@@ -105,11 +105,13 @@
 
 
     define save_unique_keys (list cards) ``{
-	list orig = SCR(`Read(.var.lib.yast.unique));
-	list skipped = maplist (`e, cards, ``(!contains (configured_unique, lookup (e, "unique", ""))));
+	list|void orig = SCR(`Read(.var.lib.yast.unique));
+	if (is (orig, void)) orig = [];
+	list skipped = filter (`e, cards, ``(!contains (configured_unique, lookup (e, "unique_key", ""))));
+
 	list sound_unique = maplist (`e, configured_unique, ``($["unique" : e, "state" : "configured"]));
 	sound_unique = union (sound_unique, maplist (`e, skipped, ``($["unique" : e, "state" : "skipped"])));
-	SCR(`Write(.var.lib.yast.unique, union (orig, sound_unique)));
+	SCR(`Write(.var.lib.yast.unique, add (orig, $["contents" : sound_unique, "section" : "sound"])));
     }
 
 
@@ -179,7 +181,7 @@
 	
 
 	list dialog = [``DisplayName (hardware_name (card), sformat("snd-card-%1", card_id)),
-		      ``CallModule ("sound_volume", [card])];
+		      ``CallModule ("sound_volume", [card, card_id])];
 			//$["ui" : `next, "return" : true]];
 
 
@@ -289,7 +291,7 @@
     if (!is(already, void)) {
 	already = maplist (`k, lookup (select (filter (`e, already, ``(lookup (e, "section") == "sound")), 0, $[]), "contents", []),
 			   ``(lookup (k, "unique")));
-	sound_cards = filter (`e, sound_cards, ``(contains (already, lookup (e, "unique_key"))));
+	sound_cards = filter (`e, sound_cards, ``(!contains (already, lookup (e, "unique_key"))));
     }
 
 
