@@ -27,6 +27,10 @@
     include "sound/routines.ycp";
     include "sound/ui.ycp";
     include "sound/texts.ycp";	
+    include "sound/alsa_routines.ycp";
+    include "sound/write_routines.ycp";
+
+    include "browser.ycp";
 
     map STRINGS=STRINGS_();
 
@@ -56,7 +60,7 @@
   /**
    * just decides which way to go-
    * manual or autodetected
-   * @return map
+   * @return map with new save_info_entry
    */
     define WhichDialog ()	``{
     // help text 
@@ -66,11 +70,23 @@
 	list nc = [];
 	integer i = 0;
 
-	list not_yet = get_not_yet (configured_unique);
+//	list not_yet = get_not_yet (configured_unique);
+	list sound_cards  = get_audio ();
+	if(db==nil)
+	{
+	    db=GetCardDatabase();
+	}
 
-	maplist (`e, not_yet, 
+
+	sound_cards = maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
+	sound_cards = filter(`e, sound_cards, ``(lookup(e, "module", $[])!=$[]));
+	sound_cards = filter_configured(save_info, sound_cards);
+	sound_cards = convert_to_save_info(sound_cards);
+
+
+	maplist (`e, sound_cards, 
 	``{
-	    nc = add (nc, `item(`id(i), mergestring(splitstring(hardware_name (e), "\n"), " ")));
+	    nc = add (nc, `item(`id(i), lookup(e, "model", "")));
 	 	  i = i + 1;
 	});
     
@@ -115,11 +131,67 @@
 	    }
 	} until ((((ui == `back) || (ui == `next) || ui == `cancel))); 
 
+	map new_entry=$[];
+
+	symbol way=UI(`QueryWidget (`id(`rg), `CurrentButton));
+	if(way == `auto)
+	{
+	    integer index=UI(`QueryWidget(`id(`sel), `CurrentItem));
+	    new_entry=select(sound_cards, index);
+	}
+	else if(way == `manual)
+	{
+	    new_entry=$["unique_key": isa_uniq()];
+	}
+
 
 	return $["ui" : ui,
-	        "way" : UI(`QueryWidget (`id(`rg), `CurrentButton)),
-		"id"  : UI(`QueryWidget(`id(`sel), `CurrentItem))];
+//	        "way" : UI(`QueryWidget (`id(`rg), `CurrentButton)),
+		"entry"  : new_entry];
 
+    }
+
+    define createTable(list save_info) ``{
+	list runn=get_running_cards();
+	integer pos=0;
+	list ret=maplist(`e, save_info, 
+	``{
+	    string state="";
+	    if(size(filter(`f, runn, ``(lookup(f, "number", -1)==pos)))!=0)
+	    {
+		// to translators: "(The card is) running
+		state=UI(_("Running"));
+	    }
+	    else
+	    {
+		if(lookup(e, "unique_key", "")==isa_uniq())
+		// card was not autodetected
+		{
+		    state=UI(_("Not running"));
+		}
+		else
+		// card was autodetected	
+		{
+		    list audio=get_audio();
+		    audio=filter(`g, audio, ``(lookup(g, "unique_key", "")==lookup(e, "unique_key", "")));
+		    if(size(audio)!=0)
+		    {
+			state=UI(_("Not running"));
+		    }
+		    else
+		    {
+			// to translators: sound card has been removed from the machine
+			state=UI(_("Card removed"));
+		    }
+		}
+	    }
+
+	    any r=`item(`id(pos), sformat("[%1]", pos), lookup(e, "model", ""), state);
+	    pos=pos+1;
+	    return r;
+
+	});
+	return ret;
     }
 
 
@@ -133,24 +205,20 @@
 	// help text 
         string helptext=lookup(STRINGS, "ComplexDialog");
 
-	list conf_cards = get_running_cards ();
-	list uniq_keys = configured_unique; //read_unique_keys ();
-
-	if(size(conf_cards) < size(uniq_keys))
+/*	if(size(conf_cards) < size(uniq_keys))
 	{
 	    if(UI(`YesNoPopup(_("There is configured sound card, but is not functional at
  the moment, because the kernel modules are not present. Try to load them?"))))
 	    {
 		SCR(`Execute (.target.bash, "/etc/init.d/alsasound restart", $[]));
 		y2error("alsa restarted");
-		conf_cards = get_running_cards ();
 	    }
 	}
-
-	list cc = maplist (`e, conf_cards, 
-	    ``(`item(`id(lookup (e, "number", 0)), sformat ("   [%1]", lookup (e, "number", 0)), lookup (e, "line1")))); 
+*/
+	list cc = createTable(save_info);
+ 
 	boolean show_fonts=false;
-	maplist(`e, get_audio(false, false), ``{ if(HasFonts(e)) show_fonts=true;});
+	maplist(`e, get_audio(), ``{ if(HasFonts(e)) show_fonts=true;});
 	
 	term con = ComplexDlgCon(cc, 
 			(lookup (rc_vars, "START_ALSA", "no") == "yes"), 
@@ -189,26 +257,18 @@
 		}
 		integer card_id = UI(`QueryWidget (`id(`configured_table), `CurrentItem));
 
-		string modname=lookup(select(save_info, card_id), "name", "");
+		string modname=lookup(select(save_info, card_id), "module", "");
 
-//		save_info=remove_module(save_info, modname);
-//		configured_unique=remove(configured_unique, card_id);
-  
 		list rem=get_indices_for_removal(save_info, modname);
 		save_info=remove_save_entries(save_info, rem);
 
-		configured_unique=remove_uniques(configured_unique, rem);
-
-		save_tmp_modules_conf(save_info);
+		SaveModulesEntry (save_info, [], true);
 
 		SCR(`Execute (.target.bash, "/etc/init.d/alsasound stop ", $[]));
 		alsasound_start_tmp(false);
 		
-
-		cards=order_cards_by_uniques(cards, configured_unique);
-		conf_cards = get_running_cards ();
-		cc = maplist (`e, conf_cards, 
-		    ``(`item(`id(lookup (e, "number", 0)), sformat ("   [%1]", lookup (e, "number", 0)), lookup (e, "line1")))); 
+		cc=createTable(save_info);
+    
 		UI(`ChangeWidget (`id(`configured_table), `Items, cc));
 		if (size (cc) == 0) 
 		{
@@ -223,31 +283,29 @@
 	    }
 	    else if (ui == `b_options)
 	    {
-
-
 		integer card_id = UI(`QueryWidget (`id(`configured_table), `CurrentItem));
-// cards are inherited from main \|/		list cards=get_audio (false,false);
-		map card=RestoreCardInfo(select(cards, card_id), save_info);
-		UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
-		map res=CallModule("sound_options", [card]);
+
+		map entry=select(save_info, card_id);    
+	
+		map res=CallModule("sound_options", [entry]);
 		if(lookup(res, "ui")==`next)
 		{
-		    map sinfo=create_save_info (lookup(res, "return"), card_id);
+		    entry=lookup(res, "return", $[]);
+		    entry=add_common_options(entry, card_id);
 		    integer pos=0;
-		    list new_save_info=[];
-		    while(pos<size(save_info))
-		    {
-			if(card_id!=pos)
+		    save_info=maplist(`e, save_info, 
+		    ``{
+			if(pos!=card_id)
 			{
-			    new_save_info=add(new_save_info, select(save_info, pos));
+			    pos=pos+1;
+			    return e;
 			}
 			else
 			{
-			    new_save_info=add(new_save_info, sinfo);
+			    pos=pos+1;
+			    return entry;
 			}
-			pos=pos+1;
-		    }
-		    save_info=new_save_info;
+		    });
 		}
 		else if(lookup(res, "ui") == `abort || lookup(res, "ui") == `cancel)
 		{
@@ -256,9 +314,7 @@
 		UI(`ChangeWidget(`id(`next), `Label, _("&Finish")));
 
 		UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
-		conf_cards = get_running_cards ();
-                cc = maplist (`e, conf_cards,
-                    ``(`item(`id(lookup (e, "number", 0)), sformat ("   [%1]", lookup (e, "number", 0)), lookup (e, "line1"))));
+		cc=createTable(save_info);
 		UI(`ChangeWidget (`id(`configured_table), `Items, cc));
 		UI(`ChangeWidget(`id(`configured_table), `CurrentItem, 0));
 	    }
@@ -278,102 +334,99 @@
 		rc_vars = add(rc_vars, "START_ALSA_SEQ", value);
 	    }
 	    else if (ui == `b_conf2) 
+	    // add soundcard
 	    {
 		repeat 
 		{
-
 		    map result = $[];
-		    if (size (get_not_yet (configured_unique)) > 0)
+		    list cards=get_audio();
+	    
+		    if(size(cards)!=0)
+		    {
+			if(db==nil)
+			{
+			    db=GetCardDatabase();
+			}
+
+			cards = maplist(`e, cards, ``(add (e, "module", get_module (e))));
+			cards = filter(`e, cards, ``(lookup(e, "module", $[])!=$[]));
+			cards = filter_configured(save_info, cards);
+		    }
+
+		    if (size (cards) > 0)
 		    {
 			result = WhichDialog ();
 		    }
 		    else 
 		    {
-			result = $["ui" : `next, "way" : `manual];
+			result = $["ui" : `next, "entry" : $["unique_key": isa_uniq()]];
 		    }
 		    ui = lookup (result, "ui", `cancel);
+		    map entry=lookup(result, "entry", $[]);
 		    if (ui == `next) 
 		    {
-			if (lookup (result, "way") == `auto) 
+//			map entry=lookup(result, "entry", $[]);
+			string uni=lookup(entry, "unique_key", "");
+			boolean showMan=false;
+			map res=$[];
+			if(uni==isa_uniq())
 			{
-			    integer i = lookup (result, "id");
-			    map card = select (get_not_yet (configured_unique), i, $[]);
-
-			    list db = GetCardDatabase();
-			    card=add(card, "module", get_module(card));
-		    
-			    if (size (card) > 0) 
-			    {
-				map result = OneCardWizard (card, size (save_info), ui, 6, false);
-				any ui     = lookup (result, "ui", `cancel); 
-				if (ui == `next) 
-				{
-				    save_info = add (save_info, lookup (result, "return"));
-				    configured_unique = add (configured_unique, lookup (card, "unique_key", ""));
-				}
-				else if (ui == `back)
-				{
-				    configured_unique = filter (`e, configured_unique, ``(lookup (card, "unique_key", "") != e));
-				}
-				else if(ui == `abort || ui == `cancel)
-				{
-				    return $["ui" : `abort];
-				}
-			    }
-			    if (ui == `back) 
-			    {
-				ui = nil;
-			    }
+			    showMan=true;
 			}
-			else if (lookup (result, "way") == `manual) 
+/*			while(true)
 			{
-
-			    list dialog = [``(CallModule ("sound_manual", []))];
-			    integer id      = 0;
-
-			    while ((id >= 0) && (id < size (dialog))) 
+			    if(showMan)
 			    {
-		
-				result = eval (select (dialog, id));
-				ui     = lookup (result, "ui", `cancel);
-
-				if (ui == `back) 
+				res=CallModule("sound_manual", []);
+				
+				if(lookup(res, "ui", nil)==`next)
 				{
-				    dialog = filter (`e, dialog, ``(e == ``(CallModule ("sound_manual", []))));
-				    id = id - 1;
+				    entry=add(entry, "model", lookup(res, "model", ""));
+				    entry=add(entry, "module", lookup(res, "module", ""));
 				}
-				else if (ui == `cancel || ui == `abort)
-				{   
-				    return $["ui" : `abort];
-				}
-				else if (ui == `skip)
+				else 
 				{
+				    ui=lookup(res, "ui");
+				    if(ui==`abort || ui==`cancel) 
+				    {
+					return $["ui": `abort];
+				    }
 				    break;
 				}
-				else if (ui == `next) 
-				{
-
-				    if (id == 0)
-				    {
-					dialog = add (dialog, ``(OneCardWizard (lookup (result, "return"), size (save_info), ui, 6, false)));
-				    }
-				    if (id == 1) 
-				    {
-					save_info = add (save_info, lookup (result, "return"));
-				    }
-				    id = id + 1;
-				}
 			    }
-
-			    if (ui == `back) 
-			    {   
+			    res=OneCardWizard(entry,  size(save_info), `next, 6, false, save_info);
+			    if(lookup(res, "ui", `cancel)==`next)
+			    {
+				entry=lookup(res, "return", $[]);
+				ui=`next;
 				break;
 			    }
-			    else if(ui == `cancel || ui == `abort)
+			    else
 			    {
-				return $["ui": `abort];
+				if(lookup(res, "ui", `cancel)!=`back)
+				{
+				    ui=`abort;
+				    break;
+				}
 			    }
 			}
+			
+*/			
+			map res=$[];
+			if(showMan)
+			{
+			    map res=add_card_manually(save_info);
+			}
+			else
+			{
+			    res=OneCardWizard(entry,  size(save_info), `next, 6, false, save_info);
+			}
+			if(ui == `next)
+			{
+			    entry=lookup(res, "return");
+			    save_info=add(save_info, entry);
+			}    
+	
 		    }
 		    else if (ui == `cancel || ui == `abort)
 		    {
@@ -384,9 +437,8 @@
 	    
 		ui = nil;
 
-		conf_cards = get_running_cards ();
-		cc = maplist (`e, conf_cards, 
-		``(`item(`id(lookup (e, "number", 0)), sformat ("   [%1]", lookup (e, "number", 0)), lookup (e, "line1")))); 
+		cc = createTable(save_info);
+
 		// dialog title
 		UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
 		UI(`ChangeWidget(`id(`configured_table), `Items, cc));
@@ -416,10 +468,10 @@
     
 
       //to_delete = filter (`e, to_delete, ``(e == lookup (lookup (lookup (result, "return"), "modules"), "alias")));
-	if (size (to_delete) > 0)
-	{
-	    save_info = mark_off (to_delete);
-	}
+//	if (size (to_delete) > 0)
+//	{
+//	    save_info = mark_off (to_delete);
+//	}
 
 
 	return $["ui"       : ui,
@@ -430,11 +482,13 @@
 
 // ===== MAIN =====
 
-    list cards     = Args(0);
-    list save_info = Args(1);
-    list configured_unique = Args(2);
+    // read the db if needed
+    list db=nil;
 
-    cards=order_cards_by_uniques(cards, configured_unique);
+    list save_info = Args(0);
+    list configured_unique = Args(1);
+
+//    cards=order_cards_by_uniques(cards, configured_unique);
 
     list to_delete = [];
     boolean config_mode = false;

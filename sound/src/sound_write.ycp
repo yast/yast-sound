@@ -65,7 +65,7 @@
       // ==== MAIN ====
 
     boolean test_mode = false;
-    map sound_info = Args (0);
+    map save_info = Args (0);
 
     string helptext = "";
     string err_msg = "";
@@ -82,10 +82,12 @@
     UI(`SetWizardContents (_("Sound configuration"), con, helptext, false, false));
     UI(`DisableWizardAbortButton());
 
+    SaveModulesEntry(save_info, [], false);
+/*
       // Step ONE: save '/etc/modules.conf'
     if (!test_mode)
     {
-	map result=SaveModulesEntry (lookup (sound_info, "cards", []), lookup (lookup (sound_info, "system", $[]), "modules", []));
+	map result=SaveModulesEntry (lookup (sound_info, "cards", []), lookup (lookup (sound_info, "system", $[]), "modules", []), false);
 	err_msg=err_msg+lookup(result, "err_msg", "");
     }
 
@@ -122,13 +124,10 @@
     }
     else 
     {	
-				  // final success message
-//	final_msg = lookup(STRINGS, "saveFinal2");
 	final_msg="";
-	if (size(filter (`e, lookup (sound_info, "cards", []), ``((size (e) > 0) && (lookup (e, "name") != "off")))) == 0)
+	if (size(filter (`e, lookup (sound_info, "cards", []), 
+	    ``((size (e) > 0) && (lookup (e, "name") != "off")))) == 0)
 	{
-					    // final success message	    
-//	    final_msg = lookup(STRINGS, "saveFinal3");
 	    final_msg="";
 	}
 
@@ -143,6 +142,6 @@
     {
         UI(`MessagePopup (final_msg));
     }
-
+*/
     return (size (err_msg) == 0);
 }

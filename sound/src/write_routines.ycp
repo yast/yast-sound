@@ -30,71 +30,145 @@
      * Saves one '/etc/modules.conf' entry
      * @return boolean
      */
-    global define SaveOneModulesEntry (string entry_name, map entry) ``{
+    global define SaveOneModulesEntry (map entry, boolean tmp) ``{
+	path mod=.modules;
+        path mod_alias=.modules.alias;
+        path mod_options=.modules.options;
+        path mod_alias_comment=.modules.alias.comment;
+        if(tmp)
+        {
+            mod=.tmp.modules;
+            mod_alias=.tmp.modules.alias;
+            mod_options=.tmp.modules.options;
+            mod_alias_comment=.tmp.modules.alias.comment;
+        }
         boolean ret = true;
         if (haskey (entry, "alias")) 
             {
-                ret = ret && SCR(`Write(.modules.alias, entry_name, lookup(entry, "alias")));
-                if (haskey (entry, "options"))
-                    {
-                        ret = ret && SCR(`Write(.modules.options, lookup(entry, "options"), entry_name));
-                    }
+                ret = ret && SCR(`Write(mod_alias, lookup(entry, "module", "off"), 
+		    lookup(entry, "alias", "off")));
+		string comment="\# "+lookup(entry, "unique_key", "")+":"+lookup(entry, "model", "")+"\n";
+		ret = ret && SCR(`Write(mod_alias_comment, comment, lookup(entry, "alias", "off")));
             }
         return ret;
     }
 
-    
+
+    global define SaveModulesOptions(list save_info, boolean tmp)
+    ``{
+	path mod_options=.modules.options;
+	if(tmp)
+	{
+	    mod_options=.tmp.modules.options;
+	}
+
+	// create distinct list of all modules
+	list mods=toset(maplist(`e, save_info, ``(lookup(e, "module", "off"))));
+	foreach(`modname, mods, 
+	``{
+	    list si=filter(`e, save_info, ``(lookup(e, "module", "off")==modname));
+	    si=maplist(`e, si, ``(lookup(e, "options", $[])));
+	    // create a set of at least once used option
+	    list opts=[];
+	    foreach(`a, si, 
+	    ``{ 
+		foreach(`b, `c, a, 
+		``{
+		    opts=add(opts, b);
+		});
+	    });
+	    opts=toset(opts);
+
+	    map res=$[];
+	    // for each option collect their values
+	    foreach(`opname, opts,
+	    ``{
+		boolean coma=false;
+		string value="";
+		foreach(`s, si,
+		``{
+		    if(coma)
+		    {
+			value=value+",";
+		    }
+		    value=value+lookup(s, opname, "");
+
+		    coma=true;
+		});
+		res=add(res, opname, value);
+	    });
+	    // write result to modules.conf   
+	    SCR(`Write(mod_options, res, modname));
+	});
+    }
+  
     /**
      * Saves all '/etc/modules.conf' entries
+     * @param cards save info
+     * @param system sytem dependent part
+     * @param tmp write to /tmp/modules.conf (not to /etc/modules.conf)
      * @return map return struct: $["return": boolean, "err_msg": string]
      */
-    global define SaveModulesEntry (list cards, list system) ``{
+    global define SaveModulesEntry (list save_info, list system, boolean tmp) ``{
+	path mod=.modules;
+	path mod_alias=.modules.alias;
+	path mod_options=.modules.options;
+	path mod_alias_comment=.modules.alias.comment;
+	if(tmp)
+	{
+	    mod=.tmp.modules;
+	    mod_alias=.tmp.modules.alias;
+	    mod_options=.tmp.modules.options;
+	    mod_alias_comment=.tmp.modules.alias.comment;
+	}
+
+	SaveModulesOptions(save_info, tmp);
+
         string err_msg="";
-	list als=SCR(`Read(.modules.alias));
+	list als=SCR(`Read(mod_alias));
+	// remove old entries
 	maplist(`e, als, 
 	``{
 	    if(	issubstring(e, "snd-card-") ||
 		issubstring(e, "sound-service-") ||
 		issubstring(e, "sound-slot-"))
 		{
-		    SCR(`Write(.modules.alias, nil, e));
+		    SCR(`Write(mod_alias, nil, e));
 		}
 	});
-
+	if(size(save_info)>0)
+	{
+	    SCR(`Write(mod_alias, "snd", "char-major-116"));
+	    SCR(`Write(mod_alias_comment, "\n# Alsa sound support. \n# Warning: please don't modify comments over "+
+"aliases 'snd-card-#'", "char-major-116"));
+	    SCR(`Write(mod_options, $["snd_cards_limit": sformat ("%1", size(save_info)),
+					     "snd_major":"116"], "snd"));
+	}
+	else
+	{
+	    SCR(`Write(mod_alias, "off", "char-major-116"));
+	}
     
-        if ((contains(maplist (`e, cards, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) 
-            {
-                // Error message
-                err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry"); 
-                return $["return": false, "err_msg": err_msg];
-            }
+        if ((contains(maplist (`e, save_info, 
+		``(SaveOneModulesEntry (e, tmp))), false))) 
+        {
+            // Error message
+            err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry"); 
+            return $["return": false, "err_msg": err_msg];
+        }
 
-        if (size (cards) > 0)
-            {
-                SCR(`Write(.modules.alias.comment, "\n#\n# YaST2: sound cards support\n#\n", 
-                           lookup (lookup (select (cards, 0), "modules", $[]), "alias")));
-            }
+	if(size(save_info)>0)
+	{
+	    
+	    list oss_aliases=alsa_oss(size(save_info));
+	    foreach(`e, oss_aliases, 
+	    ``{
+		SCR(`Write(mod_alias, lookup(e, "module", ""), lookup(e, "alias", "")));
+	    });
+	    SCR(`Write(mod_alias_comment, "\n\n\n# YaST2: sound system dependent part\n#\n", "sound-slot-0"));
+	}
+	SCR(`Write(mod, nil));
 
-        if ((contains(maplist (`e, system, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) 
-            {
-                // Error message      
-                err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry");
-                return $["return": false, "err_msg": err_msg];
-            }
-
-        if (size (system) > 0)
-            {
-                SCR(`Write(.modules.alias.comment, "\n#\n# YaST2: sound system dependent part\n#\n", 
-                           lookup (lookup (select (system, 0), "modules", $[]), "alias")));
-            }
-
-        if (!SCR(`Write(.modules, nil))) 
-            {
-                // Error message
-                err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry");
-                return $["return": false, "err_msg": err_msg];
-            }
-            
         return $["return": true, "err_msg": ""];
     }
 

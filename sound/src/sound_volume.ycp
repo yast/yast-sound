@@ -30,6 +30,7 @@
     include "sound/routines.ycp";
     include "sound/ui.ycp";
     include "sound/texts.ycp";
+    include "sound/write_routines.ycp";
 
 
     map STRINGS=STRINGS_();
@@ -55,7 +56,7 @@
 
 	integer vol = 10;
 
-	term con=VolumeCon(card, vol);
+	term con=VolumeCon(save_entry, vol);
 	    // dialog title
 	UI(`SetWizardContents (_("Sound card volume"), con, help_text, true, true));
 	if (finish)
@@ -64,7 +65,7 @@
 	}
 
 /* Sound fonts installation */
-	if(HasFonts(card) && !FontsInstalled())
+	if(HasFonts(save_entry) && !FontsInstalled())
 	{
 	    InstallFonts("", false);
 	}
@@ -122,7 +123,7 @@
     * @return symbol `back | `cancel
     */
 
-    define ErrorDialog (map card, string err) ``{
+    define ErrorDialog (map save_entry, string err) ``{
 				    // Help text - intenal YaST2 error 
 
 	string help_text=lookup(STRINGS, "ErrorDialog");
@@ -134,7 +135,7 @@
 		    // error message
 	      `Label (_("An error occured during installing")),
 	      `VSpacing (),
-	      `Label (`opt(`outputField), hardware_name (card)),
+	      `Label (`opt(`outputField), lookup(save_entry, "model", "")),
 	      `VSpacing (),
 	      `Label (err)
 	    )
@@ -168,7 +169,7 @@
     * @return symbol `back | `cancel
     */
 
-    define SuccessDialog (map card) ``{
+    define SuccessDialog (map save_entry) ``{
                                     // Help text - intenal YaST2 error 
 
         string help_text=lookup(STRINGS, "SuccessDialog");
@@ -180,7 +181,7 @@
                     // error message
               `Label (_("Your sound card is ready to use.")),
               `VSpacing (),
-              `Label (`opt(`outputField), hardware_name (card)),
+              `Label (`opt(`outputField), lookup(save_entry, "model", "")),
               `VSpacing (),
               `Label ("")
             )
@@ -218,8 +219,8 @@
        *        2. on succes unmute and volume dialog
        *        3. on fail display error message
        */
-boolean need_restart=true;
-    map card = Args (0);
+    boolean need_restart=true;
+    map save_entry = Args (0);
     integer card_id = Args (1);
     boolean finish = false;
 
@@ -236,52 +237,42 @@ boolean need_restart=true;
     {
 	quick= Args (3);
     }
-
-    if (!haskey(card, "module")) // this should not happen
+    
+    list save_info=[];
+    if (size (Args())>4)
     {
-	list db=GetCardDatabase(); //SCR(`Read (.target.yast2, "sndcards.ycp"));
-	card = add(card, "module", get_module (card));
+	save_info=Args(4);
     }
 
-    map module_map = lookup (card, "module", $[]);
     map user_settings = $["audio_file"  : "/usr/share/sounds/alsa/test.wav",
 			  "play_cmd"    : "/usr/bin/aplay",
-//			  "mixer"       : "/usr/bin/amixer -c %1 set \"%2\" %3%% unmute"];
 			  "mixer"       : "/usr/bin/amixer -c $CARD_NUM set \"$CHANNEL\" $VOLUME% unmute"];
       
     string err_msg = "";
-    boolean no_alsa = lookup (lookup (module_map, "module", $[]), "no_alsa", false);
 
     stop_programs();    
 
     if (!test_mode)
     {
 	SCR(`Execute(.target.bash, "/etc/init.d/alsasound stop", $[]));
-	add_tmp_module_record(module_map, card_id);
+	list new_save=add(save_info, save_entry);
+	SaveModulesEntry (new_save, [], true);
 	alsasound_start_tmp(true);
-	err_msg = check_module(module_map);
-//	err_msg = probe_module (module_map, user_settings);
-//        SCR(`Execute(.target.bash, "/etc/init.d/rcalsasound start", $[]));
+	err_msg = check_module(save_entry);
     }
     any ui = nil;
 
     if (size (err_msg) > 0)
     {
-	ui = ErrorDialog (card, err_msg);
+	ui = ErrorDialog (save_entry, err_msg);
     }
     else
     {
-// always	if(need_restart)
-//	{
-//	    y2error("alsa restarted");
-//	    SCR(`Execute(.target.bash, "/etc/init.d/rcalsasound restart", $[]));
-//	}
 	boolean use_alsa=true;
 	if (use_alsa)
         {
             maplist (`dev, ["Master", "PCM", "PCM,1", "Wave", "Master Digital", "Synth"],
     		    ``(SetVolume (lookup (user_settings, "mixer", "amixer"), dev, sformat ("%1", 70), card_id)));
-//                           ``(SetVolume (lookup (user_settings, "mixer", "amixer"), dev, "70"), card_id));
         }
 	if(!quick)
 	{
@@ -290,23 +281,19 @@ boolean need_restart=true;
 	else
 	{
 	    SetVolume (lookup (user_settings, "mixer", "amixer"), "Master", sformat ("%1", 75), card_id);
-	    ui = SuccessDialog(card);
+	    ui = SuccessDialog(save_entry);
 	}
     }
 
     if (ui == `back || ui == `cancel || ui == `abort)
     {
-	remove_tmp_module_record(card_id);
-	SCR(`Execute (.target.modprobe, 
-	    sformat ("-r %1", lookup (lookup (module_map, "module", $[]), "name", "")), ""));
+	SaveModulesEntry(save_info, [], true);
+	alsasound_start_tmp(true);	
     }
 
 
     UI(`ChangeWidget (`id(`next), `Label, _("&Next")));
 
-    //y2error("Leaving volume");
-
-    
     return $["ui" : ui, "return" : size (err_msg) == 0];
 
 }

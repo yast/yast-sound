@@ -14,7 +14,7 @@
  *
  * $Id$
  *
- * parameters: 1st: card
+ * parameters: 1st: parameter list
  *
  */
 
@@ -26,6 +26,8 @@
     include "sound/routines.ycp";
     include "sound/ui.ycp";
     include "sound/texts.ycp";
+
+    include "browser.ycp";
 
     map STRINGS=STRINGS_();
 
@@ -50,13 +52,13 @@
      *
      */
 
-    define OptionsDialog (list options) ``{
+    define OptionsDialog (string cardlabel, list options) ``{
 
 
 	string help_text=lookup(STRINGS, "OptionsDialog");
 	    
 	term con = `VBox ();
-				    // still omit these options -- they are assigned dynamicly
+				    // always omit these options -- they are assigned dynamicly
 	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_id"));
 	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_index"));
 	options = maplist (`e, options, ``($["description" : mysformat (lookup (e, "description")),
@@ -73,11 +75,11 @@
 
 	if (size (itemized_descriptions) > 0) 
 	{
-	    con=OptionsCon(card, itemized_descriptions, current_option, current_option_name);     
+	    con=OptionsCon(cardlabel, itemized_descriptions, current_option, current_option_name);     
 	}
 	else 			// there are no options
 	{
-	    con = `VBox (`Top(`Label (hardware_name (card))),
+	    con = `VBox (`Top(`Label , cardlabel),
 			       // To translators: label message
 			       `HVCenter (`Label (_("There are no options for this module"))));
 		  
@@ -130,6 +132,7 @@
 		}
 		else 		// value is correct
 		{
+
 		    UI (`ChangeWidget(`id(`table), `Item(current_option, 2), value));
 		    list tmp = [];
 		    maplist (`e, itemized_descriptions, ``{
@@ -166,7 +169,6 @@
 		
 	} until (((ui == `back) || (ui == `next) || ui == `cancel));
 	    
-	    //UI(`DebugDialog(itemized_descriptions));
 
 	return $["ui" : ui, "return": itemized_descriptions];
     }
@@ -174,30 +176,34 @@
 // ===== MAIN =====
 
 
-    map card	    = Args(0);
-   
-    list params = [];
-    if (haskey (card, "params"))
-    {
-	params = lookup (card, "params", []);
-    }
-    else
-    {
-	params = lookup(lookup (card, "module", $[]), "params", []);
-    }
-    map mod     = lookup (card, "module", $[]);
-    map result  = OptionsDialog (params);
+    list save_entry = Args(0);
 
+    list db=GetCardDatabase();
+
+    string modname=lookup(save_entry, "module", "");
+    string cardlabel=lookup(save_entry, "model", "");
+    list params=get_module_params(modname);
+
+    params=restore_mod_params(params, lookup(save_entry, "options", []));
+
+    UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
+
+    // now show the dialog 
+    map result  = OptionsDialog (cardlabel, params);
+    list vals= lookup(result, "return", []);
+    
       // convert from table entries back to card
+    map opts=$[];
+    foreach(`v, vals, 
+    ``{
+	if(select(v, 3)!="")
+	{
+	    opts=add(opts, select(v, 2), select(v, 3));
+	}
 
-    params = maplist (`e, params, ``(
-	  add (e, "value", select (select (filter (`k, lookup (result, "return", []), ``(
-	      select (k, 2) == lookup (e, "name"))), 0, []), 3, ""))));
+    });
 
-      
-    mod = add (mod, "params", params);
-    card = add (card, "module", mod);
+    save_entry=add(save_entry, "options", opts);
 
-
-    return $["ui" : lookup (result, "ui", `cancel), "return" : card];
+    return $["ui" : lookup (result, "ui", `cancel), "return" : save_entry];
 }
