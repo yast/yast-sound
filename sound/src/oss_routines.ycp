@@ -1,8 +1,7 @@
 /**
  *
- *
  * File:
- *   alsa_routines.ycp
+ *   oss_routines.ycp
  *
  * Module:
  *   Sound
@@ -13,7 +12,6 @@
  * $Id$
  *
  * routines for alsa sound system
- *
  *
  */
 
@@ -38,7 +36,6 @@
 	else
 	{
 	    string p = sformat(".audio.oss.cards.%1.channels.%2", cardid, group);
-
             SCR::Write(topath(p), value);
 	}
 	return true;
@@ -55,11 +52,8 @@
 	string fname="/usr/share/sounds/test.mp3";
         if (SCR::Read(.target.size, fname) == -1)
         {
-                  // To translators: just one file will be displayed
-                  // To translators: if the test audio file can not be found this message is displayed
-                  // To translators: This is just popup message, shouldn't be too long
+            // popup message: test audio file was not found
             string msg = sformat (_("Cannot find file:\n %1\n\n(test audio file)"), fname);
-
             return msg;
         }
         else
@@ -69,23 +63,20 @@
         }
         return "";
     }
-    
+
     /**
      * removes all sound modules from kernel
-     *
      */
-
     global define void sound_stop() ``{
 	// TODO:
 	list mods=SCR::Dir(.modinfo.kernel.drivers.sound);
 	mods = add(mods, "emu10k1");
 	mods = add(mods, "cs4281");
 	map modules=SCR::Read(.proc.modules);
-	foreach(`e, mods, 
-	``{
-	    if(haskey(modules, e))
-	    {	    
-		SCR::Execute(.target.bash, sformat("/sbin/rmmod -r %1", e), $[]);
+	foreach(string mod, mods, ``{
+	    if(haskey(modules, mod))
+	    {
+		SCR::Execute(.target.bash, sformat("/sbin/rmmod -r %1", mod));
 	    }
 	});
     }
@@ -94,9 +85,7 @@
      * sound_start_tmp starts alsa using temporary modules.conf
      * @param restore true - call alsactl restore, false - don't
      * @return void
-     *
      */
-
     global define void sound_start_tmp(boolean restore) ``{
 	// broken: TODO: reimplement this function in the alsa style (see alsa_routines:sound_start_tmp)
 	string snd = sformat("/sbin/modprobe snd snd_cards_limit=%1 snd_major=116", size(Sound::modules_conf));
@@ -105,46 +94,20 @@
 
         // start 'snd' module first
         cmds = flatten ([[snd], cmds]);
-        maplist(`cmd, cmds, ``{
+        maplist(string cmd, cmds, ``{
             map res = SCR::Execute(.target.bash_output, cmd, $[]);
             if (lookup(res, "stderr", "") != "")
             {
                 y2error("/sbin/modprobe error output: \n" + lookup(res, "stderr", ""));
             }
         });
-
-/*        string cmd = "/sbin/depmod -C " + get_tmp_modules_conf() + " /dev/null 2>&1";
-        SCR::Execute(.target.bash, cmd, $[]);
-
-        list als = SCR::Read(.tmp.modules.alias);
-
-
-        string modname = "";
-        integer pos = 0;
-        map res = $[];
-	string alias="";
-        while (pos < 24)
-        {
-	    alias = sformat("sound-slot-%1", pos);
-	    if (contains(als, alias))
-	    {
-		cmd     = sformat("/sbin/modprobe -C %1 %2 ", get_tmp_modules_conf(), alias);
-		res     = SCR::Execute(.target.bash_output, cmd, $[]);
-		if (lookup(res, "stderr", "") != "")
-		{
-		    y2error("modprobe error output: \n" + lookup(res, "stderr", ""));
-		}
-	    }
-	    pos = pos + 1;
-        }
-*/    }
+    }
 
     /**
      * returns list of sound card names that are supported by given module
      * @param modname module name
      * @return list of cards
      */
-
     global define list get_card_names(string modname) ``{
 	return [sformat("Sound card (%1)", modname)];
     }
@@ -155,7 +118,6 @@
      * @param cardname sound card name
      * @return string module name
      */
-
     global define string get_module_by_cardname(string cardname) ``{
 	return "";
     }
@@ -164,19 +126,18 @@
      * returns list of parameters for module 'modname'
      * @param modname module name
      * @return map of parameters
-     *
      */
-
     global define map get_module_params(string modname) ``{
 	map params = SCR::Read(topath(sformat(".modinfo.kernel.drivers.sound.%1", modname)));
-	params = filter(`k, `v, params, 
-	    ``(!contains(["module_author", "module_description", "module_filename"], k)));
+	params = filter(string k, string v, params, ``(
+	  !contains(["module_author","module_description","module_filename"],k)
+	));
 
-	list ret = maplist(`k, `v, params, ``(
+	list ret = maplist(string name, string desc, params, ``(
 	    $[
-		"name"		:   k,
-		"description"	:   [v],
-		"type"		:   "string"
+		"name"	: name,
+		"descr"	: [desc],
+		"type"	: "string"
 	    ]
 	));
 	return ret;
@@ -185,24 +146,20 @@
     /**
      * returns list of all available sound modules
      * @return list as above
-     *
      */
-
     global define list get_module_names() ``{
 	list ret = SCR::Dir(.modinfo.kernel.drivers.sound);
-	ret = filter(`e, ret, ``(e != "sound"));
+	ret = filter(string mod, ret, ``(mod != "sound"));
 	ret = add(ret, "emu10k1");
 	ret = add(ret, "cs4281");
-//	ret = sort(ret);
-	ret = maplist(`e, ret, 
-	``{
-	    string descr = lookup(SCR::Read(add(.modinfo.kernel.drivers.sound, e)), 
+	ret = maplist(string e, ret,``{
+	    string descr = lookup(
+		SCR::Read(add(.modinfo.kernel.drivers.sound, e)),
 		"module_description", "");
-	    return `item(`id(e), (descr != "" && descr != "<none>") ? descr : e);
-	});  
+	    return `item(`id(e), (descr != "" && descr != "<none>")? descr : e);
+	});
 
 	ret = sort(`a, `b, ret, ``(select(a, 1, "") < select(b, 1, "")));
-
 	return ret;
     }
 
@@ -212,7 +169,6 @@
      * not trivial to check this.
      * @return list of running cards
      */
-
     global define list get_running_cards() ``{
 	return [1,2,3,4,5]; //size(save_info);
     }
@@ -221,25 +177,25 @@
      * get_vol_settings
      * creates a list of stored values of volume and mute for each channel
      * of each card.
-     * example: [ 
+     * example: [
 		    [ ["PCM", 32, false], ["Master", 100, true]],
 		    [ [....], .....                            ]
 		]
      * @return list empty
      */
-
     global define list get_vol_settings() ``{
 	return [];
 
     }
 
     /**
-     * reads list generated by get_vol_settings and restores values for all cards
+     * reads list generated by get_vol_settings and restores values for
+     * all cards
      * param1 looks like this:
-     * [ 
+     * [
 	    [	// card #0
 		["PCM", 15, false] // channel/volume/mute
-		...	
+		...
 	    ],
 	    [   // card #1
 		....
@@ -249,28 +205,24 @@
      * @return boolean true
      * noop for oss
      */
-
     global define boolean set_vol_settings(list vol_settings) ``{
 	return true;
     }
-
 
     /**
      * creates a save-info-like list of cards
      * @param cards detected cards
      * @return list of save_entries
      */
-
     global define list convert_to_save_info(list cards) ``{
-	cards = maplist(`e, cards,
+	cards = maplist(map e, cards,
 	``{
 	    list options = lookup(e, "options", []);
 	    map opts = $[];
-	    maplist(`op, options,
-	    ``{
+	    maplist(map op, options, ``{
 		if (lookup(op, "default", "") != "")
 		{
-		    opts = add(opts, lookup(op, "name", ""), lookup(op, "default", ""));
+		    opts = add(opts, op["name"]:"", op["default"]:"");
 		}
 	    });
 	    string modname = "";
@@ -285,7 +237,6 @@
 		    modname = select(splitstring(modname, "."), 0, "");
 		}
 	    }
-
 	    map entry = $[
 		"model"     : get_card_label(e),
 		"module"    : modname,
@@ -302,32 +253,29 @@
      * @param card_id card id
      * @return modified card entry with filled alias value
      */
-
     global define map add_alias(map entry, integer card_id) ``{
 	return add(entry, "alias", sformat("sound-slot-%1", card_id));
     }
 
     /**
-     *	adds common options for module. for alsa it is 'snd_id=card(#+1) snd_index=#'
+     *	adds common options for module.
      *  @param entry card config
      *  @param card_id card_id
      *  @return map save_entry
      *  noop for oss
      */
-
     global define map add_common_options(map entry, integer card_id) ``{
 	map opts = lookup(entry, "options", $[]);
 
 	list parms = get_module_params(lookup(entry, "module", ""));
 	if (size(parms) != 0)
 	{
-	    list enab = filter(`e, parms, ``(lookup(e, "name", "") == "snd_enable"));
+	    list enab = filter (map e, parms, ``(e["name"]:"" == "snd_enable"));
 	    if (size(enab) != 0)
 	    {
 		opts = add(opts, "snd_enable", "1");
 	    }
 	}
-
 	entry = add(entry, "options", opts);
 	return entry;
     }
@@ -343,13 +291,11 @@
     }
 
     /**
-     * returns list of autodetected sound cards that haven't been already configured
+     * returns list of autodetected sound cards that haven't been
+     * already configured
      * @param save_info list of already configured cards
      * @return list of save_entries of unconfigured cards
      */
-
-    
-
     global define list getConfigurableCards(list save_info) ``{
         list snd = Sound::detected_cards;
         snd = filter_configured(save_info, snd);
@@ -359,6 +305,5 @@
         }
         return snd;
     }
- 
 
-}
+}//EOF
