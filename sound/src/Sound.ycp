@@ -358,7 +358,7 @@ could make your system unstable.
 	}
 
 	/* Confirmation: label text (detecting hardware: xxx) */
-	if (!Confirm::Detection (_("Sound cards")))
+	if (!Confirm::Detection (_("Sound Cards")))
 	    detected_cards = [];
 
 	// do noop if cards were already detected
