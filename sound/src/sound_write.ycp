@@ -1,6 +1,6 @@
 /**
  * File:
- *   sound_save.ycp
+ *   sound_write.ycp
  * 
  * Module:
  *   Sound
@@ -55,10 +55,11 @@
 
 
     textdomain "sound";
+    include "sound/texts.ycp";
 
-    map STRINGS=CallModule("sound_texts", []);
+    map STRINGS=STRINGS_();
 
-    include "sound/sound_save_routines.ycp";
+    include "sound/write_routines.ycp";
 
       // ==== MAIN ====
 

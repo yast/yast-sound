@@ -1,7 +1,7 @@
 /**
  *
  * File:
- *   sound_texts.ycp		
+ *   texts.ycp		
  *
  * Module:                      
  *   Sound
@@ -138,7 +138,7 @@
 	    ];
     }
 
-    return STRINGS_();
+//   return STRINGS_();
     
 }
 

@@ -19,7 +19,11 @@
 
     textdomain "sound";
 
-    include "sound/sound_routines.ycp";
+    include "sound/routines.ycp";
+    include "sound/ui.ycp";
+    include "sound/texts.ycp";
+    
+    map STRINGS=STRINGS_();
 
     /**
      *	dialog for manual settings

@@ -23,37 +23,12 @@
     textdomain "sound";
 
     include "misc_defines.ycp";
-    include "sound/sound_routines.ycp";
+    include "sound/routines.ycp";
+    include "sound/ui.ycp";
+    include "sound/texts.ycp";
 
+    map STRINGS=STRINGS_();
 
-    /** creates itemized table entries,
-     * @param lm list of maps to take keys from
-     * @param lk list of keys to look for in 1st param
-     * 
-     * @return list
-     */
-
-    define create_table (list lm, list lk) 
-    ``{
-	integer i = 0;
-	list itemized_list = [];
-	integer s = size (lm);
-	term val = `item ();
-
-	while (i < s) 
-	{
-	    val = `item (`id(i));
-	    foreach (`k, lk, 
-		``{
-		val = add (val, lookup (select (lm, i), k, ""));
-		});
-		    
-	    itemized_list = add (itemized_list, val);
-	    i = i + 1;
-	}
-		
-        return itemized_list;
-    };
 
     /**
      * Chooses one message according to

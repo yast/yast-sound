@@ -3,7 +3,7 @@
  * $Id$
  *
  * File:              
- *   sound_save_routines.ycp        
+ *   write_routines.ycp        
  *
  * Module:
  *   Sound
@@ -15,14 +15,16 @@
  *   Dan Veselý <dan@suse.cz> , Dan Meszaros <dmeszar@suse.cz>
  *
  *                   
- * Global variables:	STRINGS
  */
 
 {
     textdomain "sound";
 
     include "misc_defines.ycp";
-    include "sound/sound_routines.ycp";
+    include "sound/routines.ycp";
+    include "sound/texts.ycp";
+
+    map STRINGS=STRINGS_();
 
       /**
        * Saves one '/etc/modules.conf' entry

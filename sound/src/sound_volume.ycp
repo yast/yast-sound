@@ -27,103 +27,11 @@
     textdomain "sound";
 	
     include "misc_defines.ycp";
-    include "sound/sound_routines.ycp";
+    include "sound/routines.ycp";
+    include "sound/ui.ycp";
+    include "sound/texts.ycp";
 
-
-    /**
-     * here the test sound is played, by
-     * default ist alsa whistle sound, but
-     * if snd_au package is installed,
-     * than it's Linus Torvals voice, the
-     * if the test file cannot be found,
-     * the message is displayed
-     *
-     * @return void
-     */
-
-    define PlayTest () ``{
-	  
-	if (!fileexist(lookup (user_settings, "audio_file"))) 
-	{
-	    string file = lookup (user_settings, "audio_file");
-
-		  // To translators: just one file will be displayed
-		  // To translators: if the test audio file can not be found this message is displayed
-		  // To translators: This is just popup message, shouldn't be too long
-	    string msg = sformat (UI (_("Cannot find file:\n %1\n\n(test audio file)")), file);
-
-	    UI (`DisplayMessage (msg));
-	}
-	else 
-	{
-	    string play_cmd = lookup (user_settings, "play_cmd", "");
-	    string audio_file = lookup (user_settings, "audio_file", "");
-		  // more cards
-	    if (no_alsa)
-	    {
-		Shell(sformat("%1 %2 &", play_cmd, audio_file), $[]);
-	    }
-	    else
-	    {
-		Shell(sformat("%1 -c %2 %3 &", play_cmd, card_id, audio_file), $[]);
-	    }
-	}
-    };
-
-    /**
-     * tries to insert module with options (if any)
-     * @return string with error message (empty string if ok)
-     */
-
-    define probe_module (map card) ``{
-
-	string module_name    = lookup (lookup (card, "module", $[]), "name", "");
-	list params           = filter (`e, lookup (lookup (card, "module", $[]), "params", []), ``(size (lookup (e, "value")) > 0));
-	string module_options = mergestring (maplist (`e, params, ``(sformat("%1=%2", lookup (e, "name", ""), lookup (e, "value", "")))), " ");
-	boolean probe         = lookup (lookup (card, "module", $[]), "modprobe", true);
-	boolean mod_active    = lookup (lookup (card, "module", $[]), "active", false);
-
-	if (size (module_name) == 0)
-	{
-		// To translators: error message
-	    return UI(_("Invalid module name."));
-	}
-	    
-	SCR(`Execute (.target.bash, "/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`", $[]));
-      
-	if (!mod_active) 
-	{
-	    if (!probe)
-	    {
-		SCR (`Execute (.target.insmod, module_name, module_options));
-	    }
-	    else
-	    {
-		SCR(`Execute (.target.modprobe, module_name, module_options));
-	    }
-	}
-	
-	if (no_alsa) 
-	{
-	    user_settings = add (user_settings, "play_cmd", "/usr/bin/play");
-	    user_settings = add (user_settings, "mixer", "/usr/bin/aumix \"$CHANNEL\" $VOLUME");
-	}
-	else
-	{
-	    SCR(`Execute (.target.modprobe, "snd-pcm-oss", "")); // backwards OSS compatibility
-	}
-
-	map pm = SCR(`Read(.proc.modules));
-
-	if (!haskey (pm, module_name)) 
-	{
-
-		// To translators: label to error popup
-	    return sformat (UI(_("The kernel module %1 for sound support\ncould not be loaded.")), module_name);
-	}
-	return "";
-   };
-
+    map STRINGS=STRINGS_();
 
     /**
      * This dialog sipmply reads user input and calls apropriate set funtion
@@ -169,7 +77,11 @@
 	    {
 		if (!test_mode)
 		{
-		  PlayTest ();
+		    string msg=PlayTest(user_settings, card_id);
+		    if(msg != "")
+		    {
+			UI (`DisplayMessage (msg));
+		    }
 		}
 	    }
 	    else if (ui == `next) 
@@ -241,17 +153,18 @@
 
     if (size (Args ()) > 2)
     {
-      finish = Args (2);
+	finish = Args (2);
     }
 
     if (!haskey(card, "module"))
     {
-      card = add(card, "module", get_module (card));
+	void | list db=SCR(`Read (.target.yast2, "sndcards.ycp"));
+	card = add(card, "module", get_module (card));
     }
 
     map module_map = lookup (card, "module", $[]);
       
-    map user_settings = $["audio_file" : "/usr/share/sounds/alsa/test.wav",
+    map user_settings = $["audio_file"  : "/usr/share/sounds/alsa/test.wav",
 			  "play_cmd"    : "/usr/bin/aplay",
 			  "mixer"       : "/usr/bin/amixer -c $CARD_NUM set \"$CHANNEL\" $VOLUME% unmute"];
       
@@ -261,22 +174,22 @@
     boolean no_alsa = lookup (lookup (module_map, "module", $[]), "no_alsa", false);
     if (!test_mode)
     {
-      err_msg = probe_module (module_map);
+	err_msg = probe_module (module_map, user_settings);
     }
     any ui = nil;
 
     if (size (err_msg) > 0)
     {
-      ui = ErrorDialog (card, err_msg);
+	ui = ErrorDialog (card, err_msg);
     }
     else
     {
-      ui = VolumeDialog ();
+	ui = VolumeDialog ();
     }
 
     if (ui == `back)
     {
-      SCR(`Execute (.target.modprobe, sformat ("-r %1", lookup (lookup (module_map, "module", $[]), "name", "")), ""));
+	SCR(`Execute (.target.modprobe, sformat ("-r %1", lookup (lookup (module_map, "module", $[]), "name", "")), ""));
     }
 
     UI(`ChangeWidget (`id(`next), `Label, _("&Next")));

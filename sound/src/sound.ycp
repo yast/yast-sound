@@ -22,11 +22,12 @@
     textdomain "sound";
 
     include "misc_defines.ycp";
-    include "sound/sound_routines.ycp";
-    include "sound/sound_ui.ycp";
+    include "sound/routines.ycp";
+    include "sound/ui.ycp";
+    include "sound/texts.ycp";
 
     // text constants for sound module
-    map STRINGS=CallFunction(`sound_texts());
+    map STRINGS=STRINGS_();
   
     // Menuentry for the YaST2 menu
     if (Args() == [ "get_menuentry" ])
@@ -49,7 +50,7 @@
      * <br>
      * 2. modprobe and volume settings
      * @param   card_info as returned by libhd
-     * @return  list with save info, as required by sound_save for one cards
+     * @return  list with save info, as required by sound_write for one cards
      */
     define OneCardWizard (map card, integer card_id, any ui) ``{
 	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id))),
@@ -377,7 +378,7 @@
 
     //UI(`DebugDialog (save_info));
 
-	CallModule ("sound_save", [save_map, test_mode]);
+	CallModule ("sound_write", [save_map, test_mode]);
 
     
     }    

@@ -24,8 +24,12 @@
     textdomain "sound";
 
     include "misc_defines.ycp";
-    include "sound/sound_routines.ycp";
+    include "sound/routines.ycp";
+    include "sound/ui.ycp";
+    include "sound/texts.ycp";
     include "lan/lan_routines.ycp";
+
+    map STRINGS=STRINGS_();
 
   /**
    * Detected, but not configured cards
@@ -78,7 +82,7 @@
     define WhichDialog ()	``{
     // help text 
 
-	string helptext=lookup(STRING, "WhichDialog");
+	string helptext=lookup(STRINGS, "WhichDialog");
 
 	list nc = [];
 	integer i = 0;
