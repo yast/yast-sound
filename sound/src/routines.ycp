@@ -782,9 +782,10 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
      *  @return list of integers
      */
 
-    global define get_indices_for_removal(list save_info, string mod_name)
+    global define get_indices_for_removal(list save_info, string mod_name, integer card_id)
     ``{
 	list ret = [];
+	boolean remove_all = false;
 	integer pos = 0;
 	maplist(`e, save_info, 
 	``{  
@@ -792,8 +793,19 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	    {
 		ret = add(ret, pos);
 	    }
+	    else
+	    {
+		if (size(ret) > 0)
+		{
+		    remove_all = true;
+		}   
+	    }
 	    pos = pos + 1;
 	});
+	if (!remove_all)
+	{
+	    return [card_id];
+	}
 	return ret;
     }
 

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Sep 17 12:36:47 CEST 2001 - dmeszar@suse.cz
+
+- bug #10639 fixed (Removing first sound card removes them all)
+- bug #10529 (10662) fixed (YaST2 crashes: Undefined string operation?)
+  resp. (sound/routines.ycp: strange lines)
+
+-------------------------------------------------------------------
 Mon Sep 10 14:54:30 CEST 2001 - dmeszar@suse.cz
 
 - use Arch:: instead of user_settings
