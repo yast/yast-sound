@@ -479,8 +479,15 @@
     global define get_audio (boolean test_mode, boolean config_mode) ``{
 	if (!test_mode && !config_mode) 
 	{
+	    string tmpdir=SCR (`Read (.target.tmpdir));
+	    if(fileexist(tmpdir+"/audio.ycp"))
+	    {
+		return SCR(`Read(.target.ycp, tmpdir+"/audio.ycp"));
+	    }
+
 	    list ret = SCR(`Read(.probe.sound));
 	    if (ret==nil) ret = [];
+	    SCR(`Write(.target.ycp, tmpdir+"/audio.ycp", ret));
 	    return ret;
 	}
 	return [$[//"baseclass"  : "Multimedia controller", 
@@ -1239,12 +1246,23 @@
 	string cmd=sformat("/bin/echo alias snd-card-%1 %2 >> ", cid, module_name)+get_tmp_modules_conf();
 	SCR(`Execute(.target.bash, cmd, $[]));
 
-	cmd=sformat("/bin/echo options %1 snd_id=card%2 snd_index=%3 >> ", module_name, cid+1, cid) +
+	string options="";	
+
+	maplist(`e, lookup(card, "params", []),
+	``{
+	    if(lookup(e, "value", "")!="")
+	    {
+		options=options+" "+lookup(e, "name", "")+"="+lookup(e, "value", "");
+	    }
+	}
+    	);
+
+	cmd=sformat("/bin/echo options %1 snd_id=card%2 snd_index=%3 %4 >> ", module_name, cid+1, cid, options) +
 	    get_tmp_modules_conf();
 	SCR(`Execute(.target.bash, cmd, $[]));
 
 	// change snd_cards_limit to cid+1
-	cmd=sformat("sed s/snd_cards_limit=[0-9]*/snd_cards_limit=%1/ %2 >", cid+1, get_tmp_modules_conf())+get_tmp_modules_conf()+"2";
+	cmd=sformat("/bin/sed s/snd_cards_limit=[0-9]*/snd_cards_limit=%1/ %2 >", cid+1, get_tmp_modules_conf())+get_tmp_modules_conf()+"2";
 	SCR(`Execute(.target.bash, cmd, $[]));
 
 	cmd="cp "+get_tmp_modules_conf()+"2 "+get_tmp_modules_conf();
@@ -1262,6 +1280,15 @@
 
 	cmd=sformat("sed /snd_index=%1/d %2 > %3", cid, get_tmp_modules_conf()+"2", get_tmp_modules_conf());
 	SCR(`Execute(.target.bash, cmd, $[]));
+    }
+
+    /** 
+     *	@return true if the fonts have already been installed
+     *	
+     */
+
+    global define FontsInstalled() ``{
+	return fileexist("/usr/share/sfbank/creative");
     }
 
     /** @return true if the sound card supports sound fonts

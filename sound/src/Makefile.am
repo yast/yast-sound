@@ -5,6 +5,7 @@
 menudir = $(YAST2DIR)/menuentries
 modulesdir = $(YAST2DIR)/clients
 includedir = $(YAST2DIR)/include/sound
+bindir = $(YAST2DIR)/bin
 
 include_DATA = \
 	routines.ycp \
@@ -23,7 +24,10 @@ modules_DATA = 	\
 
 menu_DATA = menuentry_sound.ycp
 
+bin_DATA = copyfonts
+
 EXTRA_DIST = \
 	$(modules_DATA) \
 	$(menu_DATA) \
-	$(include_DATA)
+	$(include_DATA) \
+	$(bin_DATA)

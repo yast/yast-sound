@@ -149,10 +149,12 @@
 
 	list cc = maplist (`e, conf_cards, 
 	    ``(`item(`id(lookup (e, "number", 0)), sformat ("   [%1]", lookup (e, "number", 0)), lookup (e, "line1")))); 
-    
+	boolean show_fonts=false;
+	maplist(`e, get_audio(false, false), ``{ if(HasFonts(e)) show_fonts=true;});
+	
 	term con = ComplexDlgCon(cc, 
 			(lookup (rc_vars, "START_ALSA", "no") == "yes"), 
-			(lookup (rc_vars, "START_ALSA_SEQ", "no") == "yes"));
+			(lookup (rc_vars, "START_ALSA_SEQ", "no") == "yes"), show_fonts);
 
         // dialog title
 	UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
@@ -282,6 +284,10 @@
 
 		UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
 		UI(`ChangeWidget(`id(`configured_table), `CurrentItem, 0));
+	    }
+	    else if (ui == `b_fonts)
+	    {
+		InstallFonts("");
 	    }
 	    else if (ui == `b_alsa) 
 	    {

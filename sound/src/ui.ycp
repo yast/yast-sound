@@ -295,7 +295,34 @@
 	return con;
     }
 
-    global define ComplexDlgCon(list cc, boolean start_alsa, boolean start_alsa_seq) ``{
+    global define ComplexDlgCon(list cc, boolean start_alsa, boolean start_alsa_seq, boolean show_font_but) ``{
+	term butts=nil;
+	if(show_font_but)
+        {
+            butts=`HBox(
+                        `VBox
+                         (
+                            `Left(`CheckBox(`id(`b_alsa), `opt(`notify), _("Start ALSA"), start_alsa)),
+                         // check button label
+                            `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("Start sequencer"), start_alsa_seq))
+                         ),
+                        `VBox
+                        (
+                            `PushButton (`id(`b_fonts), _("Install soundfonts..."))
+                        )
+                    );
+        }
+	else 
+	{
+	    butts=// check button label
+                            `VBox
+                            (
+                                `Left(`CheckBox(`id(`b_alsa), `opt(`notify), _("Start ALSA"), start_alsa)),
+                             // check button label
+                                `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("Start sequencer"), start_alsa_seq))
+                            );
+
+	}
 	term con = `HBox
             (
                 `HSpacing (3),
@@ -319,18 +346,29 @@
                     `HBox
                     (
                         `HStretch (),
-                  // check button label
-                        `VBox
-                        (
-                            `Left(`CheckBox(`id(`b_alsa), `opt(`notify), _("Start ALSA"), start_alsa)),
-                         // check button label
-                            `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("Start sequencer"), start_alsa_seq))
-                        )
+			butts
                     ),
                     `VSpacing (0.5)
                 ),
                 `HSpacing (3)
             );
+	if(show_font_but)
+	{
+	    UI(`ReplaceWidget (`id(`id_rep),
+		    `HBox(
+			`VBox
+                         (
+                            `Left(`CheckBox(`id(`b_alsa), `opt(`notify), _("Start ALSA"), start_alsa)),
+                         // check button label
+                            `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("Start sequencer"), start_alsa_seq))
+                         ),
+			`VBox
+			(
+			    `PushButton (`id(`b_fonts), _("Load soundfonts..."))
+			)
+		    )
+                    ));
+	}
 	return con;
     }
     
