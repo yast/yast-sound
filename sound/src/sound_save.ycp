@@ -80,7 +80,7 @@
 		// possible string for SB Live!
 	    list sb_live_exception = ["SB Live!",
 				     "Sound Blaster Live!"];
-	    boolean sb_live = contains(sb_live_exception, soundcard_name (snd_info));
+	    boolean sb_live = contains(sb_live_exception, hardware_name (snd_info));
 
 	    string module_name = lookup (lookup (lookup (snd_info, "module", $[]), "module", $[]), "name", "snd-card-dummy");
 	    boolean has_isapnp = contains(maplist (`p, lookup (snd_info, "params", []), ``(lookup (p, "name", "") == "snd_isapnp")), true);
@@ -187,7 +187,7 @@
 	
 	term con = `VBox (
 	    `Top (
-		`Label (soundcard_name (snd_info))
+		`Label (hardware_name (snd_info))
 		),
 	    `HVCenter (
 		`ReplacePoint(`id(`la),

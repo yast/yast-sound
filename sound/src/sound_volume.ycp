@@ -171,7 +171,7 @@
 	    //"Sound Blaster Live!"];
 	    //boolean use_emu10k1_package = false;
 
-	    //if (contains(sb_live_exception, soundcard_name (snd_info)))
+	    //if (contains(sb_live_exception, hardware_name (snd_info)))
 	    //use_emu10k1_package = YesOrNo (_("Do you want to enable joystick support\n(and therefore use another than ALSA driver)?"), _("&Yes"), _("&No"));
 
 	    //if (use_emu10k1_package)
@@ -207,7 +207,7 @@
  sound configuration currently only supports ALSA.</p>"));
 	
 	
-	    con = `VBox(`Top (`Label (soundcard_name (snd_info))),
+	    con = `VBox(`Top (`Label (hardware_name (snd_info))),
 			`HVCenter(`Label (err)));
 
 	}
@@ -226,7 +226,7 @@
 	    con = `VBox (
 		`VBox (
 		    `Top (
-			`Label (soundcard_name (snd_info))
+			`Label (hardware_name (snd_info))
 			),
 		    `ReplacePoint (`id(`rprog),
 				// To translators: progress bar title

@@ -18,6 +18,8 @@
  */
 
 {
+    Include (`misc_defines());
+
 	  // Menuentry for the YaST2 menu
 	if (Args() == [ "get_menuentry" ]) 
 	    return [ "sound", $[
@@ -216,18 +218,6 @@
 	};
 
 
-				// extracts sound card name from map read from SCR
-	define soundcard_name (map device) ``{
-	    string sub_vendor = lookup (device, "sub_vendor", "");
-	    string sub_device = lookup (device, "sub_device", "");
-	    
-	    if ((sub_vendor != "") && (sub_device != ""))
-		return (sub_vendor + " " + sub_device);
-	    else
-		return (lookup (device, "vendor", "Unknown vendor") + " " + lookup (device, "device", "Unknown device"));
-
-	};
-
 				// looks-up for a kernel module for this
 				// bus, vendor_id, device_id sound card
 	define get_module (string bus, integer vendor_id, integer device_id) ``{
@@ -418,7 +408,7 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 		    if (size(module) == 0) {
 			    // To translators: parameter is sound card name
 			message = sformat (UI(_("The sound card\n%1\ncan not be configured,\nbecause there is no available driver.")),
-					   soundcard_name (ret));
+					   hardware_name (ret));
 			con = add (con, `HVCenter(`ReplacePoint (`id(`rp), `Label(message))));
 			    // "Let me choose" button: Runs dialog where user manually chooses the sound card from a list
 			    // this button is displayed when sound card was detected (by libhd), but no appropriate module can be found in DB
@@ -435,13 +425,13 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 		    }
 		    else {
  			    // To translators: parameter is sound card name
-			    //message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
+			    //message = sformat (UI(_("The sound card\n%1\nwill be configured.")), hardware_name (ret));
 
 			term lab = `VBox (
 			    `VStretch (),
 				// To translators: label message 1/2 "The sound card XY will be configured" - split due the different widget
 			    `Label (_("The sound card\n")),
-			    `Label (`opt(`outputField), soundcard_name (ret)),
+			    `Label (`opt(`outputField), hardware_name (ret)),
 				// To translators: label message 2/2 "The sound card XY will be configured" - split due the different widget
 			    `Label (_("\nwill be configured."))
 			    );
@@ -473,7 +463,7 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 						   maplist(`card, found, ``(`item(`id(sformat ("%1/%2",
 											       lookup (card, "vendor_id", 0),
 											       lookup (card, "device_id", 0))),
-										  soundcard_name (card))))));
+										  hardware_name (card))))));
 			// "Options" button: Runs dialog where user manually can modify module specific options
 		    con = add (con, `PushButton(`id (`options), `opt(`disabled), _("&Options")));
 
@@ -553,13 +543,13 @@ Do you want to select the driver manually?"),
  the <i>Options</i> button.</p>"));
 
 
-				//message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
+				//message = sformat (UI(_("The sound card\n%1\nwill be configured.")), hardware_name (ret));
 
 				term lab = `VBox (
 				    `VStretch (),
 					// To translators: label message 1/2 "The sound card XY will be configured" - split due the different widget
 				    `Label (_("The sound card\n")),
-				    `Label (`opt(`outputField), soundcard_name (ret)),
+				    `Label (`opt(`outputField), hardware_name (ret)),
 					// To translators: label message 2/2 "The sound card XY will be configured" - split due the different widget
 				    `Label (_("\nwill be configured."))
 				    );
@@ -600,7 +590,7 @@ Do you want to select the driver manually?"),
 
 
 		    module = lookup (ret, "module");
-		    map|void options = CallFunction (`sound_options (soundcard_name (ret),
+		    map|void options = CallFunction (`sound_options (hardware_name (ret),
 									 lookup (module, "params", []),
 									 options_entered, 0));
 
@@ -654,13 +644,13 @@ Do you want to select the driver manually?"),
 "<p>You can change options that are passed to the module by pressing
  the <i>Options</i> button.</p>"));
 
-			    //message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
+			    //message = sformat (UI(_("The sound card\n%1\nwill be configured.")), hardware_name (ret));
 
 			term lab = `VBox (
 			    `VStretch (),
 				// To translators: label message 1/2 "The sound card XY will be configured" - split due the different widget
 			    `Label (_("The sound card\n")),
-			    `Label (`opt(`outputField), soundcard_name (ret)),
+			    `Label (`opt(`outputField), hardware_name (ret)),
 				// To translators: label message 2/2 "The sound card XY will be configured" - split due the different widget
 			    `Label (_("\nwill be configured."))
 			    );
