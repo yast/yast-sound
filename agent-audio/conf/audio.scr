@@ -1,6 +1,6 @@
 .audio
 
 `ag_audio(
-  SCR::AudioAgent("")
+  AudioAgent("")
 )
 
