@@ -20,6 +20,14 @@
     include "lan/lan_routines.ycp";
 //    include "ui/summary.ycp";
 
+    global define is_sparc() ``{
+	if (__sparc == nil)
+	{
+	    map user_sets = SCR::Read(.target.ycp, "/var/lib/YaST2/user_settings");
+	    __sparc = (lookup(user_sets, "arch_sparc", false));
+	}
+	return __sparc;
+    }
 
     /**
      * fliters out already configured cards
@@ -327,30 +335,6 @@
     };
 
 
-    /**
-     * This is no alsa hack function
-     * @return map
-     */
-    global define no_alsa (string mod_name) ``{
-	return $[
-	    "modules" : [
-		$["name"   : mod_name,
-		 "modules" : $["alias" :  "char-major-14"]],
-		$["name"   : mod_name,
-		 "modules" : $["alias" :  "sound"]],
-		$["name"   : mod_name,
-		 "modules" : $["alias" :  "midi"]],
-		$["name"   : mod_name,
-		 "modules" : $["alias" :  "sound-slot-0"]],
-		$["name"   : mod_name,
-		 "modules" : $["alias" :  "sound-service-0-0"]]	    
-		],
-	    "volume" : $[
-		"mixer" : "/usr/bin/aumix \"$CHANNEL\" $VOLUME"
-		]
-	    ];
-    }
-
     /** 
      * returns list of detected soundcards
      *
@@ -438,16 +422,6 @@
 	}
 
 	return $[];
-    }
-
-    /**
-     * volume in percents (0..100)
-     * @return any
-     */
-    global define SetVolume (string group, integer cardid, integer value) ``{
-	string p = sformat(".audio.alsa.cards.%1.channels.%2.volume", cardid, group);
-
-	SCR::Write(topath(p), value);
     }
 
     global define SetVolumeFast(integer cardid, integer value) ``{

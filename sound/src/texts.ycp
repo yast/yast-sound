@@ -25,7 +25,8 @@
      */
 
     global define STRINGS_() ``{
-	return $["DisplayName":
+	// sound-system independent part
+	map ret = $["DisplayName":
 	     _("<p>If you want to configure this sound card and adjust its volume check <b>Normal setup</b>.</p><p>If you want to set a special option, check the <b>Advanced setup</b> radio button. Most users won't need this.</p><p>If you don't wish to adjust volume or set options now, check <b>Quick automatic setup</b>. You can set volume and change options later.</p>"),
 
 	    "quickConfig":
@@ -42,10 +43,6 @@
 	    "WhichDialogMsg":
 	    _("There are programs running that are currently using the audio device.\n To reset the configuration these programs must be terminated. Proceed?"),
 
-
-	    "ComplexDialog":
-	    _("<p>The complete sound cards list. Use the <b>Finish</b> button to save sound card information.</p><p>Use <b>Delete</b> button to remove configured sound card. <b>Add sound card</b> button can be used for adding sound card.</p><p>Use the <b>start ALSA</b> check button to enable (resp. disable) ALSA start-up during boot time. Check the <b>start sequencer</b> if you want to load modules for playing MIDI files during boot-time (these modules can be loaded on demand).</p>"),
-
 	      // To translators: To reset the sound configuration these programs must be terminated
 	      // To translators: label message
 	    "ComplexDialogMsg":
@@ -58,12 +55,6 @@
 	    "VolumeDialog":
 	    _("<p>Please adjust the volume.</p><p>You can test your sound card by pressing the <b>Test</b> button.</p><p>After the configuration is done you can use <b>amixer</b> (or any program of your choice) for adjusting the volume.</p><p><b>WARNING/SPECIAL NOTE:</b>Please start testing your sound card with <b>very</b> low volume settings to prevent an accident with too much loud noise.</p>"),
 
-
-	    "ErrorDialog":
-	    _("<p>An error has occurred. </p>")+
-	    _("<p>You should check that you have correctly installed the <b>ALSA</b> package (from the series 'snd') and that you are running this as a root.</p><p>If the the problem persists, you can try to pass some <b>options</b> to the ALSA module. If you still can't get your sound card working, you can try <i>OSS/Free</i> or another module.</p><p>However, <b>YaST2</b> sound configuration currently only supports ALSA.</p>"),
-
-	 
 	    "SuccessDialog":
 	    _("<P>Automatic configuration finished successfully.</P>"),
  
@@ -130,6 +121,24 @@
 item in list and press the <B>Configure<B> button.</P><P>Press the <B>Edit</B> button to configure already 
 installed cards</P><P>To save current configuration, press the <B>Finish</B> button.</P>")
 	    ];
+	// sound system dependent part:
+	if (use_alsa)
+	{
+	    ret = add(ret, "ComplexDialog",
+            _("<p>The complete sound cards list. Use the <b>Finish</b> button to save sound card information.</p><p>Use <b>Delete</b> button to remove configured sound card. <b>Add sound card</b> button can be used for adding sound card.</p><p>Use the <b>start ALSA</b> check button to enable (resp. disable) ALSA start-up during boot time. Check the <b>start sequencer</b> if you want to load modules for playing MIDI files during boot-time (these modules can be loaded on demand).</p>"));
+	    ret = add(ret, "ErrorDialog",
+            _("<p>An error has occurred. </p>")+
+            _("<p>You should check that you have correctly installed the <b>ALSA</b> package (from the series 'snd') and that you are running this as a root.</p><p>If the the problem persists, you can try to pass some <b>options</b> to the ALSA module. If you still can't get your sound card working, you can try <i>OSS/Free</i> or another module.</p><p>In this case launch YaST2 sound configuration module from shell using the <PRE>yast2 sound .oss</PRE> command.</p>"));
+	}
+	else
+	{
+	    ret = add(ret, "ComplexDialog",
+            _("<p>The complete sound cards list. Use the <b>Finish</b> button to save sound card information.</p><p>Use <b>Delete</b> button to remove configured sound card. <b>Add sound card</b> button can be used for adding sound card.</p>"));
+            ret = add(ret, "ErrorDialog",
+            _("<p>An error has occurred. </p>")+
+            _("<p>You can try to pass some <b>options</b> to the module.</p>"));
+	}
+	return ret;	
     }
 
 //   return STRINGS_();
