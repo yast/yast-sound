@@ -182,9 +182,9 @@
 
     string final_msg = "";
     if (size (err_msg) > 0)
-	final_msg = sformat (UI(_("These errors ocured during saving configuration:\n%1")), err_msg);
+	final_msg = sformat (UI(_("These errors occurred during saving configuration:\n%1")), err_msg);
     else
-	final_msg = UI(_("The sound card was succesfully configured.\nYou can now use it immediately."));
+	final_msg = UI(_("The sound card was successfully configured.\nYou can now use it immediately."));
 
     if (test_mode)
 	final_msg = final_msg + " " + UI(_("(TEST MODE)"));
