@@ -384,8 +384,11 @@
      */
 
     global define list getConfigurableCards(list save_info) ``{
+y2milestone("saved: %1", save_info);
         list snd = Sound::detected_cards;
+y2milestone("detected: %1", snd);
         snd = filter_configured(save_info, snd);
+y2milestone("filtered: %1", snd);
         if (size(snd) > 0)
         {
             // get all the apropriate information from the database

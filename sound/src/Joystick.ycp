@@ -39,6 +39,10 @@
 
     list joystick_backup = [];
 
+    global string start = "";
+
+    global boolean modified = false;
+
     // comment for JOYSTICK_MODULE section in sysconfig
     string module_comment = "";
 
@@ -163,6 +167,78 @@
     }
 
     /**
+     * Update the SCR of the one joystick
+     * @param pos joystick number
+     */
+    global define boolean SaveOneJoystick (integer pos) ``{
+
+	// first remove old settings
+	maplist(`e, vars, ``(SCR::Write(topath(sformat(".sysconfig.joystick.%1_%2", e, pos)), "")));
+
+	// delete old model
+	SCR::Write(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment", pos)), "");
+
+	map j = select(joystick, pos, $[]);
+
+	foreach(`v, vars, ``{
+	    SCR::Write(topath(sformat(".sysconfig.joystick.%1_%2", v, pos)), lookup(j, v, ""));
+
+	    if (lookup(j, v, "") != "")
+            {
+	        // if there is variable with value != "" enable joystick service
+	        start = "enable";
+            }
+
+	});
+
+	// write model comment
+	string model = lookup(j, "model", nil);
+
+	// add comment before first model
+	if (pos == 0)
+	{
+	    if (size(model) > 0)
+	    {
+	        model = module_comment + "\n#" + model + "\n";
+	    }
+	    else
+	    {
+	        model = module_comment + "\n#\n";
+	    }
+	}
+	else
+	{
+	    if (size(model) > 0)
+	    {
+	        model = "#" + model + "\n";
+	    }
+	}
+
+	y2debug("Read model comment: %1", model);
+
+	if (size(model) > 0)
+	{
+	    SCR::Write(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment", pos)), model);
+	}
+
+    }
+
+    global define boolean Stop() ``{
+	return SCR::Execute(.target.bash, "/etc/init.d/joystick stop", $[]);
+    }
+
+    global define boolean WriteConfig() ``{
+	return SCR::Write(.sysconfig.joystick, nil);
+    }
+
+    global define boolean StartAndEnable() ``{
+
+	SCR::Execute(.target.bash, "/etc/init.d/joystick start", $[]);
+    Runlevel::ServiceAdjust("joystick", start);
+    return true;
+    }
+
+    /**
      * Update the SCR according to joystick settings
      * @param abort A block that can be called by Write to find
      *	      out whether abort is requested. Returns true if abort
@@ -171,84 +247,32 @@
      */
     global define boolean Write (block abort) ``{
 
-	// do not write anything in the test mode
-	if (Mode::test == true)
+	// do not write anything in the test mode and if nothing was changed
+	if (Mode::test == true || !modified)
 	{
 	    return true;
 	}
 
 	integer pos = 0;
 
-	map j = $[];
-	string start = "disable";
+	start = "disable";
 
 	// stop joystick service
-	SCR::Execute(.target.bash, "/etc/init.d/joystick stop", $[]);
+    Stop();
 
 	while (pos < 4)
 	{
-	    // first remove old settings
-	    maplist(`e, vars, ``(SCR::Write(topath(sformat(".sysconfig.joystick.%1_%2", e, pos)), "")));
-
-	    // delete old model
-	    SCR::Write(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment", pos)), "");
-
-	    j = select(joystick, pos, $[]);
-
-	    foreach(`v, vars, ``{
-		SCR::Write(topath(sformat(".sysconfig.joystick.%1_%2", v, pos)), lookup(j, v, ""));
-
-		if (lookup(j, v, "") != "")
-                {
-		    // if there is variable with value != "" enable joystick service
-		    start = "enable";
-                }
-
-	    });
-
-
-	    // write model comment
-	    string model = lookup(j, "model", nil);
-
-	    // add comment before first model
-	    if (pos == 0)
-	    {
-		if (size(model) > 0)
-		{
-		    model = module_comment + "\n#" + model + "\n";
-		}
-		else
-		{
-		    model = module_comment + "\n#\n";
-		}
-	    }
-	    else
-	    {
-		if (size(model) > 0)
-		{
-		    model = "#" + model + "\n";
-		}
-	    }
-
-	    y2debug("Read model comment: %1", model);
-
-	    if (size(model) > 0)
-	    {
-		SCR::Write(topath(sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment", pos)), model);
-	    }
-
-
+        // update /etc/sysconfig/joystick file
+	    SaveOneJoystick (pos);
 	    pos = pos + 1;
 	}
 
 	// flush config to file
-	SCR::Write(.sysconfig.joystick, nil);
+    WriteConfig();
 
 	// start joystick service
-	SCR::Execute(.target.bash, "/etc/init.d/joystick start", $[]);
-
 	// enable/disable service
-        Runlevel::ServiceAdjust("joystick", start);
+    StartAndEnable();
 
 	y2milestone("%1", "Joystick configuration was written.");
 
@@ -284,5 +308,6 @@
 	// TODO FIXME: your code here...
 	return _("Summary of the joystick configuration...");
     }
+
 
 }

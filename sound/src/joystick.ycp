@@ -51,8 +51,8 @@
 
     global define symbol joystick_configuration() ``{
 
-	string helptext = "<P>Two or more sound cards in your system support joystick.<P>
-<P>To configure joystick select sound card and press button <B>Configure joystick</B>.</P>";
+	string helptext = _("<P>Two or more sound cards in your system support joystick.<P>
+<P>To configure joystick select sound card and press button <B>Configure joystick</B>.</P>");
 
 	boolean restart = false;
 
