@@ -281,7 +281,12 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 
 	    repeat {
 
-		map result = WhichDialog ();
+		map result = $[];
+		if (size (get_not_yet ()) > 0)
+		    result = WhichDialog ();
+		else {
+		    result = $["ui" : `next, "way" : `manual];
+		}
 
 		ui = lookup (result, "ui", `cancel);
 
@@ -333,7 +338,7 @@ for playing MIDI files during boot-time (these modules can be loaded on demand).
 			    }
 			}
 
-			if (ui == `back) ui = nil;
+			if (ui == `back) break;
 		    }
 		}
 		else if (ui == `cancel)

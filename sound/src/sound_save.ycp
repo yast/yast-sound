@@ -184,8 +184,12 @@
     string final_msg = "";
     if (size (err_msg) > 0)
 	final_msg = sformat (UI(_("These errors occurred during saving configuration:\n%1")), err_msg);
-    else
+    else {	
 	final_msg = UI(_("The sound card was successfully configured.\nYou can now use it immediately."));
+	if (size(filter (`e, lookup (sound_info, "cards", []), ``((size (e) > 0) && (lookup (e, "name") != "off")))) == 0)
+	    final_msg = UI (_("The sound configuration was saved."));
+
+    }
 
     if (test_mode)
 	final_msg = final_msg + " " + UI(_("(TEST MODE)"));

@@ -143,14 +143,22 @@
 	};
     });
 
+    define get_running_cards () ``{
+	
+	if (fileexist("/proc/asound/cards")) {
+	    list asound = SCR(`Read(.proc.asound.cards));
+	    if (is(select (asound, 0), map)) return asound;
+	}
+	return [];
+    }
+
+
 
     define save_unique_keys (list cards) ``{
 
 	list|void orig = SCR(`Read(.var.lib.yast.unique));
 	if (is (orig, void)) orig = [];
-	list skipped = filter (`e, cards, ``(!contains (configured_unique, lookup (e, "unique_key", ""))));
 	list sound_unique = maplist (`e, configured_unique, ``($["unique" : e, "state" : "configured"]));
-	sound_unique = union (sound_unique, maplist (`e, skipped, ``($["unique" : lookup(e, "unique_key", ""), "state" : "skipped"])));
 	orig = filter (`e, orig, ``(lookup(e, "section", "") != "sound"));
 	SCR(`Write(.var.lib.yast.unique, add (orig, $["contents" : sound_unique, "section" : "sound"])));
 
@@ -326,12 +334,14 @@ configure an other card than the one that is displayed on the right.</p>"));
     boolean config_mode   = false;
     boolean autoinst_mode = false;
     boolean use_alsa      = true;	// default
-    
+    boolean from_menu     = false;
+
     integer arg_n = size (Args ()) - 1;
     while (arg_n >= 0) {
   	if      (Args(arg_n) == .test)          test_mode     = true;
 	else if (Args(arg_n) == .autoinst_mode) autoinst_mode = true;
 	else if (Args(arg_n) == .conf_mode)     config_mode   = true;
+	else if (Args(arg_n) == .from_menu)     from_menu     = true;
   	arg_n = arg_n - 1;
     }
 
@@ -393,14 +403,22 @@ configure an other card than the one that is displayed on the right.</p>"));
 
 	if (ui == `back) break;
 	
+	if (from_menu || size (get_running_cards ()) > 0) {
 
+	    result = CallModule ("sound_complex", [sound_cards, save_info, configured_unique]);
+	}
+	else
+	    result = $["ui" : `next, "save_info" : save_info];
 
-	result = CallModule ("sound_complex", [sound_cards, save_info, configured_unique]);
 	ui = lookup (result, "ui", `cancel);
 
 	if (ui == `next) {
+	    
+	    string warn_msg = UI (_("Sound volume and the configuration\nfor the sound card will be saved now."));
+	    if (size(filter (`e, lookup (result, "save_info"), ``((size (e) > 0) && (lookup (e, "name") != "off")))) == 0)
+		warn_msg = UI (_("The sound configuration will be saved now."));
 
-	    cont = !(UI (`YesOrNo (_("Sound volume and the configuration\nfor the sound card will be saved now."), _("&Yes"), _("&No"))));
+	    cont = !(UI (`YesOrNo (warn_msg, _("&Yes"), _("&No"))));
 	    
 	    save_info = lookup (result, "save_info");
 	    rc_vars   = lookup (result, "rc", $[]);

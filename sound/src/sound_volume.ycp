@@ -49,9 +49,9 @@
 	    string audio_file = lookup (user_settings, "audio_file", "");
 	    // more cards
 	    if (no_alsa)
-		SCR(`Execute (.target.bash, sformat("%1 %2 &", play_cmd, audio_file), $[]));
+		Shell(sformat("%1 %2 &", play_cmd, audio_file), $[]);
 	    else
-		SCR(`Execute (.target.bash, sformat("%1 -c %2 %3 &", play_cmd, card_id, audio_file), $[]));
+		Shell(sformat("%1 -c %2 %3 &", play_cmd, card_id, audio_file), $[]);
 
 	}
     };
