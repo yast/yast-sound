@@ -216,7 +216,7 @@
 		save_tmp_modules_conf(save_info);
 
 		SCR(`Execute (.target.bash, "/etc/init.d/alsasound stop ", $[]));
-		alsasound_start_tmp();
+		alsasound_start_tmp(false);
 		
 
 /*		if (contains (SCR(`Read(.modules.alias)), sformat ("snd-card-%1", card_id))) 
