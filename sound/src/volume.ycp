@@ -263,7 +263,7 @@ global define map sound_volume (map save_entry, integer card_id, boolean finish,
 
     boolean need_restart	= true;
     string err_msg		= "";
-    list modules_conf_backup	= Sound::modules_conf;
+    list<map> modules_conf_backup	= Sound::modules_conf;
 
     if (Sound::use_ui) Wizard::DisableAbortButton();
 
@@ -273,10 +273,10 @@ global define map sound_volume (map save_entry, integer card_id, boolean finish,
     }
 
     // create new (temporary) modules.conf
-    list new_save = [];
+    list<map> new_save = [];
     if (card_id >= size(save_info))
     {
-	new_save = add(save_info, save_entry);
+	new_save = (list<map>) add(save_info, save_entry);
     }
     else
     {

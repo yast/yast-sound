@@ -4,7 +4,6 @@
 
 #include <Y2.h>
 #include <scr/SCRAgent.h>
-#include <scr/SCRInterpreter.h>
 
 
 #ifdef __sparc__

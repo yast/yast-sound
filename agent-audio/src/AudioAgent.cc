@@ -39,19 +39,20 @@ AudioAgent::~AudioAgent() {
 /**
  * Read
  */
-YCPValue AudioAgent::Read(const YCPPath &path, const YCPValue& arg) {
+YCPValue AudioAgent::Read ( const YCPPath &path, const YCPValue& arg,
+			    const YCPValue& opt) {
 
-    /* Same as Dir() */
+    // Same as Dir()
     if(path->length()==0) {
 	return Dir(path);
     }
 
-    /* Fetch parameters */
+    // Fetch parameters
     svect args;
     for(int i=0; i<path->length(); i++)
 	args.push_back(path->component_str(i));
 
-    /* OSS Read handling */
+    // OSS Read handling
     if(args[0]=="oss") {
 	y2debug("oss: (%ld) %s", path->length(), path->toString().c_str());
 	switch(path->length()) {
@@ -71,15 +72,15 @@ YCPValue AudioAgent::Read(const YCPPath &path, const YCPValue& arg) {
 	}
     }
 
-    /* Alsa Read handling */
+    // Alsa Read handling
     else if(args[0]=="alsa") {
 	switch(path->length()) {
-	    /* snd cards name */
+	    // snd cards name
 	    case 4:
 		if(args[1]=="cards" && args[3]=="name")
 		    return alsaGetCardName(atoi(args[2].c_str()));
 		break;
-	    /* volume reading */
+	    // volume reading
 	    case 6:
 		if(args[1]=="cards" && args[3]=="channels") {
 		    if(args[5]=="volume")
@@ -100,12 +101,12 @@ YCPValue AudioAgent::Read(const YCPPath &path, const YCPValue& arg) {
  */
 YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCPValue& arg)
 {
-    /* Do nothing */
+    // Do nothing
     if(path->length()==0) {
 	return YCPBoolean(false);
     }
 
-    /* Fetch parameters */
+    // Fetch parameters
     svect args;
     for(int i=0; i<path->length(); i++)
         args.push_back(path->component_str(i));
@@ -119,7 +120,7 @@ YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCP
     }
 
 
-    /* OSS Write handling */
+    // OSS Write handling
     if(args[0]=="oss") {
 	int volume = value->asInteger()->value();
 	y2debug("oss: (%ld) %s", path->length(), path->toString().c_str());
@@ -140,7 +141,7 @@ YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCP
 	}
     }
 
-    /* Alsa Write handling */
+    // Alsa Write handling
     else if(args[0]=="alsa") {
         switch(path->length()) {
 	    case 6:
@@ -162,6 +163,7 @@ YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCP
  * Dir
  */
 YCPValue AudioAgent::Dir(const YCPPath& path) {
+
     YCPList list;
 
     svect args;
@@ -264,6 +266,13 @@ YCPValue AudioAgent::Execute(const YCPPath& path, const YCPValue& value,
  * otherCommand
  */
 YCPValue AudioAgent::otherCommand(const YCPTerm& term) {
-    return YCPVoid();
+
+    string sym = term->name();
+    if (sym == "AudioAgent") {
+
+	return YCPVoid();
+    }
+
+    return YCPNull();
 }
 

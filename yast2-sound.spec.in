@@ -37,8 +37,8 @@ Summary:	Yast2 - Sound configuration
 @desktopdir@/sound.desktop
 @desktopdir@/joystick.desktop
 @ybindir@/copyfonts
-@moduledir@/Sound.ycp
-@moduledir@/Joystick.ycp
+@moduledir@/Sound.*
+@moduledir@/Joystick.*
 
 # database
 @ydatadir@/sndcards.ycp

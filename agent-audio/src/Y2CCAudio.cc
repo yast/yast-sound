@@ -1,24 +1,8 @@
-#include "Y2CCAudio.h"
-#include "Y2AudioComponent.h"
+#include <scr/Y2AgentComponent.h>
+#include <scr/Y2CCAgentComponent.h>
 
+#include "AudioAgent.h"
 
-Y2CCAudio::Y2CCAudio()
-    : Y2ComponentCreator(Y2ComponentBroker::BUILTIN)
-{
-}
+typedef Y2AgentComp <AudioAgent> Y2AudioAgentComp;
 
-
-bool
-Y2CCAudio::isServerCreator() const
-{
-    return true;
-}
-
-
-Y2Component *
-Y2CCAudio::create(const char *name) const {
-    if (!strcmp(name, "ag_audio")) return new Y2AudioComponent();
-    else return 0;
-}
-
-Y2CCAudio g_y2ccag_audio;
+Y2CCAgentComp <Y2AudioAgentComp> g_y2ccag_audio ("ag_audio");

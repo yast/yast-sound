@@ -44,4 +44,13 @@ module_DATA = Sound.ycp	\
 
 ybin_SCRIPTS = copyfonts
 
+YCPCFLAGS = -I.
+
+ycpchook = sound
+
+sound:
+	ln -s . sound
+
 EXTRA_DIST = $(module_DATA) $(config_DATA) $(ynclude_DATA) $(ybin_SCRIPTS) $(client_DATA) $(desktop_DATA)
+
+include $(top_srcdir)/Makefile.am.common
