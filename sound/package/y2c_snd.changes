@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Jan 18 10:20:19 CET 2001 - dan@suse.cz
+
+- options passing fix (bug 5855) 
+
+-------------------------------------------------------------------
 Fri Jan 12 11:52:28 CET 2001 - kkaempf@suse.de
 
 - bump version for latest fixes
