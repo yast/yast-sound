@@ -9,7 +9,7 @@
  *   Provides saving /etc/modules.conf and volume.
  *
  * Authors:
- *   Dan Veselý <dan@suse.cz>
+ *   Dan Vesely <dan@suse.cz>
  *   Dan Meszaros <dmeszar@suse.cz>
  *
  * $Id$
@@ -23,6 +23,8 @@
  *		    "options"	: $["snd_id":"0" ...],
  *		    "module"	: "snd-emu10k1",
  *		    "unique_key": "abcd.efghijklmn"
+ *                  "bus"       : "pci",
+ *                  "bus_id"    : "0000:00:07.0"
  *		],
  *              $[
  *                  "model"     : "avi onboard!",
@@ -30,6 +32,8 @@
  *                  "options"   : $["snd_id":"1" ...],
  *                  "module"    : "snd-asf",
  *                  "unique_key": "abcd.abcdefghij"
+ *                  "bus"       : "pci",
+ *                  "bus_id"    : "0000:00:03.1"
  *              ]
  *         ]
  *
