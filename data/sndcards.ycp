@@ -1060,7 +1060,7 @@ $[
       "params" : $[
         "snd_joystick" : $[
           "descr" : [
-            _("Forced joystick port enable for %1 soundcard."),
+            _("Forced joystick port enable for %1 sound card."),
             "AZF3328"
           ]
         ]
@@ -1076,7 +1076,7 @@ $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
           "descr" : [
-            _("PnP detection for %1 soundcard."),
+            _("PnP detection for %1 sound card."),
             "C-Media CMI8330"
           ],
           "dialog" : "check"
@@ -1168,7 +1168,7 @@ $[
         "snd_soft_ac3" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _("Sofware-conversion of raw SPDIF packets (model 033 only)."),
+          "descr" : _("Sofware conversion of raw SPDIF packets (model 033 only)."),
           "dialog" : "check"
         ]
       ]
@@ -1671,7 +1671,7 @@ $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
           "descr" : [
-            _("PnP detection for %1 soundcard."),
+            _("PnP detection for %1 sound card."),
             "ESS ES18xx AudioDrive"
           ],
           "dialog" : "check"
@@ -1737,7 +1737,7 @@ $[
         ],
         "snd_use_pm" : $[
           "allows" : "{{0,1,2}}",
-          "descr" : _("Toggle power-management.  (0 = off, 1 = on, 2 = auto)"),
+          "descr" : _("Toggle power management.  (0 = off, 1 = on, 2 = auto)"),
           "skill" : "advanced"
         ]
       ]
@@ -2393,7 +2393,7 @@ $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
           "descr" : [
-            _("PnP detection for %1 soundcard."),
+            _("PnP detection for %1 sound card."),
             "Yamaha OPL3SA2+"
           ],
           "dialog" : "check"
@@ -2731,7 +2731,7 @@ $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
           "descr" : [
-            _("PnP detection for %1 soundcard."),
+            _("PnP detection for %1 sound card."),
             "Sound Blaster 16"
           ],
           "dialog" : "check"
@@ -2848,7 +2848,7 @@ $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
           "descr" : [
-            _("PnP detection for %1 soundcard."),
+            _("PnP detection for %1 sound card."),
             "Sound Blaster AWE"
           ],
           "dialog" : "check"
@@ -3145,7 +3145,7 @@ $[
       "params" : $[
         "snd_ibl" : $[
           "descr" : [
-            _("Capture IBL size for %1 soundcard."),
+            _("Capture IBL size for %1 sound card."),
             "VXPocket440"
           ]
         ]
@@ -3156,7 +3156,7 @@ $[
       "params" : $[
         "snd_ibl" : $[
           "descr" : [
-            _("Capture IBL size for %1 soundcard."),
+            _("Capture IBL size for %1 sound card."),
             "VXPocket"
           ]
         ]

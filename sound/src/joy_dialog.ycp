@@ -50,8 +50,8 @@
 	string helptext =
 	// help text for joystick configuration 1/4
 _("<P>In this dialog, specify your joystick type. If your
-joystick type is not in the list, select <B>Generic analog joystick</B>.</p>
-<p>You will not find any USB joystick here. If you have an USB device, just plug it in and start using.</P>
+joystick type is not in the list, select <B>Generic Analog Joystick</B>.</p>
+<p>You will not find any USB joysticks here. If you have a USB device, just plug in the joystick and start using it.</P>
 ") +
 
 	// help text for joystick configuration 2/4
