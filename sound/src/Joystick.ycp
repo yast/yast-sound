@@ -89,6 +89,7 @@
 	integer pos = 0;
 
 	map j = $[];
+	string start = "disable";
 
 	while (pos < 4)
 	{
@@ -98,9 +99,19 @@
 	    j = select(joystick, pos, $[]);
 	    foreach(`v, vars, ``{
 		SCR::Write(topath(sformat(".sysconfig.joystick.%1_%2", v, pos)), lookup(j, v, ""));
+		if (lookup(j, v, "") != "")
+                {
+			// if there is variable with value != "" enable joystick service
+                        start = "enable";
+                }
 	    });
 	    pos = pos + 1;
 	}
+
+	// flush config to file
+	SCR::Write(.sysconfig.joystick, nil);
+	// enable/disable service
+        Runlevel::ServiceAdjust("joystick", start);
 
 	return true;
     }

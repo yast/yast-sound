@@ -5,7 +5,7 @@
  *   alsa_routines.ycp
  *
  * Module:
- *   Sound       
+ *   Sound
  *
  * Authors:
  *   Dan Meszaros <dmeszar@suse.cz>
@@ -13,7 +13,7 @@
  * $Id$
  *
  * routines for alsa sound system
- *                   
+ *
  *
  */
 
@@ -69,7 +69,6 @@
     
     /**
      * removes all sound modules from kernel
-     * 
      *
      */
 
