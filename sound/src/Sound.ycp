@@ -65,6 +65,11 @@
     global list<map> detected_cards = nil;
 
     /**
+     * list for storing information about removed cards
+     */
+    global list<map> removed_info = [];
+
+    /**
      * list of detected and unconfigured cards
      */
     global list<map> unconfigured_cards = nil;
@@ -572,7 +577,9 @@ could make your system unstable.
 		    "model"     : get_card_label(card),
 		    "module"    : mod["name"]:"",
 		    "unique_key": card["unique_key"]:"",
-		    "options"   : opts
+		    "options"   : opts,
+		    "bus"	: card["bus_hwcfg"]:"",
+		    "bus_id"	: card["sysfs_bus_id"]:""
 		];
 		return entry;
 		});
