@@ -1,7 +1,12 @@
 -------------------------------------------------------------------
+Tue Feb 11 17:27:04 CET 2003 - arvin@suse.de
+
+- fixed testsuite
+
+-------------------------------------------------------------------
 Mon Feb 10 12:39:42 CET 2003 - jsuchome@suse.de
 
-- proofreaded texts: 3rd round 
+- proofreaded texts: 3rd round
 
 -------------------------------------------------------------------
 Mon Feb  3 11:14:26 CET 2003 - jsuchome@suse.cz
@@ -35,7 +40,7 @@ Thu Jan  9 09:46:14 CET 2003 - jsuchome@suse.de
 Fri Dec 13 18:56:38 CET 2002 - jsuchome@suse.de
 
 - updated for new modules agent interface
-- 2.7.1 
+- 2.7.1
 
 -------------------------------------------------------------------
 Fri Oct 25 15:14:46 CEST 2002 - jsuchome@suse.cz
