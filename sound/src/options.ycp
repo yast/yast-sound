@@ -432,14 +432,13 @@
 	    {
 		current_option =
 		    (integer) UI::QueryWidget (`id(`table), `CurrentItem);
-		current_option_name = (string) select ((term)
-		    UI::QueryWidget(`id(`table), `Item(current_option)), 2, "");
+		term curr_opt = (term) UI::QueryWidget(`id(`table), `Item(current_option));
+		current_option_name = curr_opt[2]:"";
 		UI::ChangeWidget(`id(`des), `Label,
 		    // name of currently selected option: eg. 'Option: snd_asdf'
 		    sformat ("%1 %2", _("&Option: "),current_option_name));
 
-		UI::ChangeWidget(`id(`des), `Value, select ((term)
-		    UI::QueryWidget(`id(`table),`Item(current_option)), 3, ""));
+		UI::ChangeWidget(`id(`des), `Value, curr_opt[3]:"");
 
 		// update possible values
 		map optmap = origOptions[current_option_name]:$[];
@@ -453,15 +452,14 @@
 		    vals = optmap["allows"]:"";
 		}
 
-		updatePossibleValues (vals, (string) select((term)
-		    UI::QueryWidget(`id(`table),`Item(current_option)), 3, ""));
+		updatePossibleValues (vals, curr_opt[3]:"");
 	    }
 	    if (ui == `poss)
 	    {
 		current_option =
 		    (integer) UI::QueryWidget (`id(`table), `CurrentItem);
-                current_option_name = (string) select ((term)
-		    UI::QueryWidget(`id(`table), `Item(current_option)), 2, "");
+		term curr_opt = (term) UI::QueryWidget(`id(`table), `Item(current_option));
+                current_option_name = curr_opt[2]:"";
 
 		string value = sformat("%1",UI::QueryWidget(`id(`poss),`Value));
 
@@ -496,8 +494,7 @@
 
 		    list<term> tmp = [];
 		    maplist (term e, itemized_descriptions, ``{
-			if (current_option ==
-			    (integer) select((term)e[0]:`id(0), 0, 0))
+			if (current_option == e[0,0]:0)
 			{
 			    tmp = add (tmp, `item(`id (current_option),
 				e[1]:"", e[2]:"", value));

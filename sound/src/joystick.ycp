@@ -48,7 +48,7 @@
 
 	// save modules_conf now
 	SaveModulesOptions (Sound::modules_conf);
-	SCR::Write (.modprobe_sound, nil);
+	return (boolean) SCR::Write (.modprobe_sound, nil);
     }
 
     /**
