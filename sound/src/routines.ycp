@@ -759,15 +759,17 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
     
     global define nm256_opl3sa2_warn(list sound_cards) ``{
 	list s1 = filter(`e, sound_cards, 
-	    ``(lookup(lookup(lookup(e, "module", $[]), "module", $[]), "name", "") == "snd-card-nm256"));
+	    ``(lookup(e, "module", "") == "snd-card-nm256"));
 	list s2 = filter(`e, sound_cards, 
-	    ``(lookup(lookup(lookup(e, "module", $[]), "module", $[]), "name", "") == "snd-card-opl3sa2"));
+	    ``(lookup(e, "module", "") == "snd-card-opl3sa2"));
 
 	if (size(s1) > 0 && size(s2) > 0)
 	{
-	    string name1 = mergestring(splitstring(hardware_name(select(s1, 0)), "\n"), " ");
-	    string name2 = mergestring(splitstring(hardware_name(select(s2, 0)), "\n"), " ");
-	    UI::MessagePopup(sformat(lookup(STRINGS, "opl3sa_nm256_warn", ""), name1, name2));
+	    string name1 = lookup(select(s1, 0), "model", "");
+	    string name2 = lookup(select(s2, 0), "model", "");
+	    UI::LongTextPopup("",
+		`RichText("<p>"+sformat(lookup(STRINGS, "opl3sa_nm256_warn", ""), name1, name2)+"</p>"),
+		50, 12);
 	}
     }
 
