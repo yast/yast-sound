@@ -30,7 +30,7 @@ clients_DATA = 	\
 	sound_write.ycp		\
 	sound_summary.ycp
 
-menu_DATA = menuentry_sound.ycp
+menu_DATA = menuentry_sound.y2cc
 
 modules_DATA = Sound.ycp
 

@@ -9,7 +9,7 @@ docdir = @DOCDIR@
 htmldir = $(docdir)/autodocs
 
 ycp_files = \
-	../../src/menuentry_sound.ycp \
+	../../src/menuentry_sound.y2cc \
 	../../src/sound.ycp \
 	../../src/complex.ycp \
 	../../src/manual.ycp \
