@@ -1,0 +1,6 @@
+yast2-config-sound supports both alsa and oss sound system.
+alsa is used as default on all architectures except sparc.
+anyway, when the user wants to use oss sound system, 
+she can launch 'yast2 sound .oss' to use oss on all architectures.
+
+
