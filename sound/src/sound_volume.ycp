@@ -36,7 +36,8 @@
 	    else {
 		string play_cmd = lookup (user_settings, "play_cmd", "");
 		string audio_file = lookup (user_settings, "audio_file", "");
-		Shell ("" + play_cmd + " " + audio_file +" > /dev/audio &");
+		Shell ("" + play_cmd + " " + audio_file);
+
 	    }
 	};
 

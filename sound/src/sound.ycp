@@ -277,8 +277,8 @@
 		}
 
 				// if this package not installed, we have to use alsa au file
-		if (Shell ("/bin/rpm -q snd_au") == 0)
-		    user_settings = add (user_settings, "audio_file", "/usr/share/sounds/au/linus-english.au");
+		    //if (Shell ("/bin/rpm -q snd_au") == 0)
+		    //user_settings = add (user_settings, "audio_file", "/usr/share/sounds/au/linus-english.au");
 
 		return (ret == 0);
 	    };
