@@ -113,8 +113,6 @@
         }
         else
         {
-	    // ----- FIXME temporary sound! remove before 9.1 FIXME!
-	    fname = Directory::datadir + "/test.wav";
             SCR::Execute (.target.bash_background,
 		sformat("/usr/bin/aplay -D plughw:%1 %2 > /dev/null 2>&1",
 		    card_id, fname));
