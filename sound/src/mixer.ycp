@@ -260,7 +260,6 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
 	}
 	else if (ui == `test)
 	{
-	    y2error("playing test");
 	    PlayTest(card_id);
 	}
 	else if (ui == `abort && ReallyAbort())

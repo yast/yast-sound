@@ -43,7 +43,6 @@
     include "sound/manual.ycp";
     include "sound/joystick.ycp";
 
-
     boolean autoinstall = false;
 
     boolean use_alsa = !Arch::sparc;
@@ -168,6 +167,18 @@
 	    uniq_k = isa_uniq();
 	    label = lookup(res, "model", "Sound card");
 
+	    // set default values for options
+	    map optlist = lookup(Sound::db_modules, lookup(res, "module", ""), $[]);
+	    optlist = lookup(optlist, "params", $[]);
+	    map options = $[];
+	    maplist(`k, `v, optlist,
+	    ``{
+		if (haskey(v, "default"))
+		{
+		    options = add(options, k, lookup(v, "default", ""));
+		}
+	    });
+
 	    list cds = filter(`e, Sound::unconfigured_cards, ``(lookup(e, "module", "") == lookup(res, "module", nil)));
 	    y2debug("%1", cds);
 	    if (size(cds) > 0)
@@ -179,7 +190,8 @@
 	    save_entry = $[
 		"module"     : lookup(res, "module", ""),
 		"model"	     : label,
-		"unique_key" : uniq_k
+		"unique_key" : uniq_k,
+		"options"    : options
 		];
 	    card_id = -1;
 	}
@@ -234,10 +246,8 @@
 
 	    if (!Sound::autoinstallation)
 	    {
-		SaveModulesEntry (Sound::modules_conf, [], true);
-
 		sound_stop();
-		sound_start_tmp(true, size(Sound::modules_conf));
+		sound_start_tmp(true);
 		set_vol_settings(vol_settings);
 		// now we have to update the unconfigured cards list
 		Sound::UpdateUnconfiguredCards();
@@ -288,12 +298,10 @@
 
     global define symbol _snd_complex() ``{
 	was_complex = true;
-	map res	    = sound_complex(Sound::modules_conf);
+	map res	    = sound_complex();
         symbol ui   = lookup(res, "ui", nil);
         if (ui == `next)
         {
-            Sound::modules_conf	= lookup(res, "save_info", []);
-            Sound::rc_vars	= lookup(res, "rc_vars", []);
             state	= `save;
         }
 	return ui;
@@ -355,13 +363,17 @@ to configure sound cards.
 	arg_n = arg_n - 1;
     }
 
-//#    list save_info    = read_save_info ();
-    // module initialization
-//    Sound::LoadDatabase(); // FIXME TODO read on demand
-//    Sound::DetectHardware();
-    if (!Sound::autoinstallation)
+    if (!Sound::autoinstallation && !Sound::installation)
     {
 	Sound::Read(``{});
+    }
+
+    if (Sound::installation)
+    {
+	Sound::StoreSettings();
+	Sound::UpdateUnconfiguredCards();
+	sound_stop();
+	sound_start_tmp(true);
     }
 
     Sound::use_ui = true;
@@ -397,7 +409,6 @@ to configure sound cards.
 	UI::CloseDialog ();
 	return;
     }
-    SCR::Execute(.target.bash, "/bin/rm /tmp/modules.conf > /dev/null 2>&1; /bin/touch /tmp/modules.conf > /dev/null 2>&1", $[]);
 
     nm256_opl3sa2_warn(flatten(add([Sound::modules_conf], Sound::unconfigured_cards)));
 
@@ -523,6 +534,10 @@ to configure sound cards.
 
     if (ui == `back || ui == `abort)
     {
+	if (Sound::installation)
+	{
+	    Sound::RestoreSettings();
+	}
 	UI::CloseDialog();
 	return;
     }
@@ -531,10 +546,20 @@ to configure sound cards.
 
     map save_map = $[];
 
-
-    if (ui == `finish && !Sound::autoinstallation && (Sound::modules_conf != save_info_backup || Sound::rc_vars != rc_vars_backup))
+    if (Sound::installation)
     {
-	Sound::Write(``{}, ``{});
+	if (ui != `finish)
+	{
+	    Sound::RestoreSettings();
+	}
+    }
+
+    if (ui == `finish && !Sound::autoinstallation)
+    {
+	if (!Sound::installation && (Sound::modules_conf != save_info_backup || Sound::rc_vars != rc_vars_backup))
+	{
+	    Sound::Write(``{}, ``{});
+	}
     }
 
     UI::CloseDialog ();

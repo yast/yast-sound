@@ -37,7 +37,9 @@
 	}
 	else
 	{
-	    // TODO: store volume somewhere...
+	    // store volume to Sound::volume_settings datastricure in autoinstallation
+	    map oldmap = Sound::volume_settings[cardid]:$[];
+	    Sound::volume_settings[cardid] = 1;
 	    return true;
 	}
     }
@@ -76,56 +78,18 @@
      *
      */
 
-    global define void sound_start_tmp(boolean restore/*, integer count*/) ``{
-/*
-	string pattern = "options (snd-card-.*)";
+    global define void sound_start_tmp(boolean restore) ``{
+	string snd = sformat("modprobe snd snd_cards_limit=%1 snd_major=116", size(Sound::modules_conf));
 
-	string str = SCR::Read(.target.string, "/tmp/modules.conf");
-
-	list l = splitstring(str, "\n");
-
-	string cmd = sformat("/sbin/modprobe snd snd_cards_limit=%1", count);
-	y2error("executing %1", cmd);
-	SCR::Execute(.target.bash, cmd, $[]);
-
-	foreach(`e, l,
-	``{
-	    list tmp = regexptokenize(e, pattern);
-	    if (size(tmp)>0)
-	    {
-		cmd = sformat("/sbin/modprobe %1", select(tmp, 0, "off"));
-		y2error("executing %1", cmd);
-		SCR::Execute(.target.bash, cmd, $[]);
-	    }
-	});
-
-	if (restore)
-        {
-            SCR::Execute(.audio.alsa.restore, 0, 0);
-        }
-*/
-
-        string cmd = "/sbin/depmod -C " + get_tmp_modules_conf() + " /dev/null 2>&1";
-        SCR::Execute(.target.bash, cmd, $[]);
-
-        list als = SCR::Read(.tmp.modules.alias);
-
-
-        string modname = "";
-        integer pos = 0;
-        map res = $[];
-        while (contains(als, sformat("snd-card-%1", pos)))
-        {
-            modname = SCR::Read(.tmp.modules.alias, sformat("snd-card-%1", pos));
-            cmd     = sformat("/sbin/modprobe -C %1 %2 ", get_tmp_modules_conf(), modname);
-            res     = SCR::Execute(.target.bash_output, cmd, $[]);
-            if (lookup(res, "stderr", "") != "")
+	list cmds = Sound::CreateModprobeCommands();
+	cmds = flatten ([[snd], cmds]);
+	maplist(`cmd, cmds, ``{
+	    map res = SCR::Execute(.target.bash_output, cmd, $[]);
+	    if (lookup(res, "stderr", "") != "")
             {
                 y2error("modprobe error output: \n" + lookup(res, "stderr", ""));
             }
-            pos = pos + 1;
-        }
-
+	});
 
         if (restore)
         {
@@ -135,7 +99,7 @@
 
     /**
      * removes all sound modules from kernel
-     * 
+     *
      *
      */
 
@@ -227,7 +191,6 @@
 
 	mods = sort(`a, `b, mods, 
 	``{
-	    y2error("comparing %1 %2", select(a, 1, nil), select(b, 1, nil));
 	    return select(a, 1, "") <= select(b, 1, "");
 
 	});

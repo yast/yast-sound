@@ -82,7 +82,6 @@
 				// To translators: selection box title
 		    `SelectionBox (`id (`sel_mod), _("Sound card &model"), card_names));
 
-		// TODO: this would be nice to have from libyui instead of replacing widget
 		UI::ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0, ""));
 	    }
 	    else if (ui == `search)
