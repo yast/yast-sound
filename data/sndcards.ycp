@@ -239,6 +239,7 @@
       "EWS 88D, TerraTec",
       "EWS 88MT, TerraTec",
       "EWX 24/96, TerraTec",
+      "Phase 88, TerraTec",
       "EZ8, Event Electronics",
       "Generic Envy24, ICEnsemble",
       "Generic ICE1712, ICEnsemble",
@@ -254,6 +255,7 @@
       "Aureon 5.1 Sky, TerraTec",
       "Aureon 7.1 Space, TerraTec",
       "Aureon 7.1 Universe, TerraTec",
+      "Phase 22, TerraTec",
       "Generic Envy24HT, ICEnsemble",
       "Generic Envy24PT, ICEnsemble",
       "Generic ICE1724, ICEnsemble",
@@ -264,6 +266,7 @@
       "Revolution 7.1, M-Audio",
       "VT1720, VIA",
       "VT1724, VIA",
+      "9CJS, Chaintech",
       "ZNF3-150, Chaintech",
       "ZNF3-250, Chaintech"
     ],
@@ -279,7 +282,8 @@
       "CK804 Audio, NVidia",
       "CK8S Audio, NVidia",
       "ICH5, Intel",
-      "ICH6, Intel",
+      "ICH6 (AC97), Intel",
+      "ICH7 (AC97), Intel",
       "M5455, ALI",
       "MCP04 Audio, NVidia",
       "MX440, Intel",
@@ -436,6 +440,7 @@
     66 : [
       "VT8233A/C, VIA",
       "VT8235, VIA",
+      "VT8237, VIA",
       "VT82C686A/B/C, VIA"
     ],
     67 : [
@@ -492,7 +497,14 @@
       "SB Live! OEM, Dell/Creative Labs"
     ],
     77 : [
-      "SB Audigy LS, Creative Labs"
+      "SB Audigy LS, Creative Labs",
+      "SB Live! 7.1 24bit, Creative Labs",
+      "K8N Diamon MB 24bit, MSI"
+    ],
+    78 : [
+      "ICH6 (HDA), Intel",
+      "ICH6M (HDA), Intel",
+      "ICH7 (HDA), Intel"
     ],
     100 : [
       "PowerBook, Apple",
@@ -551,6 +563,7 @@
       17718 : 17,
       17957 : 17,
       17975 : 17,
+      18469 : 17,
       18487 : 17,
       26677 : 17,
       26678 : 17,
@@ -695,6 +708,7 @@
       4 : 22,
       6 : 76,
       7 : 77,
+      8 : 22,
       35128 : 24
     ],
     4358 : $[
@@ -772,8 +786,8 @@
       8704 : 48
     ],
     15892 : $[
-      2340 : 49,
-      2341 : 49,
+      2340 : 50,
+      2341 : 50,
       2353 : 51
     ],
     16389 : $[
@@ -818,7 +832,10 @@
       9429 : 38,
       9430 : 39,
       9638 : 38,
+      9832 : 78,
       9838 : 38,
+      10200 : 78,
+      10206 : 38,
       29077 : 38,
       29078 : 39
     ],
@@ -914,7 +931,8 @@
     74 : "snd-atiixp-modem",
     75 : "snd-via82xx-modem",
     76 : "snd-emu10k1x",
-    77 : "snd-audigyls",
+    77 : "snd-ca0106",
+    78 : "snd-hda-intel",
     100 : "snd-powermac"
   ],
   "modules" : $[
@@ -1119,14 +1137,18 @@
       "params" : $[
         "ac97_clock" : $[
           "default" : "48000",
-          "descr" :
-	   _("AC'97 codec clock (default 48000Hz).")
+          "descr" : _("AC'97 codec clock (default 48000Hz).")
+        ],
+        "ac97_quirk" : $[
+          "allows" : "{{-1,7}}",
+          "default" : "-1",
+          "descr" : _("AC'97 workaround for strange hardware."),
+          "dialog" : "list"
         ],
         "spdif_aclink" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" :
-	   _("S/PDIF over AC-link."),
+          "descr" : _("S/PDIF over AC-link."),
           "dialog" : "check"
         ]
       ]
@@ -1176,16 +1198,11 @@
           "allows" : "{{0,Disabled},{1,Latency},{2,Bridge},{3,Both},{255,Auto}}",
           "default" : "4",
           "descr" : [
-            _("Enable VIA work-around for %1 sound card."),
+            _("Enable VIA-workaround for %1 soundcard."),
             "Aureal Vortex 2 3D Sound Processor"
           ],
           "dialog" : "check"
         ]
-      ]
-    ],
-    "snd-audigyls" : $[
-      "description" : "AUDIGYLS",
-      "params" : $[
       ]
     ],
     "snd-azt2320" : $[
@@ -1278,9 +1295,13 @@
       "description" : "Brooktree Bt87x audio driver",
       "params" : $[
         "digital_rate" : $[
-          "descr" :
-	   _("Digital input rate for Bt87x sound card")
+          "descr" : _("Digital input rate for Bt87x soundcard")
         ]
+      ]
+    ],
+    "snd-ca0106" : $[
+      "description" : "CA0106",
+      "params" : $[
       ]
     ],
     "snd-cmi8330" : $[
@@ -2252,23 +2273,14 @@
         ]
       ]
     ],
+    "snd-hda-intel" : $[
+      "description" : "Intel HDA driver",
+      "params" : $[
+      ]
+    ],
     "snd-hdsp" : $[
       "description" : "RME Hammerfall DSP",
       "params" : $[
-        "line_outs_monitor" : $[
-          "allows" : "{{0,Disabled},{1,Enabled}}",
-          "default" : "0",
-          "descr" :
-	   _("Send all input and playback streams to line outs by default."),
-          "dialog" : "check"
-        ],
-        "precise_ptr" : $[
-          "allows" : "{{0,Disabled},{1,Enabled}}",
-          "default" : "0",
-          "descr" :
-	   _("Enable precise pointer (doesn't work reliably)."),
-          "dialog" : "check"
-        ]
       ]
     ],
     "snd-hdspm" : $[
@@ -2326,21 +2338,18 @@
       "params" : $[
         "ac97_clock" : $[
           "default" : "0",
-          "descr" :
-	   _("AC'97 codec clock (0 = auto-detect).")
+          "descr" : _("AC'97 codec clock (0 = auto-detect).")
         ],
         "ac97_quirk" : $[
-          "allows" : "{{-1,4}}",
+          "allows" : "{{-1,7}}",
           "default" : "-1",
-          "descr" :
-	   _("AC'97 workaround for strange hardware."),
+          "descr" : _("AC'97 workaround for strange hardware."),
           "dialog" : "list"
         ],
         "buggy_irq" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" :
-	   _("Enable work-around for buggy interrupts on some motherboards."),
+          "descr" : _("Enable workaround for buggy interrupts on some motherboards."),
           "dialog" : "check"
         ]
       ]
@@ -2556,24 +2565,21 @@
     "snd-mpu401" : $[
       "description" : "MPU-401 UART",
       "params" : $[
-        "acpipnp" : $[
-          "allows" : "{{0,Disabled},{1,Enabled}}",
-          "default" : "1",
-          "descr" :
-	   _("ACPI PnP detection for MPU-401 device."),
-          "dialog" : "check"
-        ],
         "irq" : $[
           "allows" : "{{5},{7},{9},{10,12},{14,15}}",
-          "descr" :
-	   _("IRQ # for MPU-401 device."),
+          "descr" : "IRQ # for MPU-401 device.",
           "dialog" : "list"
+        ],
+        "pnp" : $[
+          "allows" : "{{0,Disabled},{1,Enabled}}",
+          "default" : "1",
+          "descr" : " ",
+          "dialog" : "check"
         ],
         "port" : $[
           "allows" : "{{0,0x3fff}}",
           "base" : "16",
-          "descr" :
-	   _("Port # for MPU-401 device.")
+          "descr" : _("Port # for MPU-401 device.")
         ]
       ]
     ],
@@ -2709,7 +2715,7 @@
         ],
         "opl3sa3_ymode" : $[
           "allows" : "{{0,3}}",
-          "descr" : " ",
+          "descr" : _("Speaker size selection for 3D Enhancement mode: Desktop/Large Notebook/Small Notebook/HiFi."),
           "dialog" : "list  /* SL Added */"
         ],
         "port" : $[
@@ -3379,31 +3385,27 @@
         "async_unlink" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" :
-	   _("Use async unlink mode."),
+          "descr" : _("Use async unlink mode."),
           "dialog" : "check"
         ],
         "nrpacks" : $[
           "allows" : "{{1,10}}",
-          "descr" :
-	   _("Max. number of packets per URB.")
+          "descr" : _("Max. number of packets per URB.")
         ],
         "pid" : $[
           "allows" : "{{-1,0xffff}}",
           "base" : "16",
-          "descr" :
-	   _("Product ID for the USB audio device.")
+          "descr" : _("Product ID for the USB audio device.")
         ],
         "vid" : $[
           "allows" : "{{-1,0xffff}}",
           "base" : "16",
-          "descr" :
-	   _("Vendor ID for the USB audio device.")
+          "descr" : _("Vendor ID for the USB audio device.")
         ]
       ]
     ],
     "snd-usb-usx2y" : $[
-      "description" : "TASCAM US-X2Y Version 0.7.2",
+      "description" : "TASCAM US-X2Y Version 0.8.7.1",
       "params" : $[
       ]
     ],
@@ -3759,6 +3761,7 @@
       "True Sound 4Dwave"
     ],
     "Chaintech" : [
+      "9CJS",
       "ZNF3-150",
       "ZNF3-250"
     ],
@@ -3782,6 +3785,7 @@
     ],
     "Creative Labs" : [
       "SB Audigy LS",
+      "SB Live! 7.1 24bit",
       "SB Audigy",
       "SB Live!/PCI512/E-mu APS",
       "SB PCI64/128 (ES1370)",
@@ -3948,6 +3952,9 @@
     "Intel" : [
       "Marlin Spike Mobo CS4235",
       "PR440FX Onboard",
+      "ICH6 (HDA)",
+      "ICH6M (HDA)",
+      "ICH7 (HDA)",
       "6300ESB",
       "82801AA-ICH",
       "82801BA-ICH2",
@@ -3955,7 +3962,8 @@
       "82801DB-ICH4",
       "82901AB-ICH0",
       "ICH5",
-      "ICH6",
+      "ICH6 (AC97)",
+      "ICH7 (AC97)",
       "MX440",
       "82801AA-ICH (modem)",
       "82801BA-ICH2 (modem)",
@@ -4009,6 +4017,9 @@
     ],
     "MOTU" : [
       "MidiTimePiece AV multiport MIDI"
+    ],
+    "MSI" : [
+      "K8N Diamon MB 24bit"
     ],
     "NEC" : [
       "PK-UG-X013"
@@ -4125,7 +4136,8 @@
       "Phase 88",
       "Aureon 5.1 Sky",
       "Aureon 7.1 Space",
-      "Aureon 7.1 Universe"
+      "Aureon 7.1 Universe",
+      "Phase 22"
     ],
     "Toshiba" : [
       "Tecra 8000",
@@ -4158,6 +4170,7 @@
       "VT1724",
       "VT8233A/C",
       "VT8235",
+      "VT8237",
       "VT82C686A/B/C",
       "VT82C686A/B/C modem"
     ],
