@@ -103,13 +103,11 @@
 
     /**
      * removes all sound modules from kernel
-     * @return map stdout
-     *
+     * @return void
      */
 
-
-    global define map sound_stop() ``{
-	return SCR::Execute (.target.bash_output, "/etc/init.d/alsasound stop > /dev/null 2>&1", $[]);
+    global define void sound_stop() ``{
+	SCR::Execute (.target.bash, "/etc/init.d/alsasound stop > /dev/null 2>&1", $[]);
     }
 
     /**

@@ -473,7 +473,7 @@
                         `VSpacing (0.3),
                         `RadioButton (`id (`intro), `opt (`hstretch, `notify), _("&More detailed installation of sound cards")),
 			`VSpacing(3),
-			`Left(`CheckBox(`id(`joystick), _("Configure joystick")))
+			`Left(`CheckBox(`id(`joystick), _("&Configure joystick")))
                         )
                     )),
                 `VStretch ()

@@ -1,10 +1,10 @@
 @HEADER-COMMENT@
 
-# neededforbuild  autoconf automake ydoc ycpdoc libycp-devel yast2-devtools yast2-base libycp liby2 libyui libscr yast2-core-wfm yast2-core-scr libycp-devel yast2-agent-system yast2-testsuite dejagnu expect tcl
+# neededforbuild  autoconf automake ydoc ycpdoc libycp-devel yast2-devtools yast2-base libycp liby2 libyui libscr yast2-core-wfm yast2-core-scr libycp-devel yast2-agent-system yast2-testsuite yast2-config-runlevel yast2-lib-wizard yast2-agent-probe hwinfo expect dejagnu tcl yast2
 
 @HEADER@
 
-Requires:	yast2-trans-sound yast2-db-sound yast2 yast2-agent-any yast2-agent-audio yast2-agent-modules yast2-agent-system
+Requires:	yast2-trans-sound yast2-db-sound yast2 yast2-agent-any yast2-agent-audio yast2-agent-modules yast2-agent-system yast2-config-runlevel yast2-lib-wizard yast2-agent-probe hwinfo
 BuildArchitectures:     noarch
 Summary:	Configuration of sound
 

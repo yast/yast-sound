@@ -5,7 +5,7 @@
  *   sound_card_wizard.ycp
  *
  * Module:
- *   Sound       
+ *   Sound
  *
  * Authors:
  *   Dan Meszaros <dmeszar@suse.cz>
@@ -13,7 +13,7 @@
  * $Id$
  *
  * Snd card setup wizard.
- *                   
+ *
  *
  */
 {

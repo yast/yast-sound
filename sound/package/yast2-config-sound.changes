@@ -1,4 +1,18 @@
 -------------------------------------------------------------------
+Wed Apr 10 14:57:49 CEST 2002 - lslezak@suse.cz
+
+- SuSE-8_0-Branch merged to the head
+- spec file changes
+- testsuite fixes
+- added includes and imports
+- version 2.6.0
+
+-------------------------------------------------------------------
+Wed Mar 27 12:15:22 CET 2002 - dmeszar@suse.cz
+
+- fixed #15526 (start joystick in init only if there's a configured one)
+
+-------------------------------------------------------------------
 Thu Mar 21 14:44:57 CET 2002 - mvidner@suse.cz
 
 - Fixed rcjoystick invocation. (#14957)
