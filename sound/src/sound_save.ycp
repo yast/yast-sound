@@ -79,6 +79,7 @@
 
 
 	    string module_name = lookup (lookup (lookup (snd_info, "module", $[]), "module", $[]), "name", "snd-card-dummy");
+	    string isapnp = condition ((selected_manually && size (lookup (snd_info, "conf", "")) == 0), "snd_isapnp=0", "");
 	    
 				// and write configured card
 	    newl = add (newl, "# ALSA section {$#@begin@#$} [don't remove or move this line] vvvvv");
@@ -88,11 +89,12 @@
 	    newl = add (newl, "alias char-major-116 snd");
 	    newl = add (newl, "options snd snd_major=116 snd_cards_limit=1");
 	    newl = add (newl, sformat ("alias snd-card-0 %1", module_name));
-	    newl = add (newl, sformat ("options %1 snd_index=%2 snd_id=%3 %4",
+	    newl = add (newl, sformat ("options %1 snd_index=%2 snd_id=%3 %4 %5",
 				       module_name,
 				       lookup (options_entered, "snd_index", 0),
 				       lookup (options_entered, "snd_id", "card1"),
-				       lookup (snd_info, "conf", "")
+				       lookup (snd_info, "conf", ""),
+				       isapnp
 				       ));
 	    newl = add (newl, "#");
 	    newl = add (newl, "# OSS/Free emulation");

@@ -43,7 +43,7 @@
 				// sets the volume, with amixer check
 				// if an error occurs popup error is displayed
 	define set_volume (string device, integer v) ``{
-	    integer ret = Shell ("/usr/bin/amixer set $DEV $VOL unmute 2>/dev/null", $["DEV" : device, "VOL" : v]);
+	    integer ret = Shell ("/usr/bin/amixer set $DEV $VOL% unmute 2>/dev/null", $["DEV" : device, "VOL" : v]);
 	    if (ret == 127){
 				// To translators: This is just popup message, shouldn't be too long
 		UI (`DisplayMessage (_("Cannot find program 'amixer'"), 0,
@@ -75,10 +75,22 @@
 	    string cmd = module_name;
 	    boolean probe = lookup (lookup (lookup (snd_info, "module", $[]), "module", $[]), "modprobe", true);
 	    boolean mod_active = lookup (lookup (lookup (snd_info, "module", $[]), "module", $[]), "active", false);
+
+	    list module_exept = [snd-card-sb16,
+				snd-card-es18xx,
+				snd-card-interwave,
+				snd-card-interwave-stb];
 		
 	    if (size (cmd) == 0)
 		return _("Invalid module name.");
 
+		//  tried to load with just snd_isapnp=0
+		// if this fails the user has to provide the ISA legacy resources
+	    if (contains (module_exept, module_name) &&
+		(size (lookup (snd_info, "args", "")) == 0)) {	
+		snd_info = add (snd_info, "snd_isapnp=0");
+	    }
+		
 	    cmd = cmd + condition ((size (lookup (snd_info, "args", "")) > 0), ``(" " + lookup (snd_info, "args", "")), "");
 
 	    Shell("/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`");
@@ -95,9 +107,24 @@
 
 	    map pm = SCR(`Read(.proc.modules));
 
-	    if (!haskey (pm, module_name))
+	    if (!haskey (pm, module_name)) {
+
+		if (module_name == "snd-card-cs4210") {	// hack For the IBM Thinkpad 600E
+		    module_name = "snd-card-4236";
+		    string ibm_options = "snd_port=0x530 snd_cport=0x538 snd_irq=5 snd_dma1=1 snd_dma2=0 snd_isapnp=0";
+		    
+		    cmd = module_name + " " + ibm_options;
+		    snd_info = add (snd_info, "args", ibm_options);
+		    snd_info = add (snd_info, "conf", ibm_options);
+		    Shell("/sbin/modprobe " + cmd);
+		    Shell("/sbin/modprobe snd-pcm-oss"); // backwards OSS compatibility
+		    if (!haskey (pm, module_name))
+			return sformat (UI(_("The kernel module %1 for sound support\ncannot be loaded.")), module_name);
+		}
+		
 		return sformat (UI(_("The kernel module %1 for sound support\ncannot be loaded.")), module_name);
-	
+	    }
+	    
 	    return "";
 	    
 	};

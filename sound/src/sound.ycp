@@ -82,10 +82,16 @@
 		
 		term t = `VBox();
 		t = add(t, `Left(`Label(message)));
-		term b = `HBox (
-		    `PushButton(`id(`no), `opt (`default), _("&No")),
-		    `PushButton(`id(`yes), _("&Yes"))
-		    );
+		term b = `HBox();
+		if (d) {
+		    b = add (b, `PushButton(`id(`yes), `opt (`default), _("&Yes")));
+		    b = add (b, `PushButton(`id(`no), _("&No")));
+		}
+		else {
+		    b = add (b, `PushButton(`id(`no), `opt (`default), _("&No")));
+		    b = add (b, `PushButton(`id(`yes), _("&Yes")));
+		}
+
 		OpenDialog(`opt(`decorated), add(t, b));
 		any ui = UserInput();
 		CloseDialog();
