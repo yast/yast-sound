@@ -94,7 +94,7 @@
 	// dialog title
 	UI(`SetWizardContents (_("Configure a sound card"), con, helptext, true, true));
 	// Next - button label
-	UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
+	UI(`ChangeWidget(`id(`next), `Label, NextButtonLabel()));
 
 	if (size (nc) == 0) 
 	{
@@ -225,7 +225,7 @@
         // dialog title
 	UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
 	// Finish - button label
-	UI(`ChangeWidget(`id(`next), `Label, _("&Finish")));
+	UI(`ChangeWidget(`id(`next), `Label, FinishButtonLabel()));
     
 	if (size (cc) == 0) 
 	{
@@ -309,7 +309,7 @@
 		{
 		    return $["ui": `abort];
 		}
-		UI(`ChangeWidget(`id(`next), `Label, _("&Finish")));
+		UI(`ChangeWidget(`id(`next), `Label, FinishButtonLabel()));
 
 		UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
 		cc=createTable(save_info);
@@ -406,7 +406,7 @@
 		UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
 		UI(`ChangeWidget(`id(`configured_table), `Items, cc));
 		// Finish - button label
-		UI(`ChangeWidget(`id(`next), `Label, _("&Finish")));
+		UI(`ChangeWidget(`id(`next), `Label, FinishButtonLabel()));
 	    
 		if (size (cc) == 0) 
 		{

@@ -143,7 +143,7 @@
 	}
 
 	map nextstate=$[-13: `next, -3: `abort, -2: `skip, -1: `back];
-	return $["ui": lookup(nextstate, state, -2), "return": save_entry];
+	return $["ui": lookup(nextstate, state, `abort), "return": save_entry];
     }
 
     // ========== MAIN ==========

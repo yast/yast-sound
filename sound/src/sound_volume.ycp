@@ -55,7 +55,7 @@
 	UI(`SetWizardContents (_("Sound card volume"), con, help_text, true, true));
 	if (finish)
 	{
-	    UI(`ChangeWidget (`id(`next), `Label, _("&Finish")));
+	    UI(`ChangeWidget (`id(`next), `Label, FinishButtonLabel()));
 	}
 
 /* Sound fonts installation */
@@ -66,7 +66,9 @@
 
 /* end of sound fonts installation */
 
-	SetVolume (lookup (user_settings, "mixer", "amixer"), "Master", sformat ("%1", vol), card_id);
+	
+
+	SetVolume ("Master", card_id, vol);
 
 	repeat 
 	{
@@ -75,7 +77,7 @@
 	    if (ui == `volume) 
 	    {
 		vol = UI(`QueryWidget(`id(`volume), `Value ));
-		SetVolume (lookup (user_settings, "mixer", "amixer"), "Master", sformat ("%1", vol), card_id);
+		SetVolume ("Master", card_id, vol);
 	    }
 	    else if (ui == `test) 
 	    {
@@ -136,10 +138,10 @@
 	  );
 	    
 	    // dialog title
-	UI(`SetWizardContents (_("Error"), con, help_text, true, false));
+	UI(`SetWizardContents (ErrorMsg(), con, help_text, true, false));
 	if (finish)
 	{
-	    UI(`ChangeWidget (`id(`next), `Label, _("&Finish")));
+	    UI(`ChangeWidget (`id(`next), `Label, FinishButtonLabel()));
 	}
 
 	repeat 
@@ -185,7 +187,7 @@
         UI(`SetWizardContents (_("Success"), con, help_text, true, true));
         if (finish)
         {
-            UI(`ChangeWidget (`id(`next), `Label, _("&Finish")));
+            UI(`ChangeWidget (`id(`next), `Label, FinishButtonLabel()));
         }
 
         repeat
@@ -238,9 +240,10 @@
 	save_info=Args(4);
     }
 
-    map user_settings = $["audio_file"  : "/usr/share/sounds/alsa/test.wav",
-			  "play_cmd"    : "/usr/bin/aplay",
-			  "mixer"       : "/usr/bin/amixer -c $CARD_NUM set \"$CHANNEL\" $VOLUME% unmute"];
+    map user_settings = $["audio_file"  : "/usr/share/sounds/alsa/test.wav"];
+
+//			  "play_cmd"    : "/usr/bin/aplay",
+//			  "mixer"       : "/usr/bin/amixer -c $CARD_NUM set \"$CHANNEL\" $VOLUME% unmute"];
       
     string err_msg = "";
 
@@ -262,19 +265,16 @@
     }
     else
     {
-	boolean use_alsa=true;
-	if (use_alsa)
-        {
-            maplist (`dev, ["Master", "PCM", "PCM,1", "Wave", "Master Digital", "Synth"],
-    		    ``(SetVolume (lookup (user_settings, "mixer", "amixer"), dev, sformat ("%1", 70), card_id)));
-        }
+        maplist (`dev, ["Master", "PCM", "PCM,1", "Wave", "Master Digital", "Synth"],
+    		    ``(SetVolume (dev, card_id, 70)));
+	unmute(["Master", "PCM", "PCM,1", "Wave", "Master Digital", "Synth"], card_id);
 	if(!quick)
 	{
 	    ui = VolumeDialog ();
 	}
 	else
 	{
-	    SetVolume (lookup (user_settings, "mixer", "amixer"), "Master", sformat ("%1", 75), card_id);
+	    SetVolume ("Master", card_id, 75);
 	    ui = SuccessDialog(save_entry);
 	}
     }
@@ -286,7 +286,7 @@
     }
 
 
-    UI(`ChangeWidget (`id(`next), `Label, _("&Next")));
+    UI(`ChangeWidget (`id(`next), `Label, NextButtonLabel()));
 
     return $["ui" : ui, "return" : size (err_msg) == 0];
 

@@ -178,8 +178,8 @@
      */
     global define SetAllChannels (list cards, string command) ``{
 	string err_msg="";
-        if (contains (maplist (`e, cards, ``(maplist(`ch, `v, lookup (e, "volume", $[]), ``(SetVolume (command, ch, v,
-                                                                                                       tointeger(lookup(lookup(lookup (e, "modules", $[]), "options", $[]), "snd_index", 0))))))), false))
+//        if (contains (maplist (`e, cards, ``(maplist(`ch, `v, lookup (e, "volume", $[]), ``(SetVolume (command, ch, v,
+//        tointeger(lookup(lookup(lookup (e, "modules", $[]), "options", $[]), "snd_index", 0))))))), false))
             {
                 // Error message
                 err_msg = lookup(STRINGS, "SetAllChannels");
@@ -192,12 +192,8 @@
      * Save volume (for alsa it's alsactl store
      * @return map return struct: $["return": integer, "err_msg": string]
      */
-    global define SaveVolume (string function, string mixer_command, list cards) ``{
-        string err_msg="";
-        map res=SetAllChannels (cards, mixer_command);
-        err_msg=lookup(res, "err_msg", "");
-
-        return $["return": SCR(`Execute(.target.bash, function, $[])), "err_msg": err_msg];
+    global define SaveVolume () ``{
+	SCR(`Execute(.target.bash, "/usr/sbin/alsactl store", $[]));
     }
 
     /**

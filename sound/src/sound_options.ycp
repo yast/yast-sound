@@ -186,7 +186,7 @@
 
     params=restore_mod_params(params, lookup(save_entry, "options", []));
 
-    UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
+    UI(`ChangeWidget(`id(`next), `Label, NextButtonLabel()));
 
     // now show the dialog 
     map result  = OptionsDialog (cardlabel, params);

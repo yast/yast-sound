@@ -47,16 +47,16 @@
 		(
 		    `ReplacePoint (`id (`rep_drv),
 			    // To translators: selection box title
-			       `SelectionBox (`id (`sel_drv), `opt(`notify), _("Sound card driver"), module_names)
+			       `SelectionBox (`id (`sel_drv), `opt(`notify), _("Sound card &driver"), module_names)
 		    ),
 		    `ReplacePoint(`id(`rep_mod),
 			    // To translators: selection box title
-			      `SelectionBox (`id (`sel_mod), `opt(`notify), _("Sound card model"), card_names)
+			      `SelectionBox (`id (`sel_mod), `opt(`notify), _("Sound card &model"), card_names)
 		    )
 		),
 		`VSpacing (),
 			    // textetry label
-		`TextEntry (`id(`search), `opt(`notify), _("Search")),
+		`TextEntry (`id(`search), `opt(`notify), _("&Search")),
 		`VSpacing ()
 	    ));
 			    // To translators: text entry label
@@ -66,7 +66,7 @@
 	UI(`ChangeWidget(`id(`sel_drv), `CurrentItem, select(select (module_names, 0), 1, select (module_names, 0))));
 	UI(`ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0)));
 	    // Next - button label
-	UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
+	UI(`ChangeWidget(`id(`next), `Label, NextButtonLabel()));
 
 	any ui = nil;
 
@@ -81,7 +81,7 @@
 
 		UI(`ReplaceWidget (`id(`rep_mod),
 				// To translators: selection box title
-		    `SelectionBox (`id (`sel_mod), _("Sound card model"), card_names)));		
+		    `SelectionBox (`id (`sel_mod), _("Sound card &model"), card_names)));		
 
 		// TODO: this would be nice to have from libyui instead of replacing widget
 		UI(`ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0)));
@@ -97,7 +97,7 @@
 		{
 		    UI(`ReplaceWidget (`id(`rep_mod),
 				// To translators: selection box title
-				       `SelectionBox (`id (`sel_mod), _("Sound card model"), card_names)));
+				       `SelectionBox (`id (`sel_mod), _("Sound card &model"), card_names)));
 		
 		    UI(`ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, card_id)));
 		}

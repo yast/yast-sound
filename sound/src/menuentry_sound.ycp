@@ -1,4 +1,23 @@
+/**
+ *
+ *
+ * File:
+ *   menuentry_sound.ycp
+ *
+ * Module:
+ *   Sound       
+ *
+ * Authors:
+ *   Dan Meszaros <dmeszar@suse.cz>
+ *
+ * $Id$
+ *
+ *
+ */
+
 {
+
+
   ////////////////////////////////////////////////////////////////////////////////////////
   // set the textdomain, (generally the name of the module for example "lan" for y2c_lan
   // in doubt do a "grep textdomain" in the main module, you are calling 
