@@ -80,7 +80,7 @@
     }
     else if ( func == "Write" )
     {
-	Sound::Write();
+	Sound::Write(``{}, ``{});
     }
 
     return ret;
