@@ -116,7 +116,6 @@
 
 	} while (!contains([`next, `back], ui));
 
-	y2error("%1", ui);
 
 	map ret = $["ui" : ui];
 

@@ -470,7 +470,6 @@
 	return;
     }
 
-    y2error("final save_info: %1", save_info);
 			    // filter out empty enries
     save_info = filter (`e, save_info, ``(size (e) > 0));
     n_cards = size (save_info);

@@ -251,7 +251,6 @@ its parameters using the 'Advanced setup'.");
     {
 	sound_stop();
 	list new_save = add(save_info, save_entry);
-	y2error("storing save info:%1", new_save);
 	SaveModulesEntry (new_save, [], true);
 	sound_start_tmp(true);
 	err_msg = check_module(save_entry, card_id);
@@ -285,12 +284,6 @@ its parameters using the 'Advanced setup'.");
 	sound_start_tmp(true);	
     }
     
-    if (ui == `next)
-    {
-	y2error("Storing volume");
-//	storeVolume(-1);
-    }	
-
     SCR::Execute(.audio.alsa.restore, 0 ,0);
 
     UI::ChangeWidget (`id(`next), `Label, UI::NextButtonLabel());
