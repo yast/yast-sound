@@ -4,8 +4,6 @@
 
 AM_CXXFLAGS = -Wall
 
-plugindir = $(YAST2DIR)/plugin
-
 plugin_LTLIBRARIES = libpy2ag_audio.la
 noinst_LTLIBRARIES = liby2ag_audio.la
 

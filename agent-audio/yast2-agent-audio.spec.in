@@ -27,13 +27,13 @@ Obsoletes:	y2a_audio
 
 %files
 %defattr(-,root,root)
-@YAST2DIR@/plugin/libpy2ag_audio.so.*
-@YAST2DIR@/scrconf/*.scr
+@plugindir@/libpy2ag_audio.so.*
+@scrconfdir@/*.scr
 
 %files devel
 %defattr(-,root,root)
-@YAST2DIR@/plugin/libpy2ag_audio.so
-@YAST2DIR@/plugin/libpy2ag_audio.la
-%docdir @DOCDIR@
-%doc @DOCDIR@/*
+@plugindir@/libpy2ag_audio.so
+@plugindir@/libpy2ag_audio.la
+%docdir @docdir@
+%doc @docdir@/*
 
