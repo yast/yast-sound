@@ -306,6 +306,27 @@ global define boolean SetParametersHandler (map options) ``{
     return false;
 }
 
+global define boolean ListModulesHandler (map options) ``{
+
+    foreach (term it, get_module_names(), ``{
+	string id	= (string) select (select (it, 0, `Empty()), 0, "all");
+	string name	= select (it, 1, id);
+	if (id == "all")
+	    return;
+	string space = "\t";
+	/*
+	if (size (id) < 16)
+	    space = space + "\t";
+	if (size (id) < 8)
+	    space = space + "\t";*/
+	CommandLine::Print (id + space + name);
+//	CommandLine::Print (sformat ("%1 (%2)", name, id));
+    });
+
+    return false;
+}
+
+
 /* the command line description map */
 map cmdline = $[
     "id"		: "sound",
@@ -347,6 +368,11 @@ map cmdline = $[
 	    "help"	: _("Set the new values for given card parameters")
 // TODO	    "options"	: "non_strict" - for unknown parameter names
 	],
+	"modules": $[
+	    "handler"	: ``(ListModulesHandler()),
+	    // translators: command line help text for modules action
+	    "help"	: _("List all available sound kernel modules.")
+	],
     ],
     "options"		: $[
 	"card"	:$[
@@ -380,6 +406,7 @@ map cmdline = $[
 	"playtest"	: [ "card" ],
 	"show"		: [ "card" ],
 	"set"		: [ "card" ],
+	"modules"	: [],
     ]
 ];
 
