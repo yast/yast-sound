@@ -1,0 +1,21 @@
+-------------------------------------------------------------------
+Fri Aug 31 14:30:02 CEST 2001 - dmeszar@suse.cz
+
+- debug logging supressed
+
+-------------------------------------------------------------------
+Fri Aug 24 11:09:16 CEST 2001 - dmeszar@suse.cz
+
+- don't compile with alsa on sparc & s390
+- conversion from double to int fixed
+
+-------------------------------------------------------------------
+Thu Jul 26 18:51:15 CEST 2001 - dmeszar@suse.cz
+
+- fix for gcc 3.0
+
+-------------------------------------------------------------------
+Mon Jul 23 13:02:21 CEST 2001 - dmeszar@suse.cz
+
+- initial version
+
