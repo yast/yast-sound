@@ -20,14 +20,14 @@
 
     textdomain "sound";
     import "Sound";
+
     /**
      *	Returns map with string values
      *  @return map with translated strings
      */
-
     global define map STRINGS_() ``{
-	// help text - setup type selection 1/3
 	map ret = $["DisplayName":
+	// help text - setup type selection 1/3
 _("<p>
 To configure this sound card and adjust its 
 volume, check <b>Normal setup</b>.
@@ -77,14 +77,11 @@ entering the name in the search box.
 </p>
 ") +
 	    // help text - sound card selection 2/2
-	    // to translators: please don't translate "<b>All</b>"- add there a comment saying
-	    // something like 'all sound cards'
 _("<p>
 Select <b>All</b> to see the entire list of 
 supported sound card models.
 </p>
 "),
-
 
 	    "WhichDialog":
 	    // help text - which sound card to configure 1/2
@@ -102,14 +99,14 @@ use <b>manual selection</b>.
 
 
 	    "WhichDialogMsg":
+// To reset the sound configuration these programs must be terminated
+// (popup label message)
 _("There are programs running that are currently using 
 the audio device.
 To reset the configuration, these 
 programs must be terminated. Proceed?
 "),
 
-	      // To translators: To reset the sound configuration these programs must be terminated
-	      // To translators: label message
 	    "ComplexDialogMsg":
 _("There are programs running that are currently using 
 the audio device.
@@ -161,12 +158,6 @@ sound card with <b>very</b> low volume settings to prevent
 damage.
 </p>
 "),
-
-	    "SuccessDialog":
-	    // message
-_("<P>
-Automatic configuration finished successfully.
-</P>"),
 
 	    "nm256hackWarning":
 	    // warning/question message
@@ -262,7 +253,8 @@ _("<P>
 To save the current configuration, press <B>Finish</B>.
 </P>
 ")
-	    ];
+	];
+
 	// sound system dependent part:
 	if ( Sound::use_alsa )
 	{
@@ -272,30 +264,27 @@ This is the complete sound card list. Use the <b>Finish</b> button
 to save sound card information.
 </p>
 ") +
+
 _("<p>
 Use <b>Delete</b> to remove a configured sound card. 
 Use <b>Add sound card</b> to add a sound card.
 </p>
 ") +
+
 _("<p>
 Check <b>Start Sequencer</b> to load modules for playing MIDI 
 files during boot. These modules can be loaded on demand.
 </p>\n"));
-/*
-_("<p>
-Use <b>start ALSA</b> to enable or 
-disable ALSA start-up during boot. Check <b>start 
-sequencer</b> to load modules for playing MIDI 
-files during boot. These modules can be loaded on demand.
-</p>
-"));*/
+
 	    ret = add(ret, "ErrorDialog",
-            _("<p>An error has occurred. </p>")+
+_("<p>An error has occurred. </p>") +
+
 _("<p>
 Check you have correctly installed the 
 <b>ALSA</b> package (from the series 'snd').
 </p>
 ") +
+
 _("<p>
 If the the problem persists, try passing 
 <b>options</b> to the ALSA module. If your sound card still
@@ -303,6 +292,7 @@ will not work, try <i>OSS/Free</i> or
 another module.
 </p>
 ") +
+
 _("<p>
 In this case, launch the YaST2 sound configuration module from 
 shell using the <PRE>yast2 sound .oss</PRE> command.
@@ -317,16 +307,18 @@ This is the complete sound card list. Use the <b>Finish</b> button
 to save sound card information.
 </p>
 ") +
+
 _("<p>
 Use <b>Delete</b> to remove a configured sound card. 
 Use <b>Add sound card</b> to add a sound card.
 </p>
 "));
             ret = add(ret, "ErrorDialog",
-            _("<p>An error has occurred. </p>")+
+            _("<p>An error has occurred. </p>") +
             _("<p>You can try to pass some <b>options</b> to the module.</p>"));
 	}
 	return ret;
     }
-}
+
+}//EOF
 

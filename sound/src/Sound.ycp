@@ -27,9 +27,7 @@
     /**
      * what sound system we're using (true=alsa, false=oss)
      */
-
     global boolean use_alsa = true;
-
 
     /**
      * flag for letting the module know, that it's launched from then hardware
@@ -119,11 +117,27 @@
      */
     global string curr_model = "";
 
+    // if joystick dialog should be started after sound card config
+    global boolean conf_joystick = true;
+
+    /**
+     * default value of volume for new card
+     */
+    global integer default_volume = 75;
+
+    /**
+     * backup structures for sound settings
+     */
+    list modules_conf_b = nil;
+    map rc_vars_b = nil;
+    list volume_settings_b = nil;
+
     /**
      * Is "snd_" prefix used for sound module parameter names? (ALSA only)
      * Variable must be nil for first, will be initialized when needed
      */
     boolean use_snd_prefix = nil;
+
 
     /**
      * Checks (via 'modinfo snd') if "snd_" prefix is used for module parameters
@@ -158,17 +172,16 @@
 
 
     /**
-     * ctor
+     * sound module constructor
      */
     global define void Sound() ``{
 	if (Arch::sparc)
 	{
 	    use_alsa = false;
 	}
-
 	y2debug("Args: %1", WFM::Args());
 
-	maplist(`e, WFM::Args(), ``{
+	maplist(any e, WFM::Args(), ``{
 	    if (is(e, string) && (e == ".oss"))
 	    {
 		use_alsa = false;
@@ -184,7 +197,6 @@
 	{
 	    include "sound/oss_routines.ycp";
 	}
-
 	y2debug("use ALSA: %1", use_alsa);
     }
 
@@ -237,16 +249,14 @@ Probe the chip now?
 	}
 
 	list probelist = [];
-	foreach (`chip, chips, ``{
-	    // TODO snd- prefix could be removed from sndcards database?
+	foreach (string chip, chips, ``{
 	    string name = db_modules["snd-"+chip,"description"]:"";
 	    if (name != "")
 		name = sformat ("%1 (%2)", name, chip);
 	    else
 		name = chip;
 
-	    probelist = add (probelist,
-		`item(`id(chip), name, true));
+	    probelist = add (probelist, `item(`id(chip), name, true));
 	});
 
 	integer height = size (chips) + 12;
@@ -298,7 +308,7 @@ could make your system unstable.
 		))
 	    );
 	    boolean aborted = false;
-	    foreach (`chip, chips, ``{
+	    foreach (string chip, chips, ``{
 
 		if (aborted) return;
 		aborted = (UI::PollInput() == `abort);
@@ -322,7 +332,7 @@ could make your system unstable.
 		    ret = returned[0]:"";
 
 		    map options = $[];
-		    foreach (`o, splitstring (ret, " "), ``{
+		    foreach (string o, splitstring (ret, " "), ``{
 			list op = splitstring (o, "=");
 			if (size (op) == 2)
 			{
@@ -355,7 +365,6 @@ could make your system unstable.
 
 	if (Mode::test)
 	{
-	    autoinstallation = true;
 	    detected_cards = [$[
 		    "bus"	: "PCI",
 		    "class_id"	: 4,
@@ -498,40 +507,40 @@ could make your system unstable.
 	    UpdateUnconfiguredCards();
 	    return true;
 	}
-	if (PollAbort()) return false;
+	if (interactive && PollAbort ()) return false;
 
 	// load cards database
 	Progress::NextStage ();
-	LoadDatabase ();
+	LoadDatabase (interactive);
 
 	// load data from /etc/modules.conf
 	Progress::NextStage ();
 	ReadModulesConf();
 
-	if (PollAbort()) return false;
+	if (interactive && PollAbort()) return false;
 
 	// detect sound cards
 	Progress::NextStage ();
 	DetectHardware();
 
-	if (PollAbort()) return false;
+	if (interactive && PollAbort()) return false;
 
 	// check old isa cards (bug25285)
 	if (interactive && detected_cards == [] && modules_conf == [])
 	    DetectOldCards();
 
-	if (PollAbort()) return false;
+	if (interactive && PollAbort()) return false;
 	// read rc.config values
 	Progress::NextStage ();
 	rc_vars = read_rc_vars ();
 
-	if (PollAbort()) return false;
+	if (interactive && PollAbort()) return false;
 
 	// load volume settings
 	Progress::NextStage ();
 	volume_settings = get_vol_settings();
 
-	if (PollAbort()) return false;
+	if (interactive && PollAbort()) return false;
 
 	// create list of unconfigured cards
 	UpdateUnconfiguredCards();
@@ -563,9 +572,9 @@ could make your system unstable.
      * @return: void
      */
     global define void Set(map settings)  ``{
-	modules_conf = lookup(settings, "modules_conf", []);
-	rc_vars = lookup(settings, "rc_vars", $[]);
-	volume_settings = lookup(settings, "volume_settings", []);
+	modules_conf	= settings["modules_conf"]:[];
+	rc_vars		= settings["rc_vars"]:$[];
+	volume_settings	= settings["volume_settings"]:[];
     }
 
     /**
@@ -575,14 +584,12 @@ could make your system unstable.
      * @return boolean True on success
      */
     global define boolean Write(block _unused, block _unused2) ``{
-	// TODO: check return value
 
 	if (Mode::test == false)
 	{
 	    map settings = Export();
 	    WFM::CallFunction (`sound_write(settings));
 	}
-
 	return true;
     }
 
@@ -596,123 +603,116 @@ could make your system unstable.
 		"modules_conf"	    : modules_conf,
 		"rc_vars"	    : rc_vars,
 		"volume_settings"   : volume_settings,
-	    ];
+	];
     }
 
     /**
      * opens alsa sound cards database
      * @return void
      */
-
-    global define void LoadDatabase() ``{
+    global define void LoadDatabase (boolean use_ui) ``{
 	map sound_db =$[];
 	if (db_cards == nil || db_cards == $[])
 	{
-            string message = _("Loading the sound card database...");
-	    UI::`OpenDialog(`opt(`decorated), `Label(message));
+	    if (use_ui)
+	    {
+		string message = _("Loading the sound card database...");
+		UI::`OpenDialog(`opt(`decorated), `Label(message));
+	    }
 	    textdomain "sound_db";
 	    y2debug("Reading card database");
-	    sound_db = eval(SCR::Read (.target.yast2, "sndcards.ycp"));
+	    sound_db	= eval(SCR::Read (.target.yast2, "sndcards.ycp"));
 
-	    db_cards	= lookup(sound_db, "cards", $[]);
-	    db_modules	= lookup(sound_db, "modules", $[]);
-	    db_indices	= lookup(sound_db, "indices", $[]);
-	    db_module_index = lookup(sound_db, "mod_idx", $[]);
+	    db_cards	= sound_db["cards"]:$[];
+	    db_modules	= sound_db["modules"]:$[];
+	    db_indices	= sound_db["indices"]:$[];
+	    db_module_index = sound_db["mod_idx"]:$[];
 
 	    db_vendors	= sound_db ["vendors"]:$[];
 
 	    textdomain "sound";
-	    UI::CloseDialog();
+	    if (use_ui)
+	    {
+		UI::CloseDialog();
+	    }
 	}
-    }
-
-    /**
-     * just writes all variables to log. don't use in Master.
-     */
-
-    global define void DumpToLog() ``{
-	y2error(sformat("%1", [modules_conf, rc_vars, true, true, get_vol_settings()]));
     }
 
     /**
      * returns html formated configuration summary
      * @return string Summary string
      */
-
     global define string Summary() ``{
-	list retlist    = [];       // return value of the module
 
-	list keys = maplist(`e, modules_conf, ``(lookup(e, "unique_key", "...")));
+	list keys = maplist (map card, modules_conf, ``(
+	    card["unique_key"]:"..."));
 
-	retlist = maplist(`card, modules_conf,
-	``(
-	    // to translators: '(sound card is) Configured as snd-card-1'
-	    Summary::Device(lookup(card, "model", "Sound card"), sformat(_("Configured as %1."), 
-		lookup(card, "alias", "snd-card-0")))
+	list retlist = maplist (map card, modules_conf, ``(
+	    Summary::Device (card["model"]:"Sound card",
+		// summary text: '(sound card is) Configured as snd-card-1'
+		sformat(_("Configured as %1."), card["alias"]:"snd-card-0"))
 	));
 
-	foreach(`card, detected_cards,
-	``{
-	    if (!contains(keys, lookup(card, "unique_key", "...")))
+	foreach(map card, detected_cards, ``{
+	    if (!contains(keys, card["unique_key"]:"..."))
 	    {
-		retlist = add(retlist, Summary::Device(get_card_label(card), Summary::NotConfigured()));
+		retlist = add (retlist, Summary::Device (
+		    get_card_label(card), Summary::NotConfigured()));
 	    }
 	});
-
 	return Summary::DevicesList(retlist);
-
     }
 
     /**
-     * this function converts options for modules from 'modules_conf' data structure
-     * to another- this is needed for writing options to modules conf.
+     * this function converts options for modules from 'modules_conf'
+     * data structure to another - it is needed for writing options to
+     * /etc/modules conf.
      * eg. we have these configured cards:
      * [
-     *           $["model":"sblive", "module":"snd-emu10k1", "options":$["opt1": "a", "opt2": "b"]],
-     *           $["model":"sblive", "module":"snd-emu10k1", "options":$["opt2": "c"]],
-     *           $["model":"other", "module":"mod2", "options":$["opt1": "a", "opt2": "b"]]
+     *	$["model": "sblive", "module":"snd-emu10k1",
+     *	  "options" :$["opt1": "a", "opt2": "b"]],
+     *  $["model": "sblive", "module":"snd-emu10k1",
+     *	  "options": $["opt2": "c"]],
+     *  $["model": "other", "module":"mod2",
+     *	  "options": $["opt1": "a", "opt2": "b"]]
      * ]
-     * CollectOptions("snd-emu10k1") returns $["opt1":"a,b", "opt2":",c"]
+     * CollectOptions ("snd-emu10k1") returns $["opt1":"a,", "opt2":"b,c"]
      * @param modname module name
      * @return map Map with collected options
      *
      */
+    global define map CollectOptions (string modname) ``{
 
-    global define map CollectOptions(string modname) ``{
 	// first filter out entries with other module
-	list mod_entries = filter(`e, modules_conf, ``(lookup(e, "module", "off") == modname));
+	list mod_entries = filter (map e, modules_conf, ``(
+	    e["module"]:"off" == modname));
 	// create list of options (list of maps)
-	list mod_opts = maplist(`e, mod_entries, ``(lookup(e, "options", $[])));
+	list mod_opts = maplist (map e, mod_entries, ``(e["options"]:$[]));
 	list opts = [];
 
-	foreach(`a, mod_opts,
-	``{
-	    foreach(`b, `c, a,
-	    ``{
-	        opts = add(opts, b);
+	foreach (map card_opts, mod_opts, ``{
+	    foreach(string name, string val, card_opts, ``{
+	        opts = add (opts, name);
 	    });
 	});
-	opts = toset(opts);
-	opts = filter(`e, opts, ``(e != "snd_id"));//already should not be there
+	opts = toset (opts);
+	opts = filter (string e, opts, ``(e != "snd_id"));// not neccessary?
 
 	map res = $[];
 	// for each option collect their values
-	foreach(`opname, opts,
-	``{
+	foreach (string opname, opts, ``{
 	    boolean coma = false;
 	    string value = "";
-	    foreach(`s, mod_opts,
-	    ``{
+	    foreach (map card_opts, mod_opts, ``{
 	        if (coma)
 	        {
 	            value = value + ",";
 	        }
-	        value = value + lookup(s, opname, "");
-
-		if (s[opname]:"" != "")
+	        value = value + card_opts[opname]:"";
+		if (card_opts[opname]:"" != "")
 		    coma = true;
 	    });
-	    res = add(res, opname, value);
+	    res = add (res, opname, value);
 	});
 	return res;
     }
@@ -746,9 +746,9 @@ could make your system unstable.
     }
 
     /**
-     * reset settings. used at installation time when user invokes 'reset to original proposal'
+     * reset settings.
+     * used at installation time when user invokes 'reset to original proposal'
      */
-
     global define void ForceReset() ``{
 	modules_conf = [];
 	DetectHardware();
@@ -760,41 +760,33 @@ could make your system unstable.
      * create a proposal
      * @return boolean success/failure
      */
-
     global define boolean Propose() ``{
 	if (proposal_created)
 	{
 	    return true;
 	}
-	ForceReset();// FIXME this should not be called every time??? (also from sound_proposal)
 
 	// fix for nm256 cards: see bug #10384: leave this card unconfigured.
 	// loading of this module fails under some notebooks, nm256 module
 	// also makes some problems on other notebooks: there are detected
 	// two cards on some machines, althrough there is a sinlge card.
 	// two cards are detected: one that use opl3sa module and second one
-	// that uses nm256. let's solve this problem by filtering the nm256 module out.
-
-	unconfigured_cards = filter(`e, unconfigured_cards, ``(lookup(e, "module", "") != "snd-nm256"));
+	// that uses nm256.
+	// let's solve this problem by filtering the nm256 module out.
+	unconfigured_cards = filter (map card, unconfigured_cards, ``(
+	    card["module"]:"" != "snd-nm256"));
 
 	modules_conf = recalc_save_entries(unconfigured_cards);
 	rc_vars = $[
-		"LOAD_ALSA_SEQ": "yes"
-	    ];
+	    "LOAD_ALSA_SEQ": "yes"
+	];
 	proposal_created = true;
 	return true;
     }
 
-    /* settings' backup */
-
-    list modules_conf_b = nil;
-    map rc_vars_b = nil;
-    list volume_settings_b = nil;
-
     /**
      * copy settings to backup variables
      */
-
     global define void StoreSettings() ``{
 	modules_conf_b = modules_conf;
 	rc_vars_b = rc_vars;
@@ -804,7 +796,6 @@ could make your system unstable.
     /**
      * restore settings from backup variables
      */
-
     global define void RestoreSettings() ``{
 	if (modules_conf_b == nil)
 	{
@@ -819,7 +810,6 @@ could make your system unstable.
      * Status of configuration
      * @return boolean true if configuration was changed
      */
-
     global define boolean Changed() ``{
 	if (modules_conf != modules_conf_b ||
 	    rc_vars != rc_vars_b)
@@ -832,39 +822,33 @@ could make your system unstable.
     /**
      * returns list of configured/proposed sound cards.
      * @return list of maps: [$["name": "ASDASD", "card_no": 0]...]
-     *
      */
-
     global define list GetSoundCardList() ``{
 	if (installation)
 	{
 	    integer pos = -1;
-	    return maplist(`c, modules_conf, ``{
+	    return maplist(map card, modules_conf, ``{
 		    pos = pos + 1;
-		    return
-		    $[
-			"name" : lookup(c, "model", _("Sound card")),
+		    return $[
+			"name": card["model"]:_("Sound card"),
 			"card_no": pos
 		    ];
-		});
+	    });
 	}
 	else
 	{
-	    path cards_path = .audio.alsa.cards;
+	    path cards_path	= .audio.alsa.cards;
+	    list cards_numbers	= SCR::Dir(cards_path);
+	    list cards		= [];
 
-	    list cards_numbers = SCR::Dir(cards_path);
-
-	    list cards = [];
 	    if (cards_numbers != nil)
 	    {
-		cards =
-		    maplist(`card_no, cards_numbers, ``{
-			path curcard_path = add(cards_path, sformat("%1", card_no));
-			return $[ "card_no" : tointeger(card_no),
-                              "name" :    SCR::Read(curcard_path + .name) ];
-		    });
+		cards = maplist(string card_no, cards_numbers, ``{
+		    path curcard_path = add(cards_path, sformat("%1", card_no));
+		    return $[ "card_no"	: tointeger(card_no),
+                              "name"	: SCR::Read(curcard_path + .name) ];
+		});
 	    }
-
 	    y2debug("List of the sound cards: %1", cards);
 	    return cards;
 	}
@@ -875,11 +859,10 @@ could make your system unstable.
      * because it should not be called during autoinstallation
      *
      */
-
     global define void StoreUniqueKeys() ``{
 	UpdateUnconfiguredCards();
-	list conf = maplist(`e, modules_conf, ``(lookup(e, "unique_key", "")));
-	list unconf = maplist(`e, unconfigured_cards, ``(lookup(e, "unique_key", "")));
+	list conf = maplist (map e, modules_conf, ``(e["unique_key"]:""));
+	list unconf = maplist(map e, unconfigured_cards,``(e["unique_key"]:""));
 	SaveUniqueKeys(conf, unconf);
     }
 
@@ -888,16 +871,13 @@ could make your system unstable.
      * @param modname name of sound module
      * @return map map with options
      */
-
     global define map GetJoystickSettings(string modname) ``{
-	map mod = lookup(db_modules, modname, $[]);
-	return lookup(mod, "joystick", $[]);
+	return db_modules [modname, "joystick"]:$[];
     }
 
     /**
      * store mixer settings
      */
-
     global define void StoreMixer() ``{
 	if (size(SCR::Dir(.audio.alsa.cards)) == 0)
 	{
@@ -906,21 +886,20 @@ could make your system unstable.
 	volume_settings = [];
 	path p = nil;
 	list cards = SCR::Dir(.audio.alsa.cards);
-	maplist(`c, cards, ``{
+	maplist(string c, cards, ``{
 	    p = topath(sformat(".audio.alsa.cards.%1.channels", c));
 	    list channels = SCR::Dir(p);
-	    maplist(`ch, channels, ``{
-		p = topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", c, ch));
+	    maplist(string ch, channels, ``{
+		p = topath (sformat(
+		    ".audio.alsa.cards.%1.channels.%2.mute", c, ch));
 		if (!SCR::Read(p))
 		{
-		    p = topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", c, ch));
-		    volume_settings[tointeger(c)] = add(volume_settings[tointeger(c)]:$[],
-			ch, SCR::Read(p));
-
+		    p = topath (sformat(
+			".audio.alsa.cards.%1.channels.%2.volume", c, ch));
+		    volume_settings[tointeger(c)] = add (
+			volume_settings[tointeger(c)]:$[], ch, SCR::Read(p));
 		}
-
 	    });
-
 	});
     }
 
@@ -930,7 +909,6 @@ could make your system unstable.
      * @param channel channel name
      * @param value volume of channel [0..100]
      */
-
     global define void SetVolume(integer card_id, string channel, integer value) ``{
 	// two cases: we have sound system already running:
 	if (!Mode::config && size(SCR::Dir(.audio.alsa.cards)) > card_id)
@@ -952,28 +930,27 @@ could make your system unstable.
     }
 
     /**
-     * initialises volume after adding a new card. unmutes and sets volume for some channels
+     * initialises volume after adding a new card.
+     * unmutes and sets volume for some channels
      * @param card_id card id.
      * @param modname name of sound module
      */
-
     global define void  InitMixer(integer card_id, string modname) ``{
-        map devs = lookup(lookup(db_modules, modname, $[]), "mixer",
+        map devs = lookup(db_modules[modname]:$[], "mixer",
             $["Master":70, "PCM":70, "CD":70, "Synth": 70]);
 
 	// now let's merge settings from volume_settings list
 	if (is (volume_settings[card_id]:[], list))
 	{
-	    foreach (`channel, volume_settings[card_id]:[], ``{
+	    foreach (list channel, volume_settings[card_id]:[], ``{
 		devs = add (devs, channel[0]:"Master", channel[1]:70);
 	    });
 	}
+        list devs2 = [];
 
-        list devs2 = maplist(`k, `v, devs, ``(k));
-
-
-        foreach (`dev, `vol, devs, ``{
+        foreach (string dev, integer vol, devs, ``{
 	    SetVolume (card_id, dev, vol);
+	    devs2 = add (devs2, dev);
 	});
 
         unmute(devs2, card_id);
@@ -984,26 +961,17 @@ could make your system unstable.
      * @param card_id id of sound card
      * @return boolean True if sound card card_id supports joystick
      */
-
     global define boolean HasJoystick(integer card_id) ``{
 	if (card_id == nil)
 	{
 	    return false;
 	}
-
 	if (use_alsa == true)
 	{
-	    map entry = select(modules_conf, card_id, $[]);
-	    string modname = lookup(entry, "module", "");
+	    map entry		= modules_conf[card_id]:$[];
+	    string modname	= entry["module"]:"";
 
-	    if (lookup(lookup(db_modules, modname, $[]), "joystick", $[]) == $[])
-	    {
-		return false;
-	    }
-	    else
-	    {
-		return true;
-	    }
+	    return ( db_modules[modname, "joystick"]:$[] == $[] );
 	}
 	else
 	{
@@ -1024,15 +992,14 @@ could make your system unstable.
 	list filtered = [];
 
 	// remove cards without joystick support
-	foreach(map m, cards, ``{
-		integer cid = lookup(m, "card_no", nil);
+	foreach(map card, cards, ``{
 
-		if (cid != nil && HasJoystick(cid) == true)
-		{
-		    filtered = add(filtered, m);
-		}
+	    integer cid	= card["card_no"]:nil;
+	    if (cid != nil && HasJoystick(cid) == true)
+	    {
+		filtered = add (filtered, card);
 	    }
-	);
+	});
 
 	return filtered;
     }

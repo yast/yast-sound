@@ -1,26 +1,27 @@
 /**
  * File:
- *   modules/Joystick.ycp
+ *   joysticks.ycp
  *
  * Package:
  *   Configuration of joystick (sound)
  *
  * Summary:
- *   Joystick database. For each joystick type the protocol kernel module is defined
+ *   Joystick database. For each joystick type the protocol kernel module
+ *   is defined
  *
  * Authors:
  *   Dan Meszaros <dmeszar@suse.cz>
  *
  * $Id$
  *
- *
  */
 
 {
-    textdomain "sound";
 
-    global map JoystickDB =
-$[
+textdomain "sound";
+
+global map JoystickDB = $[
+
     "a3d":
     [
 	"FPGaming Assassin 3D",

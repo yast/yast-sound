@@ -1,7 +1,7 @@
 /**
  *
  * File:
- *   sound_options.ycp
+ *   options.ycp
  *
  * Module:
  *   Sound
@@ -30,22 +30,20 @@
     import "Popup";
 
     /**
-     * parses string eg. '{{0,2},{0,100,20}}' to a list [0,1,2,0,20,40,60,80,100]
+     * parses string (eg. '{{0,2},{0,100,20}}') to a list
+     * (in this case [0,1,2,0,20,40,60,80,100])
      * @param input input string
      * @return list of possible values
      */
-
     global define list parse_bracket(string input) ``{
-        integer pos = 0;
-        string inner = input; // substring(input, 1, size(input)-2);
-        integer siz = size(inner);
-        string tmp = "";
 
-        list output = [];
+        string inner	= input; // substring(input, 1, size(input)-2);
+        integer siz	= size(inner);
+        integer pos	= 0;
+        integer oldpos	= 0;
+        list output	= [];
 
-        integer oldpos = 0;
-
-        while(pos < siz)
+        while (pos < siz)
         {
             if (substring(inner, pos, 1) == "{")
             {
@@ -53,7 +51,7 @@
                 pos = pos + 1;
                 integer cnter = 1;
                 // let's find the pair bracket for '{'
-                while((cnter > 0) && (pos < siz))
+                while ((cnter > 0) && (pos < siz))
                 {
                     if (substring(inner, pos, 1) == "}")
                     {
@@ -65,7 +63,8 @@
                     }
                     pos = pos + 1;
                 }
-                output = add(output, parse_bracket(substring(inner, oldpos + 1, pos - oldpos - 2)));
+                output = add (output,
+		    parse_bracket(substring(inner, oldpos+1, pos - oldpos-2)));
                 pos = pos + 1;
             }
             else
@@ -88,16 +87,11 @@
      * @param input string
      * @return list of values
      */
-
     global define list string2vallist(string input) ``{
-	boolean parse_error = false;
+	boolean parse_error	= false;
+	list l			= flatten (parse_bracket(input));
 
-	list l = parse_bracket(input);
-
-	l = flatten(l);
-
-	l = maplist(`e, l,
-	``{
+	l = maplist(list e, l, ``{
 	    if (size(e) == 0)
 	    {
 		return [];
@@ -110,7 +104,7 @@
 	    integer step = 1;
 	    if (size(e) == 3)
 	    {
-		step = tointeger(select(e, 2, 1));
+		step = tointeger (e[2]:"1");
 	    }
 	    if (step < 1)
 	    {
@@ -119,25 +113,26 @@
 	    }
 
 	    boolean hex = false;
-	    if (regexpmatch(select(e, 1, ""), "^-[0-9]*$") || regexpmatch(select(e, 1, ""), "^[0-9]*$"))
+	    if (regexpmatch (e[1]:"", "^-[0-9]*$") ||
+		regexpmatch (e[1]:"", "^[0-9]*$"))
 	    {
 		hex = false;
 	    }
-	    else if (regexpmatch(select(e, 1, ""), "^-0x[0-9a-fA-F]*")
-			|| regexpmatch(select(e, 1, ""), "^0x[0-9a-fA-F]*"))
+	    else if (regexpmatch (e[1]:"", "^-0x[0-9a-fA-F]*") ||
+		     regexpmatch (e[1]:"", "^0x[0-9a-fA-F]*"))
 	    {
 		hex = true;
 	    }
 	    else
 	    {
-		if (contains(["Disabled", "Enabled"], select(e, 1, "")))
+		if (contains(["Disabled", "Enabled"], e[1]:""))
 		{
-		    return [select(e, 0, "")];
+		    return [ e[0]:"" ];
 		}
 	    }
 
-	    integer from = tointeger(select(e, 0, ""));
-	    integer to = tointeger(select(e, 1, ""));
+	    integer from = tointeger (e[0]:"");
+	    integer to = tointeger (e[1]:"");
 
 	    if (((to - from) / step) > 50)
 	    {
@@ -171,14 +166,12 @@
 	}
 
 	return l;
-
     }
 
     /**
      * default widget when there are no known values
      * @return term widget
      */
-
     global define term defWidget() ``{
 	// label text
 	return `Label(_("Possible value:\nnot known"));
@@ -190,21 +183,19 @@
      * @param default string default value (preselected in combo)
      * @return term combobox widget
      */
-
     global define term gen_list(list vals, string default) ``{
-	vals = maplist(`e, vals, ``(`item(`id(e), sformat("%1", e), default == e)));
+	vals = maplist (string e, vals, ``(`item(`id(e), e, default == e)));
 	// combo box label
-	return `ComboBox(`id(`poss), `opt(`notify), _("&Possible value:"), vals);
+	return `ComboBox(`id(`poss),`opt(`notify), _("&Possible value:"), vals);
     }
 
     /**
-     * when thew selected option in table changes, we need to update combo with values
+     * when the selected option in table is changed, we need to update
+     * combo with values
      * @param values list of values
      * @param default item
      * @return void
-     *
      */
-
     global define void updatePossibleValues(string values, string default) ``{
 	list l = string2vallist(values);
 	if (l == [])
@@ -215,7 +206,6 @@
 	term widg = gen_list(l, default);
 
 	UI::ReplaceWidget(`id(`reppoint), widg);
-
     }
 
     /**
@@ -223,7 +213,6 @@
      * @param arg type of arg can be string or list
      * @return string description
      */
-
     global define string getDescr(any arg) ``{
 	if (is(arg, string))
 	{
@@ -244,50 +233,46 @@
      *        with keys: name, value, type, default, description.
      *	      values in map are strings
      * @return map result
-     *
      */
     global define map OptionsDialog (string cardlabel, map opts) ``{
 
-
-	string help_text = lookup(STRINGS, "OptionsDialog", "");
-
-	term con = `VBox ();
+	string help_text = STRINGS["OptionsDialog"]:"";
 
 	map origOptions = opts;
-	list options = maplist (`e, `f, opts, ``($[
+	list options = maplist (string name, map o, opts, ``($[
 	    // label: description of option is not available
-	    "description" : getDescr(f["descr"]:_("No description available")),
-	    "name"	  : e,
-	    "value"	  : f["value"]:"",
-	    "type"        : f["type"]:"string",
-	    "default"     : f["default"]:""]
+	    "description" : getDescr(o["descr"]:_("No description available")),
+	    "name"	  : name,
+	    "value"	  : o["value"]:"",
+	    "type"        : o["type"]:"string",
+	    "default"     : o["default"]:""]
 	));
 
 	list itemized_descriptions = create_table (options,
 	    ["description", "name", "value"]);
 
 	integer current_option = 0;
-	string current_option_name = lookup (options[0]:$[], "name", "");
+	string current_option_name = options[current_option, "name"]:"";
+
+	term con = `VBox (
+	    // To translators: label message
+	    `HVCenter (`Label (_("There are no options for this module")))
+	);
 
 	if (size (itemized_descriptions) > 0)
 	{
-	    con = OptionsCon (cardlabel, itemized_descriptions, current_option,
-		    current_option_name);
-	}
-	else	// there are no options
-	{
-	    con = `VBox (
-		// To translators: label message
-		`HVCenter (`Label (_("There are no options for this module")))
-	    );
+	    con = OptionsCon (cardlabel, itemized_descriptions,
+		    current_option_name, options[current_option, "value"]:"");
 	}
 
 	// dialog title
 	Wizard::SetContents (_("Sound card advanced options"), con, help_text,
 	    true, true);
+
 	if (size (itemized_descriptions) > 0)
 	{
 	    UI::ChangeWidget(`id(`table), `CurrentItem, 0);
+	    UI::SetFocus (`id(`table));
 	}
 
 	symbol ui = `table;
@@ -321,7 +306,6 @@
 
 		updatePossibleValues (vals, select(
 		    UI::QueryWidget(`id(`table),`Item(current_option)), 3, ""));
-
 	    }
 	    if (ui == `poss)
 	    {
@@ -370,7 +354,6 @@
 		    });
 		    itemized_descriptions = tmp;
 		}
-
 	    }
 	    else if (ui == `reset &&
 		    // popup question
@@ -405,44 +388,38 @@
 	return $["ui" : ui, "return" : itemized_descriptions];
     }
 
-// ===== MAIN =====
-
     /**
      * just calls options dialog
      * @param save_entry map with card configuration
      * @return map result
      */
-
     global define map sound_options(map save_entry) ``{
 
-    string modname	= lookup(save_entry, "module", "");
-    string cardlabel	= lookup(save_entry, "model", "");
-    map params		= get_module_params(modname);
+	string modname	= save_entry["module"]:"";
+	string label	= save_entry["model"]:"";
+	map params	= get_module_params (modname);
 
-    map p2 = restore_mod_params(params, lookup(save_entry, "options", []));
+	map p2		= restore_mod_params (params, save_entry["options"]:[]);
+	params		= restore_mod_params (params, save_entry["options"]:[]);
 
-    params = restore_mod_params(params, lookup(save_entry, "options", []));
+	UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
 
-    UI::ChangeWidget(`id(`next), `Label, Label::NextButton());
+	// now show the dialog
+	map result	= OptionsDialog (label, params);
+	list vals	= result["return"]:[];
 
-    // now show the dialog
-    map result  = OptionsDialog (cardlabel, params);
-    list vals	= lookup(result, "return", []);
+	// convert from table entries (items) back to card
+	map opts = $[];
+	foreach (term it, vals, ``{
+	    if (select(it, 3, "") != "")
+	    {
+		opts = add(opts, select(it, 2, ""), select(it, 3, ""));
+	    }
+	});
 
-      // convert from table entries back to card
-    map opts = $[];
-    foreach(`v, vals,
-    ``{
-	if (select(v, 3, "") != "")
-	{
-	    opts = add(opts, select(v, 2, ""), select(v, 3, ""));
-	}
+	save_entry = add(save_entry, "options", opts);
 
-    });
+	return $["ui" : result["ui"]:`cancel, "return" : save_entry];
+    }
 
-    save_entry = add(save_entry, "options", opts);
-
-    return $["ui" : lookup (result, "ui", `cancel), "return" : save_entry];
-}
-
-}
+}//EOF

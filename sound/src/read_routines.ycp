@@ -22,7 +22,6 @@
      * @param card_id card id
      * @return card name, "Sound card" on failure
      */
-
     global define string read_card_name_from_alsa(integer card_id) ``{
 	path pth = topath(sformat(".audio.alsa.cards.%1.name", card_id));
 	string name = SCR::Read(pth);
@@ -38,19 +37,19 @@
      * Extacts the unique key and the name of the card from comment in the
      * modules.conf placed before char-major-81-x
      * @param comment before the char-major-81-x
-     * @return map Returns map: $[ "unique_key" : string, "name" : string ] or nil
+     * @return map example: $[ "unique_key" : string, "name" : string ] or nil
      */
-    global define map extractUniqueKey(string comment) ``{
+    global define map extractUniqueKey (string comment) ``{
 	map result = nil;
 
 	// split to lines
-	list comment_lines = splitstring(comment, "\n");
+	list comment_lines = splitstring (comment, "\n");
 
 	// find last line with a ":"
 	string line_with_uk = "";
 	integer colon_pos_uk = nil;
-	foreach(`line, comment_lines, ``{
-	    integer c_pos = findfirstof(line, ":");
+	foreach(string line, comment_lines, ``{
+	    integer c_pos = findfirstof (line, ":");
 	    if (c_pos != nil)
 	    {
 		line_with_uk = line;
@@ -62,25 +61,22 @@
 	if (colon_pos_uk != nil)
 	{
 	    // extract name
-	    string name = substring(line_with_uk,
-				    colon_pos_uk + 1,
-				    size(line_with_uk) - colon_pos_uk - 1);
+	    string name = substring (line_with_uk, colon_pos_uk + 1,
+				     size(line_with_uk) - colon_pos_uk - 1);
 	    // extract unique key
-	    integer start_uk = findfirstnotof(line_with_uk, "# \t");
-	    string uk = substring(line_with_uk,
-				  start_uk,
+	    integer start_uk = findfirstnotof (line_with_uk, "# \t");
+	    string uk = substring (line_with_uk, start_uk,
 				  colon_pos_uk - start_uk);
 
 	    result = $[ "name" : name, "unique_key" : uk ];
 	}
-
 	return result;
     }
 
 
     /**
      * reads already saved info from modules.conf
-     * example:
+     * @example of return value:
      * [
      *	    $[
      *		"alias":    "snd-card-0",
@@ -94,80 +90,63 @@
      * @return list
      */
     global define list read_save_info () ``{
-        string prefix = "";
-        list aliases  = SCR::Read(topath (sformat ("%1.modules.alias", prefix)));
-        list options  = SCR::Read(topath (sformat ("%1.modules.options", prefix)));
-        list save     = [];             // structure to save
-        integer i     = 0;
+
+        list save	= [];			// structure to save
+	list aliases	= SCR::Read(.modules.alias);
+
+	aliases = filter(string a, aliases, ``(is_snd_alias(a)));
 
 	// since parameters in modules options are separated by comas
 	// (eg. options mod snd_id=1,2,3, snd_index=1,2,3),
 	// we have to count occurences for each module
+	integer position = -1;
+	map mod_occur	= $[];			// alsa modules
 
-        if (true) // use_alsa )//contains (aliases, "char-major-116"))
-        {
-              // alsa modules
-	    map mod_occur = $[];
+	foreach (string a, aliases, ``{
 
-	    list aliases = SCR::Read(.modules.alias);
+	    position		= position + 1;
+	    string modname	= SCR::Read(add (.modules.alias, a));
+	    integer opt_pos	= mod_occur[modname]:0;
 
-	    aliases = filter(`e, aliases, ``(is_snd_alias(e)));
+	    mod_occur	= add (mod_occur, modname, mod_occur[modname]:0 + 1);
 
-	    integer position = -1;
-
-	    foreach(`e, aliases, ``{
-
-		position = position + 1;
-		map entry = $[];
-		string modname = SCR::Read(add (.modules.alias, e));
-
-		integer opt_pos = lookup(mod_occur, modname, 0);
-
-		mod_occur = add (mod_occur, modname,
-		    lookup(mod_occur, modname, 0) + 1);
-
-		map options = SCR::Read(add (.modules.options, modname));
-		options = mapmap(`k, `v, options,
-		``{
-		    list vals = splitstring(v, ",");
-		    if (size(v) > opt_pos)
-		    {
-			return [k, select(vals, opt_pos, "")];
-		    }
-		    return [nil, nil];
-		}
-		);
-
-		string comment = SCR::Read(add (add (.modules.alias, e), "comment"));
-		// read card info from the comment string
-		string uniq = "";
-		string model = "";
-		map res = extractUniqueKey(comment);
-		y2debug("%1", res);
-		if (res != nil)
+	    map options = SCR::Read(add (.modules.options, modname));
+	    options = mapmap (string name, string val, options, ``{
+		list vals = splitstring(val, ",");
+		if (size(val) > opt_pos)
 		{
-		    uniq = lookup(res, "unique_key", "");
-		    model = lookup(res, "name", "");
+		    return [name, select(vals, opt_pos, "")];
 		}
-		else
-		{
-		    // probably system upgrade
-		    uniq = isa_uniq();
-		    model = read_card_name_from_alsa(position);
-		}
-
-		entry = $[    "alias"	: e,
-			    "module"	: modname,
-			    "options"	: options,
-			    "unique_key": uniq,
-			    "model"	: model
-		];
-
-		save = add(save, entry);
+		return [nil, nil];
 	    });
 
-        }
+	    // read card info from the comment string
+	    string comment = SCR::Read(add (add (.modules.alias,a), "comment"));
+	    string uniq		= "";
+	    string model	= "";
+	    map res		= extractUniqueKey(comment);
+
+	    if (res != nil)
+	    {
+		uniq	= res["unique_key"]:"";
+		model	= res["name"]:"";
+	    }
+	    else
+	    {
+		// probably system upgrade
+		uniq	= isa_uniq();
+		model	= read_card_name_from_alsa (position);
+	    }
+	    map entry = $[
+		"alias"		: a,
+		"module"	: modname,
+		"options"	: options,
+		"unique_key"	: uniq,
+		"model"		: model
+	    ];
+	    save = add (save, entry);
+	});
         return save;
     }
 
-}
+}//EOF

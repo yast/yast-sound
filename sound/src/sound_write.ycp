@@ -14,7 +14,7 @@
  *
  * $Id$
  *
- * Parameters are given in a pam
+ * Parameters are given in a map with keys:
  *         "modules_conf" ... save info- list of configured cards:
  *	   [
  *		$[
@@ -38,7 +38,7 @@
  *		"LOAD_SEQUENCER" : "yes"
  *         ]
  *
- *	   "volume_settings" ... volume setting (usefull only for autoconfig)
+ *	   "vol_settings" ... volume setting (usefull only for autoconfig)
  *	   [
  *		[  // card #1
  *		    ["PCM", 32, false], ["Master", 100, true] ...
@@ -57,40 +57,29 @@
  *
  * Return boolean true on success, false if failed
  */
-
 {
-
-
     textdomain "sound";
 
 
     include "sound/write_routines.ycp";
     include "sound/alsa_routines.ycp";
 
-    import  "Progress";
-    import  "Wizard";
-    import  "Runlevel";
+    import "Progress";
+    import "Wizard";
+    import "Runlevel";
 
     import "Sound";
     import "Joystick";
 
-      // ==== MAIN ====
+    // ==== MAIN ====
 
-    boolean test_mode	= false;
-    map rc_values		= $[];
+    map settings	= WFM::Args(0);
+    map rc_values	= settings["rc_vars"]:$[];
+    list save_info	= settings["modules_conf"]:[];
+    list vol_settings	= settings["volume_settings"]:[];
 
-    string helptext	= "";
-    string err_msg	= "";
-
-    list save_info	= [];
-    boolean alsa	= Sound::use_alsa;
-
-    map settings = WFM::Args(0);
-    save_info = lookup(settings, "modules_conf", []);
-    rc_values = lookup(settings, "rc_vars", []);
-    volume_settings = lookup(settings, "volume_settings", []);
-
-    // do nothing when proposal is empty (Sound::installation is set to true in proposal mode)
+    // do nothing when proposal is empty
+    // (Sound::installation is set to true in proposal mode)
     if (Sound::installation && size(save_info) == 0)
     {
 	y2debug("empty proposal. exiting.");
@@ -133,29 +122,29 @@
 	Progress::New (_("Saving sound card settings."), " ", size(stones) - 1,
 		// progres bar label
 		stones, stones2, _("Saving sound card settings."));
-        Wizard::DisableAbortButton();
+        if (Sound::use_ui)
+	    Wizard::DisableAbortButton();
     }
 
-    integer step = 0;
+    Progress::NextStage();
 
-    if (!Sound::write_only) { Progress::NextStage(); }
-
-    step = step + 1;
     SaveModulesEntry(save_info, []);
 
-    if (!Sound::write_only) { sleep(100); Progress::NextStage(); }
-    step = step + 1;
+    sleep(10);
+    Progress::NextStage();
+
     if (!Sound::write_only)
     {
 	Sound::StoreUniqueKeys();
     }
 
-    if (!Sound::write_only) { sleep(100); Progress::NextStage(); }
-    step = step + 1;
+    sleep(10);
+    Progress::NextStage();
+
     SaveRCValues(rc_values);
 
-    if (!Sound::write_only) { sleep(100); Progress::NextStage(); }
-    step = step + 1;
+    sleep(10);
+    Progress::NextStage();
 
     list configuredcards = Sound::GetSoundCardList();
 
@@ -171,27 +160,29 @@
 	}
     }
 
-    if (!Sound::write_only) { Progress::NextStage(); }
-    if (size(WFM::Args()) >= 4)
+    Progress::NextStage();
+
+    if (write_only && haskey (settings, "volume_settings"))
     {
-	set_vol_settings(volume_settings);
+	set_vol_settings (vol_settings);
     }
+
     if (SCR::Read(.target.size, "/etc/asound.state") == -1)
     {
 	integer i = 0;
-	maplist(`e, save_info, ``{
-	    Sound::InitMixer(i, lookup(e, "module", ""));
+	maplist (map e, save_info, ``{
+	    Sound::InitMixer (i, e["module"]:"");
 	    i = i + 1;
 	});
     }
 
     SaveVolume();
-    if (!Sound::write_only) sleep(100);
 
-    if (!Sound::write_only) { sleep(100); Progress::NextStage(); }
+    sleep(10);
+    Progress::NextStage();
 
     // write joystick configuration
-    Joystick::Write(``{ return false;});
+    Joystick::Write (``{ return false;});
 
     if (size(configuredcards) > 0)
     {
@@ -201,8 +192,9 @@
     else
     {
 	// disable sound service - it's not needed, no soundcard is present
+	Runlevel::ServiceAdjust("joystick", "disable");
 	Runlevel::ServiceAdjust("alsasound", "disable");
     }
 
-    return (size (err_msg) == 0);
+    return true;// TODO return value!
 }

@@ -10,6 +10,7 @@
  * Authors:
  *   Dan Vesely <dan@suse.cz>
  *   Dan Meszaros <dmeszar@suse.cz>
+ *   Jiri Suchomel <jsuchome@suse.cz>
  *
  * $Id$
  *
@@ -19,574 +20,397 @@
  */
 
 {
-    import "Mode";
-    if (size(WFM::Args()) > 0 && WFM::Args(0) == .test)
+textdomain "sound";
+
+y2milestone ("----------------------------------------");
+y2milestone ("Sound module started");
+
+import "Mode";
+import "Directory";
+import "Popup";
+import "Sound";
+import "Joystick";
+import "Report";
+import "CommandLine";
+import "RichText";
+
+include "commandline/commandline.ycp";
+include "wizard/sequencer.ycp";
+
+include "sound/texts.ycp";
+include "sound/wizards.ycp";
+
+integer arg_n = size (WFM::Args ()) - 1;
+while (arg_n >= 0)
+{
+    if (WFM::Args(arg_n) == .test)
     {
-	Mode::test = true;
+        Mode::test = true;
     }
-
-    textdomain "sound";
-
-    import "Arch";
-    import "Runlevel";
-    import "Sound";
-    import "Joystick";
-    import "Directory";
-
-    include "wizard/sequencer.ycp";
-    import "Wizard_hw";
-    import "Popup";
-    import "Wizard";
-    import "Mode";
-
-    include "sound/card_wizard.ycp";
-    include "sound/read_routines.ycp";
-    include "sound/routines.ycp";
-    include "sound/ui.ycp";
-    include "sound/write_routines.ycp";
-    include "sound/volume.ycp";
-    include "sound/options.ycp";
-    include "sound/complex.ycp";
-    include "sound/select.ycp";
-    include "sound/manual.ycp";
-
-// this is currently set in constructor Sound::Sound
-//    if (size(WFM::Args()) > 0 && WFM::Args(0)==.oss)
-//    {
-//	use_alsa=false;
-//    }
-
-
-    if (Sound::use_alsa)
-    {
-	include "sound/alsa_routines.ycp";
-    }
-    else
-    {
-	include "sound/oss_routines.ycp";
-    }
-    include "sound/texts.ycp";
-
-
-    // check for database existence
-
-    if (Sound::use_alsa && SCR::Read(.target.size, Directory::datadir + "/sndcards.ycp") == -1)
-    {
-	// popup error message
-        Popup::Message(_("Sound card database not found. Please check your installation."));
-        UI::CloseDialog();
-        return;
-    }
-
-    // text constants for sound module
-    map STRINGS=STRINGS_();
-    float oldf=0.0;
-
-    // just cover functions for wizard sequencer
-    // these global variables are used and modified:
-    //	  save_info
-    //	  card_id
-    //    sound_cards
-
-    boolean conf_joystick = true;
-
-    map save_entry = $[];
-    boolean was_complex = false;
-
-    /**
-     * card selection dialog
-     * @return symbol next dialog
-     */
-
-    global define symbol _snd_select() ``{
-	Sound::UpdateUnconfiguredCards();
-	if ((size(Sound::unconfigured_cards) == 0) && (!was_complex))
-	{
-	    return `detail;
-	}
-
-	list nh	    = maplist(`e, Sound::unconfigured_cards, ``(lookup(e, "model", "")));
-
-        list ch	    = maplist(`e, Sound::modules_conf, ``(lookup(e, "model", "")));
-	map res	    = sound_select(nh, Sound::modules_conf);
-	symbol ui   = lookup(res, "ui", `abort);
-
-	card_id = lookup(res, "id", 0);
-	if (card_id == -1)
-	{
-	    return `manual;
-	}
-	return lookup(res, "ui", `abort);
-    }
-
-    /**
-     * quick configuration step #1 dialog
-     * @return symbol next dialog
-     */
-
-    global define symbol _snd_quick() ``{
-	save_entry = select(Sound::unconfigured_cards, 0, $[]);
-	card_id = 0;
-	boolean has_joy = false;
-	string modname = lookup(save_entry, "module", "");
-	if (lookup(lookup(Sound::db_modules, modname, $[]), "joystick", $[]) != $[])
-	{
-	    has_joy = true;
-	}
-
-	string modelname    = lookup(save_entry, "model", "");
-	map res		    = quickConfig(modelname, "snd-card-0", card_id, has_joy);
-	symbol ui	    = lookup(res, "ui", nil);
-	return ui;
-    }
-
-    /**
-     * quick config step #2 dialog
-     * @param type boolean quick/normal config
-     * @return symbol next dialog
-     */
-
-    global define symbol _snd_quick2(boolean type) ``{
-	save_entry  = add_common_options(save_entry, 0);
-	save_entry  = add_alias(save_entry, 0);
-	map res	    = sound_volume(save_entry, 0, true, type, []);
-	symbol ui   = lookup(res, "ui", nil);
-	if (ui == `next)
-	{
-	    Sound::modules_conf = [save_entry];
-	}
-	return ui;
-    }
-
-    /**
-     * dialog for manual card selection
-     * @return symbol next dialog
-     */
-
-    global define symbol _snd_manual() ``{
-
-	map res = sound_manual();
-
-	// if user selects the soundcards that has been already autodetected,
-	// use the detected card instead of manual selection (because it causes
-	// some problems with uniq. keys)
-
-	symbol ui = lookup(res, "ui", `abort);
-
-	boolean override = false;
-	string uniq_k = "";
-	string label = "";
-
-
-	if (ui == `next)
-	{
-	    uniq_k = isa_uniq();
-	    label = lookup(res, "model", "Sound card");
-
-	    // set default values for options
-	    map optlist = lookup(Sound::db_modules, lookup(res, "module", ""), $[]);
-	    optlist = lookup(optlist, "params", $[]);
-	    map options = $[];
-	    maplist(`k, `v, optlist,
-	    ``{
-		if (haskey(v, "default"))
-		{
-		    options = add(options, k, lookup(v, "default", ""));
-		}
-	    });
-
-	    list cds = filter(`e, Sound::unconfigured_cards, ``(lookup(e, "module", "") == lookup(res, "module", nil)));
-	    y2debug("%1", cds);
-	    if (size(cds) > 0)
-	    {
-		label  = lookup(select(cds, 0, $[]), "model", "Sound card");
-		uniq_k = lookup(select(cds, 0, $[]), "unique_key", isa_uniq());
-	    }
-
-	    save_entry = $[
-		"module"     : lookup(res, "module", ""),
-		"model"	     : label,
-		"unique_key" : uniq_k,
-		"options"    : options
-		];
-	    card_id = -1;
-	}
-	if (ui == `back)
-	{
-	    save_entry = $[];
-	}
-	return ui;
-    }
-
-    /**
-     * add card from complex dialog
-     * @return symbol next dialog
-     */
-
-    global define symbol _snd_add() ``{
-	list nh     = maplist(`e, Sound::unconfigured_cards, ``(lookup(e, "model", "")));
-	map res	    = WhichDialog(nh);
-	symbol ui   = lookup(res, "ui", `back);
-        card_id	    = lookup(res, "card_id", -1);
-        if (card_id == -1 && ui == `next)
-        {
-            return `manual;
-        }
-
-	return ui;
-    }
-
-    /**
-     * sound card deletion
-     * @return symbol next dialog
-     */
-
-    global define symbol _snd_delete() ``{
-	// popup question
-	if (Popup::YesNo(_("Do you really want to delete this entry?")))
-	{
-	    boolean terminate = stop_programs();
-	    if (terminate == false)
-            {
-                return `next;
-            }
-            string modname = lookup(select(Sound::modules_conf, card_id, $[]), "module", "");
-
-	    // remove joystick settings
-	    if (card_id < 4)
-	    {
-		Joystick::joystick = remove(Joystick::joystick, card_id);
-		Joystick::joystick[3] = $[];
-	    }
-
-
-            // we have to rember volume/mute settings because after a card removal
-            // everything is muted and set to 0.
-            list vol_settings = get_vol_settings();
-
-            Sound::modules_conf	    = remove(Sound::modules_conf, card_id);
-	    Sound::modules_conf	    = recalc_save_entries(Sound::modules_conf);
-
-	    if (vol_settings[card_id]:nil != nil)
-	    {
-		vol_settings    = remove(vol_settings, card_id);
-		// we have to move old entry in global list:
-		Sound::volume_settings = add (vol_settings,
-		    Sound::volume_settings[card_id]:[]);
-	    }
-
-	    if (!Mode::config)
-	    {
-		sound_stop();
-		sound_start_tmp(true);
-		set_vol_settings(vol_settings);
-		// now we have to update the unconfigured cards list
-		Sound::UpdateUnconfiguredCards();
-	    }
-
-
-	}
-
-	return `next;
-    }
-
-    /**
-     * configure selected card
-     * @return symbol next dialog
-     */
-
-    global define symbol _snd_config() ``{
-	if (card_id >= 0)
-	{
-	    save_entry = select(Sound::unconfigured_cards, card_id, $[]);
-	}
-	map res = OneCardWizard(save_entry, size(Sound::modules_conf), 15, false, Sound::modules_conf);
-
-        symbol ui = lookup(res, "ui", nil);
-        if (ui == `next)
-        {
-	    // copy card_entry from unconfigured to configured list
-            Sound::modules_conf = add(Sound::modules_conf, lookup(res, "return", $[]));
-	    if (card_id >= 0)
-	    {
-		// if this this card was autodetedted
-		// remove card we've just configured from unconfigured card list.
-		Sound::unconfigured_cards = remove(Sound::unconfigured_cards, card_id);
-	    }
-	    if (size(Sound::unconfigured_cards) == 0)
-	    {
-		// no other detected && unconfigured cards remained
-		return `detail;
-	    }
-        }
-	return ui;
-    }
-
-    /**
-     * complex dialog
-     * @return symbol next dialog
-     */
-
-    global define symbol _snd_complex() ``{
-	was_complex = true;
-	map res	    = sound_complex();
-        symbol ui   = lookup(res, "ui", nil);
-        if (ui == `next)
-        {
-            state	= `save;
-        }
-	return ui;
-    }
-
-    /*
-     *
-     * ========== MAIN ==========
-     *
-     */
-
-    OpenMainDialog();
-
-    boolean test_mode     = false;
-    boolean config_mode   = false;
-    boolean from_menu     = false;
-
-    integer arg_n = size (WFM::Args ()) - 1;
-    while (arg_n >= 0)
-    {
-	if (WFM::Args(arg_n) == .test)
-	{
-	    test_mode     = true;
-	}
-	if (WFM::Args(arg_n) == .conf_mode)
-	{
-	    config_mode   = true;
-	}
-	if (WFM::Args(arg_n) == ".from_menu")
-	{
-	    from_menu     = true;
-	}
-	arg_n = arg_n - 1;
-    }
-
-    if (!Mode::config && !Sound::installation)
-    {
-	if (!Sound::Read(true))
-	    return `abort;
-	Joystick::Read(``{});
-	Sound::StoreSettings();
-    }
-
-    if (Sound::installation)
-    {
-	Sound::StoreSettings();
-	if (Sound::detected_cards == [] && Sound::modules_conf == [])
-	    Sound::DetectOldCards();
-	Sound::UpdateUnconfiguredCards();
-	sound_stop();
-	sound_start_tmp(true);
-	// init mixer for all soundcards
-	integer index = 0;
-	maplist(`e, Sound::modules_conf,
-	``{
-	    Sound::InitMixer(index, lookup(e, "module", ""));
-	    index = index + 1;
-	}
-	);
-    }
-
-    Sound::use_ui = true;
-
-    integer card_id   = 0;
-    integer n_cards   = 0;
-    map result        = $[];
-    boolean cont      = true;
-
-    boolean exit = false;
-
-    if (Sound::use_alsa && SCR::Read(.target.size, Directory::datadir + "/sndcards.ycp") == -1)
-    {
-	// popup error message
-	Popup::Message(_("Sound card database not found. Please check your installation."));
-	UI::CloseDialog();
-	return;
-    }
-//#    sound_cards = getConfigurableCards(save_info);
-    integer all_cards_num = size(Sound::unconfigured_cards);
-
-    if (exit)
-    {	// no sound cards database present, shutting down
-	UI::CloseDialog ();
-	return;
-    }
-
-    nm256_opl3sa2_warn(flatten(add([Sound::modules_conf], Sound::unconfigured_cards)));
-    if ( size(flatten(add([Sound::modules_conf], Sound::unconfigured_cards))) == 1)
-    {
-	boolean nm256out = nm256hack(lookup(select(Sound::unconfigured_cards, 0, $[]), "module", ""));
-	y2debug("continue configuring: %1", nm256out);
-	if (!nm256out)
-	{
-	    UI::CloseDialog();
-	    return `back;
-	}
-    }
-
-    symbol state = `card_select;
-
-
-// test data
-//    save_info=[];
-//    sound_cards=[$["model":"Pokusna karta", "module": "snd-card-emu10k1", "unique_key":"kx", "options": []]];
-
-    string initial = "intro";
-
-    // when running this module as non-root, go to complex-dialog
-    if (size(Sound::unconfigured_cards) == 1 && size(Sound::modules_conf) == 0)
-    {
-	card_id = 0;
-	initial = "quick";
-    }
-    else if (size(Sound::unconfigured_cards) == 0)
-    {
-	initial = "complex";
-    }
-    
-
-    map m_aliases = $[
-	    "intro"	: ``(_snd_select()),
-
-	    "config1"	: ``(_snd_config()),
-	    "config2"	: ``(_snd_config()),
-
-	    "manual1"	: ``(_snd_manual()),
-	    "manual2"	: ``(_snd_manual()),
-
-	    "complex"	: ``(_snd_complex()),
-	    "delete"	: ``(_snd_delete()),
-	    "select"	: ``(_snd_add()),
-
-	    // quick configuration
-	    "quick"	: ``(_snd_quick()),
-	    "quick2"	: ``(_snd_quick2(true)),
-	    "quick3"	: ``(_snd_quick2(false)),
-
-	    "joystick"	: ``(joystick()) // joystick won't be called from here(?)
-	];
-
-    map m_sequence = $[
-	    "ws_start"	: initial,
-	    "quick"	:
-		$[
-		    `quick	    :	"quick2",
-		    `normal	    :	"quick3",
-		    `abort	    :	`abort,
-		    `intro	    :	"intro"
-		],
-	    "quick2"	:
-		$[
-		    `next	    :	`finish,
-		    `abort	    :	`abort
-		],
-	    "quick3"	:
-		$[
-		    `next	    :	`finish,
-		    `abort	    :	`abort
-		],
-
-
-	    "intro"	: 
-		$[
-		    `next	    :	`finish,
-		    `configure	    :   "config1",
-		    `manual	    :	"manual1",
-		    `detail	    :	"complex",
-		    `abort	    :	`abort
-		],
-
-
-	    "config1"	: 
-		$[
-		    `next	    :	"intro",
-		    `detail	    :	"intro",
-		    `abort	    :   `abort
-		],
-	    "manual1"	: 
-		$[
-		    `next	    :	"config1",
-		    `abort	    :	`abort		
-		],
-
-	    "config2"	:
-		$[
-		    `next	    :	"complex",
-		    `detail	    :	"complex",
-		    `abort	    :   `abort
-		],
-	    "manual2"	:
-		$[
-		    `next	    :	"config2",
-		    `abort	    :	`abort		
-		],
-
-
-	    "complex"	:
-		$[
-		    `next	    :	`finish,
-		    `abort	    :	`abort,
-		    `add_manual     :	"manual2",
-		    `add_select	    :	"select",
-		    `delete	    :	"delete"
-		],
-	    "select"	:
-		$[
-		    `abort	    :	`abort,
-		    `next	    :	"config2",
-		    `manual	    :	"manual2"
-		],
-	    "delete"	:
-		$[
-		    `next	    :	"complex"
-		],
-        "joystick"   :
-        $[
-            `next       :   `finish
-        ]
-	];
-
-    symbol ui = WizardSequencer(m_aliases, m_sequence);
-
-    if (ui == `back || ui == `abort)
-    {
-	if (Sound::installation)
-	{
-	    Sound::RestoreSettings();
-	}
-	UI::CloseDialog();
-	return `back;
-    }
-
-    n_cards = size (Sound::modules_conf);
-
-    map save_map = $[];
-
-    if (Sound::installation)
-    {
-	if (ui != `finish)
-	{
-	    Sound::RestoreSettings();
-	}
-	else
-	    ui = `next; // in installation mode, `finish is end of installation
-    }
-
-    if (ui == `finish && !Mode::config)
-    {
-	if (!Sound::installation && ( Sound::Changed() || Joystick::Changed()))
-	{
-	    Sound::Write(``{}, ``{});
-	}
-    }
-
-    UI::CloseDialog ();
-    return ui;
+    arg_n = arg_n - 1;
 }
+
+// check for database existence
+if (Sound::use_alsa &&
+    SCR::Read(.target.size, Directory::datadir + "/sndcards.ycp") == -1)
+{
+    // popup error message
+    Popup::Message(_("Sound card database not found. Please check your installation."));
+    UI::CloseDialog();
+    return;
+}
+
+// some global variables:
+
+/**
+ * text constants for sound module
+ */
+map STRINGS		= STRINGS_();
+
+/**
+ * map of current sound card
+ */
+map save_entry	= $[];
+
+/**
+ * id of current card
+ */
+integer card_id	= 0;
+boolean was_complex = false;
+
+
+// --------------------------------------------------------------------------
+// --------------------------------- cmd-line handlers
+
+/**
+ * Print summary of basic options
+ * @return boolean false
+ */
+global define boolean SoundSummaryHandler (map options ) ``{
+
+    CommandLine::Print (RichText::Rich2Plain(Sound::Summary ()));
+    return false; // do not call Write...
+}
+
+/**
+ * Wrapper function for reading the settings (used by cmd-line)
+ * @return boolean success
+ */
+global define boolean SoundRead () ``{
+
+    Sound::use_ui = false;
+    boolean ret = Sound::Read (false) && Joystick::Read(``{return false;});
+    return ret;
+}
+
+/**
+ * Wrapper function for writing the settings (used by cmd-line)
+ * @return boolean success
+ */
+global define boolean SoundWrite () ``{
+
+    return Sound::Write (``{}, ``{});
+}
+
+/**
+ * Handler for adding new card
+ * @param options parameters on command line
+ * @return boolean success
+ */
+global define boolean AddCardHandler (map options) ``{
+
+    integer card_no	= tointeger (options["card"]:"-1");
+    boolean all		= haskey (options, "all");
+    string modname	= options["module"]:"";
+    boolean ret		= false;
+
+    if (all ||
+	(Sound::unconfigured_cards != []) && (card_no == -1) && (modname == ""))
+    {
+	card_no = 0;
+    }
+    card_id = card_no; // now card_id is index to Sound::unconfigured_cards
+
+    // 1. choose the card to add
+    map save_entry = $[];
+    if (card_id >= 0)  // -1 is for manual...
+    {
+	save_entry = Sound::unconfigured_cards[card_id]:$[];
+	if (save_entry == $[])
+	{
+	    // error message
+	    Report::Error ("There is no such detected card.");
+	    return false;
+	}
+    }
+    if (save_entry == $[])// manual adding
+    {
+	if (modname == "")
+	{
+	    // error message (inssuficient parameters)
+	    Report::Error ("You must specify the kernel module name if you want to add a card which was not detected.");
+	    return false;
+	}
+	save_entry = update_manual_card ($[ "module": modname ]);
+    }
+
+    integer volume_b	= Sound::default_volume;
+    integer volume	= volume_b;
+    if (haskey (options, "volume"))
+	Sound::default_volume = tointeger (options["volume"]:"75");
+
+    // 2. configure selected card(s) ------------
+    do
+    {
+	list save_info	= Sound::modules_conf;
+	card_id		= size (Sound::modules_conf); // id of new card
+
+	save_entry  = add_common_options (save_entry, card_id);
+	save_entry  = add_alias (save_entry, card_id);
+
+	map res = sound_volume (save_entry, card_id, true, true, save_info);
+	ret = (res["ui"]:`back == `next);
+
+	if (ret)
+	{
+	    Sound::modules_conf = add (Sound::modules_conf, save_entry);
+	    if (card_no >= 0) // was autodetected
+	    {
+		Sound::unconfigured_cards = remove (Sound::unconfigured_cards,
+		    card_no);
+	    }
+	    // result message, %1 is card name
+	    CommandLine::Print (sformat (_("Successfully added card '%1'"),
+		save_entry["model"]:""));
+	    if (haskey (options, "play"))
+		PlayTest (card_id);
+	}
+	save_entry	= Sound::unconfigured_cards [0]:$[];
+
+    } while (all && ret && (save_entry != $[]));
+
+    Sound::default_volume = volume_b;
+    return ret;
+}
+
+/**
+ * Handler for removing the sound card
+ * @param options parameters on command line
+ * @return boolean success
+ */
+global define boolean RemoveCardHandler (map options) ``{
+
+    integer card_no	= tointeger (options["card"]:"-1");
+    boolean all		= haskey (options, "all");
+    boolean ret		= false;
+
+    if ((card_no == -1 && size (Sound::modules_conf) == 1) || all)
+	card_no = 0;// choose first card only if it is the only one
+    if (card_no == -1)
+    {
+	//error message
+	Report::Error( _("You must specify the card number."));
+	return false;
+    }
+    if (Sound::modules_conf[card_no]:nil == nil)
+    {
+	//error message
+	Report::Error( _("There is no such sound card."));
+	return false;
+    }
+
+    card_id = card_no;
+    do
+    {
+	ret = (_snd_delete() == `next);
+    }
+    while (all && ret && Sound::modules_conf[card_id]:nil != nil);
+
+    return ret;
+}
+
+/**
+ * Handler for playing the test sound
+ * @param options parameters on command line
+ * @return boolean false (no write)
+ */
+global define boolean TestCardHandler (map options) ``{
+
+    integer card_no = tointeger (options["card"]:"-1");
+    if (card_no == -1 && size (Sound::modules_conf) > 0)
+	card_no = 0;// choose first card if number is not given
+    if (Sound::modules_conf[card_no]:nil == nil)
+    {
+	//error message
+	Report::Error( _("There is no such sound card."));
+	return false;
+    }
+    string ret = PlayTest (card_no);
+    if (ret != "")
+    {
+	Report::Error (ret);
+	return false;
+    }
+    return false; // write not necessary
+}
+
+/**
+ * Handler for showing sound card information
+ * @param options parameters on command line
+ * @return boolean false (no write)
+ */
+global define boolean ShowCardHandler (map options) ``{
+
+    integer card_no = tointeger (options["card"]:"-1");
+    if (card_no == -1 && size (Sound::modules_conf) > 0)
+	card_no = 0;// choose first card if number is not given
+    map save_entry = Sound::modules_conf[card_no]:nil;
+    if (save_entry == nil)
+    {
+	//error message
+	Report::Error( _("There is no such sound card."));
+	return false;
+    }
+    string modname	= save_entry["module"]:"";
+    map params          = get_module_params (modname);
+    params		= restore_mod_params (params, save_entry["options"]:[]);
+
+    // label: list of card parameters will follow; %1 is card name, %2 driver
+    string out = sformat (_("Parameters of card '%1' (using module %2):\n"),
+	save_entry["model"]:"", modname);
+
+    foreach (string optname, map option, params, ``{
+	out = out + sformat ("\n%1", optname) + "\n\t"
+	    + getDescr (option["descr"]:_("No description available"));
+	if (option["default"]:"" != "")
+	    // label (default value of parameter)
+	    out = out + sformat ("\n\tDefault value: %1", option["default"]:"");
+	if (option["value"]:"" != "")
+	    // label (current value of parameter)
+	    out = out + sformat ("\n\tCurrent value: %1", option["value"]:"");
+    });
+    CommandLine::Print (out);
+
+    return false; // write not necessary
+}
+
+/**
+ * Handler for setting the paramerer values of sound card
+ * @param options parameters on command line
+ * @return boolean success
+ */
+global define boolean SetParametersHandler (map options) ``{
+
+    integer card_no = tointeger (options["card"]:"-1");
+    if (card_no == -1 && size (Sound::modules_conf) == 1)
+	card_no = 0;// choose first card only if it is the only one
+    if (card_no == -1)
+    {
+	//error message
+	Report::Error( _("You must specify the card number."));
+	return false;
+    }
+    map save_entry = Sound::modules_conf[card_no]:nil;
+    if (save_entry == nil)
+    {
+	//error message
+	Report::Error( _("There is no such sound card."));
+	return false;
+    }
+
+    string out = sformat (_("Sound card '%1'"), save_entry["model"]:"");
+    CommandLine::Print (out);
+    // TODO set parameters of the card...
+    // TODO volume: setVolume + storeVolume
+    return false;
+}
+
+/* the command line description map */
+map cmdline = $[
+    "id"		: "sound",
+    // translators: command line help text for Tv module
+    "help"		: _("Sound card configuration module."),
+    "guihandler"	: ``(SoundSequence()),
+    "initialize"	: ``(SoundRead ()),
+    "finish"		: ``(SoundWrite ()),
+    "actions"		: $[
+	"summary" :$[
+	    "handler"	: ``(SoundSummaryHandler()),
+	    // translators: command line help text for summary action
+	    "help"	: _("Configuration summary of sound cards")
+	],
+	"add" :$[
+	    "handler"	: ``(AddCardHandler()),
+	    // translators: command line help text for add action
+	    "help"	: _("Add sound card. Without parameters, add first one detected."),
+// TODO	    "options"	: "non_strict" - for unknown parameter names
+	],
+	"remove" :$[
+	    "handler"	: ``(RemoveCardHandler()),
+	    // translators: command line help text for remove action
+	    "help"	: _("Remove sound card(s)")
+	],
+	"playtest" :$[
+	    "handler"	: ``(TestCardHandler()),
+	    // translators: command line help text for test action
+	    "help"	: _("Play test sound on given sound card")
+	],
+	"show": $[
+	    "handler"	: ``(ShowCardHandler()),
+	    // translators: command line help text for test action
+	    "help"	: _("Show the information of given sound card")
+	],
+	"set": $[
+	    "handler"	: ``(SetParametersHandler()),
+	    // translators: command line help text for set action
+	    "help"	: _("Set the new values for given card parameters")
+// TODO	    "options"	: "non_strict" - for unknown parameter names
+	],
+    ],
+    "options"		: $[
+	"card"	:$[
+	    // translators: command line help text for the 'no' option
+	    "help"	: _("Number of sound card"),
+	    "type"	: "string"
+	],
+	"all"	:$[
+	    // translators: command line help text for the 'all' option
+	    "help"	: _("All available sound cards"),
+	],
+	"module"	:$[
+	    // translators: command line help text for the 'module' option
+	    "help"	: _("Kernel module (driver) for the sound card"),
+	    "type"	: "string"
+	],
+	"play"	:$[
+	    // translators: command line help text for the 'play' option
+	    "help"	: _("Play the test sound when the card is configured"),
+	],
+	"volume"	:$[
+	    // translators: command line help text for the 'volume' option
+	    "help"	: _("Volume value for the sound card (0-100)"),
+	    "type"	: "string"
+	],
+    ],
+    "mappings"		: $[
+	"summary"	: [],
+	"add"		: [ "card", "all", "module", "play", "volume"],
+	"remove"	: [ "card", "all" ],
+	"playtest"	: [ "card" ],
+	"show"		: [ "card" ],
+	"set"		: [ "card" ],
+    ]
+];
+
+// --------------------------------- cmd-line handlers
+// --------------------------------------------------------------------------
+
+
+any ret = CommandLineRun ( cmdline );
+y2debug("ret == %1", ret);
+
+y2milestone("Sound module finished");
+y2milestone("----------------------------------------");
+
+return ret;
+}//EOF

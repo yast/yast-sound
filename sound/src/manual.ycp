@@ -1,6 +1,6 @@
 /**
  * File:
- *   sound_manual.ycp
+ *   manual.ycp
  *
  * Module:
  *   Sound
@@ -33,13 +33,13 @@
      */
     global define map ManualDialogModules () ``{
 
-	string helptext	    = lookup(STRINGS, "ManualDialog", "");
-	list module_names   = get_module_names();
-	string initial = Sound::use_alsa ? "all" : select(select(module_names, 0, []), 1, "");
-	list card_names	    = get_card_names(initial);
-	term con	    = `VBox ();
+	string helptext		= STRINGS["ManualDialog"]:"";
+	list module_names	= get_module_names();
+	string initial		= Sound::use_alsa ? "all" :
+				    select(module_names[0]:[], 1, "");
+	list card_names		= get_card_names(initial);
 
-	con = add (con, `VBox (
+	term con = `VBox (
 	    `HBox (
 		`ReplacePoint (`id (`rep_drv),
 		    `SelectionBox (`id (`sel_drv), `opt(`notify),
@@ -56,7 +56,7 @@
 		// textetry label
 		`TextEntry (`id(`search), `opt(`notify), _("&Search")),
 		`VSpacing ()
-	));
+	);
 
 	// dialog title
 	Wizard::SetContentsButtons (_("Manual sound card selection"), con,
@@ -159,11 +159,11 @@
 		    // selection box title
 		    _("Sound card &vendor"), vendor_names)
 		),
-		`ReplacePoint(`id(`rep_mod),
+		`ReplacePoint (`id(`rep_mod),
 		    `SelectionBox (`id (`sel_mod), `opt(`notify),
 		    // selection box title
 		    _("Sound card &model"), card_names)
-		    )
+		)
 	    ),
 	    `VSpacing (),
 	    // textetry label
@@ -264,6 +264,49 @@
 	    ret = $["ui" : `next, "module" : modname, "model" : model];
 	}
 	return ret;
+    }
+
+    /**
+     * Update the settings for manualy choosed card: get the default options
+     * and check if it tha card wasn't detected
+     * @param card_map the current card (map with at least "module" entry)
+     * @return updated map of current card
+     */
+    global define map update_manual_card (map card_map) ``{
+
+	string uniq_k	= isa_uniq();
+	string label	= card_map["model"]:"Sound card";
+	string modname	= card_map["module"]:"";
+
+	// set default values for options
+	map optlist = Sound::db_modules[modname]:$[];
+	map options = $[];
+	maplist(string name, map val, optlist["params"]:$[], ``{
+	    if (haskey(val, "default"))
+	    {
+	        options = add (options, name, val["default"]:"");
+	    }
+	});
+
+	// if user selects the soundcard that has been already autodetected,
+	// use the detected card instead of manual selection (because it causes
+	// some problems with uniq. keys)
+	list det_cards = filter (map card, Sound::unconfigured_cards, ``(
+	    card["module"]:nil == modname));
+
+	y2debug("%1", det_cards);
+	if (size(det_cards) > 0)
+	{
+	    label  = det_cards[0, "model"]:label;
+	    uniq_k = det_cards[0, "unique_key"]:uniq_k;
+	}
+
+	return $[
+	    "module"     : modname,
+	    "model"	 : label,
+	    "unique_key" : uniq_k,
+	    "options"    : options
+	];
     }
 
     /**

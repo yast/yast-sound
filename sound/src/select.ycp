@@ -1,6 +1,6 @@
 /**
  * File:
- *   sound_select
+ *   select.ycp
  *
  * Module:
  *   Sound
@@ -14,30 +14,26 @@
  *
  * $Id$
  *
- * Params: 1st ... list of strings of new hardware
- *         2nd ... list of strings of configured hardware
  */
 
 {
-    textdomain "sound";
-    import "Summary";
-    import "Label";
 
-    /**
-     * dialog with list of unconfigured hardware
-     * @param sound_cards unconfigured cards
-     * @param save_info configured cards
-     * @return map result
-     *
-     */
+textdomain "sound";
+import "Summary";
+import "Label";
 
-    global define map sound_select(list sound_cards, list save_info) ``{
+/**
+ * dialog with list of unconfigured hardware
+ * @param sound_cards unconfigured cards
+ * @param save_info configured cards
+ * @return map result
+ */
+global define map sound_select (list sound_cards, list save_info) ``{
 
     // show the dialog
     string confhw = ConfCardsRT(save_info);
 
-    selectHardware( sound_cards,
-                    confhw);
+    selectHardware (sound_cards, confhw);
 
     UI::ChangeWidget(`id(`next), `Label, Label::FinishButton());
 
@@ -73,7 +69,6 @@
     }
 
     return $["ui" : ui, "type" : type, "id" : index];
-
 }
 
-}
+}//EOF

@@ -63,7 +63,7 @@
 		Sound::Import($[]);
 		ret = $[];
 	}
-	/* Change configuration (run AutoSequence) */
+	/* Change configuration (run AutoSequence) TODO */
 	else if (func == "Change") {
 		ret =  WFM::CallFunction(`sound());
 	}

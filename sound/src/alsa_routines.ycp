@@ -51,17 +51,16 @@
      * @param value volume 0-100
      * @return boolean success/failure
      */
-
     global define boolean setVolume (string group, integer cardid, integer value) ``{
 	if (!Mode::config)
 	{
-	    string p = sformat(".audio.alsa.cards.%1.channels.%2.volume", cardid, group);
-
+	    string p = sformat(".audio.alsa.cards.%1.channels.%2.volume",
+		cardid, group);
 	    return SCR::Write(topath(p), value);
 	}
 	else
 	{
-	    // store volume to Sound::volume_settings datastricure in autoinstallation
+	    // store volume to Sound::volume_settings for autoinstallation use
 	    map oldmap = Sound::volume_settings[cardid]:$[];
 	    Sound::volume_settings[cardid] = add(oldmap, group, value);
 	    return true;
@@ -72,9 +71,7 @@
      * plays test sound to card #card_id
      * @param card_id card id
      * @return string with error message. empty on success
-     *
      */
-
     global define string PlayTest (integer card_id) ``{
 
 	string fname = "/usr/share/sounds/alsa/test.wav";
@@ -99,9 +96,7 @@
      * sound_start_tmp starts alsa using temporary modules.conf
      * @param restore true - call alsactl restore, false - don't
      * @return void
-     *
      */
-
     global define void sound_start_tmp(boolean restore) ``{
 
 	string snd = sformat ("/sbin/modprobe snd %1cards_limit=%2 %1major=116",
@@ -112,7 +107,7 @@
 
 	// start 'snd' module first
 	cmds = flatten ([[snd], cmds]);
-	maplist(`cmd, cmds, ``{
+	maplist(string cmd, cmds, ``{
 	    map res = SCR::Execute(.target.bash_output, cmd, $[]);
 	    if (res["stderr"]:"" != "")
                 y2error("/sbin/modprobe error output: \n" + res["stderr"]:"");
@@ -139,7 +134,7 @@
      */
     global define list get_card_names (string vendor) ``{
 
-	Sound::LoadDatabase();
+	Sound::LoadDatabase(true);
         if (vendor == "all" || vendor == "")
         {
 	    if (all_card_names == [] || all_card_names == nil)
@@ -162,7 +157,7 @@
      * @return list of items with vendors (into table)
      */
     global define list get_vendor_names () ``{
-	Sound::LoadDatabase();
+	Sound::LoadDatabase(true);
 	list items = maplist (string v, list cs, Sound::db_vendors, ``{
 	    if (v == "other")
 		// table entry (vendor was not defined)
@@ -181,10 +176,10 @@
      */
     global define string get_module_by_cardname(string cardname) ``{
 	integer i = -1;
-	foreach(`e, `f, Sound::db_cards, ``{
-	    if (contains(f, cardname))
+	foreach (integer module_index, list names, Sound::db_cards, ``{
+	    if (contains (names, cardname))
 	    {
-		i = e;
+		i = module_index;
 	    }
 	});
 	return Sound::db_module_index[i]:"error";
@@ -195,9 +190,8 @@
      * @param modname module name
      * @return map with params and their descriptions
      */
-
     global define map get_module_params(string modname) ``{
-	Sound::LoadDatabase();
+	Sound::LoadDatabase(true);
 	map params = Sound::db_modules[modname, "params"]:$[];
 
 	// change the names of parameters if necessary
@@ -221,22 +215,22 @@
      */
 
     global define list get_vol_settings() ``{
-	Sound::LoadDatabase();
+	Sound::LoadDatabase(true);
 	integer bound	= size(SCR::Dir(.audio.alsa.cards));
 	integer i	= 0;
 	list retlist	= [];
 	while (i < bound)
 	{
 	    list sublist = [];
-	    string modname = lookup(select(Sound::modules_conf, i, $[]), "module", "snd-dummy");
-
-	    list chans = lookup(lookup(Sound::db_modules, modname, $[]), "mixer_elements", []);
+	    string modname = Sound::modules_conf[i,"module"]:"snd-dummy";
+	    list chans = Sound::db_modules[modname, "mixer_elements"]:[];
 
 	    if (chans == [])
 	    {
 		if (contains(SCR::Dir(.audio.alsa.cards), sformat("%1", i)))
 		{
-		    chans = SCR::Dir(topath(sformat(".audio.alsa.cards.%1.channels", i)));
+		    chans = SCR::Dir(topath(
+			sformat(".audio.alsa.cards.%1.channels", i)));
 		}
 		else
 		{
@@ -244,17 +238,15 @@
 		}
 	    }
 
-	    foreach(`e, chans,
-	    ``{
+	    foreach (string e, chans, ``{
 		path pth1 = topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", i, e));
 		path pth2 = topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", i, e));
 		sublist = add(sublist, [e, SCR::Read(pth1), SCR::Read(pth2)]);
 	    });
-	    retlist = add(retlist, sublist);
+	    retlist = add (retlist, sublist);
 	    i = i + 1;
 	}
 	return retlist;
-
     }
 
     /**
@@ -262,18 +254,17 @@
      * @param vol_settings volume settings
      * @return boolean success/failure
      */
-
-
     global define boolean set_vol_settings(list vol_settings) ``{
 	integer i = 0;
-	foreach(`e, vol_settings,
-	``{
-	    foreach(`f, e,
-	    ``{
-		path pth1 = topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", i, select(f, 0, "Master")));
-		path pth2 = topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", i, select(f,0, "Master")));
-		SCR::Write(pth1, select(f, 1, 0));
-		SCR::Write(pth2, select(f, 2, false));
+	foreach(list channels, vol_settings, ``{
+	    foreach(list channel, channels, ``{
+		string name = channel[0]:"Master";
+		path pth1 = topath (
+		    sformat(".audio.alsa.cards.%1.channels.%2.volume", i,name));
+		path pth2 = topath (
+		    sformat(".audio.alsa.cards.%1.channels.%2.mute", i, name));
+		SCR::Write (pth1, channel[1]:0);
+		SCR::Write (pth2, channel[2]:false);
 	    });
 	    i = i + 1;
 	});
@@ -283,16 +274,15 @@
     /**
      *  Returns list of already running cards
      *  @return list
-     *
-     *
      */
-
     global define list get_running_cards () ``{
 	path proot = .audio.alsa.cards;
+	list cards = SCR::Dir (proot);
 
-	list cards = SCR::Dir(proot);
-
-	return maplist(`e, cards, ``($["number":tointeger(e), "name": SCR::Read(add(add(proot, e), "name"))]));
+	return maplist(string c, cards, ``($[
+	    "number"	: tointeger (c),
+	    "name"	: SCR::Read (add(add(proot, c), "name"))
+	]));
     }
 
 
@@ -302,19 +292,14 @@
      * @param cards autodetected cards
      * @return list of entries of not configured cards
      */
-
     global define list filter_configured(list save_info, list cards) ``{
 	if (cards == nil) return [];
-	cards = filter(`e, cards,
-	``{
-	    string uniq	    = lookup(e, "unique_key", "");
+	cards = filter (map card, cards, ``{
+	    string uniq	    = card["unique_key"]:"";
 	    boolean retval  = true;
-	    foreach(`s, save_info,
-	    ``{
-		if (lookup(s, "unique_key", "") == uniq)
-		{
+	    foreach(map s, save_info, ``{
+		if (s["unique_key"]:"" == uniq)
 		    retval = false;
-		}
 	    });
 	    return retval;
 	});
@@ -368,12 +353,15 @@
 
         while (i < number)
         {
-            modules = add(modules, $[ "alias": sformat ("sound-slot-%1", i),
-                                    "module": sformat ("snd-card-%1", i)]);
-            foreach(`k, `v, oss_list,
-            ``{
-                modules = add(modules, $[ "alias": sformat("sound-service-%1-%2",i, k),
-                                        "module": v]);
+            modules = add (modules, $[
+		    "alias"	: sformat ("sound-slot-%1", i),
+		    "module"	: sformat ("snd-card-%1", i) ]
+	    );
+            foreach(integer key, string mod, oss_list, ``{
+                modules = add (modules, $[
+		    "alias"	: sformat("sound-service-%1-%2", i, key),
+		    "module"	: mod]
+		);
             });
             i = i + 1;
         }
@@ -393,11 +381,11 @@
         if (size(snd) > 0)
         {
             // create save_info entries
-	    snd = maplist(map c, snd, ``{
-		if (c["alsaconf_detected"]:false)
-		    return c;
+	    snd = maplist(map card, snd, ``{
+		if (card["alsaconf_detected"]:false)
+		    return card;
 		// get all the apropriate information from the database
-		map mod = get_module (c);
+		map mod = get_module (card);
 		if (mod == $[])
 		{
 		    return $[];
@@ -412,9 +400,9 @@
 		    }
 		});
 		map entry = $[
-		    "model"     : get_card_label(c),
+		    "model"     : get_card_label(card),
 		    "module"    : mod["name"]:"",
-		    "unique_key": c["unique_key"]:"",
+		    "unique_key": card["unique_key"]:"",
 		    "options"   : opts
 		];
 		return entry;
@@ -426,4 +414,4 @@
         return snd;
     }
 
-}
+}//EOF
