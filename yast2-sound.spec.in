@@ -7,6 +7,8 @@
 Requires:	yast2 yast2-core yast2-runlevel hwinfo
 Summary:	Yast2 - Sound configuration
 
+Provides:	yast2-config-sound yast2-agent-audio yast2-db-sound
+Obsoletes:	yast2-config-sound yast2-agent-audio yast2-db-sound
 
 %description
 This package is a part of YaST2. It contains the necessary scripts to
