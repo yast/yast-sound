@@ -31,12 +31,10 @@ flags in brackets mean:
            .cards                          # (d) card crossroad
                  .0                        # (d)
                    .channels               # (d) channels available for card
-                            .PCM           # (d)
-                                .volume    # (rw) integer [0..100]
+                            .PCM           # (drw) volume -- integer [0..100]
                                 .mute      # (rw) boolean (true if muted)
                             .Line          ...
                                  .volume
-                                 .mute
                    .name                   # (r) description
                    .store                  # (x) store values for card #0
                    .restore                # (x) restore values for card #0
