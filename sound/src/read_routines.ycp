@@ -168,7 +168,7 @@ nil
 		    {
 			string key = select(keys, position);
 			list card = filter(`cc, cards, ``(lookup(cc, "unique_key", "") == key));
-			if (size(card) >= 0)
+			if (size(card) > 0)
 			{
 			    uniq = key;
 			    model = get_card_label(select(card, 0));
