@@ -323,12 +323,12 @@ YCPValue alsaGetCardName(int card_id)
     return YCPVoid();
 }
 
-YCPValue alsaStore(int card=-1)
+YCPValue alsaStore(int card)
 {
     return YCPVoid();
 }
 
-YCPValue alsaRestore(int card=-1)
+YCPValue alsaRestore(int card)
 {
     return YCPVoid();
 }

@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Apr 17 08:34:00 CEST 2002 - lslezak@suse.cz
+
+- use y2autoconf, create-spec
+- removed acconfig.h
+- declare default value of alsaStore and alsaRestore only once
+- version 2.6.1
+
+-------------------------------------------------------------------
 Mon Apr 08 15:40:48 CEST 2002 - arvin@suse.de
 
 - fixes for gcc 3.1

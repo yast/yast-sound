@@ -1,6 +1,7 @@
 Makefile
 Makefile.in
 configure
+configure.in
 config.h
 config.h.in
 config.cache
