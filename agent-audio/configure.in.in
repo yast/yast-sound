@@ -8,5 +8,9 @@
 @YAST2-CHECKS-COMMON@
 @YAST2-CHECKS-PROGRAM@
 
+## special stuff
+AC_CHECK_LIB(asound, snd_mixer_open, LIBASOUND=-lasound, LIBASOUND=)
+AC_SUBST(LIBASOUND)
+
 ## and generate the output...
 @YAST2-OUTPUT@
