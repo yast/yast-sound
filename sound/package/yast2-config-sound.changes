@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Feb  8 18:25:12 CET 2002 - lnussel@suse.de
+
+- command line argument is of type string
+
+-------------------------------------------------------------------
 Mon Jan 28 13:08:04 CET 2002 - dmeszar@suse.cz
 
 - fixed bug #12925 (config of single autodetected card not possible)
