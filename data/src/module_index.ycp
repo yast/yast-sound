@@ -95,7 +95,8 @@ $[
     74	: "snd-atiixp-modem",
     75	: "snd-via82xx-modem",
     76	: "snd-emu10k1x",
-    77	: "snd-audigyls",
+    77	: "snd-ca0106",
+    78	: "snd-hda-intel",
 
     100 : "snd-powermac"
 ]
