@@ -22,7 +22,6 @@
     include "misc_defines.ycp";
     include "lan/lan_routines.ycp";
 
-//    include "browser.ycp";
 
   /**
    * reads variables listed in 'vars' from rc.config
@@ -1221,7 +1220,7 @@
      */
 
     global define alsasound_start_tmp(boolean restore) ``{
-	string cmd="depmod -C "+get_tmp_modules_conf();
+	string cmd="/sbin/depmod -C "+get_tmp_modules_conf();
 	SCR(`Execute(.target.bash, cmd, $[]));
 
 	list als=SCR(`Read(.tmp.modules.alias));
@@ -1268,10 +1267,10 @@
 	SCR(`Execute(.target.bash, cmd, $[]));
 	
 //	cmd=sformat("/bin/grep \"^[^#].*snd-card-\" /etc/modules.conf >> %1", get_tmp_modules_conf());
-	cmd=sformat("grep \"^alias.snd-card-[0-9]*\" /etc/modules.conf >> %1", get_tmp_modules_conf());
+	cmd=sformat("/bin/grep \"^alias.snd-card-[0-9]*\" /etc/modules.conf >> %1", get_tmp_modules_conf());
 	SCR(`Execute(.target.bash, cmd, $[]));
 	
-	cmd=sformat("grep \"^options.snd-card-\" /etc/modules.conf >> %1", get_tmp_modules_conf());
+	cmd=sformat("/bin/grep \"^options.snd-card-\" /etc/modules.conf >> %1", get_tmp_modules_conf());
 	SCR(`Execute(.target.bash, cmd, $[]));
     }
 
@@ -1316,10 +1315,10 @@
      */
 
     global define remove_tmp_module_record(integer cid) ``{
-	string cmd=sformat("sed /snd-card-%1/d %2 > %3", cid, get_tmp_modules_conf(), get_tmp_modules_conf()+"2");
+	string cmd=sformat("/bin/sed /snd-card-%1/d %2 > %3", cid, get_tmp_modules_conf(), get_tmp_modules_conf()+"2");
 	SCR(`Execute(.target.bash, cmd, $[]));
 
-	cmd=sformat("sed /snd_index=%1/d %2 > %3", cid, get_tmp_modules_conf()+"2", get_tmp_modules_conf());
+	cmd=sformat("/bin/sed /snd_index=%1/d %2 > %3", cid, get_tmp_modules_conf()+"2", get_tmp_modules_conf());
 	SCR(`Execute(.target.bash, cmd, $[]));
     }
 
@@ -1329,11 +1328,11 @@
      */
 
     global define remove_tmp_module_by_name(string mod_name) ``{
-	string cmd=sformat("sed /%1/d %2 > %3", mod_name, get_tmp_modules_conf(), get_tmp_modules_conf()+"2");	
+	string cmd=sformat("/bin/sed /%1/d %2 > %3", mod_name, get_tmp_modules_conf(), get_tmp_modules_conf()+"2");	
 	SCR(`Execute(.target.bash, cmd, $[]));
 	
 
-	cmd=sformat("cp %1 %2", get_tmp_modules_conf()+"2", get_tmp_modules_conf());
+	cmd=sformat("/bin/cp %1 %2", get_tmp_modules_conf()+"2", get_tmp_modules_conf());
 	SCR(`Execute(.target.bash, cmd, $[]));
 
     }
@@ -1355,8 +1354,12 @@
 	{
 	    return true;
 	}
-	if(issubstring(tolower(lookup(card, "sub_device", "")), "awe"))
-	    // TODO: improve awe detecting
+	if(lookup(lookup(card, "module", $[]), "name", "")=="snd-card-sbawe")
+	{
+	    return true;
+	}
+	map pm = SCR(`Read(.proc.modules));
+        if (haskey (pm, "snd-card-sbawe"))
 	{
 	    return true;
 	}
@@ -1561,7 +1564,7 @@
 
     global define remove_uniques(list key_list, list id_list) ``{
 	id_list=sort(`x, `y, id_list, ``(x>=y));
-	maplist(`e, id_list, ``{if(e<size(id_list)) key_list=remove(key_list, e); });
+	maplist(`e, id_list, ``{ if(e<size(key_list)) key_list=remove(key_list, e); });
 	return key_list;
     }
 

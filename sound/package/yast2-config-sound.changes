@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri May 11 13:27:28 CEST 2001 - dmeszar@suse.cz
+
+- soundblater awe card presence enhanced
+
+-------------------------------------------------------------------
 Thu May 10 12:07:56 CEST 2001 - dmeszar@suse.cz
 
 - fixed to work with new libhd (#7918)
