@@ -6,7 +6,6 @@
 
     map mod_idx = SCR::Read(.target.ycp, "./src/module_index.ycp");
 
-    BrowseTree(mod_idx);
 
     list mods = maplist(`k, `v, mod_idx, ``(v)); // SCR::Dir(.modinfo.misc);
 
@@ -27,11 +26,13 @@
 
     map database = $[];
 
+
     foreach (`e, mods,
     ``{
 	mod_name = e;
 	mod_descr = lookup(lookup(modopts, mod_name, $[]), "module_description", "");
 	mod_params = $[];
+
 
 	database = add(database, mod_name, 
 			$[
@@ -87,6 +88,15 @@
 	    oldmap = add(oldmap, "params", oldopts);
 	    database = add(database, modname, oldmap);
 	}
+    });
+
+    // now merge stuff from ../addons/mod_addons.ycp
+
+    map addm = SCR::Read(.target.ycp, "./addons/mod_addons.ycp");
+
+    foreach(`k, `v, addm,
+    ``{
+	database = add(database, k, v);
     });
 
     SCR::Write(.target.ycp, "./modlist.ycp.in", database);

@@ -63,7 +63,7 @@ $[
     42	: "snd-sb16",
     43	: "snd-sb8",
     44	: "snd-sbawe",
-    45	: "snd-serial",
+//    45	: "snd-serial",
     46	: "snd-sgalaxy",
     47	: "snd-sonicvibes",
     48	: "snd-trident",
