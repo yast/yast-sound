@@ -58,9 +58,13 @@
 
     list toks = [];
 
-    foreach(`e, l,
+    maplist(`e, l,
     ``{
-	toks = regexptokenize(e, "(snd-card-[^ \t]*)[\t ]*info_devices=");
+	toks = regexptokenize(e, "(snd-[^ \t]*)[\t ]*info_devices=");
+	if (lookup(index, select(toks, 0), -1) == -1)
+	{
+	    return;
+	}
 	if (size(toks) > 0)
 	{
 	    output = add (output, lookup(index, select(toks, 0), -1), get_card_list(e));

@@ -67,7 +67,7 @@ $[
     46	: "snd-sgalaxy",
     47	: "snd-sonicvibes",
     48	: "snd-trident",
-    49	: "snd-via686a",
+    49	: "snd-via686",
     50	: "snd-via8233",
     51	: "snd-virmidi",
     52	: "snd-wavefront",
