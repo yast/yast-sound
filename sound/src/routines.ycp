@@ -984,28 +984,20 @@ define isnil(any a)
      *
      */    
     
-    define InsertOptions(list optionList, map modifiedOptions) ``{
+    global define InsertOptions(list optionList, map modifiedOptions) ``{
 	integer i=0;
 	integer iopt=0;
 	list ret=[];
 	map option=$[];
 //	string value="";
 	string optname="";
+
+
 	while(i<size(optionList))
 	{
 	    option=select(optionList, i);
 	    optname=lookup(option, "name");
 
-/*	    while(iopt<size(modifiedOptions))
-	    {
-		if(lookup(select(modifiedOptions, iopt), "name")==optname)
-		{
-		    value=lookup(select(modifiedOptions, iopt), "value");
-		    break;
-		}
-		iopt=iopt+1;
-	    }
-*/	    
 	    ret=add(ret, add(option, "value", lookup(modifiedOptions, optname, "")));
 	    i=i+1;
 	}
@@ -1033,7 +1025,7 @@ define isnil(any a)
 	}
 	map save_opts=lookup(lookup(select(save, 0), "modules", []), "options", []);
 	list options=lookup(lookup(card, "module", $[]), "params", []);   
- 
+
 	options=InsertOptions(options, save_opts);
 
 	map newModule=lookup(card, "module");
