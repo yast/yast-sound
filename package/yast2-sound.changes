@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Jan 10 16:59:13 CET 2003 - jsuchome@suse.de
+
+- fixed testsuite (imported module Arch has some SCR calls)
+
+-------------------------------------------------------------------
 Thu Jan  9 09:46:14 CET 2003 - jsuchome@suse.de
 
 - fix of helptext (#19729 - "start ALSA")
