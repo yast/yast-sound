@@ -32,7 +32,7 @@
 	map ret = $[];
 	map db_entry = $[];
 	
-	if (tolower (module_name) == "all") {
+	if (module_name == UI(_("All"))) {
 	    list tmp = filter (`e, db, ``(contains(lookup (e, "cards"), card_name)));
 	    if (size (tmp) > 0)
 		db_entry = select (tmp, 0);
