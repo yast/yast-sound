@@ -1,8 +1,9 @@
 /**
  * File:	clients/sound_proposal.ycp
- * Package:	Configuration of sound
- * Summary:	Proposal function dispatcher.
+ * Package:	Sound configuration
+ * Summary:	Proposal function dispatcher
  * Authors:	Dan Meszaros <dmeszar@suse.cz>
+ *		Ladislav Slezak <lslezak@suse.cz>
  *
  * $Id$
  *
@@ -34,7 +35,9 @@
 
 	// Do not show any progress during Read()
 	Progress::off ();
+	UI::OpenDialog(`VBox(`Label(_("Detecting sound cards ..."))));
 	boolean success = Sound::Propose ();
+	UI::CloseDialog();
 	Progress::on ();
 
 
