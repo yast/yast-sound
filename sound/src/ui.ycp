@@ -98,26 +98,69 @@
 	symbol output=input;
 	if(input==`next)
 	{
-	    integer tmp=UI::QueryWidget(`id(`action), `CurrentButton);
-	    if(tmp==2)
-	    {
-		output=`options;
-	    }
-	    if(tmp==1)
+	    output = UI::QueryWidget(`id(`action), `CurrentButton);
+	    if(output==`normal)
 	    {
 		output=`next;
-	    }
-	    if(tmp==3)
-	    {
-		output=`skip;
-	    }
-	    if(tmp==0)
-	    {
-		output=`quick;
 	    }
 	}
 	return $["ui" : output];
     }
+
+    /**
+     *
+     *
+     */
+
+    global define quickConfig(string name, string cname, integer cpos, integer flags) ``{
+        string helptext=lookup(STRINGS, "quickConfig");
+        term con=QuickconfDlg(name, cname, cpos);
+        UI::SetWizardContents (_("Sound card configuration"), con, helptext, true, true);
+                // dialog title
+        integer flagc=1;
+        integer flagp=0;
+        boolean selected=false;
+        while(flagp<3)
+        {
+            if((flagc & flags) ==0)
+            {
+                UI::ChangeWidget(`id(flagp), `Enabled, false);
+            }
+            else
+            {
+                if(!selected)
+                {
+                    selected=true;
+                    UI::ChangeWidget(`id(`action), `CurrentButton, flagp);
+                }
+            }
+            flagp=flagp+1;
+            flagc=flagc*2;
+        }
+                // Next button label    
+        UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
+
+	        symbol input=`cancel;
+
+        while(input==`abort || input==`cancel)
+        {
+            input=UI::UserInput();
+            if(input == `cancel || input == `abort)
+            {
+                if(ReallyAbort())
+                {
+                    return $["ui": `abort];
+                }
+            }
+        }
+        symbol output=input;
+        if(input==`next)
+        {
+            output=UI::QueryWidget(`id(`action), `CurrentButton);
+        }
+        return $["ui" : output];
+    }
+
 
     /**
      *  
@@ -362,17 +405,62 @@
                 `HBox (`HSpacing (5), `RadioButtonGroup (
                     `id (`action),
                     `VBox (
-                        `RadioButton (`id (0), `opt (`hstretch), _("&Quick automatic setup"), true),
+                        `RadioButton (`id (`quick), `opt (`hstretch), _("&Quick automatic setup"), true),
                         `VSpacing (0.3),
-                        `RadioButton (`id (1), `opt (`hstretch), _("&Normal setup")),
+                        `RadioButton (`id (`normal), `opt (`hstretch), _("&Normal setup")),
                         `VSpacing (0.3),
-                        `RadioButton (`id (2), `opt (`hstretch), _("&Advanced setup with possibility to change options"))
+                        `RadioButton (`id (`options), `opt (`hstretch), _("&Advanced setup with possibility to change options"))
                         )
                     )),
                 `VStretch ()
                 );
 	return con;
     }
+
+    /**
+     * quick conf dialog widget
+     *
+     *
+     */
+
+        global define QuickconfDlg(string name, string cname, integer cpos) ``{
+        string clab="";
+
+        if(cpos<3)
+        {
+            clab="\n"+sformat(select(lookup(STRINGS, "soundCount", ""), cpos), cname);
+        }
+        else
+        {
+            clab="\n"+sformat(select(lookup(STRINGS, "soundCount", ""), 3), cname, cpos+1);
+        }
+
+        term con=
+            `VBox (
+                `VSpacing (1),
+                // this is the first part of message "The sound card 'cardname' will be configured as the first snd card"
+                `Label (`opt (`hstretch), _("The sound card\n")),
+                `HBox (`HSpacing (5), `Label (`opt (`hstretch), name)),
+                `Label (`opt (`hstretch), clab),
+                `VSpacing (1),
+                `HBox (`HSpacing (5), `RadioButtonGroup (
+                    `id (`action),
+                    `VBox (
+                        `RadioButton (`id (`quick), `opt (`hstretch), _("&Quick automatic setup"), true),
+                        `VSpacing (0.3),
+                        `RadioButton (`id (`normal), `opt (`hstretch), _("&Normal setup")),
+                        `VSpacing (0.3),
+                        `RadioButton (`id (`intro), `opt (`hstretch), _("More detailed installation of sound cards"))
+                        )
+                    )),
+                `VStretch ()
+                );
+        return con;
+    }
+
+
+    
+
 
     /**
      *  dialog to be displayed when user presses 'Abort' button

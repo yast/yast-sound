@@ -37,14 +37,14 @@ boolean finish=false;
 global define _showName()
 ``{
     string modelname=lookup(save_entry, "model", "");
-    res=DisplayName(modelname, lookup(save_entry, "alias"), card_id, flags);
+    map res=DisplayName(modelname, lookup(save_entry, "alias"), card_id, flags);
     symbol ui=lookup(res, "ui", nil);
     return ui;
 }
 
 global define _options()
 ``{
-    res=CallFunction (`sound_options(save_entry));
+    map res=CallFunction (`sound_options(save_entry));
     symbol ui=lookup(res, "ui", nil);
     if(ui == `next)
     {
@@ -56,14 +56,14 @@ global define _options()
 
 global define _quick()
 ``{
-    res=CallFunction (`sound_volume(save_entry, card_id, finish, true, save_info));
+    map res=CallFunction (`sound_volume(save_entry, card_id, finish, true, save_info));
     symbol ui=lookup(res, "ui", nil);
     return ui;
 }
 
 global define _volume()
 ``{
-    res=CallFunction (`sound_volume(save_entry, card_id, finish, false, save_info));
+    map res=CallFunction (`sound_volume(save_entry, card_id, finish, false, save_info));
     symbol ui=lookup(res, "ui", nil);
     return ui;
 }
@@ -122,6 +122,7 @@ global define OneCardWizard (map save_entry, integer card_id, any ui,
 	    "name":
 	    $[
 		`quick: "quick",
+		`skip : `back,
 	        `next:  "volume",
 //	        `back:  `back,
 	        `options: "options",

@@ -39,24 +39,133 @@
     // text constants for sound module
     map STRINGS=STRINGS_();
     float oldf=0.0; 
- 
-    // Menuentry for the YaST2 menu
-    if (Args() == [ "get_menuentry" ])
-    {
-	return [ "sound", $[
-	    `menuentry    : _("Hardware/Sound"),
-	    `arguments    : [ ],
-	    `widget       : `RichText(
-	    //
-	    _("Launch this module to configure your sound card.")
-	    +
-	    _("<p>You need to be logged in as <i>root</i> in order to do this.</p>")),
-	    `codefragment : nil ]
-	];
+
+    // just cover functions for wizard sequencer
+    // these global variables are used and modified: 
+    //	  save_info
+    //	  card_id
+    //    sound_cards  
+
+    /*
+     * card selection
+     *
+     */
+
+
+    map save_entry=$[];
+
+    global define _snd_select() ``{
+	list nh=maplist(`e, sound_cards, ``(lookup(e, "model", "")));
+	if(size(nh)==0)
+	{
+	    return `detail;
+	}
+
+        list ch=maplist(`e, save_info, ``(lookup(e, "model", ""))); 
+	map res=CallFunction(`sound_select(nh, save_info));
+	card_id=lookup(res, "id", -1);
+	if(card_id==-1)
+	{
+	    return `manual;
+	}
+	return lookup(res, "ui", `abort);
     }
 
-    
-    // ========== MAIN ==========
+    /**
+     *
+     *
+     */
+
+    global define _snd_quick() ``{
+	save_entry=select(sound_cards, 0);
+	card_id=0;
+	string modelname=lookup(save_entry, "model", "");
+	map res=quickConfig(modelname, "snd-card-0", card_id, 15);
+	symbol ui=lookup(res, "ui", nil);
+//	if(ui==`next)
+//	{
+//	    save_info=[save_entry];
+//	}
+	return ui;	
+    }
+
+    global define _snd_quick2(boolean type) ``{
+	save_entry=add_common_options(save_entry, 0);
+	save_entry=add_alias(save_entry, 0);
+	map res=CallFunction (`sound_volume(save_entry, 0, true, type, []));
+	symbol ui=lookup(res, "ui", nil);
+	if(ui==`next)
+	{
+	    save_info=[save_entry];
+	}
+	return ui;
+    }
+
+    /*
+     * card selection
+     *
+     */
+
+    global define _snd_manual() ``{
+	map res = add_card_manually(save_info);
+	symbol ui = lookup(res, "ui", `abort);
+	if(ui == `next)
+	{
+	    save_info = add(save_info, lookup(res, "return", $[]));
+	}	
+	return ui;
+    }
+
+    /*
+     * card selection
+     *
+     */
+
+    global define _snd_options() ``{
+
+    }
+
+    /*
+     * card selection
+     *
+     */
+
+    global define _snd_config() ``{
+	map save_entry=select(sound_cards, card_id);
+	map res=OneCardWizard(save_entry, size(save_info), false, 15, false, save_info);
+
+        symbol ui=lookup(res, "ui", nil);
+        if(ui==`next)
+        {
+            save_info=add(save_info, lookup(res, "return", $[]));
+            sound_cards=remove(sound_cards, card_id);
+            // TODO: another dialog should be called
+        }
+	return ui;
+    }
+
+    /*
+     * card selection
+     *
+     */
+
+    global define _snd_complex() ``{
+	map res=CallFunction(`sound_complex(save_info));
+        symbol ui=lookup(res, "ui", nil);
+        if(ui==`next)
+        {
+            save_info=lookup(res, "save_info", []);
+            rc_vars=lookup(res, "rc_vars", []);
+            state=`save;
+        }
+	return ui;
+    }
+
+    /*
+     *
+     * ========== MAIN ==========
+     *
+     */
 
 
     OpenMainDialog();
@@ -146,176 +255,104 @@
     nm256_opl3sa2_warn(sound_cards);
 
     symbol state=`card_select;
-    map res=$[];
 
-    boolean can_go_back=false;
+    
+    // test data
+//    save_info=[];
+//    sound_cards=[$["model":"Pokusna karta", "module": "snd-card-emu10k1", "unique_key":"kx", "options": []]];
 
-    repeat
+    string initial="intro";
+
+    if(size(sound_cards)==1 && size(save_info)==0)
     {
-	if(state==`card_select)
-	// let's select the hardware we want to configure
-	{
-	    if(size(sound_cards)==0)
-	    {
-		state=`detail;
-		can_go_back=false;
-		continue;
-	    }
-	    list nh=maplist(`e, sound_cards, ``(lookup(e, "model", "")));
-	    list ch=maplist(`e, save_info, ``(lookup(e, "model", "")));
-	    y2error(nh);
-	    res=CallFunction(`sound_select(nh, save_info));
-	    symbol ui=lookup(res, "ui", nil);
-	    if(ui==`configure)
-	    {
-		if(lookup(res, "type", nil)==`new)
-		{
-		    card_id=lookup(res, "id", 0);
-		    state=`card_wizard;
-		}
-		else if(lookup(res, "type", nil)==`configured)
-		{
-		    card_id=lookup(res, "id", 0);
-	            state=`edit_options;
-		}
-		else if(lookup(res, "type", nil)==`manual)
-		{
-		    state=`add_manual;
-		}   
-	    } 
-	    else if(ui==`detail)
-	    {
-		state=`detail;
-		can_go_back=true;
-	    }
-	    else if(ui==`back || ui==`abort)
-	    {
-		state=`abort;
-	    }
-	    else if(ui==`next)
-	    {
-		state=`save;
-	    }
-	}
-	else if(state==`card_wizard)
-	// run the card wizard for new card
-	{
-	    map save_entry=select(sound_cards, card_id);
-	    res=OneCardWizard(save_entry, size(save_info), false, 15, false, save_info);
-	    symbol ui=lookup(res, "ui", nil);
-	    if(ui==`back)
-	    {
-		state=`card_select;
-	    }
-	    else if(ui==`next)
-	    {
-		save_info=add(save_info, lookup(res, "return", $[]));
-		sound_cards=remove(sound_cards, card_id);
-		// TODO: another dialog should be called
-		state=`card_select;
-	    }
-	    else if(ui==`abort)
-	    {
-		state=`abort;
-	    }
-	}
-	else if(state==`edit_options)
-	// edit options
-	{
-	    map entry=select(save_info, card_id);
-	    map res=CallFunction(`sound_options(entry));
-	    symbol ui=lookup(res, "ui", nil);
-	    if(ui==`next)
-	    {
-	        entry=lookup(res, "return", $[]);
-	        entry=add_common_options(entry, card_id);
-	        integer pos=0;
-	        save_info=maplist(`e, save_info,
-	        ``{
-	            if(pos!=card_id)
-	            {
-	                pos=pos+1;
-	                return e;
-	            }
-	            else
-	            {
-	                pos=pos+1;
-	                return entry;
-	            }
-	        });
-		state=`card_select;
-	    }
-	    else if(ui==`abort)
-	    {
-		state=`abort;
-	    }
-	    else
-	    {
-		state=`card_select;
-	    }
-	}
-	else if(state==`detail)
-	// edit card options
-	{
-	    map res=CallFunction(`sound_complex(save_info));
-	    symbol ui=lookup(res, "ui", nil);
-	    if(ui==`next)
-	    {
-		save_info=lookup(res, "save_info", []);
-		rc_vars=lookup(res, "rc_vars", []);
-		state=`save;
-	    }
-	    else if(ui==`abort)
-	    {
-		state=`abort;
-	    }
-	    else if(ui==`back)
-	    {
-		if(can_go_back)
-		{
-		    state=`card_select;
-		}
-		else
-		{
-		    state=`abort;
-		}
-	    }
-	}
-	else if(state==`add_manual)
-	{
-	    map res=add_card_manually(save_info);
-	    symbol ui=lookup(res, "ui", nil);
-	    if(ui==`next)
-	    {
-		save_info=add(save_info, lookup(res, "return", $[]));
-		state=`card_select;
-	    }
-	    else if(ui==`abort)
-	    {
-		state=`abort;
-	    }
-	    else
-	    {
-		state=`card_select;
-	    }
-	}
-    } until(state==`abort || state==`exit || state==`save);
-    if(state==`back || state==`abort)
+	card_id=0;
+	initial="quick";
+    }
+    else if(size(sound_cards)==0)
+    {
+	initial="complex";
+    }
+    
+
+    map m_aliases=$[
+	    "intro"	: ``(_snd_select()),
+	    "config"	: ``(_snd_config()),
+	    "options"	: ``(_snd_options()),
+	    "manual"	: ``(_snd_manual()),
+	    "complex"	: ``(_snd_complex()),
+	    "quick"	: ``(_snd_quick()),
+	    "quick2"	: ``(_snd_quick2(true)),
+	    "quick3"	: ``(_snd_quick2(false))
+	];
+
+    map m_sequence=$[
+	    "ws_start"	: initial,
+	    "quick"	:
+		$[
+		    `quick	    :	"quick2",
+		    `normal	    :	"quick3",
+		    `abort	    :	`abort,
+		    `intro	    :	"intro"
+		    
+		],
+	    "quick2"	:
+		$[
+		    `next	    :	`finish,
+		    `abort	    :	`abort
+		],
+	    "quick3"	:
+		$[
+		    `next	    :	`finish,
+		    `abort	    :	`abort
+		],
+	    "intro"	: 
+		$[
+		    `next	    :	`finish,
+		    `configure	    :   "config",
+		    `options	    :	"options",
+		    `manual	    :	"manual",
+		    `detail	    :	"complex",
+		    `abort	    :	`abort
+		],
+	    "config"	: 
+		$[
+		    `next	    :	"intro",
+		    `skip	    :	"manual",
+		    `abort	    :   `abort
+		],
+	    "options"	:
+		$[
+		    `next	    :	"intro",
+		    `abort	    :	`abort
+		],
+	    "manual"	: 
+		$[
+		    `next	    :	"intro",
+		    `abort	    :	`abort		
+		],		
+	    "complex"	:
+		$[
+		    `next	    :	`finish,
+		    `abort	    :	`abort
+		]
+	];
+
+    symbol ui=WizardSequencer(m_aliases, m_sequence);
+
+    if(ui==`back || ui==`abort)
     {
 	UI::CloseDialog();
 	return;
     }
-    else if(state==`save)
-    {
-	ui=`save;
-    }   
+
+    y2error("final save_info: %1", save_info);
 			    // filter out empty enries
     save_info = filter (`e, save_info, ``(size (e) > 0));
     n_cards = size (save_info);
 
     map save_map = $[];
 
-    if (ui == `save) 
+    if (ui == `finish) 
     {
 	CallFunction (`sound_write(save_info, rc_vars));
 
