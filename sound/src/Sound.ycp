@@ -159,6 +159,26 @@
     map rc_vars_b = nil;
     list volume_settings_b = nil;
 
+
+    /* default value of settings modified */
+    global boolean modified = false;
+
+    /**
+     * Function sets internal variable, which indicates, that any
+     * settings were modified, to "true"
+     */
+    global define void SetModified () {
+        modified = true;
+    }
+
+    /**
+     * Functions which returns if the settings were modified
+     * @return boolean  settings were modified
+     */
+    global define boolean GetModified () {
+        return modified;
+    }
+
     // ----------- prototypes for routines.ycp:
 
     global define void LoadDatabase (boolean use_ui);
