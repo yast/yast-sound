@@ -279,10 +279,10 @@ define boolean ShowCardHandler (map options) ``{
 	    + getDescr (option["descr"]:nil);
 	if (option["default"]:"" != "")
 	    // label (default value of sound module parameter)
-	    out = out +sformat(_("\n\tDefault value: %1"),option["default"]:"");
+	    out = out +sformat(_("\n\tDefault Value: %1"),option["default"]:"");
 	if (option["value"]:"" != "")
 	    // label (current value of sound module parameter)
-	    out = out + sformat(_("\n\tCurrent value: %1"), option["value"]:"");
+	    out = out + sformat(_("\n\tCurrent Value: %1"), option["value"]:"");
     });
     CommandLine::Print (out);
 
