@@ -8,13 +8,13 @@
  * Summary:
  *   sound card selection dialog
  *
- * Authors: 
+ * Authors:
  * Dan Meszaros <dmeszar@suse.cz>
- * 
+ *
  * String corrections by Christian Steinruecken <cstein@suse.de>, 2001/08/01
- * 
+ *
  * $Id$
- * 
+ *
  * Params: 1st ... list of strings of new hardware
  *         2nd ... list of strings of configured hardware
  */
@@ -24,7 +24,7 @@
     import "Wizard";
 
     /**
-     * returns intfield (if we are running in ncurses) or 
+     * returns intfield (if we are running in ncurses) or
      * slider (for qt)
      * @param label label for slider
      * @param value initial value
@@ -76,18 +76,18 @@
 	    ttmp = `HBox();
 	}
 
-	
+
 
 	while (pos < 2 && pos < size(channels))
 	{
-	    string lab	= select(select(channels, pos), 0);
-	    integer vol = select(select(channels, pos), 1);
-	    
+	    string lab	= select(select(channels, pos, []), 0, "");
+	    integer vol = select(select(channels, pos, []), 1, "");
+
 	    ttmp = add(ttmp, volElement(lab, vol, spec));
 	    pos = pos + 1;
 	}
 
-	ttmp = add(ttmp, `VSpacing(1));	
+	ttmp = add(ttmp, `VSpacing(1));
 
 	mainGroup = `Frame(_("&Master volume"), `HBox(`HSpacing(3), ttmp, `HSpacing(3)));
 
@@ -100,7 +100,7 @@
 	{
 	    if (ncols == counter)
 	    {
-		widget = add(widget, `Top(col));	
+		widget = add(widget, `Top(col));
 		if (!spec)
                 {
                     widget=add(widget, `HStretch());
@@ -110,8 +110,8 @@
                 counter = 0;
 	    }
 
-	    string lab = select(select(channels, pos), 0);
-	    integer vol = select(select(channels, pos), 1);
+	    string lab = select(select(channels, pos, []), 0, "");
+	    integer vol = select(select(channels, pos, []), 1, "");
 
 	    col = add(col, `HWeight(1, volElement(lab, vol, false)));
 	    col = add(col, `HSpacing(2));
@@ -140,7 +140,7 @@
  * @param card_id
  *
  */
-    
+
 global define mixerDialog(integer card_id) ``{
 
     integer card_id	= Args(0);
@@ -154,7 +154,7 @@ global define mixerDialog(integer card_id) ``{
     // get list of muted channels
     if (use_alsa)
     {
-	foreach(`e, channels, 
+	foreach(`e, channels,
 	``{
 	    path pth2 = topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, e));
 	    if (SCR::Read(pth2))
@@ -178,7 +178,7 @@ global define mixerDialog(integer card_id) ``{
 	    channels = prepend(channels, "Master");
 	}
 
-	channels = maplist(`e, channels, 
+	channels = maplist(`e, channels,
 	``{
 	    if (contains(muted, e))
 	    {
@@ -204,10 +204,10 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
     UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
 
     path    pth = nil;
-    any	    ui = nil;	// 'any' is essential here- value can be `next `abort... or string (channel name, 
-			//  whose name is dynamical) 
+    any	    ui = nil;	// 'any' is essential here- value can be `next `abort... or string (channel name,
+			//  whose name is dynamical)
     integer value = 0;
-    
+
     repeat
     {
 	ui = UI::UserInput();

@@ -27,6 +27,8 @@
     include "sound/routines.ycp";
     include "misc_defines.ycp";
 
+    include "browser.ycp";
+
     // list for storing detected cards
     global list detected_cards = nil;
 
@@ -46,7 +48,10 @@
     global map rc_vars = $[];
 
     // alsa sound card database
-    global list sound_db = nil;
+    global map db_cards = nil;
+    global map db_modules = nil;
+    global map db_indices = nil;
+    global map db_module_index = nil;
 
     /**
      * do hardware detection
@@ -58,7 +63,8 @@
 	{
 	    return true;
 	}
-	list ret = SCR::Read(.probe.sound);
+	detected_cards  = SCR::Read(.probe.sound);
+	return true;
     }
 
 
@@ -148,12 +154,18 @@
      */
 
     global define LoadDatabase() ``{
-	if (sound_db == nil || sound_db == [])
+	map sound_db =$[];
+	if (db_cards == nil || db_cards == $[])
 	{
 	    textdomain "sound_db";
-	    y2error("Reading card database");
+	    y2debug("Reading card database");
 	    sound_db = eval(SCR::Read (.target.yast2, "sndcards.ycp"));
-	    y2error("Database size = %1", size(sound_db));
+
+	    db_cards	= lookup(sound_db, "cards", $[]);
+	    db_modules	= lookup(sound_db, "modules", $[]);
+	    db_indices	= lookup(sound_db, "indices", $[]);
+	    db_module_index = lookup(sound_db, "mod_idx", $[]);
+
 	    textdomain "sound";
 	}
     }
@@ -163,7 +175,7 @@
      */
 
     global define DumpToLog() ``{
-	y2error(sformat("%1", [Sound::module_conf, rc_vars, true, true, get_vol_settings()]));
+	y2error(sformat("%1", [Sound::modules_conf, rc_vars, true, true, get_vol_settings()]));
     }
 
 }

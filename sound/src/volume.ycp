@@ -1,10 +1,10 @@
 /**
  * File:
  *   sound_manual.ycp
- * 
+ *
  * Module:
  *   Sound
- * 
+ *
  * Summary:
  *   Module where an attemp of inserting module is provided,
  *   if everything goes well adjusting volume is done here
@@ -67,7 +67,7 @@
 
 /* end of sound fonts installation */
 
-	
+
 
 	SetVolume ("Master", card_id, vol);
 
@@ -75,12 +75,12 @@
 	{
 	    ui =  UI::UserInput ();
 
-	    if (ui == `volume) 
+	    if (ui == `volume)
 	    {
 		vol = UI::QueryWidget(`id(`volume), `Value );
 		SetVolume("Master", card_id, vol);
 	    }
-	    else if (ui == `test) 
+	    else if (ui == `test)
 	    {
 		if (!test_mode)
 		{
@@ -99,8 +99,7 @@
 		    break;
 		}
 	    }
-		      
-	} while (!contains([`back, `next, `cancel], ui)); 
+	} while (!contains([`back, `next, `cancel], ui));
 	return ui;
     }
 
@@ -112,8 +111,8 @@
     */
 
     global define ErrorDialog (map save_entry, string err) ``{
-				    // Help text - intenal YaST2 error 
-    
+				    // Help text - intenal YaST2 error
+
 	y2debug("%1", save_entry);
 	string help_text = lookup(STRINGS, "ErrorDialog", "");
 	string additional = "";
@@ -124,7 +123,7 @@ using the \"Cirrus Logic CS4232\" or \"Cirrus
 Logic CS4236\" driver and configure 
 its parameters using the 'Advanced setup'.");
 	}
-	    
+
 	term con = `HVCenter
 	  (
 	    `VBox
@@ -137,7 +136,7 @@ its parameters using the 'Advanced setup'.");
 	      `Label (err + additional)
 	    )
 	  );
-	    
+
 	    // dialog title
 	Wizard::SetContents (ErrorMsg(), con, help_text, true, false);
 	if (finish)
@@ -147,12 +146,12 @@ its parameters using the 'Advanced setup'.");
 
 	UI::SetFocus(`id(`back));
 
-	repeat 
+	repeat
 	{
 	    ui =  UI::UserInput ();
             if (ui == `cancel || ui == `abort)
             {
-                if (ReallyAbort()) 
+                if (ReallyAbort())
                 {
                     return `abort;
                 }
@@ -170,7 +169,7 @@ its parameters using the 'Advanced setup'.");
     */
 
     global define SuccessDialog (map save_entry) ``{
-                                    // Help text - intenal YaST2 error 
+                                    // Help text - intenal YaST2 error
 
         string help_text = lookup(STRINGS, "SuccessDialog", "");
 
@@ -199,8 +198,8 @@ its parameters using the 'Advanced setup'.");
             ui =  UI::UserInput ();
 	    if (ui == `cancel || ui == `abort)
 	    {
-		if (ReallyAbort()) 
-		{   
+		if (ReallyAbort())
+		{
 		    return `abort;
 		}
 	    }
@@ -219,10 +218,10 @@ its parameters using the 'Advanced setup'.");
        *        2. on succes unmute and volume dialog
        *        3. on fail display error message
        */
-   
+
     /**
      * shows volume dialog for normal setup or success dialog for quick setup
-     * in case of failure show error dialog with 'next' button disabled 
+     * in case of failure show error dialog with 'next' button disabled
      * @param save_entry card config
      * @param card_id id of currently donfigured card
      * @param finish show 'finish' button instead of 'next'
@@ -230,16 +229,11 @@ its parameters using the 'Advanced setup'.");
      * @param save_info config of previuosly configured cards
      * @return symbol
      */
- 
+
     global define sound_volume(map save_entry, integer card_id, boolean finish,	boolean quick, list save_info) ``{
 
     boolean need_restart    = true;
-//    map save_entry	    = Args (0);
-//    integer card_id	    = Args (1);
-//    boolean finish	    = false;
     boolean test_mode	    = false;
-
-//    boolean quick = false;
 
     if (autoinstall)
     {
@@ -250,7 +244,7 @@ its parameters using the 'Advanced setup'.");
 
     string err_msg = "";
 
-    stop_programs();    
+    stop_programs(); 
 
 // #################################
 
@@ -275,7 +269,7 @@ its parameters using the 'Advanced setup'.");
 	{
 	    sound_stop();
 	    SaveModulesEntry (new_save, [], true);
-	    sound_start_tmp(true);
+	    sound_start_tmp(true, size(new_save));
 	    err_msg = check_module(save_entry, card_id);
 	}
     }
@@ -305,14 +299,14 @@ its parameters using the 'Advanced setup'.");
     }
 
     if (ui == `back || ui == `cancel || ui == `abort)
-    {	
+    {
 	if (!autoinstall)
 	{
 	    SaveModulesEntry(save_info, [], true);
-	    sound_start_tmp(true);	
+	    sound_start_tmp(true);
 	}
     }
-    
+
     SCR::Execute(.audio.alsa.restore, 0 ,0);
 
     UI::ChangeWidget (`id(`next), `Label, UI::NextButtonLabel());

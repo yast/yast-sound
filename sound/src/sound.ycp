@@ -115,7 +115,7 @@
      */
 
     global define _snd_quick() ``{
-	save_entry = select(Sound::unconfigured_cards, 0);
+	save_entry = select(Sound::unconfigured_cards, 0, $[]);
 	card_id = 0;
 	string modelname    = lookup(Sound::modules_conf, "model", "");
 	map res		    = quickConfig(modelname, "snd-card-0", card_id, 15);
@@ -168,8 +168,8 @@
 	    y2debug("%1", cds);
 	    if (size(cds) > 0)
 	    {
-		label  = lookup(select(cds, 0), "model", "Sound card");
-		uniq_k = lookup(select(cds, 0), "unique_key", isa_uniq());
+		label  = lookup(select(cds, 0, $[]), "model", "Sound card");
+		uniq_k = lookup(select(cds, 0, $[]), "unique_key", isa_uniq());
 	    }
 
 	    save_entry = $[
@@ -217,20 +217,20 @@
             {
                 return `next;
             }
-            string modname = lookup(select(Sound::modules_conf, card_id), "module", "");
+            string modname = lookup(select(Sound::modules_conf, card_id, $[]), "module", "");
 
             // we have to rember volume/mute settings because after a card removal
             // everything is muted and set to 0.
             list vol_settings = get_vol_settings();
 
-            list rem	    = get_indices_for_removal(Sound::modules_conf, modname, card_id);
+            list rem	    = [card_id]; //get_indices_for_removal(Sound::modules_conf, modname, card_id);
             Sound::modules_conf	    = remove_save_entries(Sound::modules_conf, rem);
             vol_settings    = multi_remove(vol_settings, rem);
 
             SaveModulesEntry (Sound::modules_conf, [], true);
 
 	    sound_stop();
-            sound_start_tmp(true);
+            sound_start_tmp(true, size(Sound::modules_conf));
             y2debug(sformat("%1", vol_settings));
             set_vol_settings(vol_settings);
 
@@ -251,7 +251,7 @@
     global define _snd_config() ``{
 	if (card_id >= 0)
 	{
-	    save_entry = select(Sound::unconfigured_cards, card_id);
+	    save_entry = select(Sound::unconfigured_cards, card_id, $[]);
 	}
 	map res = OneCardWizard(save_entry, size(Sound::modules_conf), 15, false, Sound::modules_conf);
 

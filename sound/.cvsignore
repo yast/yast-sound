@@ -5,6 +5,7 @@ config.cache
 config.status
 config.sub
 config.guess
+configure.in
 stamp-h
 config.log
 config.h.in

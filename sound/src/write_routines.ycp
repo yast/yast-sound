@@ -2,8 +2,8 @@
  *
  * $Id$
  *
- * File:              
- *   write_routines.ycp        
+ * File:
+ *   write_routines.ycp
  *
  * Module:
  *   Sound
@@ -14,7 +14,7 @@
  * Authors:
  *   Dan Veselý <dan@suse.cz> , Dan Meszaros <dmeszar@suse.cz>
  *
- *                   
+ *
  */
 
 {
@@ -53,9 +53,9 @@
             mod_alias_comment	= .tmp.modules.alias.comment;
         }
         boolean ret = true;
-        if (haskey (entry, "alias")) 
+        if (haskey (entry, "alias"))
             {
-                ret = ret && SCR::Write(mod_alias, lookup(entry, "module", "off"), 
+                ret = ret && SCR::Write(mod_alias, lookup(entry, "module", "off"),
 		    lookup(entry, "alias", "off"));
 		string comment = createAliasComment(lookup(entry, "model", ""), lookup(entry, "unique_key", ""));
 		// comment="# "+lookup(entry, "unique_key", "")+":"+lookup(entry, "model", "")+"\n";
@@ -82,15 +82,15 @@
 
 	// create distinct list of all modules
 	list mods = toset(maplist(`e, save_info, ``(lookup(e, "module", "off"))));
-	foreach(`modname, mods, 
+	foreach(`modname, mods,
 	``{
 	    list si = filter(`e, save_info, ``(lookup(e, "module", "off") == modname));
 	    si = maplist(`e, si, ``(lookup(e, "options", $[])));
 	    // create a set of at least once used option
 	    list opts = [];
-	    foreach(`a, si, 
-	    ``{ 
-		foreach(`b, `c, a, 
+	    foreach(`a, si,
+	    ``{
+		foreach(`b, `c, a,
 		``{
 		    opts = add(opts, b);
 		});
@@ -117,7 +117,7 @@
 		res = add(res, opname, value);
 	    });
 	    // write result to modules.conf
-	    
+
 	    SCR::Write(mod_options, res, modname);
 	});
     }
@@ -129,7 +129,7 @@
      */
 
     global define removeOldEntries(list als) ``{
-	maplist(`e, als, 
+	maplist(`e, als,
 	``{
 	    if (is_snd_alias(e) ||
 		issubstring(e, "sound-service-") ||
@@ -174,7 +174,7 @@
 	removeOldEntries(als);
 
 	SCR::Write(mod_alias, "off", "char-major-14");
-	SCR::Write(mod_alias, "off", "char-major-116");	
+	SCR::Write(mod_alias, "off", "char-major-116");
 
 	if (size(save_info) >0)
 	{
@@ -191,25 +191,25 @@
 	    {
 		if (Arch::sparc)
 		{
-		    string modname = lookup(select(save_info, 0), "module", "off");
+		    string modname = lookup(select(save_info, 0, $[]), "module", "off");
 		    SCR::Write(mod_alias, "sound-slot-0", "sound");
 		}
 		SCR::Write(mod_alias, "sound", "char-major-14");
 	    }
 	}
 
-        if ((contains(maplist (`e, save_info, 
-		``(SaveOneModulesEntry (e, tmp))), false))) 
+        if ((contains(maplist (`e, save_info,
+		``(SaveOneModulesEntry (e, tmp))), false)))
         {
             // Error message
-            err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry", ""); 
+            err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry", "");
             return $["return": false, "err_msg": err_msg];
         }
 	if (size(save_info) > 0 && use_alsa)
 	{
-	    
+
 	    list oss_aliases = alsa_oss(size(save_info));
-	    foreach(`e, oss_aliases, 
+	    foreach(`e, oss_aliases,
 	    ``{
 		SCR::Write(mod_alias, lookup(e, "module", ""), lookup(e, "alias", ""));
 	    });
@@ -262,5 +262,5 @@
             }
 	return err_msg;
     }
-    
+
 }

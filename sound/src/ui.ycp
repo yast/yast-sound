@@ -14,19 +14,16 @@
  * Authors:
  *   Dan Veselý <dan@suse.cz> , Dan Meszaros <dmeszar@suse.cz>
  *
- * 
+ *
  */
 
 {
     textdomain "sound";
     import "Wizard";
-//    include "sound/texts.ycp";
 
-//    map STRINGS = STRINGS_();
-
-    /** 
+    /**
      *	InitializingDialog
-     *  
+     *
      *
      * @return symbol
      */
@@ -42,9 +39,9 @@
     };
 
 
-    /**  
+    /**
      *  DisplayName
-     *   
+     *
      * @param name card model
      * @param cname sound card alias for modules conf
      * @param cpos cards position
@@ -52,7 +49,7 @@
      *
      * @return map
      */
-	  
+
     global define DisplayName (string name, string cname, integer cpos, integer flags) ``{
 	string helptext = lookup(STRINGS, "DisplayName", "");
 	term con = AutoconfDlg(name, cname, cpos);
@@ -66,20 +63,20 @@
 	{
 	    if ((flagc & flags) == 0)
 	    {
-		UI::ChangeWidget(`id(select(flages, flagp)), `Enabled, false);
+		UI::ChangeWidget(`id(select(flages, flagp, 0)), `Enabled, false);
 	    }
 	    else
 	    {
 		if (!selected)
 		{
 		    selected = true;
-		    UI::ChangeWidget(`id(`action), `CurrentButton, select(flages, flagp));
+		    UI::ChangeWidget(`id(`action), `CurrentButton, select(flages, flagp, 0));
 		}
 	    }
 	    flagp = flagp + 1;
 	    flagc = flagc * 2;
 	}
-		// Next button label    
+		// Next button label
 	UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
 
 	symbol input = `cancel;
@@ -94,7 +91,7 @@
 		    return $["ui" : `abort];
 		}
 	    }
-	} 
+	}
 	symbol output = input;
 	if (input == `next)
 	{
@@ -129,20 +126,20 @@
         {
             if ((flagc & flags) == 0)
             {
-                UI::ChangeWidget(`id(select(flages, flagp)), `Enabled, false);
+                UI::ChangeWidget(`id(select(flages, flagp, 0)), `Enabled, false);
             }
             else
             {
                 if (!selected)
                 {
                     selected = true;
-                    UI::ChangeWidget(`id(`action), `CurrentButton, select(flages, flagp));
+                    UI::ChangeWidget(`id(`action), `CurrentButton, select(flages, flagp, 0));
                 }
             }
             flagp = flagp + 1;
             flagc = flagc * 2;
         }
-                // Next button label    
+                // Next button label
         UI::ChangeWidget(`id(`next), `Label, UI::NextButtonLabel());
 
 	        symbol input = `cancel;
@@ -168,8 +165,8 @@
 
 
     /**
-     *  
-     * 	OpenMainDialog 
+     *
+     *	OpenMainDialog
      *
      * @return void
      */
@@ -184,7 +181,7 @@
      *
      *  @param save_entry map with card info
      *  @param vol initial volume (0-100)
-     *  @return term 
+     *  @return term
      */
 
     global define VolumeCon(map save_entry , integer vol) ``{
@@ -199,10 +196,10 @@
 	term con = `HBox
 	  (
 	    `HSpacing (3),
-	    `VBox 
+	    `VBox
 	    (
 	      `VSpacing (),
-	      `Top 
+	      `Top
 	      (`VBox
 		(
 			// dialog title
@@ -210,8 +207,8 @@
 		  `Label (`opt(`outputField), lookup(save_entry, "model", ""))
 			)),
 		    // To translators keep backlash here
-		  `Frame 
-		  (_("Volume adjust and test"), 
+		  `Frame
+		  (_("Volume adjust and test"),
 		    `HBox
 		    (
 		      `HSpacing (),
@@ -236,7 +233,7 @@
 
 	return con;
     }
-	    
+
     /**
      *	UI controls for options setting dialog
      *
@@ -244,7 +241,7 @@
      *  @param itemized_descriptions option list (preformated using 'create_table' with tripples: description, name, value
      *  @param current_option index of initially selected item
      *  @param current_option_name initially selected item name
-     *  @return term 
+     *  @return term
      *  @see sound_options#create_table
      */
 
@@ -263,7 +260,7 @@
 		  `HBox
 		  (
 		    `TextEntry (`id (`des), `opt(`notify), current_option_name,
-			 lookup (select (options, current_option), "value", "")),
+			 lookup (select (options, current_option, ""), "value", "")),
 		    `VBox(
 			`Label(""),
 			`HBox(
@@ -353,19 +350,13 @@
         {
             butts = `HBox(
 			alsabuts,
-//                        `VBox
-//                         (
-//                            `Left(`CheckBox(`id(`b_alsa), `opt(`notify), _("Start &ALSA"), start_alsa)),
-//                         // check button label
-//                            `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("&Start sequencer"), start_alsa_seq))
-//                         ),
                         `VBox
                         (
                             `PushButton (`id(`b_fonts), _("&Install soundfonts..."))
                         )
                     );
         }
-	else 
+	else
 	{
 	    butts =  alsabuts;
 
@@ -387,7 +378,6 @@
 			`PushButton (`id(`b_volume), _("&Volume")),
 			`HStretch (),
                         `PushButton (`id(`b_delete), _("&Delete"))
-	    
                     ),
                     `VSpacing (0.5),
                     `HBox
@@ -401,7 +391,7 @@
             );
 	return con;
     }
-    
+
     /**
      * quick config dialog widget
      * @param name card model
@@ -411,16 +401,16 @@
      */
 
     global define AutoconfDlg(string name, string cname, integer cpos) ``{
-	string clab = "";	
-    
+	string clab = "";
+
 	if (cpos < 3)
 	{
-	    clab = "\n" + sformat(select(lookup(STRINGS, "soundCount", ""), cpos), cname);
+	    clab = "\n" + sformat(select(lookup(STRINGS, "soundCount", ""), cpos, ""), cname, "");
 	}
 	else
 	{
-	    clab = "\n" + sformat(select(lookup(STRINGS, "soundCount", ""), 3), cname, cpos + 1);
-    	}
+	    clab = "\n" + sformat(select(lookup(STRINGS, "soundCount", ""), 3, ""), cname, cpos + 1, "");
+	}
 
 	term con =
             `VBox (
@@ -459,11 +449,11 @@
 
         if (cpos < 3)
         {
-            clab = "\n" + sformat(select(lookup(STRINGS, "soundCount", ""), cpos), cname);
+            clab = "\n" + sformat(select(lookup(STRINGS, "soundCount", ""), cpos, ""), cname, "");
         }
         else
         {
-            clab = "\n" + sformat(select(lookup(STRINGS, "soundCount", ""), 3), cname, cpos + 1);
+            clab = "\n" + sformat(select(lookup(STRINGS, "soundCount", ""), 3, ""), cname, cpos + 1, "");
         }
 
         term con =
@@ -490,9 +480,6 @@
     }
 
 
-    
-
-
     /**
      *  dialog to be displayed when user presses 'Abort' button
      *	@return boolean
@@ -517,13 +504,13 @@
             index = index + 1;              // select first item
             return `item(`id(index), e, index == 0);
             });
-	
+
 	    // to translators: the full meaning of message is: "Add other not detected soundcard"
 	newHw = add(newHw, `item(`id(-1), _("Other (not detected)"), size(newHw) == 0));
 
 	term widget=Wizard_hw::DetectedContent(_("&Sound cards to configure"), newHw, false, 
 					sformat(_("<P><B>Already configured sound cards:</B>%1</P>"), confHw));
-	
+
 	string helptext = lookup(STRINGS, "selectHardware", "");
 
 
@@ -538,7 +525,7 @@
      */
 
     global define WhichDialog (list cards)       ``{
-    // help text 
+    // help text
 
         string helptext = lookup(STRINGS, "WhichDialog", "");
 

@@ -5,7 +5,7 @@
  *   sound_summary.ycp
  *
  * Module:
- *   Sound       
+ *   Sound
  *
  * Authors:
  *   Dan Meszaros <dmeszar@suse.cz>
@@ -13,8 +13,8 @@
  * $Id$
  *
  * Soud installation summary. returns list of already configured and not configured sound cards
- *             
- * @param skipNotConfigured if set to true, list of notconfigured cards will be excluded      
+ *
+ * @param skipNotConfigured if set to true, list of notconfigured cards will be excluded
  *
  */
 
@@ -28,7 +28,7 @@
 
 boolean __sparc = nil;
 boolean use_alsa = !Arch::sparc;
-if (use_alsa) 
+if (use_alsa)
 {
 	include "sound/alsa_routines.ycp";
 }
@@ -44,7 +44,7 @@ else
 	return id;
     }
 
-    list cards	    = get_audio();
+    list cards	    = Sound::detected_cards;
     list keys	    = read_unique_keys();
     list save_info  = read_save_info ();
 
