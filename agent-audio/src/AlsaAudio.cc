@@ -213,6 +213,7 @@ YCPValue alsaStore(int card=-1)
 	cmd+=tmp;
     }
     cmd+=" > /dev/null";
+    y2error("executing '%s'", cmd.c_str());
     if(system(cmd.c_str())!=-1)
     {
 	return YCPBoolean(true);

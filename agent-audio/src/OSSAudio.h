@@ -17,6 +17,10 @@
 extern char *ossChannels[];
 extern int ossChannels_num;
 
+using std::string;
+using std::vector;
+using std::map;
+
 /** 
  *  volume setting
  *  @param card card id (default if empty)
