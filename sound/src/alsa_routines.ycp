@@ -356,8 +356,8 @@
 
     global define map add_common_options(map entry, integer card_id) ``{
 	map opts = lookup(entry, "options", $[]);
-	opts = add(opts, "snd_index", card_id);
-        opts = add(opts, "snd_id", sformat("card%1", card_id+1));
+	opts = add(opts, "snd_index", sformat("%1", card_id));
+//        opts = add(opts, "snd_id", sformat("card%1", card_id+1));
 
 	opts = add(opts, "snd_enable", "1");
 
