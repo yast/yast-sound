@@ -32,21 +32,21 @@
 			if ((err = snd_mixer_open(&handle, 0)) < 0) \
 			{ \
 				y2error("Mixer %s open error: %s", card, snd_strerror(err)); \
-				return YCPVoid(); \
+				return YCPNull(); \
 			} \
 			\
 			if ((err = snd_mixer_attach(handle, card)) < 0) \
 			{ \
 				y2error("Mixer attach %s error: %s", card, snd_strerror(err)); \
 				snd_mixer_close(handle); \
-				return YCPVoid(); \
+				return YCPNull(); \
 			} \
 			\
 			if ((err = snd_mixer_selem_register(handle, NULL, NULL)) < 0) \
 			{ \
 				y2error("Mixer register error: %s", snd_strerror(err)); \
 				snd_mixer_close(handle); \
-				return YCPVoid(); \
+				return YCPNull(); \
 			} \
 			\
 			err = snd_mixer_load(handle); \
@@ -54,7 +54,7 @@
 			{ \
 				y2error("Mixer load error: %s %s", card, snd_strerror(err)); \
 				snd_mixer_close(handle); \
-				return YCPVoid(); \
+				return YCPNull(); \
 			}
 
 
@@ -131,7 +131,7 @@ YCPValue alsaGetMute(int card_id, const string& channel)
     return YCPBoolean(false);
 }
 
-YCPValue alsaSetVolume(int card_id, const string& channel, int value)
+YCPBoolean alsaSetVolume(int card_id, const string& channel, int value)
 {
     INIT_MIXER
 
@@ -161,7 +161,7 @@ YCPValue alsaSetVolume(int card_id, const string& channel, int value)
     return YCPBoolean(false);
 }
 
-YCPValue alsaSetMute(int card_id, const string& channel, bool value)
+YCPBoolean alsaSetMute(int card_id, const string& channel, bool value)
 {
     INIT_MIXER
 
@@ -183,7 +183,7 @@ YCPValue alsaSetMute(int card_id, const string& channel, bool value)
     return YCPBoolean(false);
 }
 
-YCPValue alsaGetChannels(int card_id)
+YCPList alsaGetChannels(int card_id)
 {
     YCPList outlist;
 
@@ -211,7 +211,7 @@ YCPValue alsaGetChannels(int card_id)
     return outlist;
 }
 
-YCPValue alsaGetCards()
+YCPList alsaGetCards()
 {
     YCPList list;
     char str[4];
