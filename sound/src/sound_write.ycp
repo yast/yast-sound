@@ -132,10 +132,7 @@
     sleep(10);
     Progress::NextStage();
 
-    if (!Sound::write_only)
-    {
-	Sound::StoreUniqueKeys();
-    }
+    Sound::StoreUniqueKeys();
 
     sleep(10);
     Progress::NextStage();
@@ -146,7 +143,6 @@
     Progress::NextStage();
 
     list configuredcards = Sound::GetSoundCardList();
-
     if (!Sound::write_only)
     {
 	// stop joystick before restarting ALSA
@@ -161,12 +157,7 @@
 
     Progress::NextStage();
 
-    if (Sound::write_only && haskey (settings, "volume_settings"))
-    {
-	set_vol_settings (vol_settings);
-    }
-
-    if (SCR::Read(.target.size, "/etc/asound.state") == -1)
+    if (SCR::Read(.target.size, "/etc/asound.state") == -1 || Sound::write_only)
     {
 	integer i = 0;
 	maplist (map e, (list<map>) save_info, ``{
@@ -176,6 +167,11 @@
     }
 
     SaveVolume();
+
+    if (Sound::write_only && haskey (settings, "volume_settings"))
+    {
+	set_vol_settings (vol_settings);
+    }
 
     sleep(10);
     Progress::NextStage();

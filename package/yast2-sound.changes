@@ -1,4 +1,33 @@
 -------------------------------------------------------------------
+Tue May 18 18:34:58 CEST 2004 - jsuchome@suse.cz
+
+- fixed script for copying sound fonts (#40663)
+- 2.9.22
+
+-------------------------------------------------------------------
+Tue May 11 16:50:49 CEST 2004 - jsuchome@suse.cz
+
+- during write, initialize mixer before setting volumes (#38797)
+- 2.9.21
+
+-------------------------------------------------------------------
+Tue May  4 09:14:47 CEST 2004 - jsuchome@suse.cz
+
+- merged in proofread text 
+
+-------------------------------------------------------------------
+Thu Apr 29 09:41:23 CEST 2004 - jsuchome@suse.cz
+
+- fix: do not set Mode::config during autoinstallation
+
+-------------------------------------------------------------------
+Thu Apr 22 17:02:53 CEST 2004 - jsuchome@suse.cz
+
+- match cards added during autoinstalltion config with detected ones (#38797)
+- correctly handle Imported volume settings 
+- 2.9.20
+
+-------------------------------------------------------------------
 Mon Apr  5 19:11:32 CEST 2004 - jsuchome@suse.cz
 
 - fix of audio agent: close opened mixer handle

@@ -26,29 +26,82 @@
  */
 
 {
-	textdomain "sound";
+    textdomain "sound";
 
-	y2milestone("----------------------------------------");
-	y2milestone("Sound auto started");
+    y2milestone("----------------------------------------");
+    y2milestone("Sound auto started");
 
-	import "Sound";
-	import "Mode";
-	import "Summary";
-	import "Wizard";
-	Mode::config = true;
+    import "Sound";
+    import "Mode";
+    import "Summary";
+    import "Wizard";
 
-	any ret = nil;
-	string func = "";
-	map param = $[];
+    any ret = nil;
+    string func = "";
+    map param = $[];
 
-	/* Check arguments */
-	if (size(WFM::Args()) > 0 && is(WFM::Args(0), string)) {
-		func = (string) WFM::Args(0);
-		if(size(WFM::Args()) > 1 && is(WFM::Args(1), map))
-		    param = (map) WFM::Args(1);
+    /* Check arguments */
+    if (size(WFM::Args()) > 0 && is(WFM::Args(0), string)) {
+	func = (string) WFM::Args(0);
+	if(size(WFM::Args()) > 1 && is(WFM::Args(1), map))
+	    param = (map) WFM::Args(1);
+    }
+    y2debug("func=%1", func);
+    y2debug("param=%1", param);
+
+
+    include "sound/routines.ycp";
+    include "sound/volume.ycp";
+
+    /**
+     * During autoinstallation write, update the card's from control file
+     * to match the detected cards from the current system
+     */
+    map UpdateCardsToTargetSystem (map settings) ``{
+
+	list<map> save_info	= settings["modules_conf"]:[];
+
+	Sound::DetectHardware();
+
+	save_info = maplist (map saved_card, save_info, ``{
+	    foreach (map e, Sound::detected_cards, ``{
+		map mod = get_module (e);
+		if (saved_card["module"]:"" == mod["name"]:"" &&
+		    e["unique_key"]:"" != "")
+		{
+		    saved_card["unique_key"]    = e["unique_key"]:"";
+		    saved_card["model"]		= get_card_label (e);
+		}
+	    });
+	    return saved_card;
+	});
+	// ------------------------------------------------
+	// now configure cards not included in control file
+	if (settings["configure_detected"]:false)
+	{
+	    // Now update Sound data, so the configured cards can be recognized
+	    // Import is not used, because it would remove detected cards
+	    Sound::modules_conf		= eval (save_info);
+	    Sound::volume_settings	= eval (settings["volume_settings"]:[]);
+
+	    Sound::UpdateUnconfiguredCards ();
+	    foreach (map card, Sound::unconfigured_cards, ``{
+		Sound::card_id	= size (save_info);
+		card		= add_common_options (card, Sound::card_id);
+		card		= add_alias (card, Sound::card_id);
+		map res		=
+		    sound_volume (card, Sound::card_id, true, true, save_info);
+		if (res["ui"]:`back == `next)
+		{
+		    save_info	= add (save_info, card);
+		    y2milestone ("Added sound card '%1'", card["model"]:"");
+		}
+	    });
+	    settings["volume_settings"]	= Sound::volume_settings;
 	}
-	y2debug("func=%1", func);
-	y2debug("param=%1", param);
+	settings["modules_conf"]	= eval (save_info);
+	return settings;
+    }
 
 	/* Create a  summary*/
 	if(func == "Import") {
@@ -84,6 +137,10 @@
 		Progress::off();
 		map settings = Sound::Export();
 		Sound::write_only = true;
+		// detect the cards on the system, so we could write them
+		// correctly:
+		settings = UpdateCardsToTargetSystem (settings);
+		Sound::Import (settings);
 		WFM::CallFunction ("sound_write", [ settings ]);
 		Progress::on();
 		return ret;

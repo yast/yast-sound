@@ -327,7 +327,24 @@
 	if (!Sound::use_alsa)
 	    return true;
 
+	// during autoinstallation, vol_settings list looks different... :-(
+	if (Mode::autoinst)
+	{
+	    vol_settings = maplist (any it, vol_settings, ``{
+		if (it == nil)
+		    return $[];
+		else return it;
+	    });
+	}
+	any item = vol_settings [0]:nil;
+	if (is (item, map))
+	{
+	    vol_settings = maplist (map onecard, (list<map>) vol_settings, ``{
+		return maplist (any ch, any vol, onecard, ``([ch, vol]));
+	    });
+	}
 	integer i = 0;
+
 	foreach(list<list<any> > channels, (list<list<list<any> > >)vol_settings, ``{
 	    foreach(list<any> channel, channels, ``{
 		string name = channel[0]:"Master";
@@ -705,9 +722,10 @@ module parameters, including invalid IO or IRQ parameters."), modname);
 
 	    // step3: do something
 	    map res = (map) SCR::Execute (.target.bash_output,
-		Directory::ybindir + "/copyfonts 2>/dev/null", $[] );
+		Directory::ybindir + "/copyfonts", $[] );
 
-	    integer cnt = tointeger(lookup(res, "stdout", 0));
+	    y2debug ("copyfonts output: %1", res);
+	    integer cnt = tointeger(lookup(res, "stdout", "0"));
 
 	    // restart ALSA after sound font copy
 	    y2milestone("Restarting ALSA: %1",

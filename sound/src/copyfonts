@@ -6,6 +6,9 @@
 
 # first get the path to cdrom
 CDROMDEVICE=`grep ^/dev/cdrom /etc/fstab | awk '{print $2}' | head -n1`
+if [ -z $CDROMDEVICE ]; then
+    CDROMDEVICE=`grep ^/dev/dvd /etc/fstab | awk '{print $2}' | head -n1`
+fi
 
 # mount cdrom
 mount $CDROMDEVICE
@@ -15,7 +18,8 @@ SOUNDFONTDIR="/usr/share/sfbank/creative"
 mkdir -p $SOUNDFONTDIR 
 
 # create list of unique sound font found on the whole cd
-for F in `find $CDROMDEVICE -name '*.[sS][fF]2' -type f `
+cd $CDROMDEVICE
+for F in `find . -name '*.[sS][fF]2' -type f `
 do 
     echo -e "${F##*/}\t$F"
 done | \

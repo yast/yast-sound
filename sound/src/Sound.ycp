@@ -144,6 +144,14 @@
      */
     global boolean used_modprobe_conf	= false;
 
+
+    /**
+     * When true:
+     * During autoinstallation, detected cards will be added automaticaly
+     * even if they are not defined in control file
+     */
+    global boolean configure_detected	= false;
+
     /**
      * backup structures for sound settings
      */
@@ -497,7 +505,7 @@ could make your system unstable.
 	    detected_cards = [];
 
 	// do noop if cards were already detected
-	if (detected_cards != nil)
+	if (size (detected_cards) > 0)
 	{
 	    return true;
 	}
@@ -591,7 +599,7 @@ could make your system unstable.
 	    }
             // filter out modules with unspecified module name
 	    // (sound card not supported by alsa / no module found)
-	    snd = filter(map e, snd, ``(e["module"]:"" != ""));
+	    snd = filter (map e, snd, ``(e["module"]:"" != ""));
         }
         return snd;
     }
@@ -739,9 +747,10 @@ could make your system unstable.
      * @return: void
      */
     global define void Set(map settings)  ``{
-	modules_conf	= settings["modules_conf"]:[];
-	rc_vars		= settings["rc_vars"]:$[];
-	volume_settings	= settings["volume_settings"]:[];
+	modules_conf		= settings["modules_conf"]:[];
+	rc_vars			= settings["rc_vars"]:$[];
+	volume_settings		= settings["volume_settings"]:[];
+	configure_detected	= settings["configure_detected"]:false;
     }
 
     /**
@@ -767,9 +776,10 @@ could make your system unstable.
      */
     global define map Export() ``{
 	return $[
-		"modules_conf"	    : modules_conf,
-		"rc_vars"	    : rc_vars,
-		"volume_settings"   : volume_settings,
+	    "modules_conf"	: modules_conf,
+	    "rc_vars"		: rc_vars,
+	    "volume_settings"	: volume_settings,
+	    "configure_detected": configure_detected
 	];
     }
 
@@ -993,7 +1003,7 @@ could make your system unstable.
      * @return list of maps: [$["name": "ASDASD", "card_no": 0]...]
      */
     global define list GetSoundCardList() ``{
-	if (installation)
+	if (installation || Mode::autoinst)
 	{
 	    integer pos = -1;
 	    return maplist(map card, modules_conf, ``{
@@ -1018,7 +1028,7 @@ could make your system unstable.
                               "name"	: SCR::Read(curcard_path + .name) ];
 		});
 	    }
-	    y2debug("List of the sound cards: %1", cards);
+	    y2milestone ("List of the sound cards: %1", cards);
 	    return cards;
 	}
     }
@@ -1065,10 +1075,6 @@ could make your system unstable.
 		{
 		    p = topath (sformat(
 			".audio.alsa.cards.%1.channels.%2.volume", c, ch));
-		    /* FIXME: test the behaviour...
-		    volume_settings[tointeger(c)] = add (
-			volume_settings[tointeger(c)]:$[], ch, SCR::Read(p));
-		    */
 		    volume_settings[tointeger(c)] = [ch, SCR::Read(p), "false"];
 		}
 	    });
