@@ -20,16 +20,15 @@
 
     textdomain "sound";
 
-    import "Mode";
-    import "Progress";
-    import "Wizard";
-    import "Label";
-    import "Popup";
-
     import "Joystick";
+    import "Label";
+    import "Mode";
+    import "Popup";
+    import "Progress";
+    import "Sequencer";
     import "Sound";
+    import "Wizard";
 
-    include "wizard/sequencer.ycp";
     include "sound/joy_dialog.ycp";
 
     // selected soundcard id
@@ -226,7 +225,7 @@
     y2debug("Read joystick configuration: %1", Joystick::joystick);
 
     // start wizard sequencer
-    WizardSequencer(aliases, sequence);
+    Sequencer::Run (aliases, sequence);
 
     // close dialog
     Wizard::CloseDialog();

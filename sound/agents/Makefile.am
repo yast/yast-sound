@@ -2,6 +2,6 @@
 # Makefile.am
 #
 
-scrconf_DATA = cfg_joystick.scr cfg_sound.scr
+scrconf_DATA = cfg_joystick.scr cfg_sound.scr modprobe_sound.scr
 
 EXTRA_DIST = $(scrconf_DATA)

@@ -43,9 +43,14 @@
      * @return boolean success/failure
      */
     define boolean SaveOneModulesEntry (map entry) ``{
+	/*
         path mod_alias		= add (.modules.alias, entry ["alias"]:"off");
         path mod_alias_comment	=
             add ( add (.modules.alias, entry ["alias"]:"off"), "comment");
+	*/
+        path mod_alias	= add (.modprobe_sound.alias, entry ["alias"]:"off");
+        path mod_alias_comment	=
+            add ( add (.modprobe_sound.alias, entry ["alias"]:"off"),"comment");
 
         boolean ret = true;
         if (haskey (entry, "alias"))
@@ -67,7 +72,8 @@
 
     define void SaveModulesOptions(list save_info) ``{
 
-	path mod_options = .modules.options;
+//	path mod_options = .modules.options;
+	path mod_options = .modprobe_sound.options;
 
 	// create distinct list of all modules
 	list mods = toset(maplist(map card, (list<map<string,any> >) save_info,
@@ -91,17 +97,24 @@
 		issubstring(e, "sound-service-") ||
 		issubstring(e, "sound-slot-"))
 		{
-		    SCR::Write( add (.modules.alias, e), nil);
+//		    SCR::Write( add (.modules.alias, e), nil);
+		    SCR::Write( add (.modprobe_sound.alias, e), nil);
 		}
 	});
 	// seting off-values due to kdm log (bug #19602)
 	integer i=0;
 	while (i<4)
 	{
+	    /*
 	    SCR::Write(add (.modules.alias, sformat ("sound-slot-%1", i)),
 		"off");
 	    SCR::Write(add (.modules.alias, sformat ("sound-service-%1-0", i)),
 		"off");
+	    */
+	    SCR::Write (add (.modprobe_sound.alias,
+		sformat ("sound-slot-%1", i)), "off");
+	    SCR::Write (add (.modprobe_sound.alias,
+		sformat ("sound-service-%1-0", i)), "off");
 	    i = i + 1;
 	}
     }
@@ -113,9 +126,14 @@
      * @return map return struct: $["return": boolean, "err_msg": string]
      */
     define map SaveModulesEntry (list save_info, list system) ``{
+	/*
 	path mod		= .modules;
 	path mod_alias		= .modules.alias;
 	path mod_options	= .modules.options;
+	*/
+	path mod		= .modprobe_sound;
+	path mod_alias		= .modprobe_sound.alias;
+	path mod_options	= .modprobe_sound.options;
 	SaveModulesOptions(save_info);
 
 	list als=[];

@@ -93,8 +93,20 @@
      */
     define list<map> read_save_info () ``{
 
-        list<map> save	= [];			// structure to save
-	list<string> aliases	= (list<string>) SCR::Read(.modules.alias);
+        list<map> save	= [];	// structure to save
+
+	path mod_path	= .modprobe_sound;
+
+	// read from /etc/modprobe/conf if /etc/modprobe.d/sound is not present
+	if (SCR::Read(.target.size, "/etc/modprobe.d/sound") == -1)
+	{
+	    mod_path	= .modules;
+	}
+
+	path mod_alias	= add (mod_path, "alias");
+	path mod_options= add (mod_path, "options");
+
+	list<string> aliases = (list<string>) SCR::Read (mod_alias);
 
 	aliases = filter(string a, aliases, ``(is_snd_alias(a)));
 
@@ -107,12 +119,13 @@
 	foreach (string a, aliases, ``{
 
 	    position		= position + 1;
-	    string modname	= (string) SCR::Read(add (.modules.alias, a));
+	    string modname	= (string) SCR::Read (add (mod_alias, a));
 	    integer opt_pos	= mod_occur[modname]:0;
 
 	    mod_occur	= add (mod_occur, modname, mod_occur[modname]:0 + 1);
 
-	    map<string,string> opts = (map<string,string>) SCR::Read(add (.modules.options, modname));
+	    map<string,string> opts = (map<string,string>)
+		SCR::Read(add (mod_options, modname));
 	    map options = $[];
 	    foreach (string name, string val, opts, ``{
 		list vals = splitstring(val, ",");
@@ -123,8 +136,8 @@
 	    });
 
 	    // read card info from the comment string
-	    string comment =
-		(string)SCR::Read(add (add (.modules.alias,a), "comment"));
+	    string comment = (string)
+		SCR::Read(add (add (mod_alias,a), "comment"));
 	    string uniq		= "";
 	    string model	= "";
 	    map res		= extractUniqueKey(comment);

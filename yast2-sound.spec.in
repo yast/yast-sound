@@ -41,7 +41,7 @@ Summary:	Yast2 - Sound configuration
 # database
 @ydatadir@/sndcards.ycp
 
-# agent-audio
+# agens
 @plugindir@/libpy2ag_audio.so.*
 @scrconfdir@/*.scr
 
