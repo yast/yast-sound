@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Apr  5 19:11:32 CEST 2004 - jsuchome@suse.cz
+
+- fix of audio agent: close opened mixer handle
+  (#38040: bug causes fall of whole YaST in some situations)
+- 2.9.19
+
+-------------------------------------------------------------------
 Fri Apr  2 15:51:52 CEST 2004 - jsuchome@suse.cz
 
 - changed license to GPL
