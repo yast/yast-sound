@@ -2,7 +2,7 @@
     include "gen_routines.ycp";
     include "browser.ycp";
 
-    string pattern = "(snd-card-[^ \t]*)[\t ]*(0x[0-9a-f]*)[\t ]*(0x[0-9a-f]*).*";
+    string pattern = "(snd-[^ \t]*)[\t ]*(0x[0-9a-f]*)[\t ]*(0x[0-9a-f]*).*";
 
     string kernel_ver = lookup(SCR::Execute(.target.bash_output, "uname -r", $[]), "stdout", "");
     kernel_ver = select(splitstring(kernel_ver, "\n"), 0);
@@ -15,6 +15,8 @@
     lpci = maplist(`e, lpci, ``(regexptokenize(e, pattern)));
     lpci = filter(`e, lpci, ``(e!=[]));
 
+    BrowseTree(lpci);
+
     // now we have tripples: [modname, vendor_id, device_id]
 
     // isapnp map:
@@ -23,7 +25,7 @@
     list lpnp = splitstring(s, "\n");
 
     // we need those double dots to change the order of bytes (they are in LSB in modules.isapnpmap)
-    pattern = "(snd-card-[^ \t]*)[\t ]*0x(..)(..)[\t ]*0x(..)(..).*";
+    pattern = "(snd-[^ \t]*)[\t ]*0x(..)(..)[\t ]*0x(..)(..).*";
 
     lpnp = maplist(`e, lpnp, ``(regexptokenize(e, pattern)));
     lpnp = filter(`e, lpnp, ``(e!=[]));
@@ -62,11 +64,15 @@
 
     list l = flatten([lpci, lpnp, addons]);
 
-    foreach(`e, l,
+    maplist(`e, l,
     ``{
 	vendor_id = tointeger(select(e, 1));
 	device_id = tointeger(select(e, 2));
 	mod_id = lookup(index, select(e, 0), -1);
+	if (mod_id == -1)
+	{
+	    return;
+	}
 	if (haskey(output, vendor_id))
 	{
 	    map oldmap = lookup(output, vendor_id, $[]);

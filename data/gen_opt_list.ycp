@@ -8,7 +8,6 @@
 
     list mods = maplist(`k, `v, mod_idx, ``(v)); // SCR::Dir(.modinfo.misc);
 
-
 //    mods = filter(`e, mods, ``(regexpmatch(e, "^snd-card-.*")));
     map modopts = $[];
     map subopt = $[];
@@ -16,7 +15,7 @@
 
     foreach(`e, mods, 
     ``{
-	subopt = SCR::Read(add(.modinfo.misc, e));
+	subopt = SCR::Read(add(.modinfo, e));
 	modopts = add(modopts, e, subopt);
     });
 
@@ -57,7 +56,7 @@
 y2error("entering stage #6");
 
 
-    foreach(`e, gs,
+    maplist(`e, gs,
     ``{
 	lx = regexptokenize(e, pattern);
 	y2error(e);
@@ -65,6 +64,10 @@ y2error("entering stage #6");
 	{
 	    tmpmap = parse_line(select(lx, 2, ""));
 	    modname = select(lx, 0, "");
+	    if (!contains(mods, modname))
+	    {
+		return;
+	    }
 	    parmname = select(lx, 1, "");
 	    descr = lookup(lookup(modopts, modname, $[]), parmname, $[]);
 
