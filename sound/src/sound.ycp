@@ -268,10 +268,13 @@
             Sound::modules_conf	    = remove(Sound::modules_conf, card_id);
 	    Sound::modules_conf	    = recalc_save_entries(Sound::modules_conf);
 
-	    vol_settings    = remove(vol_settings, card_id);
-	    // we have to move old entry in global list:
-	    Sound::volume_settings = add (vol_settings,
-		Sound::volume_settings[card_id]:[]);
+	    if (vol_settings[card_id]:nil != nil)
+	    {
+		vol_settings    = remove(vol_settings, card_id);
+		// we have to move old entry in global list:
+		Sound::volume_settings = add (vol_settings,
+		    Sound::volume_settings[card_id]:[]);
+	    }
 
 	    if (!Sound::autoinstallation)
 	    {

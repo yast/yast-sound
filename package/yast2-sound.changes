@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Sep  8 17:11:36 CEST 2003 - jsuchome@suse.cz
+
+- do not remove volume settings when there are not set
+
+-------------------------------------------------------------------
 Fri Sep  5 09:27:35 CEST 2003 - jsuchome@suse.cz
 
 - merged in proofread texts
