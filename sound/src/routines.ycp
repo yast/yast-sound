@@ -28,12 +28,25 @@
         string sub_vendor = "";
         string sub_device = "";
 
+	y2milestone("hardware_entry: %1", hardware_entry);
+
         sub_vendor = lookup (hardware_entry, "sub_vendor", "");
         sub_device = lookup (hardware_entry, "sub_device", "");
 
+	string vendor = lookup(hardware_entry, "vendor", "");
+	string device = lookup (hardware_entry, "device", "");
+
+
         if ((sub_vendor != "") && (sub_device != ""))
             return (sub_vendor + "\n" + sub_device);
-        else
+        else if ((vendor == "") && (device == ""))
+	{
+		string model = lookup(hardware_entry, "model", "");
+		string module_desc = lookup(lookup(hardware_entry, "module", $[]), "description", "");
+
+		return (size(model) > 0 && size(module_desc) > 0) ? model + " - " + module_desc : model + module_desc;
+	}
+	else
             return (lookup (hardware_entry, "vendor", "") + 
                     ((lookup (hardware_entry, "vendor", "") != "") ? "\n" : "") + 
                     lookup (hardware_entry, "device", ""));
@@ -107,6 +120,9 @@
     global define string get_card_label(map card)
     ``{
         list lab = splitstring(hardware_name(card),"\n");
+
+	y2milestone("Card label: %1", lab);
+
 	if (size(lab) == 0 )
 	{
 	    return "";

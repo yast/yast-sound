@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Aug 23 16:46:03 CEST 2002 - lslezak@suse.cz
+
+- use 'model' and 'description' as card name if 'sub_vendor'
+  and 'vendor' are empty (ISA card)
+- version 2.6.16
+
+-------------------------------------------------------------------
 Wed Aug 14 15:40:39 CEST 2002 - lslezak@suse.cz
 
 - merged proofread texts
