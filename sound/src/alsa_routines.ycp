@@ -66,7 +66,8 @@
         }
         else
         {
-            SCR::Execute (.target.bash_background, sformat("/usr/bin/aplay -D hw:card%1 %2 > /dev/null 2>&1", card_id, fname));
+//            SCR::Execute (.target.bash_background, sformat("/usr/bin/aplay -D hw:card%1 %2 > /dev/null 2>&1", card_id, fname));
+            SCR::Execute (.target.bash_background, sformat("/usr/bin/aplay -D plughw:%1 %2 > /dev/null 2>&1", card_id, fname));
         }
         return "";
     }
