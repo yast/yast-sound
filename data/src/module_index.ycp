@@ -63,7 +63,7 @@ $[
     42	: "snd-sb16",
     43	: "snd-sb8",
     44	: "snd-sbawe",
-//    45	: "snd-serial",
+    45	: "snd-serial-u16550",
     46	: "snd-sgalaxy",
     47	: "snd-sonicvibes",
     48	: "snd-trident",
@@ -72,6 +72,7 @@ $[
     51	: "snd-virmidi",
     52	: "snd-wavefront",
     53	: "snd-ymfpci",
+    54  : "snd-korg1212",
 
     100 : "snd-pmac"
 ]
