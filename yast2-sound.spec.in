@@ -34,6 +34,8 @@ Summary:	Yast2 - Sound configuration
 @clientdir@/joystick.ycp
 @configdir@/sound.y2cc
 @configdir@/joystick.y2cc
+@desktopdir@/sound.desktop
+@desktopdir@/joystick.desktop
 @ybindir@/copyfonts
 @moduledir@/Sound.ycp
 @moduledir@/Joystick.ycp
