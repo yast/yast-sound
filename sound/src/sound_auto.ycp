@@ -26,89 +26,69 @@
  */
 
 {
-    textdomain "sound";
+	textdomain "sound";
 
-    import "Sound";
-    import "Mode";
-    import "Summary";
-    import "Wizard";
-    Mode::config = true;
-    Sound::autoinstallation = true;
+	y2milestone("----------------------------------------");
+	y2milestone("Sound auto started");
 
-    list args = WFM::Args ();
-    if ( size (args) <= 0 )
-    {
-	y2error ("Did not get the settings, probably some mistake...");
-	return false;
-    }
-    if ( !is ( WFM::Args (0), map ) )
-    {
-	y2error ("Bad argument for sound_auto: %1", WFM::Args (0));
-	return false;
-    }
+	import "Sound";
+	import "Mode";
+	import "Summary";
+	import "Wizard";
+	Mode::config = true;
+	Sound::autoinstallation = true;
 
-    // The settings are in the first argument
-    map settings = $[];
-    {
-	integer i = 0;
-	while (i < size (WFM::Args()))
-	{
-	    if (is (WFM::Args (i), map) && nil != WFM::Args (i))	settings = WFM::Args (i);
-	    i = i + 1;
+	any ret = nil;
+	string func = "";
+	map param = $[];
+
+	/* Check arguments */
+	if(size(Args()) > 0 && is(Args(0), string)) {
+		func = WFM::Args(0);
+		if(size(Args()) > 1 && is(Args(1), map))
+			param = WFM::Args(1);
 	}
-    }
+	y2debug("func=%1", func);
+	y2debug("param=%1", param);
 
-    Sound::Import ( settings );
-    y2milestone("Imported: (%1)", settings);
-
-    /**
-     * Set contents of wizard dialog
-     */
-
-    define void set_contents() ``{
-	term contents =
-	    `VBox(
-		  `VSpacing(1),
-		  `RichText( `id(`summary), Sound::Summary()),
-		  `VSpacing(),
-		  `HBox(
-			// push button label
-			`PushButton(`id(`configure), _("&Configure Sound")),
-			`HStretch(),
-			// push button label
-			`PushButton(`id(`reset), _("&Reset Configuration"))
-			)
-
-		  );
-	// dialog header
-	Wizard::SetContents(_("Sound Configuration"),
-			    contents, "", true, true);
-    }
-
-    set_contents();
-    any result = nil;
-    any ret = nil;
-    repeat {
-	ret = UI::UserInput();
-	if (ret == `configure)
-	{
-	    result =  WFM::CallFunction(`sound());
-	    y2milestone("result: %1", result);
-	    if (result == `next || result == `finish)
-	    {
-		settings = Sound::Export ();
-	    }
-	    Sound::Set(settings);
-	    set_contents();
+	/* Create a  summary*/
+	if(func == "Summary") {
+		Sound::Import(param);
+		ret = Sound::Summary();
 	}
-	else if ( ret == `reset)
-	{
-	    settings= $[];
-	    Sound::Set(settings);
-	    set_contents();
+	/* Reset configuration */
+	else if (func == "Reset") {
+		Sound::Import($[]);
+		ret = $[];
 	}
-    } until (ret == `back || ret == `next || ret ==`key || ret ==`abort);
+	/* Change configuration (run AutoSequence) */
+	else if (func == "Change") {
+		Sound::Import(param);
+		ret =  WFM::CallFunction(`sound());
+	}
+	/* Return actual state */
+	else if (func == "Result") {
+		ret = Sound::Export();
+	}
+	/* Write givven settings */
+	else if (func == "Write") {
+		import "Progress";
+		Sound::Import(param);
+		Progress::off();
+		ret = Sound::Write();
+		Progress::on();
+	}
+	/* Unknown function */
+	else {
+		y2error("Unknown function: %1", func);
+		ret = false;
+	}
 
-    return [ret, settings];
+	y2debug("ret=%1", ret);
+	y2milestone("Sound auto finished");
+	y2milestone("----------------------------------------");
 
+	return ret;
+
+	/* EOF */
 }
