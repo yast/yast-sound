@@ -401,7 +401,7 @@
     global define map sound_options(map save_entry) ``{
 
 
-//    map save_entry	= Args(0);
+//    map save_entry	= WFM::Args(0);
     string modname	= lookup(save_entry, "module", "");
     string cardlabel	= lookup(save_entry, "model", "");
     map params		= get_module_params(modname);

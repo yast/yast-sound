@@ -21,7 +21,7 @@
 {
     import "Mode";
 
-    if (size(Args()) > 0 && Args(0) == .test)
+    if (size(WFM::Args()) > 0 && WFM::Args(0) == .test)
     {
 	Mode::test = true;
     }
@@ -51,7 +51,7 @@
 
     boolean autoinstall = false;
 
-//    if (size(Args()) > 0 && Args(0)==.oss)
+//    if (size(WFM::Args()) > 0 && WFM::Args(0)==.oss)
 //    {
 //	use_alsa=false;
 //    }
@@ -364,22 +364,22 @@
 //    boolean use_alsa      = true;	// default
     boolean from_menu     = false;
 
-    integer arg_n = size (Args ()) - 1;
+    integer arg_n = size (WFM::Args ()) - 1;
     while (arg_n >= 0)
     {
-	if (Args(arg_n) == .test)
+	if (WFM::Args(arg_n) == .test)
 	{
 	    test_mode     = true;
 	}
-	if (Args(arg_n) == .autoinst_mode)
+	if (WFM::Args(arg_n) == .autoinst_mode)
 	{
 	    autoinst_mode = true;
 	}
-	if (Args(arg_n) == .conf_mode)
+	if (WFM::Args(arg_n) == .conf_mode)
 	{
 	    config_mode   = true;
 	}
-	if (Args(arg_n) == ".from_menu")
+	if (WFM::Args(arg_n) == ".from_menu")
 	{
 	    from_menu     = true;
 	}
