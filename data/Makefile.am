@@ -4,7 +4,7 @@
 # $Id$
 #
 
-SUBDIRS = addons doc include map_indent src
+SUBDIRS = addons doc include src
 
 ydata_DATA = sndcards.ycp
 
