@@ -53,7 +53,7 @@
 						       `PushButton(`id(`back), _("&Back")),
 						       `HStretch (),
 						       // "next" button: Proceed to the next dialog
-						       `ReplacePoint( `id(`rep_next), `PushButton(`id(`next), _("&Next")) )
+						       `ReplacePoint(`id(`rep_next), `PushButton(`id(`next),`opt (`default), _("&Next")) )
 						       ),
 						 `VSpacing(0.2))),
 			     `HSpacing(1))));
