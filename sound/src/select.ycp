@@ -104,7 +104,8 @@ define map sound_select (list sound_cards, list save_info) ``{
         {
 	    return $["ui": `abort];
 	}
-    } while (!contains([`back, `next, `edit_button, `configure_button], ui));
+    } while (ui == nil ||
+	!contains([`back, `next, `edit_button, `configure_button], ui));
 
     symbol type = nil;
     integer index = 0;
