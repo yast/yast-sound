@@ -28,7 +28,6 @@
     list save_info	= Args(1);
 
     // show the dialog
-
     string confhw = ConfCardsRT(save_info);
 
     selectHardware( sound_cards, //maplist(`e, sound_cards, ``(lookup(e, "model", ""))),
@@ -39,6 +38,7 @@
     any ui = nil;
     do
     {
+	y2error("###1");
 	ui = UI::UserInput();
 	if ((ui == `abort || ui == `cancel) && ReallyAbort())
         {

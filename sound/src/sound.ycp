@@ -284,6 +284,17 @@
     InitializingDialog ();
 
     UI::DisableWizardAbortButton();
+
+    if (whoami() != "root")
+    {
+	y2error("'%1'", whoami());
+	UI::MessagePopup("You need to be logged in as root 
+in order to configure sound cards.");
+	UI::CloseDialog();
+	return;
+    }
+    
+
     boolean test_mode     = false;
     boolean config_mode   = false;
     boolean autoinst_mode = false;
@@ -341,9 +352,7 @@
 	UI::CloseDialog();
 	return;			
     }
-    
     sound_cards = getConfigurableCards(save_info);
-
     integer all_cards_num = size(sound_cards);
 
     if (exit)
@@ -364,6 +373,7 @@
 
     string initial = "intro";
 
+    // when running this module as non-root, go to complex-dialog
     if (size(sound_cards) == 1 && size(save_info) == 0)
     {
 	card_id = 0;
