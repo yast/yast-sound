@@ -3,76 +3,85 @@
 
     string pattern = "(snd-[^ \t]*)[\t ]*(0x[0-9a-f]*)[\t ]*(0x[0-9a-f]*).*";
 
-    string kernel_ver = lookup(SCR::Execute(.target.bash_output, "uname -r", $[]), "stdout", "");
+    map out	= (map) SCR::Execute (.target.bash_output, "uname -r", $[]);
+    string kernel_ver = out["stdout"]:"";
     kernel_ver = select(splitstring(kernel_ver, "\n"), 0, "");
-    string s = SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.pcimap");
+
+    string s	= (string) SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.pcimap");
 
     // pci map:
     // ========
-    list lpci = splitstring(s, "\n");
+    list<string> lpci_s	= splitstring(s, "\n");
 
-    lpci = maplist(`e, lpci, ``(regexptokenize(e, pattern)));
-    lpci = filter(`e, lpci, ``(e!=[]));
+    list<list> lpci	= maplist (string e, lpci_s,
+	``(regexptokenize(e, pattern))
+    );
+    lpci		= filter (list e, lpci, ``(e!=[]));
 
     // now we have tripples: [modname, vendor_id, device_id]
 
     // isapnp map:
 
-    s = SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.isapnpmap");
-    list lpnp = splitstring(s, "\n");
+    s = (string)
+    SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.isapnpmap");
+
+    list<string> lpnp_s	= splitstring(s, "\n");
 
     // we need those double dots to change the order of bytes (they are in LSB in modules.isapnpmap)
     pattern = "(snd-[^ \t]*)[\t ]*0x(..)(..)[\t ]*0x(..)(..).*";
 
-    lpnp = maplist(`e, lpnp, ``(regexptokenize(e, pattern)));
-    lpnp = filter(`e, lpnp, ``(e!=[]));
+    list<list> lpnp	= maplist (string e, lpnp_s,
+	``(regexptokenize(e, pattern)));
+
+    lpnp = filter (list e, lpnp, ``(e!=[]));
 
     // change LSB to MSB
-    lpnp = maplist(`e, lpnp, 
-	``([
-	    select(e, 0, nil),
-	    "0x" + select(e, 2, nil)+select(e, 1, nil),
-	    "0x" + select(e, 4, nil)+select(e, 3, nil)
-	]));
+    lpnp = maplist (list e, lpnp, ``(
+	[
+	    e[0]:nil,
+	    "0x" + e[2]:"" + e[1]:"",
+	    "0x" + e[4]:"" + e[3]:""
+	]
+    ));
 
 
     // open the module index database
-    map mod_idx = SCR::Read(.target.ycp, "./src/module_index.ycp");
+    map<integer,string> mod_idx	=
+	(map<integer,string>) SCR::Read (.target.ycp, "./src/module_index.ycp");
 
     // we need 'reverse' map od module index:
+    map<string,integer> index	=
+	(map<string,integer>) mapmap (integer k, string v, mod_idx, ``($[v:k]));
 
-    map index = mapmap(`k, `v, mod_idx, ``([v, k]));
-
-    map output = $[];
-
-    integer vendor_id = 0;
-    integer device_id = 0;
-    integer mod_id = 0;
+    map output		= $[];
+    integer vendor_id	= 0;
+    integer device_id	= 0;
+    integer mod_id	= 0;
 
     // finally let's include some manually defined add-ons from the
     // id_addons.ycp file
 
-    list addons = [];
+    list<list> addons = [];
 
     if (SCR::Read(.target.size, "./addons/id_addons.ycp") > 0)
     {
-	addons = SCR::Read(.target.ycp, "./addons/id_addons.ycp");
+	addons = (list<list>) SCR::Read(.target.ycp, "./addons/id_addons.ycp");
     }
 
-    list l = flatten([lpci, lpnp, addons]);
+    list<list> l = flatten ([lpci, lpnp, addons]);
 
-    maplist(`e, l,
-    ``{
-	vendor_id = tointeger(select(e, 1, nil));
-	device_id = tointeger(select(e, 2, nil));
-	mod_id = lookup(index, select(e, 0, nil), -1);
+    maplist(list e, l,
+    {
+	vendor_id	= tointeger(e[1]:"");
+	device_id	= tointeger(e[2]:"");
+	mod_id		= lookup (index, e[0]:"", -1);
 	if (mod_id == -1)
 	{
 	    return;
 	}
 	if (haskey(output, vendor_id))
 	{
-	    map oldmap = lookup(output, vendor_id, $[]);
+	    map oldmap = output[vendor_id]:$[];
 	    oldmap = add(oldmap, device_id, mod_id);
 	    output = add(output, vendor_id, oldmap);
 	}

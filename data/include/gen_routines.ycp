@@ -1,5 +1,5 @@
 {
-    global define find_pair(string input, integer start) ``{
+    define integer find_pair(string input, integer start) {
         integer pos = start+1;
         integer siz = size(input);
         integer cnter = 1;
@@ -18,7 +18,7 @@
         return pos -1;
     }
 
-    global define parse_bracket(string input) ``{
+    define list parse_bracket(string input) {
         integer pos = 0;
         string inner = input; // substring(input, 1, size(input)-2);
         integer siz = size(inner);
@@ -65,7 +65,7 @@
         return output;
     }
 
-    global define parse_line(string input) ``{
+    define map parse_line(string input) {
         string token = "";
         integer pos = 0;
         integer siz = size(input);
@@ -107,7 +107,7 @@
         map output = $[];
 
         // now let's split tokens to "key": "value" pairs.
-        foreach(`e, tokens,
+        foreach(string e, (list<string>) tokens,
         ``{
             list l = splitstring(e, ":");
             if (size(l) == 2)

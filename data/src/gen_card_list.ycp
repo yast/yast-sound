@@ -1,15 +1,8 @@
 {
     include "./include/gen_routines.ycp";
 
+    define list<string> get_card_list(string str) {
 
-    map mod_idx = SCR::Read(.target.ycp, "./src/module_index.ycp");
-
-    // we need 'reverse' map od module index:
-
-    map index = mapmap(`k, `v, mod_idx, ``([v, k]));
-
-
-    global define get_card_list(string str) ``{
         string pattern = "([^ \t]*)[\t ]*info_devices=[\{](.*)[\}]";
         list l = regexptokenize ( str, pattern );
 
@@ -19,55 +12,67 @@
         }
 
 
-        string second = select(l, 1, "");
+        string second = l[1]:"";
         string token = "";
 
 	list output = [];
 
-	list cards = parse_bracket(second);
+	list cards = parse_bracket (second);
 
 	if (size(cards) > 0)
 	{
-	    output = maplist(`e, cards, 
-	    ``{
+	    output = maplist (list e, (list<list>) cards, ``{
 		if (size(e) > 1)
 		{
-		    return select(e, 1, "")+", "+select(e, 0, "");
+		    return e[1]:"" + ", " + e[0]:"";
 		}
 		else
 		{
-		    return select(e, 0, "");
+		    return e[0]:"";
 		}
 	    });
 	}
 
-	output = toset(output);
+	output = toset (output);
 
-	return output;
-}
+	return (list<string>) output;
+    }
+
+
+    map<integer,string> mod_idx	=
+	(map<integer,string>) SCR::Read (.target.ycp, "./src/module_index.ycp");
+
+    // we need 'reverse' map od module index:
+
+    map<string,integer> index	=
+	(map<string,integer>) mapmap (integer k, string v, mod_idx, ``($[v:k]));
+
 
     // let's open input file...
-    string kernel_ver = lookup(SCR::Execute(.target.bash_output, "uname -r", $[]), "stdout", "");
+    map out	= (map) SCR::Execute (.target.bash_output, "uname -r", $[]);
+    string kernel_ver = out["stdout"]:"";
     kernel_ver = select(splitstring(kernel_ver, "\n"), 0, "");
-    string s = SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.generic_string");
 
-    list l = splitstring(s, "\n");
+    string s	= (string) SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.generic_string");
+    if (s == nil) s = "";
+
+    list<string> l	= splitstring(s, "\n");
 
     map output = $[];
     map vendors_cards = $[];
 
     list toks = [];
 
-    maplist(`e, l,
-    ``{
+    maplist(string e, l, {
+
 	toks = regexptokenize(e, "(snd-[^ \t]*)[\t ]*info_devices=");
-	if (lookup(index, select(toks, 0, " "), -1) == -1)
+	if (lookup(index, toks[0]:" ", -1) == -1)
 	{
 	    return;
 	}
 	if (size(toks) > 0)
 	{
-	    list cardlist = get_card_list(e);
+	    list<string> cardlist = get_card_list(e);
 	    foreach (string cardname, cardlist, ``{
 		list card = splitstring (cardname, ",");
 		string vendor = card[1]:"other";
@@ -79,23 +84,25 @@
 		else
 		    vendors_cards [vendor] = [ card[0]:"" ];
 	    });
-	    output = add (output, lookup(index, select(toks, 0, " "), -1), cardlist);
+	    output = add (output, lookup(index, toks[0]:" ", -1), cardlist);
 	}
 
     });
 
     // now add manual add-ons if available
-    list ladd = SCR::Read(.target.ycp, "./addons/card_addons.ycp");
-    foreach(`e, ladd,
-    ``{
-	integer i = lookup(index, select(e, 0, ""), -1);
+    list<list> ladd	=
+	(list<list>)SCR::Read(.target.ycp, "./addons/card_addons.ycp");
+
+    foreach (list e, ladd,
+    {
+	integer i = lookup(index, e[0]:"", -1);
 	if (i == -1)
 	{
-	    y2error("module %1 not defined in module_index.ycp file!", select(e, 0, ""));
+	    y2error("module %1 not defined in module_index.ycp file!", e[0]:"");
 	}
-	string cardname = select(e, 1, "");
-	list card = splitstring (cardname, ",");
-	string vendor = card[1]:"other";
+	string cardname	= e[1]:"";
+	list card	= splitstring (cardname, ",");
+	string vendor	= card[1]:"other";
 	if (substring (vendor, 0, 1) == " ")
 	    vendor = substring (vendor, 1);
 	if (haskey (vendors_cards, vendor))
