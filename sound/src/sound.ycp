@@ -321,7 +321,7 @@
     boolean exit = false;
     list sound_db = nil;
 
-    if (SCR::Read(.target.size, "/usr/lib/YaST2/sndcards.ycp")==-1) //!fileexist("/usr/lib/YaST2/sndcards.ycp"))
+    if (use_alsa && SCR::Read(.target.size, "/usr/lib/YaST2/sndcards.ycp")==-1) 
     {
 	UI::MessagePopup(_("Sound card database not found. Please check your installation."));
 	UI::CloseDialog();
