@@ -27,7 +27,7 @@
     include "sound/routines.ycp";
     include "sound/ui.ycp";
     include "sound/texts.ycp";	
-    
+
     map STRINGS=STRINGS_();
 
 
@@ -66,7 +66,7 @@
 	list nc = [];
 	integer i = 0;
 
-	list not_yet = get_not_yet ();
+	list not_yet = get_not_yet (configured_unique);
 
 	maplist (`e, not_yet, 
 	``{
@@ -283,7 +283,7 @@
 		{
 
 		    map result = $[];
-		    if (size (get_not_yet ()) > 0)
+		    if (size (get_not_yet (configured_unique)) > 0)
 		    {
 			result = WhichDialog ();
 		    }
@@ -297,7 +297,10 @@
 			if (lookup (result, "way") == `auto) 
 			{
 			    integer i = lookup (result, "id");
-			    map card = select (get_not_yet (), i, $[]);
+			    map card = select (get_not_yet (configured_unique), i, $[]);
+
+			    list db = GetCardDatabase();
+			    card=add(card, "module", get_module(card));
 		    
 			    if (size (card) > 0) 
 			    {
