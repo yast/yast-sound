@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Sep 24 08:51:21 CEST 2004 - jsuchome@suse.cz
+
+- do not save modules options with default value (#45646)
+- updated sound card database (#45646)
+
+-------------------------------------------------------------------
 Tue Sep 14 16:45:10 CEST 2004 - lslezak@suse.cz
 
 - autoyast fixes - sound card status is always "not running",
