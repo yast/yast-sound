@@ -7,7 +7,8 @@ modulesdir = $(YAST2DIR)/clients
 includedir = $(YAST2DIR)/include/sound
 
 include_DATA = \
-	sound_routines.ycp
+	sound_routines.ycp \
+	sound_ui.ycp
 
 modules_DATA = 	\
 	sound.ycp 		\
@@ -15,7 +16,8 @@ modules_DATA = 	\
 	sound_save.ycp		\
 	sound_complex.ycp	\
 	sound_options.ycp	\
-	sound_volume.ycp     
+	sound_volume.ycp     	\
+	sound_texts.ycp
 
 menu_DATA = menuentry_sound.ycp
 

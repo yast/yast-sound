@@ -1,19 +1,18 @@
 /**
  * File:
  *   sound_manual.ycp
- *
+ * 
  * Module:
  *   Sound
- *
+ * 
  * Summary:
  *   Module for manual selection of sound card from the database
- *
+ * 
  * Authors:
- *   Dan Vesely (dan@suse.cz)
+ *   Dan Veselý <dan@suse.cz>
  *
  * $Id$
  *
- * Module for manual selection of sound card from the database
  */
 
 {
@@ -21,16 +20,19 @@
     textdomain "sound";
     /**
      * Used for searching
-     * @param name user entered part of sound card name
-     * @return integer possition of the nearest matching sound card (-1 when no success)
+     * @return integer
      */
+
     define search_card_id (string name) ``{
-	list all_cards = get_cards ("all");
+        list all_cards = get_cards ("all");
 	integer pos = 0;
 	integer len = size (name);
-	while (pos < size (all_cards)) {
+	while (pos < size (all_cards)) 
+	{
 	    if (substring (tolower(select (all_cards, pos)), 0, len) == tolower(name)) 
+	    {
 		return pos;
+	    }
 	    pos = pos + 1;
 	};
 	return -1;
@@ -38,28 +40,34 @@
 
 
     /**
-     * creates such a "libhd entry" from db info
-     * @param module_name name of the ALSA module
-     * @param card_name name of the card
-     * @return map such as "libhd" entry
+     * creates "libhd entry" from db info
+     * @return map
      */
-    define get_card (string module_name, string card_name) ``{
+  define get_card (string module_name, string card_name) ``{
 	map ret = $[];
 	map db_entry = $[];
-	
-	if (module_name == UI(_("All"))) {
+    
+	if (module_name == UI(_("All"))) 
+	{
 	    list tmp = filter (`e, db, ``(contains(lookup (e, "cards"), card_name)));
 	    if (size (tmp) > 0)
+	    {
 		db_entry = select (tmp, 0);
+	    }
 	    else
+	    {
 		db_entry = select (filter (`e, db, ``(lookup (e, "name", "") == card_name)), 0, $[]);
+	    }
 	}
 	else
+	{
 	    db_entry = select (filter (`e, db, ``(lookup (e, "name", "") == module_name)), 0, $[]);
+	}
 
 
 
-	if (size (db_entry) == 0) {
+	if (size (db_entry) == 0) 
+	{
 	    y2error ("Db entry not found");
 	    return ret;
 	}
@@ -70,146 +78,153 @@
 	ret = add (ret, "module", module_entry);
 	ret = add (ret, "sub_vendor", card_name);
 	if (tolower (module_name) == "all")
+	{
 	    ret = add (ret, "sub_device", sformat ("(%1)", card_name));
+	}
 	else
+	{
 	    ret = add (ret, "sub_device", sformat ("(%1)", module_name));
+	}
 	map libhd = select (lookup (db_entry, "libhd", []), 0, $[]);
 	ret = add (ret, "vendor_id", lookup (libhd, "vendor_id", 0));
 
-	if (is (lookup (libhd, "device_id"), list)) {
+	if (is (lookup (libhd, "device_id"), list)) 
+	{
 	    ret = add (ret, "device_id", select (lookup (libhd, "device_id", 0), 0));
 	    ret = add (ret, "bus", "PCI");
 	}
-	else {
+	else 
+	{
 	    ret = add (ret, "device_id", lookup (libhd, "device_id", 0));
 	    ret = add (ret, "bus", "ISA");
 	}
-
-
 	return ret;
     }
 
     /**
-     * returns list of sound cards matching the module name from sound card database
-     * @param module_name anme of ALSA module
-     * @return list of matching databese entries (maps)
+     * returns list of sound cards
+     * @return list
      */
     define get_cards (string module_name) ``{
 	list ret = [];
 
-	if (tolower(module_name) == "all") {
-	    maplist (`e, db, ``{
+	if (tolower(module_name) == "all") 
+	{
+	maplist (`e, db, 
+	    ``{
 		if (size (lookup (e, cards)) > 0) ret = add (ret, lookup (e, cards));
 		else ret = add (ret, [lookup (e, "name")]);
 	    });
 	}
-	else {
+	else 
+	{
 	    ret = maplist (`c, filter (`e, db, ``(lookup (e, "name", "") == module_name)), ``(lookup (c, "cards", [])));
 	    ret = filter (`e, ret, ``(size(e) > 0));
 
 	    if (size (ret) == 0)
+	    {
 		ret = add (ret, [module_name]);
+	    }
 	}
-
 	return sort(flatten(ret));
     }
 
     /**
      * Itemize list for selection box
-     * @param l list to be itemized
-     * @param default itemt to became default
-     * @return list with itemized elements
+     * @return list
      */
     define itemize_list (list l, integer default) ``{
 	integer i = 0;
 	list itemized_list = [];
 	integer s = size (l);
-	while (i < s) {
+	while (i < s) 
+	{
 	    itemized_list = add (itemized_list, `item (`id(i), select (l, i), (i == default)));
 	    i = i + 1;
 	}
-	
 	return itemized_list;
     };
 
     /**
-     * Dialog for manual selection
-     * @return map with "ui" as user input 
+     *	dialog for manual setting
+     *  @return list
      */
+
+
     define ManualDialog () ``{
-
-	    // Help text - manual configuration 1/2
-	string helptext = UI(_("<p>Please <b>manually</b> choose the sound\
- card, you want to configure. You can search for a particular sound\
- card by entering the name in the search box.</p>"));
-	    // Help text - manual configuration 2/2
-	helptext = helptext + UI(_("<p>Select <b>All</b> if you want\
- to see the whole list of supported sound card models.</p>"));
-
-	// label if no module name found
+	string helptext=lookup(STRINGS, "ManualDialog");
+	    // label if no module name found
 	list module_names = sort (maplist (`e, db, ``(lookup (e, "name", _("Unknown module name")))));
-	// in the modules/cards list - to see all available cards
+	    // in the modules/cards list - to see all available cards
 	module_names = prepend (module_names, _("All"));
 	list card_names = get_cards ("All");
-
-//	list tree = sort(maplist (`e, db, ``(`item(`id(0), lookup (e, "name"), false, maplist (`c, lookup (e, "cards"), ``(`item(`id(0), c)))))));
 
 	term con = `VBox ();
 
 //	term con = `VBox (`VSquash(`Tree(`id(`tree), `opt(`hstretch), "Select", tree)));
 
-    	con = add (con, `VBox(
-	    `HBox (
-		`ReplacePoint (`id (`rep_drv),
-			       // To translators: selection box title
+	con = add (con, `VBox
+	    (
+		`HBox 
+		(
+		    `ReplacePoint (`id (`rep_drv),
+			    // To translators: selection box title
 			       `SelectionBox (`id (`sel_drv), `opt(`notify), _("Sound card driver"), module_names)
 		    ),
-		`ReplacePoint(`id(`rep_mod),
-			      // To translators: selection box title
+		    `ReplacePoint(`id(`rep_mod),
+			    // To translators: selection box title
 			      `SelectionBox (`id (`sel_mod), `opt(`notify), _("Sound card model"), card_names)
-		    )),
-	    `VSpacing (),
-	    // textetry label
-	    `TextEntry (`id(`search), `opt(`notify), _("Search")),
-	    `VSpacing ()
+		    )
+		),
+		`VSpacing (),
+			    // textetry label
+		`TextEntry (`id(`search), `opt(`notify), _("Search")),
+		`VSpacing ()
 	    ));
-		   // To translators: text entry label
-		   //con = add (con, `TextEntry (`id(`search), `opt(`notify), _("Search")));
+			    // To translators: text entry label
 
-	// dialog title
+	    // dialog title
 	UI(`SetWizardContents (_("Sound manual configuration"), con, helptext, true, true));
 	UI(`ChangeWidget(`id(`sel_drv), `CurrentItem, select (module_names, 0)));
 	UI(`ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0)));
-	// Next - button label
+	    // Next - button label
 	UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
 
 	any ui = nil;
 
-	repeat {
+	repeat 
+	{
 	    ui = UI(`UserInput ());
-	    
-	    if (ui == `sel_drv) {
+	        
+	    if (ui == `sel_drv) 
+	    {
 		string drv = UI (`QueryWidget (`id(`sel_drv), `CurrentItem));
 		if (drv == UI(_("All")))
+		{
 		    card_names = get_cards ("all");
+		}
 		else
+		{
 		    card_names = get_cards (drv);
+		}
 
 		UI(`ReplaceWidget (`id(`rep_mod),
 				// To translators: selection box title
-				   `SelectionBox (`id (`sel_mod), _("Sound card model"), card_names)));		
+		    `SelectionBox (`id (`sel_mod), _("Sound card model"), card_names)));		
 
 		// TODO: this would be nice to have from libyui instead of replacing widget
 		// UI(`ChangeWidget(`id(`sel_mod), `Items, card_names));
 		UI(`ChangeWidget(`id(`sel_mod), `CurrentItem, select (card_names, 0)));
 	    }
-	    else if (ui == `search) {
+	    else if (ui == `search) 
+	    {
 		string entry = UI(`QueryWidget (`id(`search), `Value));
 		integer card_id = search_card_id (entry);
 		card_names = get_cards ("all");
 		// always "all" field
 		UI(`ChangeWidget(`id(`sel_drv), `CurrentItem, select (module_names, 0)));
-		if (card_id >= 0) {
+		if (card_id >= 0) 
+		{
 		    UI(`ReplaceWidget (`id(`rep_mod),
 				// To translators: selection box title
 				       `SelectionBox (`id (`sel_mod), _("Sound card model"), card_names)));
@@ -223,16 +238,12 @@
 
 	map ret = $["ui" : ui];
 
-	if (ui == `next) {
-	   
+	if (ui == `next) 
+	{
 	    ret = add (ret, "return", get_card (UI (`QueryWidget (`id(`sel_drv), `CurrentItem)),
-						 UI (`QueryWidget (`id(`sel_mod), `CurrentItem))));
-
-	    
+					  UI (`QueryWidget (`id(`sel_mod), `CurrentItem))));
 	}
-
 	return ret;
-
     }
 
 
@@ -241,11 +252,10 @@
 
     list|void db = SCR(`Read (.target.yast2, "sndcards.ycp"));
     
-    if (is (db, void)) {
+    if (is (db, void)) 
+    {
 	UI(`DisplayMessage ("The Sound card database cannot be found!!!"));
 	return $["ui" : `back];
     }
-
-
     return ManualDialog ();
 }

@@ -1,0 +1,281 @@
+/**
+ *
+ * $Id$
+ *
+ * File:              
+ *   sound_ui.ycp        
+ *
+ * Module:
+ *   Sound
+ *
+ * Summary:
+ *   UI interface
+ *
+ * Authors:
+ *   Dan Veselý , Dan Meszaros
+ *
+ *                   
+ * Global variables:	STRINGS
+ */
+
+{
+    textdomain "sound";
+
+    include "misc_defines.ycp";
+    include "sound/sound_routines.ycp";
+
+    /** 
+     *	InitializingDialog
+     *  
+     *
+     * @return symbol
+     */
+
+    define InitializingDialog () ``{
+	  // label message
+	term con = `Label (sformat(UI(_("Initializing ..."))));
+	string helptext = "";
+	 // dialog title message
+	UI(`SetWizardContents (_("YaST2\nInitializing ..."), con, helptext, false, false));
+
+	return `next;
+    };
+
+
+    /**  
+     *  DisplayName
+     *  
+     *
+     * @return map
+     */
+	  
+    define DisplayName (string name, string cname) ``{
+	string helptext=lookup(STRINGS, "DisplayName");
+
+	term con = `VBox 
+	(
+	  `VStretch (),
+	  `HBox
+	  (
+	    `HSpacing (3),
+	    `HVCenter
+	    (
+	      `VBox
+	      (
+			// To translators: label message 1/2 The sound card XY will be configured
+		`Left(`Label (_("The sound card\n"))),
+		`Label (`opt(`outputField), name),
+		`VSpacing (),
+			// To translators: label message 2/2 The sound card XY will be configured
+		`Left(`Label (_("\nwill be configured as"))),
+		`Label (`opt(`outputField), cname)
+	      )
+	    )
+	  ),
+	  `VStretch (),
+	  `VBox
+	  (
+	    `HSquash
+	    (
+	      `HBox 
+	      (
+			// Options - button label
+		`HWeight(1, `PushButton (`id(`options), _("Options"))),
+			// Skip button label
+		`HWeight(1, `PushButton (`id(`skip), _("Skip")))
+	      )
+	    ),
+	    `VSpacing ()
+	  )
+	);
+
+		// dialog title
+	UI(`SetWizardContents (_("Sound card configuration"), con, helptext, true, true));
+		// Next button label    
+	UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
+	return $["ui" : UI(`UserInput ())];
+    }
+
+    /**
+     *  
+     * 	OpenMainDialog 
+     *
+     * @return void
+     */
+
+    define OpenMainDialog() ``{
+	UI(`OpenDialog(`opt(`defaultsize), `VBox
+	  (
+	    `Image(`suseheader, "SuSE"),
+	    `HBox
+	    (
+	      `HWeight(30, `RichText(`id(`help), "")),
+	      `HWeight
+	      (70, `VBox
+		(
+		  `Left(`Heading(`id(`title), _("YaST2\nInitializing ..."))),
+		  `HVCenter(`ReplacePoint(`id(`contents), `Empty())),
+		  `HBox
+		  (
+			// back pushbutton: the user input is ignored and the last dialog is called
+		    `PushButton(`id(`back), `opt(`disabled), _("&Back")),
+		    `HStretch (),
+			// next pushbutton: the user input is checked and the next dialog is called
+		    `PushButton(`id(`next), `opt(`disabled, `default), _("&Next"))
+		  )
+		)
+	      )
+	    )
+	  )
+	));
+    }
+
+    /**
+     *  
+     *  SetWizardContents 
+     * 
+     * @return void
+     */
+
+    UI(
+    ``{
+	define SetWizardContents(string title, term contents, string helptext,
+				       boolean has_back, boolean has_next) 
+	    ``{
+	      ChangeWidget(`id(`next), `Enabled, has_next);
+	      ChangeWidget(`id(`back), `Enabled, has_back);
+	      ChangeWidget(`id(`help), `Value, helptext);
+	      ChangeWidget(`id(`title), `Value, title);
+	      ReplaceWidget(`id(`contents), contents);
+	    }
+	}
+    );
+
+    /*
+     *  
+     *  DisplayMessage 
+     *
+     * @return void
+     */
+
+    UI(
+    ``{
+	define DisplayMessage(string message) 
+	``{
+		    // ok pushbutton: confirm the dialog
+	    OpenDialog(`opt(`decorated),
+	      `HBox(
+		`HSpacing(1),
+		`VBox(
+		  `VSpacing(0.2),
+		  `Label(message),
+		    // "OK" button: User confirmation
+		  `PushButton(`opt(`default), _("&OK")),
+		  `VSpacing(0.2)
+		),
+		`HSpacing(1)
+	      )
+	    );
+	    UserInput();
+	    CloseDialog();
+	}
+    }
+    );		
+
+    /*  =========================================================================================
+     *  
+     *  Dysplays YesOrNo dialog
+     *  @param message message
+     *  @param 'yes' button message
+     *  @param 'no' button message
+     */
+
+    UI(
+    ``{
+	define YesOrNo(any message, string yes_button_message, string no_button_message) 
+	``{
+	    OpenDialog(`opt(`decorated),
+	      `HBox
+	      (
+		`HSpacing(1),
+		`VBox
+		(
+		  `VSpacing(0.2),
+		  `Label(message),
+		  `HBox
+		  (
+		    `PushButton(`id(`yes), `opt(`default), yes_button_message),
+		    `HSpacing(2),
+		    `PushButton( no_button_message )
+		  ),
+		  `VSpacing(0.2)
+		),
+		`HSpacing(1)
+	      )
+	    );
+	    any ret = UserInput();
+	    CloseDialog();
+	    return (ret == `yes);
+	}
+    }
+    );	
+
+    /* 
+     *  
+     *  DebugDialog 
+     *
+     * @return void
+     */
+
+    UI(
+    ``{
+	define DebugDialog(any str) 
+	``{
+	      // OK button user confirmation
+	    OpenDialog(`VBox(`RichText(sformat("%1",str)),`PushButton(_("&OK"))));
+	    any r = UserInput();
+	    CloseDialog();
+	}
+    }
+    );
+
+    /* 
+     *  
+     *  WarnDialog 
+     *
+     * @return boolean
+     */
+
+    UI(
+    ``{
+	define WarnDialog(string message) 
+	``{
+	    OpenDialog(`opt(`decorated, `warncolor),
+	      `HBox
+	      (
+		`HSpacing(1),
+		`VBox
+		(
+		  `VSpacing(0.2),
+		  `Heading(message),
+		  `HBox
+		  (
+			// Yes button - user confirmation
+		    `PushButton(`id(`yes),  _("&Yes")),
+		    `HStretch(),
+			// Yes button - user confirmation
+		    `PushButton(`opt(`default), _("&No"))
+		  ),
+		  `VSpacing(0.2)
+		),
+		`HSpacing(1)
+	      )
+	    );
+	    any ret = UserInput();
+	    CloseDialog();
+	    return (ret == `yes);
+	}            
+    }
+    );
+
+}

@@ -1,22 +1,20 @@
 /**
  * File:
- *   sound_volume.ycp
- *
+ *   sound_manual.ycp
+ * 
  * Module:
  *   Sound
- *
+ * 
  * Summary:
- *   Modules are inserted and the volume is set-up here.
- *
+ *   Module where an attemp of inserting module is provided,
+ *   if everything goes well adjusting volume is done here
+ *   otherwise error message is displayed
+ * 
  * Authors:
- *   Dan Vesely (dan@suse.cz)
+ *   Dan Veselý <dan@suse.cz>
  *
  * $Id$
-
- * Module where an attemp of inserting module is provided,
- * if everything goes well adjusting volume is done here
- * otherwise error message is displayed
- * Dan Veselý <dan@suse.cz>, 2000
+ *
  *
  * parameters: 1st: module, Map, map of card
  *             2nd: card_id, integer
@@ -32,46 +30,51 @@
     include "sound/sound_routines.ycp";
 
 
-
-
-    /** 
-     * Here the test sound is played, if file not found, the message is displayed.
+    /**
+     * here the test sound is played, by
+     * default ist alsa whistle sound, but
+     * if snd_au package is installed,
+     * than it's Linus Torvals voice, the
+     * if the test file cannot be found,
+     * the message is displayed
+     *
      * @return void
      */
+
     define PlayTest () ``{
-	
-	if (!fileexist(lookup (user_settings, "audio_file"))) {
+	  
+	if (!fileexist(lookup (user_settings, "audio_file"))) 
+	{
 	    string file = lookup (user_settings, "audio_file");
 
-	    // To translators: just one file will be displayed
-	    // To translators: if the test audio file can not be found this message is displayed
-	    // To translators: This is just popup message, shouldn't be too long
+		  // To translators: just one file will be displayed
+		  // To translators: if the test audio file can not be found this message is displayed
+		  // To translators: This is just popup message, shouldn't be too long
 	    string msg = sformat (UI (_("Cannot find file:\n %1\n\n(test audio file)")), file);
 
 	    UI (`DisplayMessage (msg));
 	}
-	else {
-
-	    
-	    
+	else 
+	{
 	    string play_cmd = lookup (user_settings, "play_cmd", "");
 	    string audio_file = lookup (user_settings, "audio_file", "");
-	    // more cards
+		  // more cards
 	    if (no_alsa)
+	    {
 		Shell(sformat("%1 %2 &", play_cmd, audio_file), $[]);
+	    }
 	    else
+	    {
 		Shell(sformat("%1 -c %2 %3 &", play_cmd, card_id, audio_file), $[]);
-
+	    }
 	}
     };
 
-
-
     /**
-     * Tries to insert module with options (if any)
-     * @param card card info
+     * tries to insert module with options (if any)
      * @return string with error message (empty string if ok)
      */
+
     define probe_module (map card) ``{
 
 	string module_name    = lookup (lookup (card, "module", $[]), "name", "");
@@ -81,227 +84,246 @@
 	boolean mod_active    = lookup (lookup (card, "module", $[]), "active", false);
 
 	if (size (module_name) == 0)
-	    // To translators: error message
+	{
+		// To translators: error message
 	    return UI(_("Invalid module name."));
-	
-	SCR(`Execute (.target.bash, "/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`", $[]));
-
-
-
-	    
-	if (!mod_active) {
-	    if (!probe)
-		SCR (`Execute (.target.insmod, module_name, module_options));
-	    else
-		SCR(`Execute (.target.modprobe, module_name, module_options));
 	}
-
-
-	if (no_alsa) {
+	    
+	SCR(`Execute (.target.bash, "/sbin/depmod -a -F /boot/System.map-`uname -r` `uname -r`", $[]));
+      
+	if (!mod_active) 
+	{
+	    if (!probe)
+	    {
+		SCR (`Execute (.target.insmod, module_name, module_options));
+	    }
+	    else
+	    {
+		SCR(`Execute (.target.modprobe, module_name, module_options));
+	    }
+	}
+	
+	if (no_alsa) 
+	{
 	    user_settings = add (user_settings, "play_cmd", "/usr/bin/play");
 	    user_settings = add (user_settings, "mixer", "/usr/bin/aumix \"$CHANNEL\" $VOLUME");
 	}
 	else
+	{
 	    SCR(`Execute (.target.modprobe, "snd-pcm-oss", "")); // backwards OSS compatibility
+	}
 
 	map pm = SCR(`Read(.proc.modules));
 
-	if (!haskey (pm, module_name)) {
+	if (!haskey (pm, module_name)) 
+	{
 
-	    // To translators: label to error popup
+		// To translators: label to error popup
 	    return sformat (UI(_("The kernel module %1 for sound support\ncould not be loaded.")), module_name);
 	}
-	
 	return "";
-	
-    };
+   };
 
 
-/**
- * This dialog sipmply reads user input and call apropriate set funtion
- * @return any user input
- */
+    /**
+     * This dialog sipmply reads user input and calls apropriate set funtion
+     *
+     * @return symbol
+     */
+
     define VolumeDialog () ``{
 
-	//unmute these devices
+	    //unmute these devices
 	if (use_alsa)
+	{
 	    maplist (`dev, ["PCM", "PCM,1", "Wave", "Master Digital", "Synth"], 
-		     ``(SetVolume (lookup (user_settings, "mixer"), dev, sformat ("%1", 70), card_id)));
-	    
-	// Help text - adjusting volume 1/4
-	string help_text = UI(_("<p>Please adjust the volume.</p>"));
-				// Help text - adjusting volume 2/4
-	help_text = help_text + UI(_("<p>You can test your sound card by pressing the <b>Test</b> button.</p>"));
-				// Help text - adjusting volume 3/4
-	help_text = help_text + UI(_("<p>After the configuration is\
- done you can use <b>amixer</b> (or any program of your choice) for\
- adjusting the volume.</p>"));
+			   ``(SetVolume (lookup (user_settings, "mixer"), dev, sformat ("%1", 70), card_id)));
+	}
+	
+	/* help text: adjusting volume */
 
-	// Help text - adjusting volume 4/4
-	help_text = help_text + UI(_("<p><b>WARNING/SPECIAL\
- NOTE:</b>Please start testing your sound card with <b>very</b> low\
- volume settings to prevent an accident with too much loud\
- noise.</p>"));
-
+	string help_text=lookup(STRINGS, "VolumeDialog");
 
 	integer vol = 10;
 
-	// slider label
+	    // slider label
 	term slider = `IntField(`id(`volume), `opt(`notify), _("Volume"), 0, 100, vol);
 
 	if (UI(`HasSpecialWidget(`Slider)))
-	    	// slider label
+	{
+		      // slider label
 	    slider = `Slider (`id(`volume), `opt(`notify), _("Volume"), 0, 100, vol);
+	}
 
-
-	term con = `HBox(
+	term con = `HBox
+	  (
 	    `HSpacing (3),
-	    `VBox (
-		`VSpacing (),
-		`Top (`VBox(
-		    // dialog title
-		    `Left(`Label(_("Settings for sound card"))),
-		    `Label (`opt(`outputField), hardware_name (card))
-		    )),
-		// To translators keep backlash here
-		`Frame (_("Volume adjust and test"), `HBox(
-		    `HSpacing (),
-		    `VBox(
+	    `VBox 
+	    (
+	      `VSpacing (),
+	      `Top 
+	      (`VBox
+		(
+			// dialog title
+		  `Left(`Label(_("Settings for sound card"))),
+		  `Label (`opt(`outputField), hardware_name (card))
+			)),
+		    // To translators keep backlash here
+		  `Frame 
+		  (_("Volume adjust and test"), 
+		    `HBox
+		    (
+		      `HSpacing (),
+		      `VBox
+		      (
 			`VSpacing (0.5),
 			slider,
 			`VSpacing (),
-			// Test - button label
+			    // Test - button label
 			`PushButton (`id (`test), _("&Test")),
 			`VSpacing (0.5),
-			// message label
+			    // message label
 			`Label (_("Press 'Test' to start playing sound sample")),
 			`VSpacing (0.5)
-			),
-		    `HSpacing ())),
-		`VStretch ()
-		),
-	    `HSpacing (3));
+		      ),
+		      `HSpacing ()
+		    )
+		  ),
+		  `VStretch ()
+	      ),
+	      `HSpacing (3));
 
-	// dialog title
+	    // dialog title
 	UI(`SetWizardContents (_("Sound cards"), con, help_text, true, true));
 	if (finish)
+	{
 	    UI(`ChangeWidget (`id(`next), `Label, _("&Finish")));
+	}
 	SetVolume (lookup (user_settings, "mixer"), "Master", sformat ("%1", vol), card_id);
 
-	repeat {
-
+	repeat 
+	{
 	    ui =  UI (`UserInput ());
 
-	    if (ui == `volume) {
+	    if (ui == `volume) 
+	    {
 		vol = UI(`QueryWidget(`id(`volume), `Value ));
 
 		SetVolume (lookup (user_settings, "mixer"), "Master", sformat ("%1", vol), card_id);
 	    }
-	    else if (ui == `test) {
+	    else if (ui == `test) 
+	    {
 		if (!test_mode)
-		    PlayTest ();
+		{
+		  PlayTest ();
+		}
 	    }
-	    else if (ui == `next) {
+	    else if (ui == `next) 
+	    {
 		if (finish)
+		{
 		    if (!UI (`YesOrNo (_("Sound volume and the configuration\nfor the sound card will be saved now."), _("&Yes"), _("&No"))))
-			continue;
+		    {
+		      continue;
+		    }
+		}
 		ui = `next;
 	    }
-		
+		      
 	} until ((ui == `back) || (ui == `next) || ui == `cancel);
-
-
 	return ui;
     }
 
     /**
-     * Diaplays error message
-     * @param card map with card info
-     * @param err string with error message to display
-     * @return any user input
-     */
-    define ErrorDialog (map card, string err) ``{
-					// Help text - intenal YaST2 error 1/3
-	string help_text = UI(_("<p>An error has occurred. </p>"));
-				// Help text - intenal YaST2 error 2/3
-	help_text = help_text + UI(_("<p>You should check that you have\
- correctly installed the <b>ALSA</b> package (from the series 'snd') and that\
- you are running this as a root.</p>"));
-	
-				// Help text - intenal YaST2 error 3/3
-	help_text = help_text + UI (_("<p>If the the problem\
- persists, you can try to pass some <b>options</b> to the ALSA module.\
- If you still can't get your sound card working, you can try\
- <i>OSS/Free</i> or another module.</p>\
- <p>However, <b>YaST2</b>\
- sound configuration currently only supports ALSA.</p>"));
+    * pops up error dialog
+    * @return symbol `back | `cancel
+    */
 
-	
-	term con = `HVCenter(
-	    `VBox(
-		// error message
-		`Label (_("An error occured during installing")),
-		`VSpacing (),
-		`Label (`opt(`outputField), hardware_name (card)),
-		`VSpacing (),
-		`Label (err)));
-	
-	// dialog title
+    define ErrorDialog (map card, string err) ``{
+				    // Help text - intenal YaST2 error 
+
+	string help_text=lookup(STRINGS, "ErrorDialog");
+	    
+	term con = `HVCenter
+	  (
+	    `VBox
+	    (
+		    // error message
+	      `Label (_("An error occured during installing")),
+	      `VSpacing (),
+	      `Label (`opt(`outputField), hardware_name (card)),
+	      `VSpacing (),
+	      `Label (err)
+	    )
+	  );
+	    
+	    // dialog title
 	UI(`SetWizardContents (_("Sound cards"), con, help_text, true, false));
 	if (finish)
+	{
 	    UI(`ChangeWidget (`id(`next), `Label, _("&Finish")));
+	}
 
-	repeat {
-	    
+	repeat 
+	{
 	    ui =  UI (`UserInput ());
-
-
 	} until ((ui == `back) || ui == `cancel);
 
 	return ui;
     }
 
 
-// ===== main =====
-    /*
-     * Steps:
-     *        1. try to insert kernel module
-     *        2. on succes unmute and volume dialog
-     *        3. on fail display error message
-     */
+  // ===== main =====
+      /*
+       * Steps:
+       *        1. try to insert kernel module
+       *        2. on succes unmute and volume dialog
+       *        3. on fail display error message
+       */
 
     map card = Args (0);
     integer card_id = Args (1);
     boolean finish = false;
 
     if (size (Args ()) > 2)
-	finish = Args (2);
+    {
+      finish = Args (2);
+    }
 
     if (!haskey(card, "module"))
-	card = add(card, "module", get_module (card));
+    {
+      card = add(card, "module", get_module (card));
+    }
 
     map module_map = lookup (card, "module", $[]);
-    
+      
     map user_settings = $["audio_file" : "/usr/share/sounds/alsa/test.wav",
-			 "play_cmd"    : "/usr/bin/aplay",
-			 "mixer"       : "/usr/bin/amixer -c $CARD_NUM set \"$CHANNEL\" $VOLUME% unmute"];
-    
+			  "play_cmd"    : "/usr/bin/aplay",
+			  "mixer"       : "/usr/bin/amixer -c $CARD_NUM set \"$CHANNEL\" $VOLUME% unmute"];
+      
 
 
     string err_msg = "";
     boolean no_alsa = lookup (lookup (module_map, "module", $[]), "no_alsa", false);
     if (!test_mode)
-	err_msg = probe_module (module_map);
-
+    {
+      err_msg = probe_module (module_map);
+    }
     any ui = nil;
 
     if (size (err_msg) > 0)
-	ui = ErrorDialog (card, err_msg);
+    {
+      ui = ErrorDialog (card, err_msg);
+    }
     else
-	ui = VolumeDialog ();
+    {
+      ui = VolumeDialog ();
+    }
 
     if (ui == `back)
-	SCR(`Execute (.target.modprobe, sformat ("-r %1", lookup (lookup (module_map, "module", $[]), "name", "")), ""));
+    {
+      SCR(`Execute (.target.modprobe, sformat ("-r %1", lookup (lookup (module_map, "module", $[]), "name", "")), ""));
+    }
 
     UI(`ChangeWidget (`id(`next), `Label, _("&Next")));
     return $["ui" : ui, "return" : size (err_msg) == 0];

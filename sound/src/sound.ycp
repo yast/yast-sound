@@ -1,20 +1,20 @@
 /**
+ *
+ *
  * File:
  *   sound.ycp
  *
  * Module:
- *   Sound
- *
- * Summary:
- *   Configuration of the sound card.
+ *   Sound 	 
  *
  * Authors:
- *   Dan Vesely (dan@suse.cz)
+ *   Dan Veselý
  *
  * $Id$
  *
- * Purpose:		Installation of the sound card. If the sound card was not auto-detected ask user.
+ * Installation of the sound card. If the sound card was not auto-detected ask user.
  *		     
+ *
  */
 
 {
@@ -23,343 +23,198 @@
 
     include "misc_defines.ycp";
     include "sound/sound_routines.ycp";
+    include "sound/sound_ui.ycp";
 
-
-
-// Menuentry for the YaST2 menu
+    // text constants for sound module
+    map STRINGS=CallFunction(`sound_texts());
+  
+    // Menuentry for the YaST2 menu
     if (Args() == [ "get_menuentry" ])
+    {
 	return [ "sound", $[
 	    `menuentry    : UI(_("Hardware/Sound")),
 	    `arguments    : [ ],
 	    `widget       : `RichText(
-		//
-		UI(_("Launch this module to configure your sound card."))
-		+
-		UI(_("<p>You need to be logged in as <i>root</i> in order to do this.</p>"))),
+	    //
+	    UI(_("Launch this module to configure your sound card."))
+	    +
+	    UI(_("<p>You need to be logged in as <i>root</i> in order to do this.</p>"))),
 	    `codefragment : nil ]
-	    ];
+	];
+    }
 
-
-
-
-    // =========== UI ============
-    UI(``{
-    
-	// The main dialog. Copied from installation.ycp.
-	OpenDialog(`opt(`defaultsize),
-		   `VBox(`Image(`suseheader, "SuSE"),
-			 `HBox(`HWeight(30, `RichText(`id(`help), "")),
-			       `HWeight(70, `VBox(
-				   `Left(`Heading(`id(`title), _("YaST2\nInitializing ..."))),
-				   `HVCenter(`ReplacePoint(`id(`contents), `Empty())),
-				   `HBox(
-				       // back pushbutton: the user input is ignored and the last dialog is called
-				       `PushButton(`id(`back), `opt(`disabled), _("&Back")),
-//				   `HCenter( // "abort" button: The installation will be aborted
-//				       `ReplacePoint( `id(`rep_skip), `Empty ())
-//				       ),
-				       `HStretch (),
-				       // next pushbutton: the user input is checked and the next dialog is called
-				       `PushButton(`id(`next), `opt(`disabled, `default), _("&Next"))))))));
-    
-    
-	define SetWizardContents(string title, term contents, string helptext,
-				 boolean has_back, boolean has_next) ``{
-	    ChangeWidget(`id(`next), `Enabled, has_next);
-	    ChangeWidget(`id(`back), `Enabled, has_back);
-	    ChangeWidget(`id(`help), `Value, helptext);
-	    ChangeWidget(`id(`title), `Value, title);
-	    ReplaceWidget(`id(`contents), contents);
-//	if (has_skip) ReplaceWidget(`id(`rep_skip), `PushButton(`id(`skip), _("&Skip")));
-//	else ReplaceWidget(`id(`rep_skip), `HStretch ());
-	    // ControlWidget(TheWizardDialog(), `id(`next), `SetFocus());
-	};
-
-    	// This is a popup dialog for displaying (usually) error messages      
-	define DisplayMessage(string message) ``{
-	    // ok pushbutton: confirm the dialog
-	    OpenDialog(
-		`opt(`decorated),
-		`HBox(
-		    `HSpacing(1),
-		    `VBox(
-			`VSpacing(0.2),
-			`Label(message),
-			// "OK" button: User confirmation
-			`PushButton(`opt(`default), _("&OK")),
-			`VSpacing(0.2)
-			),
-		    `HSpacing(1)
-		    )
-		);
-	    UserInput();
-	    CloseDialog();
-	};
-	
-        define YesOrNo(any message, string yes_button_message, string no_button_message) ``{
-	    OpenDialog(`opt(`decorated),
-		       `HBox(`HSpacing(1),
-			     `VBox(`VSpacing(0.2),
-				   `Label(message),
-				   `HBox(`PushButton(`id(`yes), `opt(`default), yes_button_message),
-					 `HSpacing(2),
-					 `PushButton( no_button_message )),
-				   `VSpacing(0.2)),
-			     `HSpacing(1)
-			   ));
-	    any ret = UserInput();
-	    CloseDialog();
-	    return (ret == `yes);
-	};
-
-	define DebugDialog(any str) ``{
-	    // OK button user confirmation
-	    OpenDialog(`VBox(`RichText(sformat("%1",str)),`PushButton(_("&OK"))));
-	    any r = UserInput();
-	    CloseDialog();
-	};
-
-	define WarnDialog(string message) ``{
-
-	    OpenDialog(`opt(`decorated, `warncolor),
-		       `HBox(
-			   `HSpacing(1),
-			   `VBox(
-			       `VSpacing(0.2),
-			       `Heading(message),
-			       `HBox(
-				   // Yes button - user confirmation
-				   `PushButton(`id(`yes),  _("&Yes")),
-				   `HStretch(),
-				   // Yes button - user confirmation
-				   `PushButton(`opt(`default), _("&No"))
-				   ),
-			       `VSpacing(0.2)
-			       ),
-			   `HSpacing(1)
-			   )
-		);
-	    any ret = UserInput();
-	    CloseDialog();
-	    return (ret == `yes);
-	    
-	};
-    });
-
-/**
- * Reads already configured ALSA cards
- * @return list of ALSA configured sound cards
- */
+ 
+    /**
+     *	@return list
+     *  
+     *
+     */
+   
     define get_running_cards () ``{
-	
-	if (fileexist("/proc/asound/cards")) {
+	if (fileexist("/proc/asound/cards")) 
+	{
 	    list asound = SCR(`Read(.proc.asound.cards));
-	    if (is(select (asound, 0), map)) return asound;
+	    if (is(select (asound, 0), map)) 
+	    {
+		return asound;
+	    }
 	}
 	return [];
     }
 
 
-/**
- * Saves unique keys for a list of sound cards
- * @param cards list of sound cards
- * @return void
- */
-    define save_unique_keys (list cards) ``{
+    /**
+     *	@return void
+     *  
+     *
+     */   
 
+    define save_unique_keys (list cards) ``{
 	list|void orig = SCR(`Read(.var.lib.yast.unique));
-	if (is (orig, void)) orig = [];
+	if (is (orig, void))
+	{
+	    orig = [];
+	}
 	list sound_unique = maplist (`e, configured_unique, ``($["unique" : e, "state" : "configured"]));
 	orig = filter (`e, orig, ``(lookup(e, "section", "") != "sound"));
 	SCR(`Write(.var.lib.yast.unique, add (orig, $["contents" : sound_unique, "section" : "sound"])));
-
     }
 
-/**
- * This is a temporal hack for a nm256 based module - displays warning dialog
- * @param card map with card info
- * @return boolean continue or not
- */
-    define nm256hack (map card) ``{
-	string module_name = "";
-	if (!haskey(card, "module"))	    
-	    module_name = lookup(get_module (card), "name", "");
-	else
-	    module_name = lookup (lookup(lookup (card, "module", $[]), "module", ""), "name", "");
+    /**
+     *	@return boolean
+     *  
+     *
+     */   
 
-	if (module_name == "snd-card-nm256"){
+    define nm256hack (map card) ``{
+        string module_name = "";
+	if (!haskey(card, "module"))
+	{
+	    module_name = lookup(get_module (card), "name", "");
+	}
+	else
+	{
+	    module_name = lookup (lookup(lookup (card, "module", $[]), "module", ""), "name", "");
+	}
+	if (module_name == "snd-card-nm256")
+	{
 	    // special warning message for in a special case
-	    string warn_text = UI(_("Configuring this sound card on some Sony VAIO notebooks
-may be unsuccessful with running X. You may avoid these problems by specifying snd_vaio_hack
-option value to 1 or configuring this card outside X. Proceed?"));
+	    string warn_text=lookup(STRINGS, "nm256hackWarning");
 	    return UI(`WarnDialog (warn_text));
 	}
 	return true;
     }
 
-    // =========== dialogs ===========
-
-/**
- * Dialog when initializing
- * @return symbol
- */
-    define InitializingDialog () ``{
-    
-	// label message
-	term con = `Label (sformat(UI(_("Initializing ..."))));
-	string helptext = "";
-	// dialog title message
-	UI(`SetWizardContents (_("YaST2\nInitializing ..."), con, helptext, false, false));
-	
-	return `next;
-    };
-
-/**
- * Dialog for displaying name
- * @param name card module name
- * @param cname name of the alias (snd-card-X)
- * @return map with "ui" key as user input
- */
-    define DisplayName (string name, string cname) ``{
-
-	// help text 1/3
-	string helptext = UI (_("<p>If you want to configure this sound card press <b>Next</b></p>"));
-	
-	// Help text 2/3 (one sound card found)
-	helptext = helptext + UI (_("<p>If you want to set a special option, press the <b>Options</b> button.
-Most users won't need this.</p>"));
-	// help text 2/3
-	helptext = helptext + UI (_("<p>If you have more than one sound card, you can press <b>Skip</b> to
-configure an other card than the one that is displayed on the right.</p>"));
-	
-	term con = `VBox (
-	    `VStretch (),
-	    `HBox(`HSpacing (3),
-		  `HVCenter(
-		      `VBox(
-			  // To translators: label message 1/2 The sound card XY will be configured
-			  `Left(`Label (_("The sound card\n"))),
-			  `Label (`opt(`outputField), name),
-			  `VSpacing (),
-			  // To translators: label message 2/2 The sound card XY will be configured
-			  `Left(`Label (_("\nwill be configured as"))),
-			  `Label (`opt(`outputField), cname)
-			  ))),
-	    `VStretch (),
-	    `VBox(
-		`HSquash(`HBox (
-		    // Options - button label
-		    `HWeight(1, `PushButton (`id(`options), _("Options"))),
-		    // Skip button label
-		    `HWeight(1, `PushButton (`id(`skip), _("Skip")))
-		    )),
-		`VSpacing ())
-	    );
-	
-	// dialog title
-	UI(`SetWizardContents (_("Sound card configuration"), con, helptext, true, true));
-	// Next button label	
-	UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
-	return $["ui" : UI(`UserInput ())];
-    }
-
-
     
     /**
-     * Wizard for one card, steps: 1. displayname 2. modprobe and volume settings
-     * @param card info as return by libhd
-     * @param card_id card number
-     * @param ui user input (for backward steps)
-     * @return map save info, as required by sound_save for one cards
+     * Wizard steps: 1. displayname 
+     * <br>
+     * 2. modprobe and volume settings
+     * @param   card_info as returned by libhd
+     * @return  list with save info, as required by sound_save for one cards
      */
     define OneCardWizard (map card, integer card_id, any ui) ``{
-	
-
 	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id))),
-		      ``(CallModule ("sound_volume", [card, card_id, (size (sound_cards) == 1)] ))];
-			//$["ui" : `next, "return" : true]];
-
+		    ``(CallModule ("sound_volume", [card, card_id, (size (sound_cards) == 1)] ))];
 
 	integer id = 0;
 	if (ui == `back)
+	{
 	    id = size (dialog) - 1;
+	}
 	map result = $[];
 	any ui = nil;
 
 	boolean success = false;
 	any act_dialog = nil;
 
-	while ((id >= 0) && (id < size (dialog))) {
+	while ((id >= 0) && (id < size (dialog))) 
+	{
 
 	    act_dialog = select (dialog, id);
 
 	    if (id+1 == size (dialog))
-		if (!nm256hack(card)) {
+	    {
+		if (!nm256hack(card)) 
+		{
 		    id = 0;
 		    continue;
 		}
-	    
+	    }    
 	    result = eval(act_dialog);
 	    ui = lookup(result, "ui", `cancel);
 	    
 	    if ((ui == `cancel) || (ui == `skip))
+	    {
 		break;
-	    else if (ui == `next) {
+	    }
+	    
+	      // case: next
+	    else if (ui == `next) 
+	    {
 		id = id + 1;
 
 		if (id == size (dialog)) 
+		{
 		    success = lookup (result, "return", false);
-		else if (act_dialog == ``(CallModule ("sound_options", [card]))) {
-
-		    // UI(`DebugDialog(maplist (`e, lookup (lookup (card, "module"), "params"), ``(lookup (e, "value", "none")))));
-		    card = lookup (result, "return");
-		    // UI(`DebugDialog(maplist (`e, lookup (lookup (card, "module"), "params"), ``(lookup (e, "value", "none")))));
+		}
+		else 
+		{
+		    if (act_dialog == ``(CallModule ("sound_options", [card]))) 
+		    {
+			card = lookup (result, "return");
+		    }
 		}
 	    }
-	    else if (ui == `back) {
-
+		// case: back
+	    else if (ui == `back) 
+	    {
 		id = id - 1;
-		
-		if (id == 0) dialog = filter (`e, dialog, ``(e != ``(CallModule ("sound_options", [card]))));
-		
+		if (id == 0) 
+		{
+		    dialog = filter (`e, dialog, ``(e != ``(CallModule ("sound_options", [card]))));
+		}
 	    }
-	    else if (ui == `options) {
+		// case: options
+	    else if (ui == `options) 
+	    {
 		list nd   = [];
 		integer i = 0;
 		// insert into the pre-last position
 		foreach (`e, dialog, ``{
-		    if ((size (dialog) - 1) == i) nd = add (nd, ``(CallModule ("sound_options", [card])));
+		    if ((size (dialog) - 1) == i) 
+		    {
+			nd = add (nd, ``(CallModule ("sound_options", [card])));
+		    }
 		    nd = add (nd, select(dialog, i));
 		    i = i + 1;
 		});
 		dialog = nd;
 		id = id + 1;
 	    }
-	    
 	}
-	
+
 	map ret = $[];
 
-	if (((ui == `next) && success) || (ui == `back)) {
-
-
-
+	if (((ui == `next) && success) || (ui == `back)) 
+	{
 	    result = create_save_info (card, card_id);
 	    if (size (result) > 0)
+	    {
 		ret = add (ret, "return", result);
+	    }
 	}
 
 	if (no_alsa_exception (card, config_mode))
+	{
 	    ret = add (ret, "use_alsa", false);
-
+	}
 	return add (ret, "ui", ui);
-	
-
-
     }
 
     // ========== MAIN ==========
 
+    OpenMainDialog();
     InitializingDialog ();
 
     boolean test_mode     = false;
@@ -369,12 +224,25 @@ configure an other card than the one that is displayed on the right.</p>"));
     boolean from_menu     = false;
 
     integer arg_n = size (Args ()) - 1;
-    while (arg_n >= 0) {
-  	if      (Args(arg_n) == .test)          test_mode     = true;
-	else if (Args(arg_n) == .autoinst_mode) autoinst_mode = true;
-	else if (Args(arg_n) == .conf_mode)     config_mode   = true;
-	else if (Args(arg_n) == .from_menu)     from_menu     = true;
-  	arg_n = arg_n - 1;
+    while (arg_n >= 0) 
+    {
+	if (Args(arg_n) == .test)
+	{ 
+	    test_mode     = true;
+	}
+	if (Args(arg_n) == .autoinst_mode) 
+	{
+	    autoinst_mode = true;
+	}
+	if (Args(arg_n) == .conf_mode)    
+	{
+	    config_mode   = true;
+	}
+	if (Args(arg_n) == .from_menu)
+	{
+	    from_menu     = true;
+	}
+	arg_n = arg_n - 1;
     }
 
     list sound_cards  = get_audio (test_mode, config_mode);
@@ -391,145 +259,188 @@ configure an other card than the one that is displayed on the right.</p>"));
     boolean exit = false;
     list|void db = SCR(`Read (.target.yast2, "sndcards.ycp"));
     
-    if (is (db, void)) {
+    if (is (db, void)) 
+    {
 	UI(`DisplayMessage ("The Sound card database cannot be found!!!"));
 	exit = true;
     }
 
     // get all the apropriate information from the database
-    sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
+      sound_cards =  maplist(`e, sound_cards, ``(add (e, "module", get_module (e))));
 
     list|void already = nil;
     if (SCR(`Read(.target.size, "/var/lib/YaST/unique.inf")) > 0)
+    {
 	already = SCR (`Read(.var.lib.yast.unique));
-    if (!is(already, void)) {
+    }
+
+    if (!is(already, void)) 
+    {
 	already = maplist (`k, lookup (select (filter (`e, already, ``(lookup (e, "section") == "sound")), 0, $[]), "contents", []),
 			   ``(lookup (k, "unique")));
 	sound_cards = filter (`e, sound_cards, ``(!contains (already, lookup (e, "unique_key"))));
     }
 
-    if (!exit) {
+    if (!exit) 
+    {
 
-    boolean skipped = false;
-    call_complex_dialog = size (sound_cards) != 1;	
-    while (cont) {
-
+	boolean skipped = false;
+	call_complex_dialog = size (sound_cards) != 1;	
+	while (cont) 
+	{
 				// wizards ...
-	while ((card_id >= 0) && (card_id < size (sound_cards))) {
+	    while ((card_id >= 0) && (card_id < size (sound_cards))) 
+	    {
+		result = OneCardWizard (select (sound_cards, card_id), size (save_info), condition (skipped, `next, ui));
+
+		ui       = lookup (result, "ui", `cancel);
+		use_alsa = lookup (result, "use_alsa", true);
+
+		if (ui == `cancel)
+		{
+		    break;
+		}
+		if (ui == `skip) 
+		{
+		    card_id = card_id + 1;
+		    skipped = true;
+		}
+		if (ui == `back) 
+		{
+		    map rem = lookup (result, "return", $[]);
+		    save_info = filter (`e, save_info, ``(e != rem));
+		    configured_unique = filter (`e, configured_unique, ``(lookup (select (sound_cards, card_id), "unique_key", "") != e));
+		    card_id = card_id - 1;
+		}
+		if (ui == `next) 
+		{
+		    map new = lookup (result, "return", $[]);
+		    save_info = add (save_info, new);
+		    configured_unique = add (configured_unique, lookup (select (sound_cards, card_id), "unique_key", ""));
+		    card_id = card_id + 1;
+		    skipped = false;
+		}
 	
-	    
-	    result = OneCardWizard (select (sound_cards, card_id), size (save_info), condition (skipped, `next, ui));
+	    }
 
-	    ui       = lookup (result, "ui", `cancel);
-	    use_alsa = lookup (result, "use_alsa", true);
-
-	    if (ui == `cancel)
+	    if (ui == `back) 
+	    {
 		break;
-	    else if (ui == `skip) {
-		card_id = card_id + 1;
-		skipped = true;
-	    }
-	    else if (ui == `back) {
-		map rem = lookup (result, "return", $[]);
-		save_info = filter (`e, save_info, ``(e != rem));
-		configured_unique = filter (`e, configured_unique, ``(lookup (select (sound_cards, card_id), "unique_key", "") != e));
-		card_id = card_id - 1;
-	    }
-	    else if (ui == `next) {
-		map new = lookup (result, "return", $[]);
-		save_info = add (save_info, new);
-		configured_unique = add (configured_unique, lookup (select (sound_cards, card_id), "unique_key", ""));
-		card_id = card_id + 1;
-		skipped = false;
 	    }
 	
-	}
-
-	if (ui == `back) break;
-	
-	if (call_complex_dialog) {
-
-	    result = CallModule ("sound_complex", [sound_cards, save_info, configured_unique]);
-	}
-	else
-	    result = $["ui" : `next, "save_info" : save_info];
-
-	ui = lookup (result, "ui", `cancel);
-
-	if (ui == `next && (size (sound_cards) != 1)) {
-	    
-	    // confirmation popup message
-	    string warn_msg = UI (_("Sound volume and the configuration\nfor the sound card will be saved now."));
-	    if (size(filter (`e, lookup (result, "save_info"), ``((size (e) > 0) && (lookup (e, "name") != "off")))) == 0)
-		// confirmation popup message		
-		warn_msg = UI (_("The sound configuration will be saved now."));
-
-	    // Yes, No - button label
-	    cont = !(UI (`YesOrNo (warn_msg, _("&Yes"), _("&No"))));
-	    
-	    if (call_complex_dialog) {
-		save_info = lookup (result, "save_info");
-		rc_vars   = lookup (result, "rc", $[]);
-		configured_unique = lookup (result, "configured_unique", []);
+	    if (call_complex_dialog) 
+	    {
+		result = CallModule ("sound_complex", [sound_cards, save_info, configured_unique]);
 	    }
 	    else
-		skipped = true;
+	    {
+		result = $["ui" : `next, "save_info" : save_info];
+	    }
+
+	    ui = lookup (result, "ui", `cancel);
+
+	    if (ui == `next && (size (sound_cards) != 1)) 
+	    {
+	    
+	  // confirmation popup message
+		string warn_msg = UI (_("Sound volume and the configuration\nfor the sound card will be saved now."));
+		if (size(filter (`e, lookup (result, "save_info"), ``((size (e) > 0) && (lookup (e, "name") != "off")))) == 0)
+		{
+	    // confirmation popup message		
+		    warn_msg = UI (_("The sound configuration will be saved now."));
+		}
+
+	    // Yes, No - button label
+		cont = !(UI (`YesOrNo (warn_msg, _("&Yes"), _("&No"))));
+	    
+		if (call_complex_dialog) 
+		{
+		    save_info = lookup (result, "save_info");
+		    rc_vars   = lookup (result, "rc", $[]);
+		    configured_unique = lookup (result, "configured_unique", []);
+		}
+		else
+		{
+		    skipped = true;
+		}
+	    }
+	    else 
+	    {
+		if ((size (sound_cards) != 1))
+		{
+		    cont = false;
+		}
+		else 
+		{
+		    if (ui == `back) 
+		    {
+			card_id = card_id - 1;
+		    }
+		}
+  
+	    }
+	    if ((size (sound_cards) == 1)) 
+	    {
+		cont = false;
+	    }
 	}
-	else if ((size (sound_cards) != 1)) cont = false;
-	else if (ui == `back) card_id = card_id - 1;
-    
-	if ((size (sound_cards) == 1)) cont = false;
-    }
 
 				// filter out empty enries
-    save_info = filter (`e, save_info, ``(size (e) > 0));
-    n_cards = size (save_info);
+	save_info = filter (`e, save_info, ``(size (e) > 0));
+	n_cards = size (save_info);
 
-    map save_map = $[];
+	map save_map = $[];
     
-    if ((n_cards > 0) && (ui == `next)) {
-	if (use_alsa) {
-	    string snd_name = "off";
+	if ((n_cards > 0) && (ui == `next)) 
+	{
+	    if (use_alsa) 
+	    {
+		string snd_name = "off";
 
-    	    if (size (filter (`e, save_info, ``(lookup (e, "name") != "off"))) > 0)
-   		snd_name = "snd";
+		if (size (filter (`e, save_info, ``(lookup (e, "name") != "off"))) > 0)
+		{
+		    snd_name = "snd";
+		}
 
-	    save_info = prepend (save_info, $["name"   : snd_name,
-					     "modules" : $["alias"  : "char-major-116",
-							  "options" : $["snd_cards_limit" : sformat ("%1", n_cards),
-								       "snd_major"        : "116"]]]);
+		save_info = prepend (save_info, $["name"   : snd_name,
+					  "modules" : $["alias"  : "char-major-116",
+							"options" : $["snd_cards_limit" : sformat ("%1", n_cards),
+					 		"snd_major"        : "116"]]]);
 
-	    save_map = add (save_map, "cards",  save_info);
-	    save_map = add (save_map, "system", $["modules" : alsa_oss (n_cards),
+		save_map = add (save_map, "cards",  save_info);
+		save_map = add (save_map, "system", $["modules" : alsa_oss (n_cards),
 						 "rc"       : rc_vars]);
-	    save_map = add (save_map, "other",  ``(AlsaFinish ()));
-	
+		save_map = add (save_map, "other",  ``(AlsaFinish ()));
 
-	}
-	else {
+	    }
+	    else 
+	    {
 	    // no alsa
-	    string mod_name = lookup (select (sound_cards, 0), "module", "");
-	    if (size (mod_name) > 0)
-		save_map = add (save_map, "system", no_alsa (mod_name));
-
-	}
+		string mod_name = lookup (select (sound_cards, 0), "module", "");
+		if (size (mod_name) > 0)
+		{
+		    save_map = add (save_map, "system", no_alsa (mod_name));
+		}
+	    }
 
 	//UI(`DebugDialog (save_info));
 
-	CallModule ("sound_save", [save_map, test_mode]);
+	    CallModule ("sound_save", [save_map, test_mode]);
 
 	
-    }    
+	}    
     
-    if (ui == `next) {
+	if (ui == `next) 
+	{
 	// always save unique keys 
-	save_unique_keys (get_audio (test_mode, config_mode));
+	    save_unique_keys (get_audio (test_mode, config_mode));
 
-	if (lookup (rc_vars, "START_ALSA") == "no")
-	    SCR(`Execute (.bin.bash, "/etc/init.d/alsasound stop", $[]));
-    }
+	    if (lookup (rc_vars, "START_ALSA") == "no")
+	    {
+		SCR(`Execute (.bin.bash, "/etc/init.d/alsasound stop", $[]));
+	    }
+	}
 
     }
     UI(`CloseDialog ());
-    
 }

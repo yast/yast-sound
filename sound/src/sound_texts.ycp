@@ -1,0 +1,120 @@
+/**
+ *
+ * File:
+ *   sound_texts.ycp		
+ *
+ * Module:                      
+ *   Sound
+ * 
+ * Authors:            
+ *   Dan Veselý/Dan Meszaros
+ *
+ * Summary:     
+ *   Text constants for sound module                
+ * 
+ * $Id$
+ *
+ */
+
+{
+  
+    textdomain "sound";
+
+    /**
+     *	Returns map with string values
+     *  @return map
+     */
+
+    define STRINGS() ``{
+	return $["DisplayName":
+	     UI(_("<p>If you want to configure this sound card press <b>Next<b></p>"))+
+	     UI (_("<p>If you want to set a special option, press the <b>Options</b> button.
+  Most users won't need this.</p>"))+
+	     UI (_("<p>If you have more than one sound card, you can press <b>Skip</b> to
+  configure an other card than the one that is displayed on the right.</p>")),
+
+	    
+	    "ManualDialog":
+	    UI(_("<p>Please <b>manually</b> choose the sound\
+   card, you want to configure. You can search for a particular sound\
+   card by entering the name in the search box.</p>"))+
+	    UI(_("<p>Select <b>All</b> if you want\
+   to see the whole list of supported sound card models.</p>")),
+      
+
+	    "WhichDialog":
+	    UI (_("<p>Please select what kind of card you want to configure.</p>"))+
+	    UI (_("<p>If the list contains <b>autodetected</b> (and not yet configured) cards, select one and go ahead. "))+
+	    UI (_("Otherwise use <b>manual selection</b>.</p>")),
+
+	
+	    "WhichDialogMsg":
+	    UI (_("There are programs running that are currently using the audio device.\n")) +
+	    UI (_("To reset the configuration these programs must be terminated. Proceed?")),
+
+
+	    "ComplexDialog":
+	    UI(_("<p>The complete sound cards list. Use the <b>Finish</b> button \
+  to save sound card information.</p>"))+
+	    UI(_("<p>Use <b>Delete</b> button to remove configured sound card. \
+  <b>Add soundcard</b> button can be used for adding sound card.</p>"))+
+	    UI(_("<p>Use the <b>start ALSA</b> check button to enable (resp. disable) \
+  ALSA start-up during boot time. Check the <b>start sequencer</b> if you want to load modules \
+  for playing MIDI files during boot-time (these modules can be loaded on demand).</p>")),
+
+	      // To translators: To reset the sound configuration these programs must be terminated
+	      // To translators: label message
+	    "ComplexDialogMsg":
+	    UI (_("There are programs running that are currently using the audio device.\n"))+
+	    UI (_("To reset the configuration these programs must be terminated. Proceed?")),
+
+
+	    "OptionsDialog":
+	    "<p>"+
+	    UI(_("Here, you can modify the options for the sound modules.\n"))+
+	    UI(_("If you are not <b>absolutely sure</b> what you are doing, please leave this dialog untouched."))+
+	    "</p>"+
+	    UI (_("<p>Choose the option you want\
+   to set, use the <b>Set</b> button to enable new value. You can reset\
+   all values by pressing <b>Reset</b>. Numeric values can be entered as\
+   decimal or hexadecimal (hexadecimal with a <b>0x</b> prefix).</p>"))+
+	    "<p>",
+   
+
+	    "VolumeDialog":
+	    UI(_("<p>Please adjust the volume.</p>"))+
+	    UI(_("<p>You can test your sound card by pressing the <b>Test</b> button.</p>"))+
+	    UI(_("<p>After the configuration is\
+   done you can use <b>amixer</b> (or any program of your choice) for\
+   adjusting the volume.</p>"))+
+	    UI(_("<p><b>WARNING/SPECIAL\
+   NOTE:</b>Please start testing your sound card with <b>very</b> low\
+   volume settings to prevent an accident with too much loud\
+   noise.</p>")),
+
+
+	    "ErrorDialog":
+	    UI(_("<p>An error has occurred. </p>"))+
+	    UI(_("<p>You should check that you have\
+   correctly installed the <b>ALSA</b> package (from the series 'snd') and that\
+   you are running this as a root.</p>"))+
+	    UI (_("<p>If the the problem\
+   persists, you can try to pass some <b>options</b> to the ALSA module.\
+   If you still can't get your sound card working, you can try\
+   <i>OSS/Free</i> or another module.</p>\
+   <p>However, <b>YaST2</b>\
+   sound configuration currently only supports ALSA.</p>")),
+
+	  
+	    "nm256hackWarning":
+	    UI(_("Configuring this sound card on some Sony VAIO notebooks
+  may be unsuccessful with running X. You may avoid these problems by specifying snd_vaio_hack
+  option value to 1 or configuring this card outside X. Proceed?"))
+
+	    ];
+    }
+
+    return STRINGS();
+    
+}
+

@@ -1,351 +1,378 @@
 /**
  * File:
  *   sound_routines.ycp
- *
+ * 
  * Module:
  *   Sound
- *
+ * 
  * Summary:
- *   Useful rooutines for a sound cards configuration
- *
+ *   Routines for sound card configuration
+ * 
  * Authors:
- *   Dan Vesely (dan@suse.cz)
+ *   Dan Veselý <dan@suse.cz>
  *
  * $Id$
  *
- * Useful routines
- *		     
  */
+
 
 {
 
-/**
- * same as  ()?():(); statement in c
- * @param c condition
- * @param statement 1
- * @param statement 2
- * @return one of evaluated statements
- */
-define condition (boolean c, any s1, any s2) ``{
-    if (c) return eval (s1);
-    else   return eval (s2);
-};
+    /**
+     * same as  ()?():(); statement in c
+     * @return any
+     */
+    define condition (boolean c, any s1, any s2) ``{
+	if (c) 
+	{ 
+	    return eval (s1);
+	}
+	else
+	{
+	    return eval (s2);
+	}
+    };
 
 
-/**
- * Simply returns list with ALSA OSS/Free emulation modules
- * @params number number of sound cards
- * @return list of modules.conf entries
- */
-define alsa_oss (integer number) ``{
+    /**
+     * Simply returns list with ALSA OSS/Free emulation modules
+     * Params: "number" ... number of sound cards
+     * @return list
+     */
+    define alsa_oss (integer number) ``{
+	list modules = [];
+	integer i = 0;
+	// map with minor as a key and module as value
+	map oss_list = $[		
+	    0  : "snd-mixer-oss",
+	    11 : "snd-mixer-oss",
+	    3  : "snd-pcm-oss",
+	    12 : "snd-pcm-oss",
+	    1  : "snd-seq-oss",
+	    8  : "snd-seq-oss"
+	    ];
+	
+	while (i < number) 
+	{
+	    modules = add (modules, $["name"   : sformat ("snd-card-%1", i),
+				      "modules" : $["alias" : sformat ("sound-slot-%1", i)]]);
 
+	    modules = union (modules, maplist (`minor, `mod, oss_list, ``(
+		$["name"   : sformat ("%1", mod),
+		  "modules" : $["alias" : sformat ("sound-service-%1-%2", i, minor)]])));
 
-    list modules = [];
-    integer i = 0;
-    // map with minor as a key and module as value
-    map oss_list = $[		
-	0  : "snd-mixer-oss",
-	11 : "snd-mixer-oss",
-	3  : "snd-pcm-oss",
-	12 : "snd-pcm-oss",
-	1  : "snd-seq-oss",
-	8  : "snd-seq-oss"
-	];
-    
-    while (i < number) {
-	modules = add (modules, $["name"   : sformat ("snd-card-%1", i),
-				 "modules" : $["alias" : sformat ("sound-slot-%1", i)]]);
-
-	modules = union (modules, maplist (`minor, `mod, oss_list, ``(
-	    $["name"   : sformat ("%1", mod),
-	     "modules" : $["alias" : sformat ("sound-service-%1-%2", i, minor)]])));
-
-	i = i + 1;
+	    i = i + 1;
+	}   
+	return modules;
     }
 
-    return modules;
-}
 
-
-/**
- * This is no alsa hack function
- * @param mod_name name of the module
- * @return map with OSS/Free sound info
- */
-define no_alsa (string mod_name) ``{
-    return $[
-	"modules" : [
-	    $["name"   : mod_name,
-	     "modules" : $["alias" :  "char-major-14"]],
-	    $["name"   : mod_name,
-	     "modules" : $["alias" :  "sound"]],
-	    $["name"   : mod_name,
-	     "modules" : $["alias" :  "midi"]],
-	    $["name"   : mod_name,
-	     "modules" : $["alias" :  "sound-slot-0"]],
-	    $["name"   : mod_name,
-	     "modules" : $["alias" :  "sound-service-0-0"]]	    
-	    ],
-	"volume" : $[
-	    "mixer" : "/usr/bin/aumix \"$CHANNEL\" $VOLUME"
-	    ]
-	];
-}
-
-/**
- * simply gets detected audio
- * @param test_mode boolean
- * @param config_mode boolean
- * @return sound cards found by libhd
- */
-define get_audio (boolean test_mode, boolean config_mode) ``{
-
-    if (!test_mode && !config_mode) {
-	list|void ret = SCR(`Read(.probe.sound));
-	if (is (ret, void)) ret = [];
-	return ret;
+    /**
+     * This is no alsa hack function
+     * @return map
+     */
+    define no_alsa (string mod_name) ``{
+	return $[
+	    "modules" : [
+		$["name"   : mod_name,
+		 "modules" : $["alias" :  "char-major-14"]],
+		$["name"   : mod_name,
+		 "modules" : $["alias" :  "sound"]],
+		$["name"   : mod_name,
+		 "modules" : $["alias" :  "midi"]],
+		$["name"   : mod_name,
+		 "modules" : $["alias" :  "sound-slot-0"]],
+		$["name"   : mod_name,
+		 "modules" : $["alias" :  "sound-service-0-0"]]	    
+		],
+	    "volume" : $[
+		"mixer" : "/usr/bin/aumix \"$CHANNEL\" $VOLUME"
+		]
+	    ];
     }
-    
-    
-    return [$["baseclass"    : "Multimedia controller", 
-	     "bus"           : "PCI", 
-	     "device"        : "ES1371 [AudioPCI-97]", 
-	     "device_id"     : 70513, 
-	     "resource"      : $["io":[$["active":true, "length":0, "mode":"rw", "start":28672]], 
-				"irq":[$["count":0, "enabled":true, "irq":10]]], 
-	     "rev"           : "6", 
-	     "sub_device"    : "Creative Sound Blaster AudioPCI64V, AudioPCI128", 
-	     "sub_device_id" : 70513, 
-	     "sub_vendor"    : "Ensoniq", 
-	     "sub_vendor_id" : 70260, 
-	     "subclass"      : "Multimedia audio controller", 
-	     "vendor"        : "Ensoniq", 
-	     "vendor_id"     : 70260,
-	     "unique_key"    : "test.test"],
-      $["baseclass"    : "Multimedia controller", 
-       "bus"           : "PCI", 
-       "device"        : "ES1371 [AudioPCI-97]", 
-       "device_id"     : 98309, 
-       "resource"      : $["io":[$["active":true, "length":0, "mode":"rw", "start":28672]], 
-  			"irq":[$["count":0, "enabled":true, "irq":10]]], 
-       "rev"           : "6", 
-       "sub_device"    : "Creative Sound Blaster AudioPCI64V, AudioPCI128", 
-       "sub_device_id" : 70513, 
-       "sub_vendor"    : "Ensoniq", 
-       "sub_vendor_id" : 70260, 
-       "subclass"      : "Multimedia audio controller", 
-       "vendor"        : "Ensoniq", 
-       "vendor_id"     : 69832,
-       "unique_key"    : "test2.test2"]];
 
-}
+    /**
+     * simply gets detected audio
+     * @return map
+     */
+    define get_audio (boolean test_mode, boolean config_mode) ``{
+	if (!test_mode && !config_mode) 
+	{
+	    list|void ret = SCR(`Read(.probe.sound));
+	    if (is (ret, void)) ret = [];
+	    return ret;
+	}
+	return [$["baseclass"    : "Multimedia controller", 
+		 "bus"           : "PCI", 
+		 "device"        : "ES1371 [AudioPCI-97]", 
+		 "device_id"     : 70513, 
+		 "resource"      : $["io":[$["active":true, "length":0, "mode":"rw", "start":28672]], 
+				    "irq":[$["count":0, "enabled":true, "irq":10]]], 
+		 "rev"           : "6", 
+		 "sub_device"    : "Creative Sound Blaster AudioPCI64V, AudioPCI128", 
+		 "sub_device_id" : 70513, 
+		 "sub_vendor"    : "Ensoniq", 
+		 "sub_vendor_id" : 70260, 
+		 "subclass"      : "Multimedia audio controller", 
+		 "vendor"        : "Ensoniq", 
+		 "vendor_id"     : 70260,
+		 "unique_key"    : "test.test"],
+	  $["baseclass"    : "Multimedia controller", 
+	   "bus"           : "PCI", 
+	   "device"        : "ES1371 [AudioPCI-97]", 
+	   "device_id"     : 98309, 
+	   "resource"      : $["io":[$["active":true, "length":0, "mode":"rw", "start":28672]], 
+			    "irq":[$["count":0, "enabled":true, "irq":10]]], 
+	   "rev"           : "6", 
+	   "sub_device"    : "Creative Sound Blaster AudioPCI64V, AudioPCI128", 
+	   "sub_device_id" : 70513, 
+	   "sub_vendor"    : "Ensoniq", 
+	   "sub_vendor_id" : 70260, 
+	   "subclass"      : "Multimedia audio controller", 
+	   "vendor"        : "Ensoniq", 
+	   "vendor_id"     : 69832,
+	   "unique_key"    : "test2.test2"]];
 
-/**
- * Looks up in the database for the module
- * @param card card map info
- * @return map with ALSA module info
- */
-define get_module (map card) ``{
- 
-    list|void db = SCR(`Read (.target.yast2, "sndcards.ycp"));
-    
-    if (db == nil)
+  }
+
+    /**
+     * Looks up in the database for the module
+     * @return map
+     */
+    define get_module (map card) ``{
+	list|void db = SCR(`Read (.target.yast2, "sndcards.ycp"));
+	
+	if (db == nil)
+	{
+	    return $[];
+	}
+
+	string bus        = lookup (card, "bus");
+	integer offset    = condition ((tolower (bus) == "isa"), 0x20000, 0x10000);
+	integer vendor_id = lookup (card, "vendor_id", 0);
+	integer device_id = lookup (card, "device_id", 0);
+
+	list|void fc = [];
+	
+	if (tolower (bus) == "pci") 
+	{
+	    fc = filter (`d, db, 
+			 ``(filter(`c, lookup (d, "libhd"), ``((lookup (c, "vendor_id") == vendor_id - offset) && 
+							       (contains(lookup(c, "device_id"), device_id - offset)))) != []));
+	}
+	else 
+	{
+	    fc = filter (`d, db, 
+		   ``(filter(`c, lookup (d, "libhd"), ``((lookup (c, "vendor_id") == vendor_id - offset) &&
+							 (lookup (c, "device_id") == device_id - offset))) != []));
+	}
+	if (fc != nil)
+	{
+	    if (size (fc) > 0) return select (fc, 0);
+	}
 	return $[];
-
-    string bus        = lookup (card, "bus");
-    integer offset    = condition ((tolower (bus) == "isa"), 0x20000, 0x10000);
-    integer vendor_id = lookup (card, "vendor_id", 0);
-    integer device_id = lookup (card, "device_id", 0);
-
-    list|void fc = [];
-    
-    if (tolower (bus) == "pci") 
-	fc = filter (`d, db, 
-		     ``(filter(`c, lookup (d, "libhd"), ``((lookup (c, "vendor_id") == vendor_id - offset) && 
-							   (contains(lookup(c, "device_id"), device_id - offset)))) != []));
-    
-    
-    else {
-	
-	
-	fc = filter (`d, db, 
-		     ``(filter(`c, lookup (d, "libhd"), ``((lookup (c, "vendor_id") == vendor_id - offset) &&
-							   (lookup (c, "device_id") == device_id - offset))) != []));
-	
-    }
-    
-    if (fc != nil)
-	if (size (fc) > 0) return select (fc, 0);
-	    
-    return $[];
-    
-}
-
-/**
- * Use another module than alsa
- * @param card sound card info
- * @param config_mode boolean
- * @return boolean true if no ALSA should be used
- */
-define no_alsa_exception (map card, boolean config_mode) ``{
-    
-    if (!config_mode)
-	return MacRisc ();
-}
-
-/** 
- * Callback to test if MacRisc architecture is present
- * @return boolean
- */
-define MacRisc () ``{
-    if (lookup (select (SCR(`Read(.probe.system)), 0), "system") == "MacRISC")
-	return true;
-    return false;
-}
-
-/**
- * Creates save information based on card map return by libhd First list of exceptions is processed (has two keys : "try" with function to provide test and "handle" with function to handle (return) the corrected result otherwise vendor_id, device_id search in sound db is run
- * @param card sound card info
- * @param card_id card number
- * @return map with save information
- */
-define create_save_info (map card, integer card_id) ``{
-
-    list except_list = [$["try" : ``(MacRisc ()), "handle" : ``(mac_risc ())]];
-    integer exp_id = 0;
-    
-    while (exp_id < size (except_list)) {
-	if (eval(lookup(select (except_list, exp_id), "try")))
-	    return eval(lookup(select (except_list, exp_id), "handle"));
-	exp_id = exp_id + 1;
     }
 
-    // no exceptions, normal way ...
-
-
-    map mod     = $[];
-    if (haskey (card, "module"))
-	mod = lookup (card, "module");
-    else
-	mod = get_module (card);
-
-    list params = filter (`e, lookup (lookup (card, "module", $[]), "params", []), ``(size (lookup (e, "value")) > 0));
-    map options = listmap (`e, params, ``([lookup (e, "name", ""), lookup (e, "value", "")]));
-
-    if (lookup (lookup (mod, "module", $[]), "name" , "off") != "off") {
-	options = add (options, "snd_id", sformat ("card%1", card_id + 1));
-	options = add (options, "snd_index", sformat ("%1", card_id));
-    }
-
-    return $["name"   : lookup (lookup (mod, "module", $[]), "name" , "off"),
-	    "modules" : $["alias"  : sformat ("snd-card-%1", card_id),
-			 "options" : options]];
-
-}
-
-/**
- * Sets volume command must be string with $CHANNEL and $VALUE included
- * @param command command for set-up volume
- * @param channel channel to set volume of
- * @param value volume value
- * @param card_num card number
- * @return integer exit code
- */
-define SetVolume (string command, string channel, string value, integer card_num) ``{
-    return SCR(`Execute (.target.bash, command, $["CHANNEL" : channel, "VOLUME" : value, "CARD_NUM" : card_num]));
-}
-
-/**
- * reads already saved info from modules.conf
- * @return list of modules.conf entries
- */
-define read_save_info () ``{
-    
-    string prefix = "";
-    list aliases  = SCR(`Read(topath (sformat ("%1.modules.alias", prefix))));
-    list options  = SCR(`Read(topath (sformat ("%1.modules.options", prefix))));
-    list save     = [];		// structure to save
-    integer i     = 0;
-
-    if (contains (aliases, "char-major-116")) {
-	// alsa modules
-	
-	
-	if (SCR(`Read(topath(sformat ("%1.modules.alias", prefix)), "char-major-116")) == "snd") {
-
-	    list minor_list = [0, 1, 3, 8, 11, 12];		
-	    integer cards   = tointeger (lookup (SCR(`Read(topath (sformat ("%1.modules.options", prefix)), "snd")), "snd_cards_limit", 1));
-	    map entry       = $[];
-	    map mod_entry   = $[];
-
-	    string alias    = "";
-	    string module_name   = "";
-	    string comment  = "";
-
-	    // read the cards
-	    while (i < cards) {
-
-		// == snd-card-X ==
-		entry = $[];
-		alias = sformat ("snd-card-%1", i);
-
-		if (!contains(aliases, alias)) { i = i + 1; continue;} // not found
-		
-		module_name  = SCR(`Read(topath (sformat ("%1.modules.alias", prefix)), alias));
-		if ((module_name == "off") || (module_name == "null")) { i = i + 1; continue; }
-		comment = SCR(`Read(topath (sformat ("%1.modules.alias.comment", prefix)), alias));
-
-		entry = add (entry, "name", module_name);
-		mod_entry = add (mod_entry, "alias", alias);
-		if (contains (options, module_name)) mod_entry = add (mod_entry, "options", SCR(`Read(topath (sformat ("%1.modules.options", prefix)), module_name)));
-		if (size (comment) > 0) entry = add (entry, "comment", comment);
-		
-		entry = add (entry, "modules", mod_entry);
-		save = add (save, entry);
-
-		i = i + 1;
-	    }
+    /**
+     * Use another module than alsa
+     * @return boolean
+     */
+    define no_alsa_exception (map card, boolean config_mode) ``{
+	if (!config_mode)
+	{
+	    return MacRisc ();
 	}
     }
-    else if (contains (aliases, "char-major-14")) {
-	// oss (poor support, should be enhanced ... )
-	
-	// list of aliases to be read
-	list local_aliases = ["char-major-14",
-			     "sound",
-			     "midi",
-			     "sound-slot-0",
-			     "sound-service-0-0"];
 
-	map entry      = $[];
-	map option     = $[];
-	string module_name  = "";
-	string comment = "";
-	
-	maplist (`alias, local_aliases, ``{
-	    if (contains (aliases, alias)) {
-		entry   = $[];
-		module_name  = SCR (`Read(topath (sformat ("%1.modules.alias", prefix)), alias));
-		comment = SCR (`Read(topath (sformat ("%1.modules.alias.comment", prefix)), alias));
-		if (contains (options, module_name)) option = SCR (`Read(topath (sformat ("%1.modules.options", prefix)), module_name));
-		else option = $[];
+    /**
+     *
+     * @return boolean
+     */
 
-		if ((module_name != "off") && (module_name != "null")) {
-
-		    if (size (module_name) > 0) {
-			entry = add (entry, "alias", alias);
-			entry = add (entry, "name", module_name);
-			if (size (option) > 0) entry = add (entry, "options", option);
-			if (size (comment) > 0) entry = add (entry, "comment", comment);
-		    }
-		}
-		if (size (entry) > 0) save = add (save, entry);
-	    }
-	});
+    define MacRisc () ``{
+	if (lookup (select (SCR(`Read(.probe.system)), 0), "system") == "MacRISC")
+	{
+	    return true;
+	}
+	return false;
     }
 
-    return save;
+    /**
+     * Creates save information based on card map return by libhd
+     * First list of exceptions is processed (has two keys : "try" with function to 
+     * provide test and "handle" with function to handle (return) the corrected result
+     * otherwise vendor_id, device_id search in sound db is run
+     *
+     * @return map
+     */
+    define create_save_info (map card, integer card_id) ``{
+	list except_list = [$["try" : ``(MacRisc ()), "handle" : ``(mac_risc ())]];
+	integer exp_id = 0;
+	
+	while (exp_id < size (except_list))
+	{
+	      if (eval(lookup(select (except_list, exp_id), "try")))
+	      {
+		  return eval(lookup(select (except_list, exp_id), "handle"));
+	      }
+	      exp_id = exp_id + 1;
+	}
 
-}
+	// no exceptions, normal way ...
 
+
+	map mod     = $[];
+	if (haskey (card, "module"))
+	{
+	    mod = lookup (card, "module");
+	}
+	else
+	{
+	    mod = get_module (card);
+	}
+
+	list params = filter (`e, lookup (lookup (card, "module", $[]), "params", []), ``(size (lookup (e, "value")) > 0));
+	map options = listmap (`e, params, ``([lookup (e, "name", ""), lookup (e, "value", "")]));
+
+	if (lookup (lookup (mod, "module", $[]), "name" , "off") != "off") 
+	{
+	    options = add (options, "snd_id", sformat ("card%1", card_id + 1));
+	    options = add (options, "snd_index", sformat ("%1", card_id));
+	}
+
+	return $["name"   : lookup (lookup (mod, "module", $[]), "name" , "off"),
+		"modules" : $["alias"  : sformat ("snd-card-%1", card_id),
+			     "options" : options]];
+    }
+
+    /**
+     * command must be string with $CHANNEL and $VALUE included
+     * @return any
+     */
+    define SetVolume (string command, string channel, string value, integer card_num) ``{
+	return SCR(`Execute (.target.bash, command, $["CHANNEL" : channel, "VOLUME" : value, "CARD_NUM" : card_num]));
+    }
+
+    /**
+     * reads already saved info from modules.conf
+     * @return list 
+     */
+    define read_save_info () ``{
+	string prefix = "";
+	list aliases  = SCR(`Read(topath (sformat ("%1.modules.alias", prefix))));
+	list options  = SCR(`Read(topath (sformat ("%1.modules.options", prefix))));
+	list save     = [];		// structure to save
+	integer i     = 0;
+
+	if (contains (aliases, "char-major-116")) 
+	{
+	      // alsa modules
+	      
+	      
+	    if (SCR(`Read(topath(sformat ("%1.modules.alias", prefix)), "char-major-116")) == "snd") 
+	    {
+		list minor_list = [0, 1, 3, 8, 11, 12];		
+		integer cards   = tointeger (lookup (SCR(`Read(topath (sformat ("%1.modules.options", prefix)), "snd")), "snd_cards_limit", 1));
+		map entry       = $[];
+		map mod_entry   = $[];
+
+		string alias    = "";
+		string module_name   = "";
+		string comment  = "";
+
+		    // read the cards
+		while (i < cards) 
+		{
+
+			  // == snd-card-X ==
+		    entry = $[];
+		    alias = sformat ("snd-card-%1", i);
+
+		    if (!contains(aliases, alias)) 
+		    {
+			i = i + 1; continue; // not found
+		    }
+			  
+		    module_name  = SCR(`Read(topath (sformat ("%1.modules.alias", prefix)), alias));
+		    if ((module_name == "off") || (module_name == "null")) 
+		    { 
+			i = i + 1; continue; 
+		    }
+		    comment = SCR(`Read(topath (sformat ("%1.modules.alias.comment", prefix)), alias));
+
+		    entry = add (entry, "name", module_name);
+		    mod_entry = add (mod_entry, "alias", alias);
+		    if (contains (options, module_name)) 
+		    {
+			mod_entry = add (mod_entry, "options", SCR(`Read(topath (sformat ("%1.modules.options", prefix)), module_name)));
+		    }
+		    if (size (comment) > 0) 
+		    {
+			entry = add (entry, "comment", comment);
+		    }
+			  
+		    entry = add (entry, "modules", mod_entry);
+		    save = add (save, entry);
+
+		    i = i + 1;
+		}
+	    }
+	}
+	else if (contains (aliases, "char-major-14")) 
+	{
+	      // oss (poor support, should be enhanced ... )
+	      
+	      // list of aliases to be read
+	    list local_aliases = ["char-major-14",
+				  "sound",
+				  "midi",
+				  "sound-slot-0",
+				  "sound-service-0-0"];
+
+	    map entry      = $[];
+	    map option     = $[];
+	    string module_name  = "";
+	    string comment = "";
+	      
+	    maplist (`alias, local_aliases, 
+	      ``{
+		if (contains (aliases, alias)) 
+		{
+		    entry   = $[];
+		    module_name  = SCR (`Read(topath (sformat ("%1.modules.alias", prefix)), alias));
+		    comment = SCR (`Read(topath (sformat ("%1.modules.alias.comment", prefix)), alias));
+		    if (contains (options, module_name)) 
+		    {
+			option = SCR (`Read(topath (sformat ("%1.modules.options", prefix)), module_name));
+		    }
+		    else 
+		    {
+			option = $[];
+		    }
+
+		    if ((module_name != "off") && (module_name != "null")) 
+		    {
+			if (size (module_name) > 0) 
+			{
+			    entry = add (entry, "alias", alias);
+			    entry = add (entry, "name", module_name);
+			    if (size (option) > 0) 
+			    {
+				entry = add (entry, "options", option);
+			    }
+			    if (size (comment) > 0) 
+			    {
+				entry = add (entry, "comment", comment);
+			    }
+			}
+		    }
+		    if (size (entry) > 0) 
+		    {
+			save = add (save, entry);
+		    }
+		}
+	      });
+	}
+	return save;
+    }
 }

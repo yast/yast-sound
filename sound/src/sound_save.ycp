@@ -1,18 +1,17 @@
 /**
  * File:
  *   sound_save.ycp
- *
+ * 
  * Module:
  *   Sound
  *
  * Summary:
- *   Provides saving /etc/modules.conf and volume for the sound.
+ *   Provides saving /etc/modules.conf and volume.
  *
  * Authors:
- *   Dan Veselý <dan@suse.cz>
+ *   Dan Veselý <dan@suse.cz>, 2000
  *
  * $Id$
- *
  *
  * Params:
  *         1st ... map with information to store with these keys:
@@ -56,184 +55,200 @@
 
     textdomain "sound";
 
-    /**
-     * Saves one '/etc/modules.conf' entry
-     * @param entry_name name of modules.conf entry
-     * @param entry map with "alias" and "options"
-     * @return boolean result of the write
-     */
+      /**
+       * Saves one '/etc/modules.conf' entry
+       * @return boolean
+       */
     define SaveOneModulesEntry (string entry_name, map entry) ``{
+	y2error(sformat("%1", entry));
 	boolean ret = true;
-	
-	if (haskey (entry, "alias")) {
+	if (haskey (entry, "alias")) 
+	{
 	    ret = ret && SCR(`Write(.modules.alias, entry_name, lookup(entry, "alias")));
-
 	    if (haskey (entry, "options"))
+	    {
 		ret = ret && SCR(`Write(.modules.options, lookup(entry, "options"), entry_name));
+	    }
 	}
 	return ret;
     }
 
-    /**
-     * Saves all '/etc/modules.conf' entries
-     * @param cards list of cards with modules.conf info
-     * @param system list with system dependent (i.e. ALSA) modules
-     * @return boolean success
-     */
+      /**
+       * Saves all '/etc/modules.conf' entries
+       * @return boolean
+       */
     define SaveModulesEntry (list cards, list system) ``{
 
-	if ((contains(maplist (`e, cards, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) {
-				// Error message
+	if ((contains(maplist (`e, cards, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) 
+	{
+				      // Error message
 	    err_msg = err_msg + UI(_("Error while saving '/etc/modules.conf'.\n"));
 	    return false;
 	}
 
 	if (size (cards) > 0)
-	    SCR(`Write(.modules.alias.comment, "\n#\n# YaST2: sound cards support\n#\n", lookup (lookup (select (cards, 0), "modules", $[]), "alias")));
+	{
+	    SCR(`Write(.modules.alias.comment, "\n#\n# YaST2: sound cards support\n#\n", 
+		      lookup (lookup (select (cards, 0), "modules", $[]), "alias")));
+	}
 
-	if ((contains(maplist (`e, system, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) {
-				// Error message	    
+	if ((contains(maplist (`e, system, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) 
+	{
+				      // Error message	    
 	    err_msg = err_msg + UI(_("Error while saving '/etc/modules.conf'.\n"));
 	    return false;
 	}
 
 	if (size (system) > 0)
+	{
 	    SCR(`Write(.modules.alias.comment, "\n#\n# YaST2: sound system dependent part\n#\n", 
-		       lookup (lookup (select (system, 0), "modules", $[]), "alias")));
+		lookup (lookup (select (system, 0), "modules", $[]), "alias")));
+	}
 
-	if (!SCR(`Write(.modules, nil))) {
-				// Error message
+	if (!SCR(`Write(.modules, nil))) 
+	{
+				      // Error message
 	    err_msg = err_msg + UI(_("Error while saving '/etc/modules.conf'.\n"));
 	    return false;
 	}
-	
+	    
 	return true;
     }
 
 
-    /**
-     * Sets volume for all channels
-     * @param cards list of cards to set the volume of
-     * @param command command that is used for settting up the volume
-     * @return boolean success
-     */
+      /**
+       * Sets volume for all channels
+       * @return boolean
+       */
     define SetAllChannels (list cards, string command) ``{
 	if (contains (maplist (`e, cards, ``(maplist(`ch, `v, lookup (e, "volume", $[]), ``(SetVolume (command, ch, v, 
-		       tointeger(lookup(lookup(lookup (e, "modules", $[]), "options", $[]), "snd_index", 0))))))), false)) {
-				// Error message
+			   tointeger(lookup(lookup(lookup (e, "modules", $[]), "options", $[]), "snd_index", 0))))))), false)) 
+	{
+				      // Error message
 	    err_msg = err_msg + UI(_("Error while setting volume.\n"));
 	    return false;
 	}
 	return true;
     }
 
-    /**
-     * Save volume (for alsa it's alsactl store)
-     * @param function function name to call
-     * @param mixer_command command user for volume setting
-     * @param cards list of cards to set the volume of
-     * @return integer shell return value
-     */
+      /**
+       * Save volume (for alsa it's alsactl store
+       * @return boolean
+       */
     define SaveVolume (string function, string mixer_command, list cards) ``{
-	
 	SetAllChannels (cards, mixer_command);
 
 	return SCR(`Execute(.target.bash, function, $[]));
     }
 
-    /**
-     * Additional hack to enable ALSA joystick support
-     * @return integer shell return value
-     */
+      /**
+       * Additional hack to enable ALSA joystick support
+       * @return boolean
+       */
     define EnableJoystick () ``{
 	string tmpdir = SCR(`Read(.target.tmpdir));
 	return SCR(`Execute(.target.bash, "/usr/sbin/alsactl -f "+tmpdir+"/asound.conf store;\
-	    /usr/bin/sed '/\"Joystick\"/s/false/true/' "+tmpdir+"/asound.conf >/etc/asound.conf;\
-	    /bin/rm -f "+tmpdir+"/asound.conf;\
-            /usr/sbin/alsactl restore", $[]));
-	
+		/usr/bin/sed '/\"Joystick\"/s/false/true/' "+tmpdir+"/asound.conf >/etc/asound.conf;\
+		/bin/rm -f "+tmpdir+"/asound.conf;\
+		/usr/sbin/alsactl restore", $[]));
+	    
     }
-	
-    /**
-     * function to finish ALSA instalation
-     * @return void
-     */
+	  
+      /**
+       * function to finish ALSA instalation
+       * @return void
+       */
     define AlsaFinish () ``{
-
 	EnableJoystick ();
     }
 
+      /**
+       *
+       * @return void
+       */
 
-    /**
-     * Saves rc.config values
-     * @param rc map with variables
-     * @return void
-     */
     define SaveRCValues (map rc) ``{
-	
 	if (contains (maplist (`k, `v, rc, ``(SCR(`Write(topath(sformat(".rc.system.%1", k)), v)))), false) ||
-	    !SCR(`Write(.rc.system, nil)))
-				// Error message
+		!SCR(`Write(.rc.system, nil)))
+	{
+				    // Error message
 	    err_msg = err_msg + UI (sformat (_("Error while saving file: %1 \n"), "/etc/rc.config"));
-
+	}
     }
 
 
-    // ==== MAIN ====
+      // ==== MAIN ====
 
     boolean test_mode = false;
     map sound_info = Args (0);
     string helptext = "";
     string err_msg = "";
 
-    
+      
     if (size (Args ()) > 1)
+    {
 	test_mode = Args (1);
+    }
 
-				// label message
+				  // label message
     term con = `Label(_("Saving ..."));
-    				// dialog title
+				  // dialog title
     UI(`SetWizardContents (_("Sound configuration"), con, helptext, false, false));
 
-    // Step ONE: save '/etc/modules.conf'
+      // Step ONE: save '/etc/modules.conf'
     if (!test_mode)
+    {
 	SaveModulesEntry (lookup (sound_info, "cards", []), lookup (lookup (sound_info, "system", $[]), "modules", []));
+    }
 
     string mixer_command = lookup (lookup (lookup (sound_info, "system", $[]), "volume", $[]), "mixer", "");
     string function      = lookup (lookup (lookup (sound_info, "system", $[]), "volume", $[]), "store", "");
 
-    // Step TWO: save '/etc.rc.config'
+      // Step TWO: save '/etc.rc.config'
     if (!test_mode && size(lookup(lookup (sound_info, "system", $[]), "rc", $[])) > 0)
+    {
 	SaveRCValues (lookup(lookup (sound_info, "system", $[]), "rc", $[]));
+    }
 
-    // Step THREE: save volume
+      // Step THREE: save volume
     if (!test_mode && (size (function) > 0) && (size (mixer_command) > 0))
+    {
 	SaveVolume (function, mixer_command, lookup (sound_info, "cards", []));
+    }
 
 
-    // Step FOUR: call "other" function to handle some additional workaround
+      // Step FOUR: call "other" function to handle some additional workaround
     if (!test_mode)
+    {
 	eval (lookup (sound_info, "other"));
+    }
 
-    // Finally let's display message
+      // Finally let's display message
 
     string final_msg = "";
     if (size (err_msg) > 0)
-				// Error popup message	
-	final_msg = sformat (UI(_("These errors occurred during saving configuration:\n%1")), err_msg);
-    else {	
-					// final success message
+    {
+				  // Error popup message	
+	  final_msg = sformat (UI(_("These errors occurred during saving configuration:\n%1")), err_msg);
+    }
+    else 
+    {	
+				  // final success message
 	final_msg = UI(_("The sound card was successfully configured.\nYou can now use it immediately."));
 	if (size(filter (`e, lookup (sound_info, "cards", []), ``((size (e) > 0) && (lookup (e, "name") != "off")))) == 0)
-					// final success message	    
+	{
+					    // final success message	    
 	    final_msg = UI (_("The sound configuration was saved."));
+	}
 
     }
 
     if (test_mode)
-	// message displayed just in the test mode
-	final_msg = final_msg + " " + UI(_("(TEST MODE)"));
-    
+    {
+	  // message displayed just in the test mode
+	  final_msg = final_msg + " " + UI(_("(TEST MODE)"));
+    }
+      
     UI(`DisplayMessage (final_msg));
 
     return (size (err_msg) == 0);

@@ -2,41 +2,41 @@
   ////////////////////////////////////////////////////////////////////////////////////////
   // set the textdomain, (generally the name of the module for example "lan" for y2c_lan
   // in doubt do a "grep textdomain" in the main module, you are calling 
-   textdomain "sound";
+    textdomain "sound";
    
-   return([ "sound",
-   $[
+    return([ "sound",
+    $[
      ////////////////////////////////////////////////////////////////////////////////
      // name of the entry, shon in curses menu and ycc                             //
-     `menuentry    : UI(_("Sound")),
+	`menuentry    : UI(_("Sound")),
      
      ////////////////////////////////////////////////////////////////////////////////
      //leave blank,  experts only ;-)
-     `arguments    : [ .from_menu ],
+	`arguments    : [ .from_menu ],
      
       ////////////////////////////////////////////////////////////////////////////////
       // group (one of the groups in /usr/lib/YaST2/etc/y2contolcenter.conf         //
-     `group        : "Hardware", 
+	`group        : "Hardware", 
    
      ////////////////////////////////////////////////////////////////////////////////
      // Icon used in y2contolcenter                                                //
-     `icon         : UI(_("soundcard.png")),
+	`icon         : UI(_("soundcard.png")),
      
       ////////////////////////////////////////////////////////////////////////////////
       // explanation of yast2 menueentry in ncurses menu                            //                 
-     `widget       : `RichText(
+	`widget       : `RichText(
 			       UI(_("Launch this module to configure your sound card."))
 			       +
 			       UI(_("<p>You need to be logged in as <i>root</i> in order to do this.</p>"))),
      
       ////////////////////////////////////////////////////////////////////////////////
       // explanation in YaST2 Control Center                                         //
-      `helptext     : UI(_("Configure your sound card")),
+	`helptext     : UI(_("Configure your sound card")),
    
       ////////////////////////////////////////////////////////////////////////////////
       // leaf nil, experts only ;-)
-      `codefragment : nil 
+	`codefragment : nil 
    
-   ]
-   ]);
+    ]
+    ]);
 }
