@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Jan  5 13:38:42 CET 2001 - kkaempf@suse.de
+
+- fix frame caption for gettext
+
+-------------------------------------------------------------------
 Thu Jan  4 13:45:39 CET 2001 - dan@suse.cz
 
 - special warning dialog for nm256 cards
