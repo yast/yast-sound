@@ -134,8 +134,8 @@ Try to restart sound system?")))
 	maplist(`e, save_info, ``{ if (HasFonts(e)) show_fonts = true;});
 
 	term con = ComplexDlgCon(cc,
-			(lookup (rc_vars, "START_ALSA", "no") == "yes"),
-			(lookup (rc_vars, "START_ALSA_SEQ", "no") == "yes"), show_fonts);
+			(lookup (rc_vars, "LOAD_ALSA", "no") == "yes"),
+			(lookup (rc_vars, "LOAD_ALSA_SEQ", "no") == "yes"), show_fonts);
 
         // dialog title
 	Wizard::SetContents (_("Sound configuration"), con, helptext, true, true);
@@ -151,7 +151,7 @@ Try to restart sound system?")))
 	    UI::ChangeWidget(`id(`configured_table), `CurrentItem, 0);
 	}
 
-	if (lookup (rc_vars, "START_ALSA", "") != "yes")
+	if (lookup (rc_vars, "LOAD_ALSA", "") != "yes")
 	{
 	    UI::ChangeWidget(`id(`b_seq), `Enabled, false);
 	}
@@ -210,6 +210,7 @@ Try to restart sound system?")))
 	    else if (ui == `b_volume)
 	    {
 		integer card_id = UI::QueryWidget (`id(`configured_table), `CurrentItem);
+		y2error("# use_alsa = %1", use_alsa);
 		map res = mixerDialog(card_id);
 		if (lookup(res, "ui", nil) == `abort || lookup(res, "ui", nil) == `cancel)
                 {
@@ -230,13 +231,13 @@ Try to restart sound system?")))
 	    else if (ui == `b_alsa)
 	    {
 		string value = UI::QueryWidget(`id(`b_alsa), `Value) ?  "yes" : "no";
-		rc_vars = add(rc_vars, "START_ALSA", value);
+		rc_vars = add(rc_vars, "LOAD_ALSA", value);
 		UI::ChangeWidget(`id(`b_seq), `Enabled, value == "yes");
 	    }
 	    else if (ui == `b_seq)
 	    {
 		string value = UI::QueryWidget(`id(`b_seq), `Value) ? "yes" : "no";
-		rc_vars = add(rc_vars, "START_ALSA_SEQ", value);
+		rc_vars = add(rc_vars, "LOAD_ALSA_SEQ", value);
 	    }
 	    else if (ui == `b_conf2)
 	    // add soundcard
@@ -294,17 +295,17 @@ Try to restart sound system?")))
     boolean config_mode = false;
     map rc_vars = Sound::rc_vars;
 
-//    map rc_vars		= read_rc_vars (["START_ALSA", "START_ALSA_SEQ"]);
+//    map rc_vars		= read_rc_vars (["LOAD_ALSA", "LOAD_ALSA_SEQ"]);
 
 
-    if (size(lookup (Sound::rc_vars, "START_ALSA", "")) == 0)
+    if (size(lookup (Sound::rc_vars, "LOAD_ALSA", "")) == 0)
     {
-	Sound::rc_vars = add (Sound::rc_vars, "START_ALSA", "yes");
+	Sound::rc_vars = add (Sound::rc_vars, "LOAD_ALSA", "yes");
     }
 
-    if (size (lookup (Sound::rc_vars, "START_ALSA_SEQ", "")) == 0)
+    if (size (lookup (Sound::rc_vars, "LOAD_ALSA_SEQ", "")) == 0)
     {
-	rc_vars = add (rc_vars, "START_ALSA_SEQ", "yes");
+	rc_vars = add (rc_vars, "LOAD_ALSA_SEQ", "yes");
     }
 
     return ComplexDialog ();

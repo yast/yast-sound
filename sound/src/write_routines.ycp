@@ -253,6 +253,11 @@
      */
 
     global define string SaveRCValues (map rc) ``{
+	string start = (lookup(rc, "LOAD_ALSA", "no") == "yes") ? "enable" : "disable";
+	Runlevel::ServiceAdjust("alsasound", start);
+
+	SCR::Write(.alsa.LOAD_ALSA_SEQ, lookup(rc, "LOAD_ALSA_SEQ", "no"));
+	/*
         string err_msg = "";
 	if (contains (maplist (`k, `v, rc, ``(SCR::Write(topath(sformat(".sysconfig.alsa.%1", k)), v))), false) ||
             !SCR::Write(.rc.system, nil))
@@ -261,6 +266,8 @@
                 err_msg = sformat (lookup(STRINGS, "saveRCValues", ""), "/etc/rc.config");
             }
 	return err_msg;
+	*/
+	return "";
     }
 
 }

@@ -150,8 +150,16 @@
    * @param vars list of variables to read
    * @return map optname: value
    */
-    global define map read_rc_vars (list vars) ``{
-        return listmap (`k, vars, ``([k, SCR::Read(topath(sformat (".rc.system.%1", k)))]));
+    global define map read_rc_vars () ``{
+	string load_alsa = "no";
+	if (Runlevel::ServiceEnabled("alsasound"))
+	{
+	    load_alsa = "yes";
+	}
+
+	return $["LOAD_ALSA" : load_alsa , "LOAD_ALSA_SEQ" : SCR::Read(.alsa.LOAD_ALSA_SEQ)];
+
+//        return listmap (`k, vars, ``([k, SCR::Read(topath(sformat (".rc.system.%1", k)))]));
     }
 
 

@@ -106,7 +106,7 @@
 	// create list of unconfigured cards
 	UpdateUnconfiguredCards();
 	// read rc.config values
-	rc_vars = read_rc_vars (["START_ALSA", "START_ALSA_SEQ"]);
+	rc_vars = read_rc_vars ();
 	// load volume settings
 	volume_settings = get_vol_settings();
 	BrowseTree(volume_settings);
