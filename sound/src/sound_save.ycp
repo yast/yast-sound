@@ -118,11 +118,11 @@
      * Additional hack to enable ALSA joystick support
      */
     define EnableJoystick () ``{
-
-	return SCR(`Execute(.target.bash, "/usr/sbin/alsactl -f /tmp/asound.conf store;\
-	    /usr/bin/sed '/\"Joystick\"/s/false/true/' /tmp/asound.conf >/etc/asound.conf;\
-	    /bin/rm -f /tmp/asound.conf;\
-            /usr/sbin/alsactl restore", $[]));	    
+	string tmpdir = SCR(`Read(.target.tmpdir));
+	return SCR(`Execute(.target.bash, "/usr/sbin/alsactl -f "+tmpdir+"/asound.conf store;\
+	    /usr/bin/sed '/\"Joystick\"/s/false/true/' "+tmpdir+"/asound.conf >/etc/asound.conf;\
+	    /bin/rm -f "+tmpdir+"/asound.conf;\
+            /usr/sbin/alsactl restore", $[]));
 	
     }
 	
