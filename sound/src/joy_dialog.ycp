@@ -86,6 +86,7 @@ define boolean joy_test_popup (integer card_id, integer joymodidx,
     list joysticks	= [];
     integer i		= 0;
 
+    sleep (100);
     while (i < 4)
     {
         if (SCR::Execute(.target.bash,

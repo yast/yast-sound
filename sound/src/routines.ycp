@@ -88,7 +88,6 @@
 
 	path proot = .audio.alsa.cards;
 	list<string> cards = (list<string>) SCR::Dir (proot);
-
 	return maplist(string c, cards, ``($[
 	    "number"	: tointeger (c),
 	    "name"	: SCR::Read (add(add(proot, c), "name"))
@@ -341,7 +340,7 @@
 	    });
 	    i = i + 1;
 	});
-	SCR::Execute(.audio.alsa.store, nil);
+	SCR::Execute(.audio.alsa.store, "");
 	return true;
     }
 
@@ -393,21 +392,6 @@
             });
             return retval;
         });
-    }
-
-    /**
-     * returns the result of /usr/bin/whoami. currently broken. no idea why...
-     * @return string username
-     */
-    define string whoami() ``{
-	map ret	= (map)SCR::Execute(.target.bash_output,"/usr/bin/whoami", $[]);
-	string out = ret["stdout"]:"";
-	list l = splitstring(out, "\n");
-	if (size(l) > 0)
-	{
-	    return l[0]:"dontknow";
-	}
-	return "";
     }
 
     /**
