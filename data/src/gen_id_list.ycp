@@ -5,7 +5,7 @@
     string pattern = "(snd-[^ \t]*)[\t ]*(0x[0-9a-f]*)[\t ]*(0x[0-9a-f]*).*";
 
     string kernel_ver = lookup(SCR::Execute(.target.bash_output, "uname -r", $[]), "stdout", "");
-    kernel_ver = select(splitstring(kernel_ver, "\n"), 0);
+    kernel_ver = select(splitstring(kernel_ver, "\n"), 0, "");
     string s = SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.pcimap");
 
     // pci map:
@@ -31,9 +31,9 @@
     // change LSB to MSB
     lpnp = maplist(`e, lpnp, 
 	``([
-	    select(e, 0),
-	    "0x" + select(e, 2)+select(e, 1),
-	    "0x" + select(e, 4)+select(e, 3)
+	    select(e, 0, nil),
+	    "0x" + select(e, 2, nil)+select(e, 1, nil),
+	    "0x" + select(e, 4, nil)+select(e, 3, nil)
 	]));
 
 
@@ -64,9 +64,9 @@
 
     maplist(`e, l,
     ``{
-	vendor_id = tointeger(select(e, 1));
-	device_id = tointeger(select(e, 2));
-	mod_id = lookup(index, select(e, 0), -1);
+	vendor_id = tointeger(select(e, 1, nil));
+	device_id = tointeger(select(e, 2, nil));
+	mod_id = lookup(index, select(e, 0, nil), -1);
 	if (mod_id == -1)
 	{
 	    return;
