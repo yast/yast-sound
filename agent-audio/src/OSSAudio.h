@@ -16,17 +16,17 @@
 
 /** 
  *  volume setting
- *  @param card card id
- *  @param channel name eg. "Master"
+ *  @param card card id (default if empty)
+ *  @param channel name eg. "Master" ("Master" if empty)
  *  @param value volume 0..100
  */
-YCPValue ossSetVolume(const int value, const string channel = "", const string card = "");
+YCPValue ossSetVolume(const string card, const string channel, const int value);
 
 /**
  * volume reading
- * @param card card id
- * @param channel channel name
+ * @param card card id (default if empty)
+ * @param channel channel name (Master if empty)
  */
-YCPValue ossGetVolume(const string channel = "", const string card = "");
+YCPValue ossGetVolume(const string card, const string channel);
 
 #endif

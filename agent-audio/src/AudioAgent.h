@@ -22,12 +22,11 @@
 #ifndef __AUDIOAGENT
 #define __AUDIOAGENT
 
-#undef y2log_component
 #define y2log_component "ag_audio"
+
 #include <Y2.h>
 #include <scr/SCRAgent.h>
 #include <scr/SCRInterpreter.h>
-
 
 class AudioAgent;
 

@@ -10,6 +10,7 @@
  *
  * Authors:
  *   dan.meszaros <dmeszar@suse.cz>
+ *   Michal Svec <msvec@suse.cz>
  *
  * $Id$
  *
@@ -19,121 +20,121 @@
 
 #include "AudioAgent.h"
 #include "AlsaAudio.h"
-#include <sys/asoundlib.h>
-#include <math.h>
+#include "OSSAudio.h"
 
-/* AudioAgent */
+typedef vector<string> svect;
+
+/**
+ * AudioAgent
+ */
 AudioAgent::AudioAgent() : SCRAgent() {
 }
 
+/**
+ * ~AudioAgent
+ */
 AudioAgent::~AudioAgent() {
 }
 
 /**
+ * Read
  */
-
-typedef vector<string> svect;
-
 YCPValue AudioAgent::Read(const YCPPath &path, const YCPValue& arg) {
-    if(path->length()==0)
-    {
-	// do nothing
-	return YCPVoid();
+
+    /* Same as Dir() */
+    if(path->length()==0) {
+	return Dir(path);
     }
 
-    // fetch parameters
-
+    /* Fetch parameters */
     svect args;
     for(int i=0; i<path->length(); i++)
-    {
 	args.push_back(path->component_str(i));
+
+    /* OSS Read handling */
+    if(path->length()>1 && args[0]=="oss" && args[1]=="cards") {
+	switch(path->length()) {
+	    case 2:
+		return ossGetVolume("", "");
+	    case 3:
+		return ossGetVolume(args[2], "");
+	    case 5:
+		if(args[3]=="channels")
+		    return ossGetVolume(args[2], args[4]);
+	}
     }
 
-    if(args[0]=="alsa")
-    {
-	switch(path->length())
-	{
-	    // snd cards name
+    /* Alsa Read handling */
+    else if(args[0]=="alsa") {
+	switch(path->length()) {
+	    /* snd cards name */
 	    case 4:
 		if(args[1]=="cards" && args[3]=="name")
-		{
 		    return YCPString("cardname"); // alsaCardName(atoi(args[2].c_str())))
-		}
 		break;
-	    // volume reading
+	    /* volume reading */
 	    case 6:
-		if(args[1]=="cards" && args[3]=="channels")
-		{
+		if(args[1]=="cards" && args[3]=="channels") {
 		    if(args[5]=="volume")
-		    {
 			return alsaGetVolume(atoi(args[2].c_str()), args[4].c_str());
-		    }
 		    else if(args[5]=="mute")
-		    {
 			return alsaGetMute(atoi(args[2].c_str()), args[4].c_str());
-		    }
 		    break;
 		}
 	} 
-	// wrong path
-	y2error("attempt to read %s, whose value is undefined", path->toString().c_str());
-	return YCPBoolean(false);
     }
-    /*
-    else if(s_system=="oss" || s_system=="common")
-    {
-    }
-    */
     
     y2error("Wrong path '%s' in Read().", path->toString().c_str());
     return YCPVoid();
 }
 
 /**
+ * Write
  */
-
 YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCPValue& arg) 
 {
-    if(path->length()==0)
-    {
-        // do nothing
-        return YCPBoolean(false);
+    /* Do nothing */
+    if(path->length()==0) {
+	return YCPBoolean(false);
     }
     
-        // fetch parameters
-
+    /* Fetch parameters */
     svect args;
     for(int i=0; i<path->length(); i++)
-    {
         args.push_back(path->component_str(i));
+
+    if(!value->isInteger()) {
+	y2error("bad argument to Write: %s", value->toString().c_str());
+	return YCPBoolean(false);
     }
 
+    int volume = value->asInteger()->value();
 
-    if(args[0]=="alsa")
-    {
-        switch(path->length())
-        {
+    /* OSS Write handling */
+    if(path->length()>1 && args[0]=="oss" && args[1]=="cards") {
+	switch(path->length()) {
+	    case 2:
+		return ossSetVolume("", "", volume);
+	    case 3:
+		return ossSetVolume(args[2], "", volume);
+	    case 5:
+		if(args[3]=="channels")
+		    return ossSetVolume(args[2], args[4], volume);
+	}
+    }
+
+    /* Alsa Write handling */
+    else if(args[0]=="alsa") {
+        switch(path->length()) {
 	    case 6:
-		if(args[1]=="cards" &&
-		   args[3]=="channels")
-		{
+		if(args[1]=="cards" && args[3]=="channels") {
 		    if(args[5]=="volume")
-		    {
 			return alsaSetVolume(atoi(args[2].c_str()), args[4].c_str(), value->asInteger()->value());
-		    }
 		    else if(args[5]=="mute")
-		    {
 			return alsaSetMute(atoi(args[2].c_str()), args[4].c_str(), value->asBoolean()->value());
-		    }
 		}
 		break;
         }
-	y2error("attempt to write to %s", path->toString().c_str());
-	return YCPBoolean(false);
-    }
-    else if(args[0]=="oss" || args[0]=="common")
-    {
-	//TODO
     }
 
     y2error("Wrong path '%s' in Write().", path->toString().c_str());
@@ -141,16 +142,14 @@ YCPValue AudioAgent::Write(const YCPPath &path, const YCPValue& value, const YCP
 }
 
 /** 
+ * Dir
  */
-
 YCPValue AudioAgent::Dir(const YCPPath& path) {
     YCPList list;
 
     svect args;
     for(int i=0; i<path->length(); i++)
-    {
         args.push_back(path->component_str(i));
-    }
 
     switch(path->length())
     {
@@ -227,8 +226,8 @@ YCPValue AudioAgent::Dir(const YCPPath& path) {
 }
 
 /**
+ * otherCommand
  */
-
 YCPValue AudioAgent::otherCommand(const YCPTerm& term) {
     return YCPVoid();
 }
