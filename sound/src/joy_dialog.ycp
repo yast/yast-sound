@@ -120,7 +120,7 @@ before pressing <B>Test</B> or <B>Next</B>.</P>");
 		     // label above list of joystick types
 		    `SelectionBox(`id(`os), _("&Select your joystick type:"), boxitems),
             `HSpacing(3),
-            `PushButton(`id(`test), _("&Test")),
+            `PushButton(`id(`test), `opt(`key_F6), _("&Test")),
 		    `HSpacing(3)
 		),
 		`VSpacing(3)

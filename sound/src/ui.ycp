@@ -223,7 +223,7 @@
 			slider,
 			`VSpacing (),
 			    // Test - button label
-			`PushButton (`id (`test), _("&Test")),
+			`PushButton (`id (`test), `opt(`key_F6), _("&Test")),
 			`VSpacing (0.5),
 			    // message label
 			`Label (_("Press 'Test' to start playing sound sample")),
@@ -265,7 +265,7 @@
 		  `HBox
 		  (
 		    `TextEntry (`id (`des), `opt(`notify), current_option_name,
-			 lookup (select (options, current_option, ""), "value", "")),
+			    lookup (select (options, current_option, ""), "value", "")),
 		    `VBox(
 			`Label(""),
 			`HBox(
@@ -353,16 +353,15 @@
 		    );
 	}
 	if (show_font_but)
-        {
-            butts = `HBox(
-			alsabuts,
-                        `VBox
-                        (
+    {
+        butts = `HBox(
+		alsabuts,
+            `VBox (
 			    // push button label
-                            `PushButton (`id(`b_fonts), _("&Install soundfonts..."))
-                        )
-                    );
-        }
+                `PushButton (`id(`b_fonts),`opt(`key_F7), _("&Install soundfonts..."))
+            )
+        );
+    }
 	else
 	{
 	    butts =  alsabuts;
@@ -381,14 +380,14 @@
                     `HBox
                     (
 			// push button label
-                        `PushButton (`id(`b_conf2), _("Add sound &card")),
+            `PushButton (`id(`b_conf2), `opt (`key_F3), _("Add sound &card")),
 			// push button label
-			`PushButton (`id(`b_options), _("&Options")),
+			`PushButton (`id(`b_options), `opt (`key_F4), _("&Options")),
 			// push button label
-			`PushButton (`id(`b_volume), _("&Volume")),
+			`PushButton (`id(`b_volume), `opt (`key_F6), _("&Volume")),
 			`HStretch (),
 			// push button label
-                        `PushButton (`id(`b_delete), _("&Delete"))
+            `PushButton (`id(`b_delete), `opt (`key_F5), _("&Delete"))
                     ),
                     `VSpacing (0.5),
                     `HBox
