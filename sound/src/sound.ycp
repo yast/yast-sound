@@ -78,7 +78,7 @@
 
 
 	        // This is a popup dialog with Yes/No question
-	    define DisplayYesNo(string message) ``{
+	    define DisplayYesNo(string message, boolean d) ``{
 		
 		term t = `VBox();
 		t = add(t, `Left(`Label(message)));
@@ -277,20 +277,25 @@
 	
 	define GetAudio () ``{
 
-	    return remove_duplicates (SCR(`Read(.probe.byclass.multimedia.audio)));
+	    if (!test_mode)
+		return remove_duplicates (SCR(`Read(.probe.byclass.multimedia.audio)));
 
-/*
+
 	    list simulation = [
 		$["vendor_id" : 0x1274 + 0x10000,
 		 "device_id" : 0x5000 + 0x10000,
-		 "bus" : "pci"],
-		$["vendor_id" : 0x1275 + 0x10000,
-		 "device_id" : 0x5001 + 0x10000,
-		 "bus" : "pci"]
+		 "bus" : "pci",
+		 "vendor" : "Ensoniq Audio PCI",
+		 "device" : "ES1371"]
 	    ];
 	    
+//		$["vendor_id" : 0x1275 + 0x10000,
+//		 "device_id" : 0x5001 + 0x10000,
+//		 "bus" : "pci"]
+//	    ];
+	    
 	    return simulation;
-*/  
+  
 	};
 	
 
@@ -423,7 +428,7 @@
 			UI(`ChangeWidget(`id(`next), `Enabled, false));
 			UI(`ChangeWidget(`id(`options), `Enabled, false));
 
-			if (UI (`DisplayYesNo (_("There is no available driver for selected card.\nDo you want to select the driver manually?"))))
+			if (UI (`DisplayYesNo (_("There is no available driver for selected card.\nDo you want to select the driver manually?"), true)))
 			{
 			    
 			    options_entered = $[]; // clear options
@@ -574,6 +579,17 @@
 
 	    // ===== main =====
 
+	integer arg_n = size(Args()) - 1;
+	boolean test_mode = false;
+
+	while (arg_n >= 0) {
+	    if (Args(arg_n) == .test) {
+		test_mode = true;
+	    }            
+	    arg_n = arg_n - 1;
+	}
+	
+	
 				// This help text is displayed during some "userless" operations,
 				// like searching in DB, saving, etc ...
 	string help_text = UI (_("<p>No help text available.<p>"));

@@ -56,13 +56,15 @@
 
 				// unmute all devices to vol
 	define unmute_all (integer vol) ``{
-	    list devices = SCR(`Read(.usr.bin.amixer));
-	    
-	    foreach (`d, devices, ``{
-		set_volume (lookup (d, "device", "Master"), vol);
-	    });
-	    
-	    set_volume ("Master", vol);
+	    list|void devices = SCR(`Read(.usr.bin.amixer));
+
+	    if (devices != nil) {
+		foreach (`d, devices, ``{
+		    set_volume (lookup (d, "device", "Master"), vol);
+		});
+		
+		set_volume ("Master", vol);
+	    }
 	    
 	};
 
@@ -112,7 +114,7 @@
 				// Help text - adjusting volume 3/4
 	help_text = help_text + UI(_("<p>After the configuration is done you can use <b>amixer</b> (or any program of your choice) for adjusting the volume.</p>"));
 	    // Help text - adjusting volume 4/4
-	help_text = help_text + UI(_("<p><b>WARNING/SPECIAL NOTE:</b>Please start testing your sound card with <b>very</b> low volume settings to prevent an accident with too much loud noise.</p>
+	help_text = help_text + UI(_("<p><b>WARNING/SPECIAL NOTE:</b>Please start testing your sound card with <b>very</b> low volume settings to prevent an accident with too much loud noise.</p>"));
 	
 	map snd_info = Args (0);
 
@@ -121,7 +123,10 @@
 	integer vol = 10;		// let's start with 10% volume for Master
 	integer step = 3;
 
-	string err = probe_module (snd_info);
+	string err = "";
+	
+	if (!test_mode)
+	    err = probe_module (snd_info);
 
 	boolean back = true;
 	boolean next = false;
@@ -146,7 +151,8 @@
 
 	    next = true;
 				// let's unmute all devices to 90%
-	    unmute_all (90);
+	    if (!test_mode)
+		unmute_all (90);
 	    
 	    
 				// TODO: add some other device ajusting here (stereo, other devices like CD, etc ...)???
@@ -172,39 +178,54 @@
 	}
 	
 	UI(`SetContents (_("Sound cards"), con, help_text, back, next));
+	UI(`ChangeWidget (`id(`next), `Label, _("&Finish")));
 	
 	any ui = nil;
+
+	boolean volume_continue = false;
+
+	while (!volume_continue) {
+	    
+	    repeat {
+	    
+		ui =  UI (`UserInput ());
+	    
+		if (ui == `minus) {
+		    if (vol > step) {
+			vol = vol - step;
+			if (!test_mode)
+			    set_volume ("Master", vol);
+		    }
+		    else {
+			vol = 0;
+		    }
+		}
+		else if (ui == `plus) {
+		    if (vol + step < 100) {
+			vol = vol + step;
+			if (!test_mode)
+			    set_volume ("Master", vol);
+		    }
+		    else {
+			vol = 100;
+		    }
+		}
+		else if (ui == `test)
+		    if (!test_mode)
+			PlayTest ();
+	    
+		UI (`ChangeWidget(`id(`pb), `Value, vol));
+	    
+	    } until ((ui == `back) || (ui == `next) || ui == `cancel);
+
+	    if (ui == `next) {
+		volume_continue = UI(`DisplayYesNo (_("Sound volume and the configuration\nfor the sound card will be saved now."), true));
+	    }
+	    else
+		volume_continue = true;
 	
-	repeat {
-	    
-	    ui =  UI (`UserInput ());
-	    
-	    if (ui == `minus) {
-		if (vol > step) {
-		    vol = vol - step;
-		    set_volume ("Master", vol);
-		}
-		else {
-		    vol = 0;
-		}
-	    }
-	    else if (ui == `plus) {
-		if (vol + step < 100) {
-		    vol = vol + step;
-		    set_volume ("Master", vol);
-		}
-		else {
-		    vol = 100;
-		}
-	    }
-	    else if (ui == `test)
-		PlayTest ();
-	    
-	    UI (`ChangeWidget(`id(`pb), `Value, vol));
-	    
-	} until ((ui == `back) || (ui == `next) || ui == `cancel);
-
-
+	}
+	
 	return ui;
 	
 }

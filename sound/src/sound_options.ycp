@@ -236,6 +236,11 @@
 	boolean next = false;
 
 	term con = `VBox ();
+
+
+	    /// still omit these options until more sound cards support will be included
+	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_id"));
+	options = filter (`op, options, ``(lookup (op, "name", "") != "snd_index"));
 	
 	if (size (options) > 0) {
 	    

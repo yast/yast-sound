@@ -12,7 +12,7 @@
 
 
 	SCR(``{			// reads/writes lines from file, deletes blank lines
-	    MountAgent (`anyagent(
+	    MountAgent (`ag_anyagent(
 		``Description (
 		    ``File("/etc/modules.conf"),         // real file name
 		    "\n",                     // Comment
@@ -147,8 +147,8 @@
 				// Help text - saving configuration/volume 2/2
 	help_text = help_text + UI(_("<p>The configuration of the sound card will be <b>saved</b>.</p>"));
 
-	boolean next = true;
-	boolean back = true;
+	boolean next = false;
+	boolean back = false;
 
 	map snd_info = Args (0);
 	map options_entered = Args (1);
@@ -160,49 +160,42 @@
 	    `HVCenter (
 		`ReplacePoint(`id(`la),
 				// To translators: label message
-			      `Label (_("Sound volume and the configuration\nfor the sound card will be saved now."))
+			      `Label (_("Saving ..."))
 			      )));
 	
 	UI(`SetContents (_("Sound cards"), con, help_text, back, next));
 
 	any ui = nil;
 
-	repeat {
+	string err = "";
+	if (!test_mode)
+	    err = save ();
 
-	    ui = UI(`UserInput ());
-	    
-	} until (ui == `next || ui == `back || ui == `cancel);
+	UI(`ChangeWidget (`id(`next), `Label, _("&Next")));
 
+	UI(`ReplaceWidget(`id(`la), `Label("")));
 	
-	if (ui == `next) {
-	    UI(`ChangeWidget(`id(`back), `Enabled, false));
-	    UI(`ChangeWidget(`id(`next), `Enabled, false));
-	    UI(`ReplaceWidget(`id(`la), `Label(_("Saving ..."))));
-
-	    string err = save ();
-
+	if (size (err) > 0) {
+	    
 	    UI(`ChangeWidget(`id(`back), `Enabled, true));
-	    UI(`ChangeWidget(`id(`next), `Enabled, true));
+		    
+	    UI(`ReplaceWidget(`id(`la), `Label(sformat (UI(_("The sound card configuration cannot be saved,\n due to following error:\n%1")),
+							err))));
 
-	    if (size (err) > 0) {
-		
-		UI(`ReplaceWidget(`id(`la), `Label(sformat (UI(_("The sound card configuration cannot be saved,\n due to following error:\n%1")),
-							    err))));
-	    }
-	    else {
-		back = false;
-		UI(`ReplaceWidget(`id(`la), `Label(_("The sound card was succesfully configured and\nyou can use it right now."))));
-		UI(`ChangeWidget(`id(`back), `Enabled, back));
-	    }
 	    repeat {
 		
 		ui = UI(`UserInput ());
-		
+	    
 	    } until (ui == `next || ui == `back || ui == `cancel);
-
-
+	    
+	    
+	    return ui;
+	    
 	}
-	
-	return ui;
-	
+	else {
+
+	    UI (`DisplayMessage (_("The sound card was succesfully configured and\nyou can use it right now."), 0, ""));
+	}
+
+	return `next;
 }
