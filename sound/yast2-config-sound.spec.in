@@ -4,7 +4,7 @@
 
 @HEADER@
 
-Requires:	yast2-trans-sound yast2-db-sound yast2 yast2-agent-any yast2-agent-audio yast2-agent-modules yast2-agent-system yast2-config-runlevel yast2-lib-wizard yast2-agent-probe hwinfo
+Requires:	yast2-db-sound yast2 yast2-agent-any yast2-agent-audio yast2-agent-modules yast2-agent-system yast2-config-runlevel yast2-lib-wizard yast2-agent-probe hwinfo
 BuildArchitectures:     noarch
 Summary:	Configuration of sound
 
