@@ -82,7 +82,7 @@
 	if ((contains(maplist (`e, cards, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) 
 	{
 				      // Error message
-	    err_msg = err_msg + UI(_("Error while saving '/etc/modules.conf'.\n"));
+	    err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry"); 
 	    return false;
 	}
 
@@ -95,7 +95,7 @@
 	if ((contains(maplist (`e, system, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) 
 	{
 				      // Error message	    
-	    err_msg = err_msg + UI(_("Error while saving '/etc/modules.conf'.\n"));
+	    err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry");
 	    return false;
 	}
 
@@ -108,7 +108,7 @@
 	if (!SCR(`Write(.modules, nil))) 
 	{
 				      // Error message
-	    err_msg = err_msg + UI(_("Error while saving '/etc/modules.conf'.\n"));
+	    err_msg = err_msg + lookup(STRINGS, "SaveModuleEntry");
 	    return false;
 	}
 	    
@@ -125,7 +125,7 @@
 			   tointeger(lookup(lookup(lookup (e, "modules", $[]), "options", $[]), "snd_index", 0))))))), false)) 
 	{
 				      // Error message
-	    err_msg = err_msg + UI(_("Error while setting volume.\n"));
+	    err_msg = err_msg + lookup(STRINGS, "SetAllChannels");
 	    return false;
 	}
 	return true;
@@ -172,7 +172,8 @@
 		!SCR(`Write(.rc.system, nil)))
 	{
 				    // Error message
-	    err_msg = err_msg + UI (sformat (_("Error while saving file: %1 \n"), "/etc/rc.config"));
+//	    err_msg = err_msg + UI (sformat (_("Error while saving file: %1 \n"), "/etc/rc.config"));
+	    err_msg = err_msg + sformat (lookup(STRINGS, "saveRCValues"), UI(_("/etc/rc.config")));
 	}
     }
 
@@ -229,16 +230,16 @@
     if (size (err_msg) > 0)
     {
 				  // Error popup message	
-	  final_msg = sformat (UI(_("These errors occurred during saving configuration:\n%1")), err_msg);
+	  final_msg = sformat (lookup(STRINGS, "saveFinal1"), err_msg);
     }
     else 
     {	
 				  // final success message
-	final_msg = UI(_("The sound card was successfully configured.\nYou can now use it immediately."));
+	final_msg = lookup(STRINGS, "saveFinal2");
 	if (size(filter (`e, lookup (sound_info, "cards", []), ``((size (e) > 0) && (lookup (e, "name") != "off")))) == 0)
 	{
 					    // final success message	    
-	    final_msg = UI (_("The sound configuration was saved."));
+	    final_msg = lookup(STRINGS, "saveFinal3");
 	}
 
     }

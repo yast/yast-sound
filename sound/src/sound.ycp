@@ -8,7 +8,7 @@
  *   Sound 	 
  *
  * Authors:
- *   Dan Veselý
+ *   Dan Veselý	<dan@suse.cz>
  *
  * $Id$
  *
@@ -44,24 +44,6 @@
     }
 
  
-    /**
-     *	@return list
-     *  
-     *
-     */
-   
-    define get_running_cards () ``{
-	if (fileexist("/proc/asound/cards")) 
-	{
-	    list asound = SCR(`Read(.proc.asound.cards));
-	    if (is(select (asound, 0), map)) 
-	    {
-		return asound;
-	    }
-	}
-	return [];
-    }
-
 
     /**
      *	@return void
@@ -78,31 +60,6 @@
 	list sound_unique = maplist (`e, configured_unique, ``($["unique" : e, "state" : "configured"]));
 	orig = filter (`e, orig, ``(lookup(e, "section", "") != "sound"));
 	SCR(`Write(.var.lib.yast.unique, add (orig, $["contents" : sound_unique, "section" : "sound"])));
-    }
-
-    /**
-     *	@return boolean
-     *  
-     *
-     */   
-
-    define nm256hack (map card) ``{
-        string module_name = "";
-	if (!haskey(card, "module"))
-	{
-	    module_name = lookup(get_module (card), "name", "");
-	}
-	else
-	{
-	    module_name = lookup (lookup(lookup (card, "module", $[]), "module", ""), "name", "");
-	}
-	if (module_name == "snd-card-nm256")
-	{
-	    // special warning message for in a special case
-	    string warn_text=lookup(STRINGS, "nm256hackWarning");
-	    return UI(`WarnDialog (warn_text));
-	}
-	return true;
     }
 
     
@@ -257,8 +214,9 @@
     list configured_unique = []; // list of unique keys, that was configured
 
     boolean exit = false;
+y2error("Begin reading sound db");
     list|void db = SCR(`Read (.target.yast2, "sndcards.ycp"));
-    
+y2error("db reading inished");
     if (is (db, void)) 
     {
 	UI(`DisplayMessage ("The Sound card database cannot be found!!!"));
@@ -343,11 +301,12 @@
 	    {
 	    
 	  // confirmation popup message
-		string warn_msg = UI (_("Sound volume and the configuration\nfor the sound card will be saved now."));
+		string warn_msg = lookup(STRINGS, "ConfigSaveWarn");
+
 		if (size(filter (`e, lookup (result, "save_info"), ``((size (e) > 0) && (lookup (e, "name") != "off")))) == 0)
 		{
 	    // confirmation popup message		
-		    warn_msg = UI (_("The sound configuration will be saved now."));
+		    warn_msg = lookup(STRINGS, "ConfigSaveWarn2");
 		}
 
 	    // Yes, No - button label

@@ -28,7 +28,7 @@
     include "lan/lan_routines.ycp";
 
   /**
-   * Detected, but not configured
+   * Detected, but not configured cards
    *
    * @return list
    */
@@ -39,27 +39,9 @@
 	return not_yet;
     }
 
-    /**
-     *
-     *
-     * @return list
-     */
-
-    define get_running_cards () ``{
-    
-	if (fileexist("/proc/asound/cards")) 
-	{
-	    list asound = SCR(`Read(.proc.asound.cards));
-	    if (is(select (asound, 0), map)) 
-	    {
-		return asound;
-	    }
-	}
-	return [];
-    }
 
   /**
-   * reads variables from rc.config
+   * reads variables listed in 'vars' from rc.config
    * @return list
    */
     define read_rc_vars (list vars) ``{
@@ -89,7 +71,7 @@
     }
 
   /**
-   * just decides which way to go
+   * just decides which way to go-
    * manual or autodetected
    * @return map
    */
@@ -192,7 +174,7 @@
 
 
     /**
-     * 
+     * shows list of soundcards 
      *
      * @return map
      */

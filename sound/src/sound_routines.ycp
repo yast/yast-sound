@@ -17,6 +17,182 @@
 
 
 {
+    /**
+     * Used for searching. returns index of the card in the database identified by name
+     * @return integer
+     */
+
+    textdomain "sound";
+
+    define search_card_id (string name) ``{
+        list all_cards = get_cards ("all");
+        integer pos = 0;
+        integer len = size (name);
+        while (pos < size (all_cards))
+        {
+            if (substring (tolower(select (all_cards, pos)), 0, len) == tolower(name))
+            {
+                return pos;
+            }
+            pos = pos + 1;
+        };
+        return -1;
+    }
+
+    /**
+     * creates "libhd entry" from db info
+     * @return map
+     */
+    define get_card (string module_name, string card_name) ``{
+        map ret = $[];
+        map db_entry = $[];
+
+        if (module_name == UI(_("All")))
+        {
+            list tmp = filter (`e, db, ``(contains(lookup (e, "cards"), card_name)));
+            if (size (tmp) > 0)
+            {
+                db_entry = select (tmp, 0);
+            }
+            else
+            {
+                db_entry = select (filter (`e, db, ``(lookup (e, "name", "") == card_name)), 0, $[]);
+            }
+        }
+        else
+        {
+            db_entry = select (filter (`e, db, ``(lookup (e, "name", "") == module_name)), 0, $[]);
+        }
+
+
+
+        if (size (db_entry) == 0)
+        {
+            y2error ("Db entry not found");
+            return ret;
+        }
+
+        map module_entry = $["params" : lookup (db_entry, "params", []),
+                            "module"  : lookup (db_entry, "module", $[])];
+
+        ret = add (ret, "module", module_entry);
+        ret = add (ret, "sub_vendor", card_name);
+        if (tolower (module_name) == "all")
+        {
+            ret = add (ret, "sub_device", sformat ("(%1)", card_name));
+        }
+        else
+        {
+            ret = add (ret, "sub_device", sformat ("(%1)", module_name));
+        }
+        map libhd = select (lookup (db_entry, "libhd", []), 0, $[]);
+        ret = add (ret, "vendor_id", lookup (libhd, "vendor_id", 0));
+
+        if (is (lookup (libhd, "device_id"), list))
+        {
+            ret = add (ret, "device_id", select (lookup (libhd, "device_id", 0), 0));
+            ret = add (ret, "bus", "PCI");
+        }
+        else
+        {
+            ret = add (ret, "device_id", lookup (libhd, "device_id", 0));
+            ret = add (ret, "bus", "ISA");
+        }
+        return ret;
+    }
+
+    /**
+     * returns list of sound cards. get_cards("all") returns all cards
+     * @return list
+     */
+    define get_cards (string module_name) ``{
+        list ret = [];
+
+        if (tolower(module_name) == "all")
+        {	// copy the whole database
+        maplist (`e, db,
+            ``{
+                if (size (lookup (e, cards)) > 0) ret = add (ret, lookup (e, cards));
+                else ret = add (ret, [lookup (e, "name")]);
+            });
+        }
+        else
+        {	// filter by name 
+            ret = maplist (`c, filter (`e, db, ``(lookup (e, "name", "") == module_name)), ``(lookup (c, "cards", [])));
+            ret = filter (`e, ret, ``(size(e) > 0));
+
+            if (size (ret) == 0)
+            {
+                ret = add (ret, [module_name]);
+            }
+        }
+        return sort(flatten(ret));
+    }
+
+    /**
+     * Itemize list for selection box
+     * @return list
+     */
+    define itemize_list (list l, integer default) ``{
+        integer i = 0;
+        list itemized_list = [];
+        integer s = size (l);
+        while (i < s)
+        {
+            itemized_list = add (itemized_list, `item (`id(i), select (l, i), (i == default)));
+            i = i + 1;
+        }
+        return itemized_list;
+    };
+
+
+
+    /**
+     *  Returns list of already running cards
+     *  @return list
+     *  
+     *
+     */
+
+    define get_running_cards () ``{
+        if (fileexist("/proc/asound/cards"))
+        {
+            list asound = SCR(`Read(.proc.asound.cards));
+            if (is(select (asound, 0), map))
+            {
+                return asound;
+            }
+        }
+        return [];
+    }
+
+    /**
+     *  @return boolean
+     *  
+     *
+     */
+
+    define nm256hack (map card) ``{
+        string module_name = "";
+        if (!haskey(card, "module"))
+        {
+            module_name = lookup(get_module (card), "name", "");
+        }
+        else
+        {
+            module_name = lookup (lookup(lookup (card, "module", $[]), "module", ""), "name", "");
+        }
+        if (module_name == "snd-card-nm256")
+        {
+            // special warning message for in a special case
+            string warn_text=lookup(STRINGS, "nm256hackWarning");
+            return UI(`WarnDialog (warn_text));
+        }
+        return true;
+    }
+
+
+
 
     /**
      * same as  ()?():(); statement in c
@@ -92,7 +268,7 @@
     }
 
     /**
-     * simply gets detected audio
+     * simply gets detected audio. 
      * @return map
      */
     define get_audio (boolean test_mode, boolean config_mode) ``{
@@ -182,10 +358,11 @@
 	{
 	    return MacRisc ();
 	}
+	return false;
     }
 
     /**
-     *
+     * true if system is MacRISC
      * @return boolean
      */
 
