@@ -4,11 +4,11 @@
 
 menudir = $(YAST2DIR)/menuentries
 clientsdir = $(YAST2DIR)/clients
-includedir = $(YAST2DIR)/include/sound
+yincludedir = $(YAST2DIR)/include/sound
 modulesdir = $(YAST2DIR)/modules
 bindir = $(YAST2DIR)/bin
 
-include_DATA = \
+yinclude_DATA = \
 	routines.ycp \
 	write_routines.ycp \
 	read_routines.ycp \
@@ -41,4 +41,4 @@ modules_DATA = Sound.ycp	\
 
 bin_SCRIPTS = copyfonts
 
-EXTRA_DIST = $(modules_DATA) $(menu_DATA) $(include_DATA) $(bin_SCRIPTS) $(clients_DATA)
+EXTRA_DIST = $(modules_DATA) $(menu_DATA) $(yinclude_DATA) $(bin_SCRIPTS) $(clients_DATA)
