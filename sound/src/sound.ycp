@@ -283,7 +283,7 @@
 				// not istalled
 	    define NotInstalled () ``{
 				// Help text when Alsa-drivers are not installed 1/1
-		string help_text = UI(_("Sound support requires the <b>ALSA</b> package. You can find it in the <b>SuSE</b> distribution (series 'snd') or you can download it from <i>http://www.alsa-project.org</i> and than install it."));
+		string help_text = UI(_("Sound support requires the <b>ALSA</b> package. You can find it in the <b>SuSE</b> distribution (series 'snd1') or you can download it from <i>http://www.alsa-project.org</i> and than install it."));
 		
 		UI(`SetContents (_("Sound cards"),
 				 `HVCenter (

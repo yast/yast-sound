@@ -71,7 +71,7 @@
 
 
 				// Help text, if an attempt for configuration failed 2/2
-    help_text = help_text + UI(_("<p>You can reset the configuration process by pressing the <i>Reset</i> button and try to configure the card again. Please refer to the <b>SuSE</b> help system, section 'package description', series 'snd', <b>alsa</b> package for more information."));
+    help_text = help_text + UI(_("<p>You can reset the configuration process by pressing the <i>Reset</i> button and try to configure the card again. Please refer to the <b>SuSE</b> help system, section 'package description', series 'snd1', <b>alsa</b> package for more information."));
 
 
 	}

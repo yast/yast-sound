@@ -79,7 +79,8 @@
 
 
 	    string module_name = lookup (lookup (lookup (snd_info, "module", $[]), "module", $[]), "name", "snd-card-dummy");
-	    string isapnp = condition ((selected_manually && size (lookup (snd_info, "conf", "")) == 0), "snd_isapnp=0", "");
+	    boolean has_isapnp = contains(maplist (`p, lookup (snd_info, "params", []), ``(lookup (p, "name", "") == "snd_isapnp")), true);
+	    string isapnp = condition ((selected_manually && has_isapnp), "snd_isapnp=0", "");
 	    
 				// and write configured card
 	    newl = add (newl, "# ALSA section {$#@begin@#$} [don't remove or move this line] vvvvv");
@@ -115,6 +116,7 @@
 	    return "";
 	};
 
+	
   
 				// 1. depmode 2. save modules.conf 3. depmode 4. alsactl store
 	define save () ``{
