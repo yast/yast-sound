@@ -23,6 +23,7 @@
     include "misc_defines.ycp";
     include "sound/routines.ycp";
     include "sound/texts.ycp";
+    include "ui/common_popups.ycp";
 
     map STRINGS=STRINGS_();
 
@@ -33,7 +34,7 @@
      * @return symbol
      */
 
-    define InitializingDialog () ``{
+    global define InitializingDialog () ``{
 	  // label message
 	term con = `Label (sformat(UI(_("Initializing ..."))));
 	string helptext = "";
@@ -51,7 +52,7 @@
      * @return map
      */
 	  
-    define DisplayName (string name, string cname) ``{
+    global define DisplayName (string name, string cname) ``{
 	string helptext=lookup(STRINGS, "DisplayName");
 
 	term con = `VBox 
@@ -105,7 +106,7 @@
      * @return void
      */
 
-    define OpenMainDialog() ``{
+    global define OpenMainDialog() ``{
 	UI(`OpenDialog(`opt(`defaultsize), `VBox
 	  (
 	    `Image(`suseheader, "SuSE"),
@@ -141,7 +142,7 @@
      * 
      * @return void
      */
-	define SetWizardContents(string title, term contents, string helptext,
+	global define SetWizardContents(string title, term contents, string helptext,
 				       boolean has_back, boolean has_next) 
 	    ``{
 	      ChangeWidget(`id(`next), `Enabled, has_next);
@@ -156,83 +157,13 @@
 
     UI(
     ``{
-    /**
-     *  
-     *  displays a popup message with OK button. 
-     *
-     * @return void
-     */
-	define DisplayMessage(string message) 
-	``{
-		    // ok pushbutton: confirm the dialog
-	    OpenDialog(`opt(`decorated),
-	      `HBox(
-		`HSpacing(1),
-		`VBox(
-		  `VSpacing(0.2),
-		  `Label(message),
-		    // "OK" button: User confirmation
-		  `PushButton(`opt(`default), _("&OK")),
-		  `VSpacing(0.2)
-		),
-		`HSpacing(1)
-	      )
-	    );
-	    UserInput();
-	    CloseDialog();
-	}
-    }
-    );		
-
-
-    UI(
-    ``{
-    /**
-     *  
-     *  Dysplays YesOrNo dialog
-     *  @param message message
-     *  @param yes_button_message 'yes' button message
-     *  @param no_button_message 'no' button message
-     *  @return boolean true/false
-     */
-	define YesOrNo(any message, string yes_button_message, string no_button_message) 
-	``{
-	    OpenDialog(`opt(`decorated),
-	      `HBox
-	      (
-		`HSpacing(1),
-		`VBox
-		(
-		  `VSpacing(0.2),
-		  `Label(message),
-		  `HBox
-		  (
-		    `PushButton(`id(`yes), `opt(`default), yes_button_message),
-		    `HSpacing(2),
-		    `PushButton( no_button_message )
-		  ),
-		  `VSpacing(0.2)
-		),
-		`HSpacing(1)
-	      )
-	    );
-	    any ret = UserInput();
-	    CloseDialog();
-	    return (ret == `yes);
-	}
-    }
-    );	
-
-
-    UI(
-    ``{
     /* 
      *  
      *  DebugDialog 
      *
      * @return void
      */
-	define DebugDialog(any str) 
+	global define DebugDialog(any str) 
 	``{
 	      // OK button user confirmation
 	    OpenDialog(`VBox(`RichText(sformat("%1",str)),`PushButton(_("&OK"))));
@@ -243,44 +174,6 @@
     );
 
 
-    UI(
-    ``{
-    /* 
-     *  
-     *  WarnDialog 
-     *
-     * @return boolean
-     */
-	define WarnDialog(string message) 
-	``{
-	    OpenDialog(`opt(`decorated, `warncolor),
-	      `HBox
-	      (
-		`HSpacing(1),
-		`VBox
-		(
-		  `VSpacing(0.2),
-		  `Heading(message),
-		  `HBox
-		  (
-			// Yes button - user confirmation
-		    `PushButton(`id(`yes),  _("&Yes")),
-		    `HStretch(),
-			// Yes button - user confirmation
-		    `PushButton(`opt(`default), _("&No"))
-		  ),
-		  `VSpacing(0.2)
-		),
-		`HSpacing(1)
-	      )
-	    );
-	    any ret = UserInput();
-	    CloseDialog();
-	    return (ret == `yes);
-	}            
-    }
-    );
-
     /**
      *	UI controls for volume setting dialog
      *
@@ -289,7 +182,7 @@
      *  @return term 
      */
 
-    define VolumeCon(map card , integer vol) ``{
+    global define VolumeCon(map card , integer vol) ``{
 	term slider = `IntField(`id(`volume), `opt(`notify), _("Volume"), 0, 100, vol);
 
 	if (UI(`HasSpecialWidget(`Slider)))
@@ -350,7 +243,7 @@
      *  @see sound_options#create_table
      */
 
-    define OptionsCon(map card, list itemized_descriptions, integer current_option, string current_option_name) ``{
+    global define OptionsCon(map card, list itemized_descriptions, integer current_option, string current_option_name) ``{
 	con = `HBox
               (
                 `HSpacing (3),
@@ -389,7 +282,7 @@
      * @see WhichDialog
      */
 
-    define WhichDlgCon(list nc) ``{
+    global define WhichDlgCon(list nc) ``{
 	term con = `HBox(
             `HSpacing (3),
         // frame label
@@ -428,7 +321,7 @@
 	return con;
     }
 
-    define ComplexDlgCon(list cc, boolean start_alsa, boolean start_alsa_seq) ``{
+    global define ComplexDlgCon(list cc, boolean start_alsa, boolean start_alsa_seq) ``{
 	term con = `HBox
             (
                 `HSpacing (3),
@@ -442,8 +335,8 @@
                     `HBox
                     (
                         `PushButton (`id(`b_delete), _("Delete")),
-//                        `HStretch (),
-//			`PushButton (`id(`b_edit), _("Edit")),
+                        `HStretch (),
+			`PushButton (`id(`b_options), _("Options")),
 			`HStretch (),
                   // Add soundcard ... - button label
                         `PushButton (`id(`b_conf2), _("Add soundcard ..."))

@@ -135,14 +135,12 @@
 
 	if(size(conf_cards) < size(uniq_keys))
 	{
-	    if(UI(`YesOrNo(_("There are configured sound cards, but is not functional at
- the moment, because the kernel modules are not present. Try to load them?"), _("&Yes"), _("&No"))))
+	    if(UI(`YesNoPopup(_("There is configured sound card, but is not functional at
+ the moment, because the kernel modules are not present. Try to load them?"))))
 	    {
 		SCR(`Execute (.target.bash, "/etc/init.d/alsasound start", $[]));
 		conf_cards = get_running_cards ();
 	    }
-	    
-
 	}
 
 	list cc = maplist (`e, conf_cards, 
@@ -184,7 +182,7 @@
 				// To translators: label message
 		    string msg=lookup(STRINGS, "WhichDialogMsg");
 			// Yes, No - button labels
-		    boolean terminate = UI(`YesOrNo (msg, _("&Yes"), _("&No")));
+		    boolean terminate = UI(`YesNoPopup (msg));
 		    if (terminate)
 		    {
 			SCR(`Execute (.target.bash, "/bin/fuser -k /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]));
@@ -223,7 +221,7 @@
 		else 
 		{
 		    // error popup message
-		    UI (`DisplayMessage (_("Cannot delete this entry!")));
+		    UI (`MessagePopup (_("Cannot delete this entry!")));
 		}
 
 		conf_cards = get_running_cards ();
@@ -239,6 +237,35 @@
 		{ 
 		    UI(`ChangeWidget(`id(`configured_table), `CurrentItem, 0));
 		}
+	    }
+	    else if (ui == `b_options)
+	    {
+		integer card_id = UI(`QueryWidget (`id(`configured_table), `CurrentItem));
+		map card=RestoreCardInfo(card_id, save_info);
+		map res=CallModule("sound_options", [card]);
+		y2error("#############sound_options: %1", res);
+		if(lookup(res, "ui")==`next)
+		{
+		    map sinfo=create_save_info (lookup(res, "return"), card_id);
+		    y2error(sformat("save info options: %1 ", sinfo));
+		    integer pos=0;
+		    list new_save_info=[];
+		    while(pos<size(save_info))
+		    {
+			if(card_id!=pos)
+			{
+			    new_save_info=add(new_save_info, select(save_info, pos));
+			}
+			else
+			{
+			    new_save_info=add(new_save_info, sinfo);
+			}
+			pos=pos+1;
+		    }
+		    save_info=new_save_info;
+		}
+
+		        UI(`SetWizardContents (_("Sound configuration"), con, helptext, true, true));
 	    }
 	    else if (ui == `b_alsa) 
 	    {

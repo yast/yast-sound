@@ -25,7 +25,7 @@
      *  @return map
      */
 
-    define STRINGS_() ``{
+    global define STRINGS_() ``{
 	return $["DisplayName":
 	     UI(_("<p>If you want to configure this sound card press <b>Next</b></p>"))+
 	     UI (_("<p>If you want to set a special option, press the <b>Options</b> button.

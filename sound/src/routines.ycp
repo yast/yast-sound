@@ -26,7 +26,7 @@
    * reads variables listed in 'vars' from rc.config
    * @return list
    */
-    define read_rc_vars (list vars) ``{
+    global define read_rc_vars (list vars) ``{
         return listmap (`k, vars, ``([k, SCR(`Read(topath(sformat (".rc.system.%1", k))))]));
     }
 
@@ -38,7 +38,7 @@
      *
      */
 
-    define hextoi(string num) ``{
+    global define hextoi(string num) ``{
 	return tointeger(num);
     }
 
@@ -50,10 +50,10 @@
      *
      */
 
-    define save_unique_keys (list cards, list configured_unique) ``{
-        list|void orig = SCR(`Read(.var.lib.yast.unique));
+    global define save_unique_keys (list cards, list configured_unique) ``{
+        list orig = SCR(`Read(.var.lib.yast.unique));
 	y2error(sformat("uniques   %1", orig));
-        if (is (orig, void))
+        if (isnil(orig))
         {
             orig = [];
         }
@@ -72,8 +72,8 @@
      * @return list modified list of save_info
      */
 
-    define remove_invalid_save_info(list save_info) ``{
-	void | list cards=nil;
+    global define remove_invalid_save_info(list save_info) ``{
+	list cards=nil;
 	if(fileexist("/proc/asound/cards"))
 	{
 	    cards = SCR(`Read(.proc.asound.cards));
@@ -93,7 +93,7 @@
      * @return list
      */
 
-    define GetCardDatabase() ``{
+    global define GetCardDatabase() ``{
 	any database=SCR(`Read (.target.yast2, "sndcards.ycp"));
 	textdomain "sound_db";
 	database = UI (database);
@@ -106,7 +106,7 @@
      * @return integer
      */
 
-    define search_card_id (string name) ``{
+    global define search_card_id (string name) ``{
         list all_cards = get_cards ("all");
         integer pos = 0;
         integer len = size (name);
@@ -128,7 +128,7 @@
      * @return map
      */
     /* !!! variable db is inherited from module sound.ycp*/
-    define get_card (string module_name, string card_name) ``{
+    global define get_card (string module_name, string card_name) ``{
         map ret = $[];
         map db_entry = $[];
 
@@ -192,7 +192,7 @@
      */
 
     /* !!! variable cards is inherited from module sound_manual.ycp*/
-    define get_cards (string module_name) ``{
+    global define get_cards (string module_name) ``{
         list ret = [];
 
         if (tolower(module_name) == "all")
@@ -220,7 +220,7 @@
      * Itemize list for selection box
      * @return list
      */
-    define itemize_list (list l, integer default) ``{
+    global define itemize_list (list l, integer default) ``{
         integer i = 0;
         list itemized_list = [];
         integer s = size (l);
@@ -241,7 +241,7 @@
      *
      */
 
-    define get_running_cards () ``{
+    global define get_running_cards () ``{
         if (fileexist("/proc/asound/cards"))
         {
             list asound = SCR(`Read(.proc.asound.cards));
@@ -266,8 +266,8 @@
      * @return list with unique keys
      */
 
-    define read_unique_keys () ``{
-	list|void already = nil;
+    global define read_unique_keys () ``{
+	list already = nil;
 	if (SCR(`Read(.target.size, "/var/lib/YaST/unique.inf")) > 0)
 	{
 	    already = SCR (`Read(.var.lib.yast.unique));
@@ -287,7 +287,7 @@
      *
      */
 
-    define nm256hack (map card) ``{
+    global define nm256hack (map card) ``{
         string module_name = "";
         if (!haskey(card, "module"))
         {
@@ -301,7 +301,8 @@
         {
             // special warning message for in a special case
             string warn_text=lookup(STRINGS, "nm256hackWarning");
-            return UI(`WarnDialog (warn_text));
+//          return UI(`WarnDialog (warn_text));
+	    return UI(`YesNoPopup(warn_text));
         }
         return true;
     }
@@ -313,7 +314,7 @@
      * same as  ()?():(); statement in c
      * @return any
      */
-    define condition (boolean c, any s1, any s2) ``{
+    global define condition (boolean c, any s1, any s2) ``{
 	if (c) 
 	{ 
 	    return eval (s1);
@@ -330,7 +331,7 @@
      * Params: "number" ... number of sound cards
      * @return list
      */
-    define alsa_oss (integer number) ``{
+    global define alsa_oss (integer number) ``{
 	list modules = [];
 	integer i = 0;
 	// map with minor as a key and module as value
@@ -362,7 +363,7 @@
      * This is no alsa hack function
      * @return map
      */
-    define no_alsa (string mod_name) ``{
+    global define no_alsa (string mod_name) ``{
 	return $[
 	    "modules" : [
 		$["name"   : mod_name,
@@ -386,11 +387,11 @@
      * simply gets detected audio. 
      * @return map
      */
-    define get_audio (boolean test_mode, boolean config_mode) ``{
+    global define get_audio (boolean test_mode, boolean config_mode) ``{
 	if (!test_mode && !config_mode) 
 	{
-	    list|void ret = SCR(`Read(.probe.sound));
-	    if (is (ret, void)) ret = [];
+	    list ret = SCR(`Read(.probe.sound));
+	    if (isnil (ret)) ret = [];
 	    return ret;
 	}
 	return [$["baseclass"    : "Multimedia controller", 
@@ -430,7 +431,7 @@
      * Looks up in the database for the module
      * @return map
      */
-    define get_module (map card) ``{
+    global define get_module (map card) ``{
 	if (db == nil)
 	{
 	    return $[];
@@ -441,7 +442,7 @@
 	integer vendor_id = lookup (card, "vendor_id", 0);
 	integer device_id = lookup (card, "device_id", 0);
 
-	list|void fc = [];
+	list fc = [];
 	
 	if (tolower (bus) == "pci") 
 	{
@@ -455,7 +456,7 @@
 		   ``(filter(`c, lookup (d, "libhd"), ``((lookup (c, "vendor_id") == vendor_id - offset) &&
 							 (lookup (c, "device_id") == device_id - offset))) != []));
 	}
-	if (fc != nil)
+	if (!isnil(fc))
 	{
 	    if (size (fc) > 0) return select (fc, 0);
 	}
@@ -466,7 +467,7 @@
      * Use another module than alsa
      * @return boolean
      */
-    define no_alsa_exception (map card, boolean config_mode) ``{
+    global define no_alsa_exception (map card, boolean config_mode) ``{
 	if (!config_mode)
 	{
 	    return MacRisc ();
@@ -479,7 +480,7 @@
      * @return boolean
      */
 
-    define MacRisc () ``{
+    global define MacRisc () ``{
 	if (lookup (select (SCR(`Read(.probe.system)), 0), "system") == "MacRISC")
 	{
 	    return true;
@@ -495,7 +496,7 @@
      *
      * @return map
      */
-    define create_save_info (map card, integer card_id) ``{
+    global define create_save_info (map card, integer card_id) ``{
 	list except_list = [$["try" : ``(MacRisc ()), "handle" : ``(mac_risc ())]];
 	integer exp_id = 0;
 	
@@ -539,7 +540,7 @@
      * command must be string with $CHANNEL and $VALUE included
      * @return any
      */
-    define SetVolume (string command, string channel, string value, integer card_num) ``{
+    global define SetVolume (string command, string channel, string value, integer card_num) ``{
 	return SCR(`Execute (.target.bash, command, $["CHANNEL" : channel, "VOLUME" : value, "CARD_NUM" : card_num]));
     }
 
@@ -547,7 +548,7 @@
      * reads already saved info from modules.conf
      * @return list 
      */
-    define read_save_info () ``{
+    global define read_save_info () ``{
 	string prefix = "";
 	list aliases  = SCR(`Read(topath (sformat ("%1.modules.alias", prefix))));
 	list options  = SCR(`Read(topath (sformat ("%1.modules.options", prefix))));
@@ -677,7 +678,7 @@
      * @return string returns empty string on succes, otherwise error string 
      */
 
-    define PlayTest (map user_settings, integer card_id) ``{
+    global define PlayTest (map user_settings, integer card_id) ``{
 
         if (!fileexist(lookup (user_settings, "audio_file")))
         {
@@ -712,7 +713,7 @@
      * @return string with error message (empty string if ok)
      */
 
-    define probe_module (map card, map user_settings) ``{
+    global define probe_module (map card, map user_settings) ``{
 
         string module_name    = lookup (lookup (card, "module", $[]), "name", "");
         list params           = filter (`e, lookup (lookup (card, "module", $[]), "params", []), ``(size (lookup (e, "value")) > 0));
@@ -768,7 +769,7 @@
      *  @return list
      */
 
-    define create_table (list lm, list lk)
+    global define create_table (list lm, list lk)
     ``{
         integer i = 0;
         list itemized_list = [];
@@ -798,7 +799,7 @@
      * [range=1-19] or something not recognized
      * @return list
      */
-    define parse_values (string des) ``{
+    global define parse_values (string des) ``{
         list ret = [];
         integer pos = 0;
         integer len = size (des);
@@ -862,7 +863,7 @@
    * @return string
    * @example mysformat(["Message %1 %2 %3", "A", "B", "C"])  ->  "Message A B C"
    */
-    define mysformat (list msg)
+    global define mysformat (list msg)
     ``{
         if (size (msg) == 0)
         {
@@ -888,7 +889,7 @@
      * returns error message, empty string if ok
      * @return string
      */
-    define check_value (string value, string type, list poss) ``{
+    global define check_value (string value, string type, list poss) ``{
         if (type == "int")
         {
             if (tolower(substring (value, 0, 2)) == "0x")               // hex number
@@ -961,12 +962,21 @@
    *
    * @return list
    */
-    define get_not_yet () ``{
+    global define get_not_yet () ``{
         list all = get_audio (test_mode, config_mode);
         list not_yet = get_unique_not (all, ["configured"], "sound", false, config_mode);
 
         return not_yet;
     }
 
+    global define RestoreCardInfo(integer card_id, list save_info) ``{
+	list cards=get_audio(false,false);   
+	cards =  maplist(`e, cards, ``(add (e, "module", get_module (e))));
+	map card_save=select(save_info, card_id);
+    
+	y2error(sformat("%1", save_info));
+
+	return select(cards, card_id);
+    }
    
 }

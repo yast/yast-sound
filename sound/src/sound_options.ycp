@@ -126,7 +126,7 @@
 			
 		if (size (err) > 0)  // error - wrong value 
 		{
-		    UI(`DisplayMessage (err));
+		    UI(`MessagePopup (err));
 		    UI(`ChangeWidget(`id(`des), `Value, ""));
 						  
 		}
@@ -169,6 +169,7 @@
 
 
     map card    = Args(0);
+    
     list params = [];
     if (haskey (card, "params"))
     {
@@ -191,6 +192,7 @@
     mod = add (mod, "params", params);
     card = add (card, "module", mod);
 
+    y2error(sformat("%1", card));
 
     return $["ui" : lookup (result, "ui", `cancel), "return" : card];
 }

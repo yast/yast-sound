@@ -30,7 +30,7 @@
        * Saves one '/etc/modules.conf' entry
        * @return boolean
        */
-    define SaveOneModulesEntry (string entry_name, map entry) ``{
+    global define SaveOneModulesEntry (string entry_name, map entry) ``{
         boolean ret = true;
         if (haskey (entry, "alias")) 
         {
@@ -48,7 +48,7 @@
        * Saves all '/etc/modules.conf' entries
        * @return map return struct: $["return": boolean, "err_msg": string]
        */
-    define SaveModulesEntry (list cards, list system) ``{
+    global define SaveModulesEntry (list cards, list system) ``{
         string err_msg="";
     
         if ((contains(maplist (`e, cards, ``(SaveOneModulesEntry (lookup (e, "name", ""), lookup (e, "modules", $[])))), false))) 
@@ -91,7 +91,7 @@
        * Sets volume for all channels
        * @return map return struct: $["return": boolean, "err_msg": string]
        */
-    define SetAllChannels (list cards, string command) ``{
+    global define SetAllChannels (list cards, string command) ``{
 	string err_msg="";
         if (contains (maplist (`e, cards, ``(maplist(`ch, `v, lookup (e, "volume", $[]), ``(SetVolume (command, ch, v,
                            tointeger(lookup(lookup(lookup (e, "modules", $[]), "options", $[]), "snd_index", 0))))))), false))
@@ -107,7 +107,7 @@
        * Save volume (for alsa it's alsactl store
        * @return map return struct: $["return": integer, "err_msg": string]
        */
-    define SaveVolume (string function, string mixer_command, list cards) ``{
+    global define SaveVolume (string function, string mixer_command, list cards) ``{
         string err_msg="";
         map res=SetAllChannels (cards, mixer_command);
         err_msg=lookup(res, "err_msg", "");
@@ -119,7 +119,7 @@
        * Additional hack to enable ALSA joystick support
        * @return boolean
        */
-    define EnableJoystick () ``{
+    global define EnableJoystick () ``{
         string tmpdir = SCR(`Read(.target.tmpdir));
         return SCR(`Execute(.target.bash, "/usr/sbin/alsactl -f "+tmpdir+"/asound.conf store;\
                 /usr/bin/sed '/\"Joystick\"/s/false/true/' "+tmpdir+"/asound.conf >/etc/asound.conf;\
@@ -131,7 +131,7 @@
        * function to finish ALSA instalation
        * @return void
        */
-    define AlsaFinish () ``{
+    global define AlsaFinish () ``{
         EnableJoystick ();
     }
       /**
@@ -139,7 +139,7 @@
        * @return string error string
        */
 
-    define SaveRCValues (map rc) ``{
+    global define SaveRCValues (map rc) ``{
         string err_msg="";
 	if (contains (maplist (`k, `v, rc, ``(SCR(`Write(topath(sformat(".rc.system.%1", k)), v)))), false) ||
                 !SCR(`Write(.rc.system, nil)))

@@ -43,7 +43,7 @@
  *        2nd ... boolean - testmode
  *
  * Steps:
- *        1. save '/etc/modules/conf'
+ *        1. save '/etc/modules.conf'
  *        2. save '/etc/rc.config'
  *        3. save volume
  *        4. call function to provide some additional work
@@ -56,6 +56,7 @@
 
     textdomain "sound";
     include "sound/texts.ycp";
+    include "browser.ycp";
 
     map STRINGS=STRINGS_();
 
@@ -66,7 +67,7 @@
     boolean test_mode = false;
     map sound_info = Args (0);
 
-y2error(sformat("%1", sound_info));
+    BrowseTree (sound_info);
 
     string helptext = "";
     string err_msg = "";
@@ -138,7 +139,7 @@ y2error(sformat("%1", sound_info));
 	  final_msg = final_msg + " " + UI(_("(TEST MODE)"));
     }
       
-    UI(`DisplayMessage (final_msg));
+    UI(`MessagePopup (final_msg));
 
     return (size (err_msg) == 0);
 }

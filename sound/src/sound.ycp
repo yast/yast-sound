@@ -52,7 +52,7 @@
      * @param   card_info as returned by libhd
      * @return  list with save info, as required by sound_write for one cards
      */
-    define OneCardWizard (map card, integer card_id, any ui) ``{
+    global define OneCardWizard (map card, integer card_id, any ui) ``{
 	list dialog = [``(DisplayName (hardware_name (card), sformat("snd-card-%1", card_id))),
 		    ``(CallModule ("sound_volume", [card, card_id, (size (sound_cards) == 1)] ))];
 
@@ -197,10 +197,10 @@
     list configured_unique = []; // list of unique keys, that was configured
 
     boolean exit = false;
-    list|void db = GetCardDatabase(); 
-    if (is (db, void)) 
+    list db = GetCardDatabase(); 
+    if (isnil (db)) 
     {
-	UI(`DisplayMessage ("The Sound card database cannot be found!!!"));
+	UI(`MessagePopup ("The Sound card database cannot be found!!!"));
 	exit = true;
     }
 
@@ -295,7 +295,7 @@
 	    }
 
 	// Yes, No - button label
-	    cont = !(UI (`YesOrNo (warn_msg, _("&Yes"), _("&No"))));
+	    cont = !(UI (`YesNoPopup (warn_msg)));
 	
 	    if (call_complex_dialog) 
 	    {

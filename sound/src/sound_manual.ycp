@@ -130,11 +130,11 @@
     // ==== main ====
 
 
-    list|void db = GetCardDatabase(); 
+    list db = GetCardDatabase(); 
     
-    if (is (db, void)) 
+    if (isnil(db)) 
     {
-	UI(`DisplayMessage(_("The Sound card database cannot be found!!!")));
+	UI(`MessagePopup(_("The Sound card database cannot be found!!!")));
 	return $["ui" : `back];
     }
     return ManualDialog ();
