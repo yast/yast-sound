@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Jan  7 16:33:36 CET 2002 - dmeszar@suse.cz
+
+- removed START_ALSA (moved to runlevel editor) and START_ALSA_SEQ
+  (moved to /etc/sysconfig/alsa) variables.
+- uses new sound database
+
+-------------------------------------------------------------------
 Tue Dec 18 11:34:33 CET 2001 - dmeszar@suse.cz
 
 - Sound module implemented, third param for 'select'

@@ -490,7 +490,7 @@ in order to configure sound cards."));
 		    `next	    :	"config2",
 		    `abort	    :	`abort		
 		],
-	    
+
 
 	    "complex"	:
 		$[
@@ -520,20 +520,14 @@ in order to configure sound cards."));
 	return;
     }
 
-			    // filter out empty enries
-    // save_info = filter (`e, save_info, ``(size (e) > 0)); FIXME: ?? needed ? i doubt
     n_cards = size (Sound::modules_conf);
 
     map save_map = $[];
 
-    if (true)
-    {
-//	Sound::DumpToLog();
-    }
 
     if (ui == `finish && !Sound::autoinstallation && (Sound::modules_conf != save_info_backup || Sound::rc_vars != rc_vars_backup))
     {
-	Sound::Write(``{}, ``{}); // CallFunction (`sound_write(Sound::modules_conf, Sound::rc_vars));
+	Sound::Write(``{}, ``{});
     }
 
     UI::CloseDialog ();
