@@ -485,8 +485,6 @@
 
     map save_map = $[];
 
-    y2error("#old: %1 #new: %2", save_info_backup, save_info);
-
     if (ui == `finish && (save_info != save_info_backup || rc_vars != rc_vars_backup)) 
     {
 	CallFunction (`sound_write(save_info, rc_vars));
