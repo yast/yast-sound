@@ -348,7 +348,7 @@ to configure sound cards.
 	{
 	    config_mode   = true;
 	}
-	if (Args(arg_n) == .from_menu)
+	if (Args(arg_n) == ".from_menu")
 	{
 	    from_menu     = true;
 	}
