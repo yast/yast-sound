@@ -1,0 +1,125 @@
+/**
+ * File:
+ *   modules/Joystick.ycp
+ *
+ * Package:
+ *   Configuration of joystick
+ *
+ * Summary:
+ *   Data for configuration of joystick, input and output functions.
+ *
+ * Authors:
+ *   Dan Meszaros <dmeszar@suse.cz>
+ *
+ * $Id$
+ *
+ * Representation of the configuration of joystick.
+ * Input and output routines.
+ *
+ */
+
+{
+    // Set the name of the module
+    module "Joystick";
+    import "Progress";
+
+    textdomain "sound";
+
+    /**
+     * joystick config datastructure (list of maps)
+     */
+    global list joystick = [];
+
+    list vars = [   "JS_GAMEPORT_MODULE",
+                    "JS_DEVICE_MODULE",
+                    "JS_DEVICE_MODULE_OPTION",
+                    "JS_CONTROL",
+                    "JS_PORT"];
+
+    /**
+     * Read all joystick settings from the SCR
+     * @param abort A block that can be called by Read to find
+     *	      out whether abort is requested. Returns true if abort
+     *	      was pressed.
+     * @return True on success
+     */
+    global define boolean Read (block abort) ``{
+	integer pos = 0;
+
+	joystick = [];
+
+	string tmp = "";
+
+	while (pos < 4)
+	{
+	    map j = $[];
+
+	    // go thru 'vars' list and read all variable values
+	    foreach(`v, vars, ``{
+		tmp = SCR::Read(topath(sformat(".joystick.%1_%2", v, pos)));
+		j = add(j, v, tmp);
+	    });
+
+	    joystick = add(joystick, j);
+
+	    pos = pos + 1;
+	}
+    }
+
+    /**
+     * Update the SCR according to joystick settings
+     * @param abort A block that can be called by Write to find
+     *	      out whether abort is requested. Returns true if abort
+     *	      was pressed.
+     * @return True on success
+     */
+    global define boolean Write (block abort) ``{
+	integer pos = 0;
+
+	map j = $[];
+
+	while (pos < 4)
+	{
+	    j = select(joystick, pos, $[]);
+	    foreach(`v, vars, ``{
+		SCR::Write(topath(sformat(".joystick.%1_%2", v, pos)), lookup(j, v, ""));
+	    });
+	    pos = pos + 1;
+	}
+
+	return true;
+    }
+
+    /**
+     * Get all joystick settings from the first parameter
+     * (For use by autoinstallation.)
+     * @param settings The YCP structure to be imported.
+     * @return True on success
+     */
+    global define boolean Import (map settings) ``{
+	joystick = settings;
+	sleep (30);
+	return true;
+    }
+
+    /**
+     * Dump the joystick settings to a single map
+     * (For use by autoinstallation.)
+     * @return Dumped settings (later acceptable by Import ())
+     */
+    global define map Export () ``{
+	sleep (30);
+	return joystick;
+    }
+
+    /**
+     * Build a textual summary that can be used e.g. in inst_hw_config () or
+     * something similar.
+     * @return Summary of the configuration.
+     */
+    global define string Summary () ``{
+	// TODO FIXME: your code here...
+	return _("Summary of the joystick configuration...");
+    }
+
+}
