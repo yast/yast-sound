@@ -100,6 +100,7 @@ $[
 			"Digital PC 5000 Onboard, Unknown",
 			"E1000 Onboard CS4236B, Gateway",
 			"HP6330 sound, Hewlett Packard",
+			"Intel PR440FX Onboard",
 			"IntelliStation M Pro, IBM",
 			"Malibu, Turtle Beach",
 			"Marlin Spike Mobo CS4235, Intel",
@@ -242,12 +243,13 @@ $[
 		],
 		28:
 		[
-			"82801AA, Intel",
-			"82801BA, Intel",
-			"82901AB, Intel",
+			"82801AA-ICH, Intel",
+			"82801BA-ICH2, Intel",
+			"82801CA-ICH3, Intel",
+			"82801DB-ICH4, Intel",
+			"82901AB-ICH0, Intel",
 			"AMD768, AMD",
 			"AMD8111, AMD",
-			"ICH3, Intel",
 			"MX440, Intel",
 			"NForce Audio, NVidia",
 			"SI7012, SiS"
@@ -482,6 +484,7 @@ $[
 			1079:10,
 			1845:10,
 			2869:10,
+			2870:10,
 			3378:9,
 			4917:10,
 			5157:10,
@@ -493,6 +496,7 @@ $[
 			16951:10,
 			17206:10,
 			17718:10,
+			17957:10,
 			17975:10,
 			18487:10,
 			26677:10,
@@ -510,6 +514,7 @@ $[
 			55607:10,
 			59429:10,
 			59446:10,
+			59702:10,
 			61490:9,
 			62005:10,
 			62008:10
@@ -562,7 +567,7 @@ $[
 		4130:
 		$[
 			29765:28,
-			30285:28
+			29805:28
 		],
 		4131:
 		$[
@@ -735,6 +740,7 @@ $[
 			9253:28,
 			9285:28,
 			9349:28,
+			9413:28,
 			29077:28
 		]
 	],
@@ -1550,7 +1556,11 @@ $[
 			],
 			"params":
 			$[
-
+				"snd_dual_codec":
+				$[
+					"allows":"{{0,3}}",
+					"descr":_("Secondary Codec ID (0 = disabled).")
+				]
 			]
 		],
 		"snd-cs46xx":
@@ -1558,7 +1568,7 @@ $[
 			"description":"Cirrus Logic Sound Fusion CS46XX",
 			"joystick":
 			$[
-				"GAMEPORT_MODULE":"cs461x"
+				"GAMEPORT_MODULE":"off"
 			],
 			"params":
 			$[
@@ -3366,7 +3376,7 @@ $[
 			$[
 				"snd_adaptor":
 				$[
-					"allows":"{{0=Soundcanvas,1=MS-124T,2=MS-124W S/A,3=MS-124W M/B}}",
+					"allows":"{{0=Soundcanvas,1=MS-124T,2=MS-124W S/A,3=MS-124W M/B,4=Generic}}",
 					"descr":_("Type of adaptor."),
 					"dialog":"list"
 				],
@@ -3374,6 +3384,12 @@ $[
 				$[
 					"allows":"{57600,115200,230400,460800}",
 					"descr":_("Base for divisor in bauds."),
+					"dialog":"list"
+				],
+				"snd_ins":
+				$[
+					"allows":"{{1,16}}",
+					"descr":_("Number of MIDI inputs."),
 					"dialog":"list"
 				],
 				"snd_irq":
@@ -3499,7 +3515,7 @@ $[
 			"description":"Trident 4D-WaveDX/NX & SiS SI7018",
 			"joystick":
 			$[
-				"GAMEPORT_MODULE":"pcigame"
+				"GAMEPORT_MODULE":"off"
 			],
 			"mixer":
 			$[
@@ -3622,8 +3638,8 @@ $[
 					"base":"16",
 					"descr":
 					[
-						_("ISA PnP detection for %1 soundcard."),
-						"Turtle Beach Wavefront"
+						_("Port # for %1 driver."),
+						"WaveFront"
 					]
 				],
 				"snd_dma1":
@@ -3631,7 +3647,7 @@ $[
 					"allows":"{{0,1},{3},{5,7}}",
 					"descr":
 					[
-						_("1st DMA1 for %1 driver."),
+						_("1st DMA # for %1 driver."),
 						"WaveFront"
 					],
 					"dialog":"list"
@@ -3641,7 +3657,7 @@ $[
 					"allows":"{{0,1},{3},{5,7}}",
 					"descr":
 					[
-						_("2nd DMA2 for %1 driver."),
+						_("2nd DMA # for %1 driver."),
 						"WaveFront"
 					],
 					"dialog":"list"
@@ -3683,7 +3699,7 @@ $[
 					"descr":
 					[
 						_("ISA PnP detection for %1 soundcard."),
-						"Turtle Beach Wavefront"
+						"WaveFront"
 					],
 					"dialog":"check"
 				],
@@ -3731,6 +3747,13 @@ $[
 						_("MPU-401 port # for %1 driver."),
 						"YMFPCI"
 					]
+				],
+				"snd_rear_switch":
+				$[
+					"allows":"{{0,Disabled},{1,Enabled}}",
+					"default":"0",
+					"descr":_("Enable shared rear/line-in switch"),
+					"dialog":"check"
 				]
 			]
 		]
