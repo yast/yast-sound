@@ -187,7 +187,6 @@
     step = step + 1;
 
     list configuredcards = Sound::GetSoundCardList();
-y2milestone("------------ karty: %1", configuredcards);
 
     if (!autoinstall)
     {
