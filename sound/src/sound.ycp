@@ -29,7 +29,7 @@
 		    UI(_("<p>You need to be logged in as <i>root</i> in order to do this.</p>"))),
 		`codefragment : nil ]
 	    ];
-	
+
 	    // === UI ===
 
 	UI(``{
@@ -115,7 +115,7 @@
 
 	        // This is a popup dialog with Yes/No question
 	    define DisplayYesNo(string message, boolean d) ``{
-		
+
 		term t = `VBox();
 		t = add(t, `Left(`Label(message)));
 		term b = `HBox();
@@ -131,9 +131,9 @@
 		OpenDialog(`opt(`decorated), add(t, b));
 		any ui = UserInput();
 		CloseDialog();
-		
+
 		return (ui == `yes);
-		
+
 	    };
 	});
 
@@ -144,9 +144,9 @@
 	    else
 		return eval (s2);
 	};
-	
 
-	
+
+
 				// creates new list from list l
 				// but cards with the same device/vendor id are added just once
 	define remove_duplicates (list l) ``{
@@ -177,7 +177,7 @@
 		s = size (to_add);
 	    
 	    list ret = [];
-		
+
 	    map curr_map = $[];
 	    
 	    while (i < s) {
@@ -196,7 +196,7 @@
 
 
 
-	
+
 				// itemize list, FIXME: try to convert it to use maplist
 	define itemize_list (list l, integer default) ``{
 	    integer i = 0;
@@ -209,7 +209,7 @@
 	    
 	    return itemized_list;
 	};
-	
+
 
 				// extracts sound card name from map read from SCR
 	define soundcard_name (map device) ``{
@@ -222,7 +222,7 @@
 		return (lookup (device, "vendor", "Unknown vendor") + " " + lookup (device, "device", "Unknown device"));
 
 	};
-	
+
 				// looks-up for a kernel module for this
 				// bus, vendor_id, device_id sound card
 	define get_module (string bus, integer vendor_id, integer device_id) ``{
@@ -240,12 +240,12 @@
 	    
 	    
 	    else {
-		
-		
+
+
 		fc = filter (`d, snd_database, 
 			     ``(filter(`c, lookup (d, "libhd"), ``((lookup (c, "vendor_id") == vendor_id - offset) &&
 								   (lookup (c, "device_id") == device_id - offset))) != []));
-		
+
 	    }
 
 	    if (fc != nil)
@@ -262,19 +262,19 @@
 				// package in order to continue with
 				// the configuration
 	    define IsAlsaInstalled () ``{
-		
+
 		integer ret = Shell ("/bin/rpm -q alsa");
-		
+
 		if (ret == 127) {
 			// To translators: This is just popup message, shouldn't be too long
 		    UI (`DisplayMessage (_("Cannot execute the program \"rpm\".\nPlease check if the 'rpm' package from the series 'a1' is installed.")));
 
 		}
-		
+
 				// if this package not installed, we have to use alsa au file
 		if (Shell ("/bin/rpm -q snd_au") == 0)
 		    user_settings = add (user_settings, "audio_file", "/usr/share/sounds/au/linus-english.au");
-		
+
 		return (ret == 0);
 	    };
 	    
@@ -288,7 +288,7 @@
 Sound support requires the <b>ALSA</b> package.\
  You can find it in the <b>SuSE</b> distribution (series 'snd')\
  or you can download it from <i>http://www.alsa-project.org</i>"));
-		
+
 		UI(`SetContents (_("Sound cards"),
 				 `HVCenter (
 				// This label is displayed when no alsa package is not installed
@@ -297,7 +297,7 @@ Sound support requires the <b>ALSA</b> package.\
  package ALSA (Advanced Linux Sound Architecture)\n before you proceed
  with the configuration of your sound system."))
 				     ), help_text, true, false));
-		
+
 		return UI(`UserInput ());
 	    };
 
@@ -313,18 +313,18 @@ Sound support requires the <b>ALSA</b> package.\
 An internal <b>YaST2</b> file is missing or corrupted.\
  Please try to reinstall <b>YaST2</b>.\
  You can find it in the <b>SuSE</b> distribution, series 'a'."));
-		
+
 		UI(`SetContents (_("Sound cards"),
 				 `HVCenter (
 				// To translators: label message
 				     `Label (_("The Sound card database cannot be found!!!"))
 				     ), help_text, true, true));
-		
+
 		return UI(`UserInput ());
 	    };
 
 
-	
+
 	define GetAudio () ``{
 
 	    if (!test_mode)
@@ -347,11 +347,11 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 	    return simulation;
   
 	};
-	
+
 
 
 // ============= dialogs ============
-	
+
 	    // First dialog
 	define FindCard () ``{
 
@@ -384,17 +384,16 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 		help_text = help_text + UI(_("<p>If you still want to
  configure your sound card, press the <i>Manual</i> button. Otherwise
  simply quit by pressing the <i>Back</i> button.</p>"));
-		
-		
+
+
 		message = UI (_("No sound cards were found on your system.\n Try manual setup."));
 		con = add (con, `HVCenter(`ReplacePoint(`id(`rp), `Label(message))));
 		con = add (con, `Bottom(`PushButton(`id (`manual), _("&Manual"))));
-	    
 		next = false;
 	    }
-		
+
   	    else {
-		
+
 		    // one sound card
 		if (size (found) == 1) {
 
@@ -414,18 +413,18 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 			con =  add (con, `Bottom(`PushButton(`id (`manual), _("&Let me choose"))));
 
 			    // Help text 1/2 (driver not available)
-			help_text = UI(_("<p>This means that appropriate driver for your your sound card is not available.<p>"));
-			    // Help text 2/2 (driver not available)			
-			help_text = help_text + UI(_("<p>You may try
- to use one of available drivers that can fit to your sound card by
+			help_text = UI(_("<p>This means that an appropriate driver for your your sound card is not available.<p>"));
+			    // Help text 2/2 (driver not available)
+			help_text = help_text + UI(_("<p>You may try\
+ to use one of the available drivers that can fit to your sound card by\
  pressing the <i>Let me choose</i> button.</p>"));
-			
+
 			next = false;
 		    }
 		    else {
  			    // To translators: parameter is sound card name
 			    //message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
-			
+
 			term lab = `VBox (
 			    `VStretch (),
 			    `Label (_("The sound card\n")),
@@ -434,23 +433,23 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 			    );
 			con = add (con, lab);
 			con = add (con, `Bottom(`PushButton(`id (`options), _("&Options"))));
-			
+
 			    // Help text 1/2 (one sound card found)
 			help_text = UI (_("<p>The sound card was
  found. If you want to configure this sound card press <i>Next</i>
  otherwise quit by pressing <i>Back</i><p/>"));
-			
+
 			    // Help text 2/2 (one sound card found)
 			help_text = help_text + UI (_("<p>You can
  change option values that are passed to the module by pressing the
  <i>Options</i> button.</p>"));
-			
+
 
 			ret = add (ret, "module", module);
 		    }
 		    
 		}
-		
+
 		    // more sound cards
 		else {
 		    integer i = 0;
@@ -466,11 +465,11 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 			help_text = UI(_("<p>There were found more
  sound cards. Please select <b>the one</b> you want to
  configure.</p>"));
-			
+
 
 		    next = false;
 		}
-		
+
 	    }
 
 	    UI(`SetContents (_("Sound cards"), con, help_text, prev, next));
@@ -516,24 +515,24 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 			    }
 		    
 			    else if (size (manual) > 0) {
-				
+
 				ret = lookup (manual, "scr", $[]);
 				module = lookup (ret, "module");
 				manual_driver = lookup(lookup (manual, "return", $[]), "driver", 0);
 				manual_model = lookup(lookup (manual, "return", $[]), "model", 0);
-				
+
 				con = `VBox ();
 
 				// help text 1/1
 				help_text = UI (_("<p>By pressing the
  <i>Next</i> button you should get your sound card working.</p>"));
-				
+
 				    // help text 2/2
 				help_text = help_text + UI (_("<p>You
  can change option values that are passed to the module by pressing
  the <i>Options</i> button.</p>"));
-				
-				
+
+
 				//message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
 
 				term lab = `VBox (
@@ -545,7 +544,7 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 				con = add (con, `ReplacePoint (`id(`rp), `HVCenter(lab)));
 				con = add (con, `Bottom(`PushButton(`id (`options), _("&Options"))));
 				next = true;
-				
+
 				selected_manually = true;
 			    }
 
@@ -559,10 +558,10 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 				*/
 
 			}
-			
+
 		    }
 		    else {
-			
+
 			ret = add (ret, "module", module);
 			UI(`ChangeWidget(`id(`next), `Enabled, true));
 			UI(`ChangeWidget(`id(`options), `Enabled, true));
@@ -597,7 +596,7 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 
 		    UI(`SetContents (_("Sound cards"), con, help_text, prev, next));
 		}
-		
+
 		else if ((ui == `manual) || (selected_manually && (ui == `back))) {
 
 		    options_entered = $[]; // clear options
@@ -614,7 +613,7 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 		    }
 		    
 		    else if (size (manual) > 0) {
-			
+
 			ret = lookup (manual, "scr", $[]);
 			module = lookup (ret, "module");
 			manual_driver = lookup(lookup (manual, "return", $[]), "driver", 0);
@@ -628,8 +627,8 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 			help_text = help_text + UI (_("<p>You can
  change option values that are passed to the module by pressing the
  <i>Options</i> button.</p>"));
-			
-			
+
+
 			    //message = sformat (UI(_("The sound card\n%1\nwill be configured.")), soundcard_name (ret));
 
 			term lab = `VBox (
@@ -641,7 +640,7 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 			con = add (con, `ReplacePoint (`id(`rp), `HVCenter(lab)));
 			con = add (con, `Bottom(`PushButton(`id (`options), _("&Options"))));
 			next = true;
-			
+
 			selected_manually = true;
 		    }
 		    else {
@@ -656,13 +655,13 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 		    continue;
 		    
 		}
-		
+
 	    } until (((ui == `back) || (ui == `next) || ui == `cancel));
 	    
 	    if (ui == `next) {
-		
+
 		    //UI (`DisplayMessage(sformat ("%1", lookup (ret, "module", "Unknown module")), 0, ""));
-		
+
 		return ret;
 	    }
 
@@ -682,12 +681,12 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 	    }            
 	    arg_n = arg_n - 1;
 	}
-	
-	
+
+
 				// This help text is displayed during some "userless" operations,
 				// like searching in DB, saving, etc ...
 	string help_text = UI (_("<p>No help text available.<p>"));
-	
+
 	string database_name = "sndcards.ycp";
 
 	map user_settings = $["audio_file" : "/usr/share/sounds/alsa/whistle.au"];
@@ -695,7 +694,7 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 	boolean cont = true;
 	map snd_info = $[];
 	boolean selected_manually = false;
-	
+
 	list found = FindCard ();
 	map options_entered = $[];
 
@@ -704,7 +703,7 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 	if (IsAlsaInstalled ()) {
 	    
 	    if (already == nil || already == `next) {   
-		
+
 		while (cont) {
 		    
 		    snd_info = DisplayFound (found);
@@ -725,8 +724,8 @@ An internal <b>YaST2</b> file is missing or corrupted.\
 		    else {
 			cont = false;
 		    }
-		
-		
+
+
 		}
 	    
 	    }
