@@ -97,7 +97,8 @@
     maplist(`e, gs,
     ``{
 	lx = regexptokenize(e, pattern);
-//	y2error(e);
+//	y2error("e = %1", e);
+//	y2error("lx = %1", lx);
 	if (size(lx) > 0 && !contains(["snd_index", "snd_enable", "snd_id"], select(lx, 1, "")))
 	{
 	    tmpmap = parse_line(select(lx, 2, ""));
