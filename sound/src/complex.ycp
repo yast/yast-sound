@@ -34,21 +34,22 @@
 
     import "Sound";
     include "sound/mixer.ycp";
+    include "sound/options.ycp"; // sound_options
 
     /**
-     * creates summary table with card labels and thier states (running/not running/dissappeared)
+     * creates summary table with card labels and thier states
+     * (running/not running/dissappeared)
      * @return list table contents
      */
-
     global define list createTable() ``{
 	list runn   = get_running_cards();
 	integer pos = 0;
-	list ret    = maplist(`e, Sound::modules_conf,
+	list ret    = maplist(map card, Sound::modules_conf,
 	``{
 	    string state = "";
 	    if (Sound::use_alsa)
 	    {
-		if (size(filter(`f, runn, ``(lookup(f, "number", -1) == pos))) !=0 )
+		if (size(filter(map f, runn, ``(f["number"]:-1 == pos))) !=0 )
 		{
 		    // to translators: "(The card is) running
 		    state = _("Running");
@@ -56,8 +57,8 @@
 	    }
 	    else
 	    {
-		string mname = lookup(e, "module", "");
-		if( haskey (SCR::Read(.proc.modules), mname) )
+		string mname = card["module"]:"";
+		if( haskey ((map)SCR::Read(.proc.modules), mname) )
 		{
 		    // to translators: "(The card is) running
 		    state = _("Running");
@@ -66,7 +67,7 @@
 
 	    if (state == "")
 	    {
-		if (lookup(e, "unique_key", "") == isa_uniq())
+		if (card["unique_key"]:"" == isa_uniq())
 		{
 		    // status of cound card
 		    state = _("Not running");
@@ -75,7 +76,8 @@
 		// card was autodetected
 		{
 		    list audio = Sound::detected_cards;
-		    audio = filter(`g, audio, ``(lookup(g, "unique_key", "") == lookup(e, "unique_key", "")));
+		    audio = filter(map g, audio,
+			``(g["unique_key"]:"" == card["unique_key"]:""));
 		    if (size(audio) != 0)
 		    {
 			// status of cound card
@@ -89,7 +91,8 @@
 		}
 	    }
 
-	    term r = `item(`id(pos), sformat("[%1]", pos), lookup(e, "model", ""), state);
+	    term r = `item(`id(pos), sformat("[%1]", pos), card["model"]:"",
+		state);
 	    pos = pos + 1;
 	    return r;
 
@@ -117,7 +120,7 @@
     global define map ComplexDialog () ``{
 	// help text
 	symbol ui = nil;
-        string helptext = lookup(STRINGS, "ComplexDialog", "");
+        string helptext = Sound::STRINGS["ComplexDialog"]:"";
 
 	y2debug(" save_info %1, agent %2", size(Sound::modules_conf), size(SCR::Dir(.audio.alsa.cards)));
 
@@ -138,13 +141,15 @@ Try to restart sound system?")))
 	list cc = createTable();
 
 	boolean show_fonts = false;
-	maplist(`e, Sound::modules_conf, ``{ if (HasFonts(e)) show_fonts = true;});
+	maplist(map card, Sound::modules_conf, ``{
+	    if (HasFonts(card)) show_fonts = true;
+	});
 
 	term con = ComplexDlgCon(cc,
-			(lookup (Sound::rc_vars, "LOAD_ALSA_SEQ", "no") == "yes"), show_fonts);
+	    (Sound::rc_vars["LOAD_ALSA_SEQ"]:"no" == "yes"), show_fonts);
 
         // dialog title
-	Wizard::SetContents (_("Sound configuration"), con, helptext, true, true);
+	Wizard::SetContents (_("Sound configuration"), con, helptext,true,true);
 	// Finish - button label
 	UI::ChangeWidget(`id(`next), `Label, Label::FinishButton());
 
@@ -164,35 +169,36 @@ Try to restart sound system?")))
 		SCR::Execute(.audio.alsa.restore, 0, 0);
 	    }
 
-	    ui = UI::`UserInput ();
+	    ui = (symbol) UI::`UserInput ();
 
 	    if (ui == `b_delete)
 	    {
 		ui = `delete;
-		// global variable card_id
-		card_id = UI::QueryWidget (`id(`configured_table),`CurrentItem);
+		Sound::card_id = (integer)
+		    UI::QueryWidget (`id(`configured_table),`CurrentItem);
 	    }
 	    else if (ui == `b_options)
 	    {
-		integer card_id = UI::QueryWidget (`id(`configured_table), `CurrentItem);
+		Sound::card_id = (integer)
+		    UI::QueryWidget (`id(`configured_table), `CurrentItem);
 
-		map entry = select(Sound::modules_conf, card_id, $[]);
+		map entry = Sound::modules_conf[Sound::card_id]:$[];
 
 		map res = sound_options(entry);
 		if (lookup(res, "ui", nil) == `next)
 		{
 		    map oldentry = entry;
 
-		    entry = lookup(res, "return", $[]);
-		    entry = add_common_options(entry, card_id);
+		    entry = res["return"]:$[];
+		    entry = add_common_options(entry, Sound::card_id);
 
 		    integer pos = 0;
-		    Sound::modules_conf = maplist(`e, Sound::modules_conf,
+		    Sound::modules_conf = maplist(map card, Sound::modules_conf,
 		    ``{
-			if (pos != card_id)
+			if (pos != Sound::card_id)
 			{
 			    pos = pos + 1;
-			    return e;
+			    return card;
 			}
 			else
 			{
@@ -213,7 +219,7 @@ Restart sound system now?
 			}
 		    }
 		}
-		else if (lookup(res, "ui", nil) == `abort || lookup(res, "ui", nil) == `cancel)
+		else if (res["ui"]:nil == `abort || res["ui"]:nil == `cancel)
 		{
 		    return $["ui" : `abort];
 		}
@@ -227,8 +233,9 @@ Restart sound system now?
 	    }
 	    else if (ui == `b_volume)
 	    {
-		integer card_id = UI::QueryWidget (`id(`configured_table), `CurrentItem);
-		map res = mixerDialog(card_id);
+		Sound::card_id = (integer)
+		    UI::QueryWidget (`id(`configured_table), `CurrentItem);
+		map res = mixerDialog(Sound::card_id);
 		if (lookup(res, "ui", nil) == `abort || lookup(res, "ui", nil) == `cancel)
                 {
                     return $["ui": `abort];
@@ -248,21 +255,14 @@ Restart sound system now?
 	    }
 	    else if (ui == `b_seq)
 	    {
-		string value = UI::QueryWidget(`id(`b_seq), `Value) ? "yes" : "no";
+		string value = (boolean)
+		    UI::QueryWidget(`id(`b_seq), `Value) ? "yes" : "no";
 		Sound::rc_vars = add(Sound::rc_vars, "LOAD_ALSA_SEQ", value);
 	    }
 	    else if (ui == `b_conf2)
 	    // add soundcard
 	    {
 		Sound::UpdateUnconfiguredCards();
-//		if (size(cards) != 0)
-//		{
-//		    cards = maplist(`e, cards, ``(add (e, "module", get_module (e))));
-//		    cards = filter(`e, cards, ``(lookup(e, "module", $[]) != $[]));
-//		    cards = filter_configured(save_info, cards);
-//		}
-
-
 		if (size(Sound::unconfigured_cards) == 0)
 		{
 		    ui = `add_manual;
@@ -293,17 +293,16 @@ Restart sound system now?
 
 // ===== MAIN =====
 
-    /**
-     * just calls ComplexDialog
-     * @return map passed from ComplexDialog
-     */
-
-    global define map sound_complex() ``{
+/**
+ * just calls ComplexDialog
+ * @return map passed from ComplexDialog
+ */
+global define map sound_complex() ``{
 
     list to_delete	= [];
     boolean config_mode = false;
 
     return ComplexDialog ();
+}
 
-}
-}
+}//EOF

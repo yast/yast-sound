@@ -19,8 +19,67 @@
 {
 
 textdomain "sound";
+
+import "Sound";
 import "Summary";
 import "Label";
+import "Wizard";
+import "Wizard_hw";
+
+include "sound/ui.ycp"; // ReallyAbort
+
+/**
+ * creates hardware-summary-like list of configured cards
+ * @return string richtext
+ * @param save_info save info
+ */
+global define string ConfCardsRT(list save_info) ``{
+    list retlist = [];
+    list conflist = [];
+    foreach(map card, save_info, ``{
+        conflist = add (conflist, card["model"]:"");
+    });
+    integer i = 0;
+    foreach(string cardname, conflist, ``{
+        retlist = add (retlist, Summary::Device (cardname,
+	// to translators: '(sound card is) Configured as snd-card-1'
+	sformat(_("Configured as snd-card-%1."), i)));
+        i = i + 1;
+    });
+    return Summary::DevicesList(retlist);
+}
+
+/**
+ * ui that displays two listbox with new and configured harwdare
+ *
+ * @param newHw list with new hardware
+ * @param confHw list with already configured hardware
+ * @return void
+ */
+global define void selectHardware (list newHw, string confHw) ``{
+    integer index = -1;
+    newHw = maplist (string cardname, newHw, ``{
+        index = index + 1;              // select first item
+        return `item(`id(index), cardname, index == 0);
+    });
+
+    // the full meaning of message is: "Add other not detected soundcard"
+    newHw = add (newHw, `item(`id(-1), _("Other (not detected)"),
+        size(newHw) == 0));
+
+    // label above list
+    term widget = Wizard_hw::DetectedContent(_("&Sound cards to configure"),
+        newHw, false,
+        // label above list
+        sformat(_("<P><B>Already configured sound cards:</B>%1</P>"),confHw)
+    );
+
+    string helptext = Sound::STRINGS["selectHardware"]:"";
+
+    // dialog header
+    Wizard::SetContents (_("Sound card configuration"), widget, helptext,
+        true, true);
+}
 
 /**
  * dialog with list of unconfigured hardware
@@ -40,7 +99,7 @@ global define map sound_select (list sound_cards, list save_info) ``{
     symbol ui = nil;
     do
     {
-	ui = UI::UserInput();
+	ui = (symbol) UI::UserInput();
 	if ((ui == `abort || ui == `cancel) && ReallyAbort())
         {
 	    return $["ui": `abort];
@@ -53,7 +112,7 @@ global define map sound_select (list sound_cards, list save_info) ``{
     if (ui == `configure_button)
     {
 	type = `new;
-	index = UI::QueryWidget(`id(`detected_selbox), `CurrentItem);
+	index = (integer)UI::QueryWidget(`id(`detected_selbox), `CurrentItem);
 	ui = `configure;
     }
 

@@ -37,7 +37,60 @@
     import "Sound";
 
     include "sound/joy_dialog.ycp";
+    include "sound/volume_routines.ycp"; // PlayTest, setVolume
+    include "sound/routines.ycp"; // FontsInstalled, HasFonts, InstallFonts
 
+    /**
+     *	UI controls for volume setting dialog
+     *
+     *  @param save_entry map with card info
+     *  @param vol initial volume (0-100)
+     *  @return term volume dialog contents
+     */
+    global define term VolumeCon (map save_entry , integer vol) ``{
+
+	term slider = `IntField(`id(`volume), `opt(`notify),
+	    // volume slider label
+	    _("&Volume"), 0, 100, vol);
+
+	if (UI::HasSpecialWidget(`Slider))
+	{
+	    slider = `Slider (`id(`volume), `opt(`notify),
+		// volume slider label
+		_("&Volume"), 0, 100, vol);
+	}
+
+	term con = `HBox (
+	    `HSpacing (3),
+	    `VBox (
+		`VSpacing (),
+		`Top (`VBox(
+		    // dialog title
+		    `Left(`Label(_("Settings for sound card"))),
+		    `Label (`opt(`outputField), save_entry["model"]:"")
+		)),
+		// frame label
+		`Frame(_("Volume adjust and test"), `HBox(
+		    `HSpacing (),
+		    `VBox (
+			`VSpacing (0.5),
+			slider,
+			`VSpacing (),
+			// Test - button label
+			`PushButton (`id (`test), `opt(`key_F6), _("&Test")),
+			`VSpacing (0.5),
+			// message label
+			`Label(_("Press 'Test' to start playing sound sample")),
+			`VSpacing (0.5)
+		    ),
+		    `HSpacing ()
+		)),
+		`VStretch ()
+	    ),
+	    `HSpacing (3)
+	);
+	return con;
+    }
 
     /**
      * This dialog simply reads user input and calls apropriate set funtion
@@ -45,9 +98,10 @@
      * @param finish show 'finish' button instead of 'next'
      * @return symbol next dialog
      */
-    global define symbol VolumeDialog (boolean finish) ``{
+    global define symbol VolumeDialog (map save_entry, boolean finish,
+				       integer card_id) ``{
 
-	string help_text	= STRINGS["VolumeDialog"]:"";
+	string help_text	= Sound::STRINGS["VolumeDialog"]:"";
 	integer vol		= 50;
 	term con		= VolumeCon(save_entry, vol);
 
@@ -70,18 +124,20 @@
 	    InstallFonts("", false);
 	}
 
+	string modname = save_entry["module"]:"snd-dummy";
 	string master_elem = Sound::db_modules[modname, "main_volume"]:"Master";
         setVolume (master_elem, card_id, vol);
 	// some cards use Headphone instead of Master (bug #26539):
 	setVolume ("Headphone", card_id, vol);
 
+	symbol ui = nil;
 	do
 	{
-	    ui =  UI::UserInput ();
+	    ui = (symbol) UI::UserInput ();
 
 	    if (ui == `volume)
 	    {
-		vol = UI::QueryWidget(`id(`volume), `Value );
+		vol = (integer) UI::QueryWidget(`id(`volume), `Value );
 		setVolume (master_elem, card_id, vol);
 		setVolume ("Headphone", card_id, vol);
 	    }
@@ -141,7 +197,7 @@
 	    Report::Error (err);
 	    return `back;
 	}
-	string help_text	= STRINGS["ErrorDialog"]:"";
+	string help_text	= Sound::STRINGS["ErrorDialog"]:"";
 	string additional	= "";
 
 	if (save_entry["module"]:"" == "snd-cs461x")
@@ -173,9 +229,10 @@ its parameters using the 'Advanced setup'.");
 
 	UI::SetFocus(`id(`back));
 
+	symbol ui = nil;
 	repeat
 	{
-	    ui =  UI::UserInput ();
+	    ui =  (symbol)UI::UserInput ();
             if (ui == `cancel || ui == `abort)
             {
                 if (ReallyAbort())
@@ -258,7 +315,7 @@ global define map sound_volume (map save_entry, integer card_id, boolean finish,
 	{
 	    while (true)
 	    {
-		ui = VolumeDialog (finish);
+		ui = VolumeDialog (save_entry, finish, card_id);
 		if (ui != `joystick)
 		{
 		    break;

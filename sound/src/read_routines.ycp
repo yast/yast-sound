@@ -17,6 +17,8 @@
 
 {
 
+    include "sound/routines.ycp";// for is_snd_alias()
+
     /**
      * tries to determine card model name from audio.alsa agent
      * @param card_id card id
@@ -24,7 +26,7 @@
      */
     global define string read_card_name_from_alsa(integer card_id) ``{
 	path pth = topath(sformat(".audio.alsa.cards.%1.name", card_id));
-	string name = SCR::Read(pth);
+	string name = (string) SCR::Read(pth);
 	if (name == nil)
 	{
 	    return "Sound card";
@@ -92,7 +94,7 @@
     global define list read_save_info () ``{
 
         list save	= [];			// structure to save
-	list aliases	= SCR::Read(.modules.alias);
+	list aliases	= (list) SCR::Read(.modules.alias);
 
 	aliases = filter(string a, aliases, ``(is_snd_alias(a)));
 
@@ -105,23 +107,24 @@
 	foreach (string a, aliases, ``{
 
 	    position		= position + 1;
-	    string modname	= SCR::Read(add (.modules.alias, a));
+	    string modname	= (string) SCR::Read(add (.modules.alias, a));
 	    integer opt_pos	= mod_occur[modname]:0;
 
 	    mod_occur	= add (mod_occur, modname, mod_occur[modname]:0 + 1);
 
-	    map options = SCR::Read(add (.modules.options, modname));
-	    options = mapmap (string name, string val, options, ``{
+	    map opts = (map) SCR::Read(add (.modules.options, modname));
+	    map options = $[];
+	    foreach (string name, string val, opts, ``{
 		list vals = splitstring(val, ",");
 		if (size(val) > opt_pos)
 		{
-		    return [name, select(vals, opt_pos, "")];
+		    options = add (options, name, vals[opt_pos]:"");
 		}
-		return [nil, nil];
 	    });
 
 	    // read card info from the comment string
-	    string comment = SCR::Read(add (add (.modules.alias,a), "comment"));
+	    string comment =
+		(string)SCR::Read(add (add (.modules.alias,a), "comment"));
 	    string uniq		= "";
 	    string model	= "";
 	    map res		= extractUniqueKey(comment);

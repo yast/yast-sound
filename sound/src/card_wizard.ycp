@@ -18,10 +18,13 @@
 
 import "Sound";
 
-/**
- * configuration map of current card
- */
-list save_entry	= [];
+
+include "sound/ui.ycp";
+include "sound/options.ycp"; // sound_options
+include "sound/volume.ycp"; // sound_volume
+include "sound/routines.ycp"; // add_common_options, add_alias
+
+include "wizard/sequencer.ycp";
 
 /**
  * wrapper function for running first card config dialog (There will be shown
@@ -29,8 +32,8 @@ list save_entry	= [];
  */
 global define symbol _showName (integer card_id, integer flags) ``{
 
-    string modelname	= save_entry["model"]:"";
-    string modname	= save_entry["module"]:"";
+    string modelname	= Sound::save_entry["model"]:"";
+    string modname	= Sound::save_entry["module"]:"";
     boolean has_joy	= false;
 
     if (Sound::db_modules[modname, "joystick"]:$[] != $[])
@@ -39,7 +42,7 @@ global define symbol _showName (integer card_id, integer flags) ``{
     }
 
     map res	= DisplayName (
-	modelname, save_entry["alias"]:"", card_id, flags, has_joy);
+	modelname, Sound::save_entry["alias"]:"", card_id, flags, has_joy);
 
     symbol ui	= res["ui"]:nil;
     return ui;
@@ -50,12 +53,12 @@ global define symbol _showName (integer card_id, integer flags) ``{
  */
 global define symbol _options (integer card_id) ``{
 
-    map res	= sound_options(save_entry);
+    map res	= sound_options(Sound::save_entry);
     symbol ui	= res["ui"]:nil;
     if (ui == `next)
     {
-	save_entry = res["return"]:$[];
-        save_entry = add_common_options(save_entry, card_id);
+	Sound::save_entry = res["return"]:$[];
+        Sound::save_entry = add_common_options(Sound::save_entry, card_id);
     }
     return ui;
 }
@@ -65,7 +68,7 @@ global define symbol _options (integer card_id) ``{
  */
 global define symbol _quick (integer card_id, boolean finish, list save_info)
 ``{
-    map res	= sound_volume (save_entry, card_id, finish, true, save_info);
+    map res = sound_volume (Sound::save_entry, card_id, finish, true,save_info);
     symbol ui	= res["ui"]:nil;
     return ui;
 }
@@ -75,19 +78,10 @@ global define symbol _quick (integer card_id, boolean finish, list save_info)
  */
 global define symbol _volume (integer card_id, boolean finish, list save_info)
 ``{
-    map res	= sound_volume(save_entry, card_id, finish, false, save_info);
+    map res = sound_volume(Sound::save_entry, card_id, finish, false,save_info);
     symbol ui	= res["ui"]:nil;
     return ui;
 }
-
-/**
- * wrapper function for setting the volume during expert config (after options)
- *
-global define symbol _optVolume() ``{
-    return _volume();
-}
-*/
-
 
 /**
  * Wizard steps: 1. displayname<br>
@@ -143,13 +137,13 @@ global define map OneCardWizard (map card_entry, integer card_id, integer flags,
 	    ]
 	];
 
-    save_entry	= eval (card_entry);
-    map opts	= save_entry["options"]:$[];
-    save_entry	= add_common_options (save_entry, card_id);
-    save_entry	= add_alias (save_entry, card_id);
+    Sound::save_entry	= (map) eval (card_entry);
+    map opts		= Sound::save_entry["options"]:$[];
+    Sound::save_entry	= add_common_options (Sound::save_entry, card_id);
+    Sound::save_entry	= add_alias (Sound::save_entry, card_id);
 
     symbol ui	= WizardSequencer (aliases, sequence);
-    return $["ui": ui, "return": save_entry];
+    return $["ui": ui, "return": Sound::save_entry];
 }
 
 

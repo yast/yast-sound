@@ -38,6 +38,9 @@
     // label for `next button in joystick configuration dialog
     symbol label = `next;
 
+    // abort block for read/write dialogs
+    block<boolean> abort_block = ``{ return false; };
+
     /**
      * First cofiguration dialog - if more than one sound card which support
      * joystick is found display them, if there is exactly one card skip to
@@ -105,14 +108,14 @@
 	    {
 	        // start sound module - joystick can be configured there
 	        // so after sound config abort this module
-	        WFM::CallModule("sound", []);
+	        WFM::CallFunction("sound", []);
 	    }
 	    return `abort;
 	}
 	else					// more sound cards
 	{
 	    list tcont = maplist (map card, filtered, ``{
-	        map jconf	= Joystick::joystick[ card["card_no"]:0 ]:0;
+	        map jconf	= Joystick::joystick[ card["card_no"]:0 ]:$[];
 	        string jmodel	= jconf["model"]:"";
 
 	        // translate generic joystick
@@ -155,7 +158,7 @@
 
 	do
 	{
-	    ret = UI::UserInput();
+	    ret = (symbol) UI::UserInput();
 	}
 	while (ret != `next && ret != `abort && ret != `back &&
 	       ret != `cancel && ret != `config);
@@ -164,7 +167,7 @@
 	{
 	    ret = `abort;
 	}
-	selected_card = UI::QueryWidget(`id(`cards), `CurrentItem);
+	selected_card = (integer) UI::QueryWidget(`id(`cards), `CurrentItem);
 
 	return ret;
     }
@@ -174,7 +177,7 @@
      * @return symbol Return `next (for wizard sequencer)
      */
     global define symbol saveconfig() ``{
-	Joystick::Write(``{});
+	Joystick::Write (abort_block);
 	return `next;
     }
 
@@ -218,7 +221,7 @@
     Progress::on();
 
     // read joystick configuration
-    Joystick::Read(``{});
+    Joystick::Read(abort_block);
 
     y2debug("Read joystick configuration: %1", Joystick::joystick);
 

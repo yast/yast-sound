@@ -24,209 +24,7 @@
     include "sound/joysticks.ycp";
     include "sound/ui.ycp";
 
-    /**
-     * Joystick configuration dialog.
-     * Configuration of joystick attached to specified sound card.
-     * @param card_id Sound card card_id
-     * @param button Label for `next button: `finish, `ok or `next
-     * @return symbol Id of pressed button in the dialog
-     */
-    global define symbol joy_dialog (integer card_id, symbol button) ``{
-
-	// item in joystick types
-	string nonejoy = _("No joystick");
-
-	if (card_id == nil)
-	{
-	    return `back;
-	}
-
-	list jcards = Sound::GetSoundCardListWithJoy();
-
-	// find card name
-	string cardname = "";
-	foreach (map card, jcards, ``{
-	    if (card["card_no"]:-1 == card_id)
-		cardname = card["name"]:"";
-	});
-
-	// dialog header
-	string caption = _("Joystick configuration") +
-	    sformat (" - %1 (snd-card-%2)", cardname, card_id);
-
-	string helptext =
-	// help text for joystick configuration 1/4
-_("<P>In this dialog, specify your joystick type. If your
-joystick type is not in the list, select <B>Generic Analog Joystick</B>.</p>
-<p>You will not find any USB joysticks here. If you have a USB device, just plug in the joystick and start using it.</P>
-") +
-
-	// help text for joystick configuration 2/4
-_("<P>To remove the configured joystick from the system
-or if you do not have a joystick, select <B>No joystick</B>.</P>
-") +
-
-	// help text for joystick configuration 3/4
-_("<P>Press <B>Test</B> to test the functionality of the selected joystick type.</P>") +
-
-	// help text for joystick configuration 4/4
-_("<P><B>Note:</B> Connect your joystick to your computer
-before pressing <B>Test</B> or <B>Next</B>.</P>");
-
-	map joy		= Joystick::joystick[card_id]:$[];
-	string mod	= joy["model"]:"";
-
-	y2milestone("Joystick configuration of snd-card-%1 started", card_id);
-
-	// translate model from /etc/sysconfig/joystick
-	if (mod == Joystick::generic_joystick)
-	{
-	    mod = Joystick::generic_joystick_translated;
-	}
-
-	// set none joystick
-	if (mod == "")
-	{
-	    mod = nonejoy;
-	}
-
-	list joylist = [];
-	joylist = flatten (maplist(string modname, list models, JoystickDB, ``(
-	    maplist(string model, models, ``([modname, model]))
-	)));
-
-	joylist = sort(list j1, list j2, joylist, ``( j1[1]:"" <= j2[1]:""));
-
-	joylist = prepend (joylist,
-	    ["analog", Joystick::generic_joystick_translated]);
-
-	joylist = prepend(joylist, ["", nonejoy]);
-
-	y2debug("joylist: %1", joylist);
-
-	integer index = 0;
-	list boxitems = [];
-
-	foreach (list l, joylist, ``{
-
-	    string model = l[1]:"";
-	    if (mod == model)
-	    {
-		// preselect item
-		boxitems = add(boxitems, `item(`id(index), model, true));
-	    }
-	    else
-	    {
-		boxitems = add(boxitems, `item(`id(index), model));
-	    }
-	    index = index + 1;
-	});
-
-	y2debug("for widget: %1", boxitems);
-
-	term contents = `VBox(
-	    `VSpacing(3),
-	    `HBox(
-		`HSpacing(3),
-		// label above list of joystick types
-		`SelectionBox(`id(`os), _("&Select your joystick type:"),
-		    boxitems),
-		`HSpacing(3),
-		// button label
-		`PushButton(`id(`test), `opt(`key_F6), _("&Test")),
-		`HSpacing(3)
-	    ),
-	    `VSpacing(3)
-	);
-
-	map nextbutton = $[
-	    `finish	: Label::FinishButton(),
-	    `ok		: Label::OKButton(),
-	    `next	: Label::NextButton()
-	];
-	Wizard::ReplaceNextButton (`PushButton(`id(`next), `opt(`default),
-	    nextbutton[button]:Label::NextButton()));
-
-	Wizard::SetContents (caption, contents, helptext, true, true);
-
-	symbol s = nil;
-	do
-	{
-	    s = UI::UserInput();
-
-	    if (s == `abort && !ReallyAbort())
-	    {
-		s = `skip_event;
-	    }
-
-	    if (s == `next && UI::QueryWidget(`id(`os), `CurrentItem) == nil)
-	    {
-		// warning message - user did not select any joystick type
-		Popup::Warning(_("Select the joystick type from the list
-before pressing Next.
-
-"));
-		s = `skip;
-	    }
-
-	    if (s == `test)
-	    {
-		integer idx = UI::QueryWidget(`id(`os), `CurrentItem);
-		string joymod = joylist[idx,0]:"";
-		if (joymod == "")
-		    // error message (no joystick selected)
-		    Popup::Message(_("Select the joystick to test."));
-		else if (Require::RequireAndConflict(["joystick"],[],
-// popup: %1 is required application
-_("<p>To test your joystick, the <b>%1</b> package is required.
-It is currently not installed. Install it now?</p>")))
-		    joy_test_popup (card_id, idx, joymod);
-	    }
-
-	} while (!contains([`next, `back, `abort, `cancel], s));
-
-	if (s == `next)
-	{
-	    string modname	= Sound::modules_conf[card_id, "module"]:"";
-	    map joy_entry	= Sound::GetJoystickSettings (modname);
-	    integer joymodidx	= UI::QueryWidget(`id(`os), `CurrentItem);
-	    string joymod	= joylist[joymodidx,0]:"";
-
-	    if (joymod == "")
-	    {
-		// selected none joystick
-		joy_entry = $[];
-	    }
-	    else
-	    {
-		string model = joylist[joymodidx, 1]:"";
-
-		// do not translate model in /etc/sysconfig/joystick
-		if (model == Joystick::generic_joystick_translated)
-		{
-		    model = Joystick::generic_joystick;
-		}
-
-		y2debug("selected joy module: %1, model: %2", joymod, model);
-
-		joy_entry = add (joy_entry, "JOYSTICK_MODULE", joymod);
-		joy_entry = add (joy_entry, "model", model);
-	    }
-
-	    Joystick::joystick[card_id] = joy_entry;
-	    Joystick::modified = true;
-
-	    y2milestone("New joystick configuration: %1", joy_entry);
-	}
-
-	// restore previous `next button label (only if label was not Finish)
-	if (button != `finish)
-	{
-	    Wizard::RestoreNextButton();
-	}
-
-	return s;
-    }
+    global list joylist = [];
 
 /**
  * Dialog for joystick testing.
@@ -252,7 +50,7 @@ global define boolean joy_test_popup (integer card_id, integer joymodidx,
     ));
 
     // store old joystick configuration:
-    list current_conf = eval (Joystick::joystick);
+    list current_conf = (list) eval (Joystick::joystick);
 
     // if new joystick type was selected:
     boolean testing_new = false;
@@ -343,10 +141,10 @@ and press some of its buttons several times.
 		sformat("/usr/bin/jstest --event /dev/input/js%1", js_id));
 	    sleep (500);
 
-	    if (SCR::Read(.background.output_open) &&
-		SCR::Read(.background.newlines)>0)
+	    if ((boolean) SCR::Read(.background.output_open) &&
+		(integer) SCR::Read(.background.newlines)>0)
 	    {
-		list test_output	= SCR::Read(.background.newout);
+		list test_output	= (list)SCR::Read(.background.newout);
 		string last_output	= test_output [size (test_output)-1]:"";
 		last_output		= deletechars (last_output, ",");
 		list listed_output	= splitstring (last_output," ");
@@ -384,8 +182,8 @@ and press some of its buttons several times.
         sformat("/usr/bin/jstest --event /dev/input/js%1",js_id));
 
     // read the output of joystick initialization
-    while (SCR::Read(.background.output_open) &&
-	   SCR::Read(.background.newlines) == 0)
+    while ((boolean)SCR::Read(.background.output_open) &&
+	   (integer)SCR::Read(.background.newlines) == 0)
     {
         ret = UI::PollInput();
         if (ret != nil)
@@ -404,7 +202,7 @@ and press some of its buttons several times.
         }
     }
     // get the number of axes and buttons from the initial jstest output line
-    list test_output	= SCR::Read(.background.newout);
+    list test_output	= (list)SCR::Read(.background.newout);
     string last_output	= test_output[0]:"";
     list listed_output	= splitstring (last_output," ");
     integer axes	= 2;
@@ -477,13 +275,13 @@ and press some of its buttons several times.
     // read the jstest output until "OK" button is pushed
     do
     {
-        if (SCR::Read(.background.output_open) &&
-	    SCR::Read(.background.newlines)>0)
+        if ((boolean)SCR::Read(.background.output_open) &&
+	    (integer)SCR::Read(.background.newlines)>0)
         {
             // read the output line from jstest:
-            test_output		= SCR::Read(.background.newout);
+            test_output		= (list)SCR::Read(.background.newout);
             // select the last item of the list:
-            last_output		= test_output [ test_output - 1 ]:"";
+            last_output		= test_output [ size(test_output) - 1 ]:"";
             last_output		= deletechars (last_output, ",");
 
             listed_output	= splitstring (last_output," ");
@@ -529,6 +327,211 @@ and press some of its buttons several times.
     UI::CloseDialog();
     return true;
 }
+
+
+    /**
+     * Joystick configuration dialog.
+     * Configuration of joystick attached to specified sound card.
+     * @param card_id Sound card card_id
+     * @param button Label for `next button: `finish, `ok or `next
+     * @return symbol Id of pressed button in the dialog
+     */
+    global define symbol joy_dialog (integer card_id, symbol button) ``{
+
+	// item in joystick types
+	string nonejoy = _("No joystick");
+
+	if (card_id == nil)
+	{
+	    return `back;
+	}
+
+	list jcards = Sound::GetSoundCardListWithJoy();
+
+	// find card name
+	string cardname = "";
+	foreach (map card, jcards, ``{
+	    if (card["card_no"]:-1 == card_id)
+		cardname = card["name"]:"";
+	});
+
+	// dialog header
+	string caption = _("Joystick configuration") +
+	    sformat (" - %1 (snd-card-%2)", cardname, card_id);
+
+	string helptext =
+	// help text for joystick configuration 1/4
+_("<P>In this dialog, specify your joystick type. If your
+joystick type is not in the list, select <B>Generic Analog Joystick</B>.</p>
+<p>You will not find any USB joysticks here. If you have a USB device, just plug in the joystick and start using it.</P>
+") +
+
+	// help text for joystick configuration 2/4
+_("<P>To remove the configured joystick from the system
+or if you do not have a joystick, select <B>No joystick</B>.</P>
+") +
+
+	// help text for joystick configuration 3/4
+_("<P>Press <B>Test</B> to test the functionality of the selected joystick type.</P>") +
+
+	// help text for joystick configuration 4/4
+_("<P><B>Note:</B> Connect your joystick to your computer
+before pressing <B>Test</B> or <B>Next</B>.</P>");
+
+	map joy		= Joystick::joystick[card_id]:$[];
+	string mod	= joy["model"]:"";
+
+	y2milestone("Joystick configuration of snd-card-%1 started", card_id);
+
+	// translate model from /etc/sysconfig/joystick
+	if (mod == Joystick::generic_joystick)
+	{
+	    mod = Joystick::generic_joystick_translated;
+	}
+
+	// set none joystick
+	if (mod == "")
+	{
+	    mod = nonejoy;
+	}
+
+	joylist = maplist(string modname, list models, JoystickDB, ``(
+	    maplist(string model, models, ``([modname, model]))
+	));
+	joylist = flatten ((list<list>)joylist);
+
+	joylist = sort (list j1, list j2, joylist, ``( j1[1]:"" <= j2[1]:""));
+
+	joylist = prepend (joylist,
+	    ["analog", Joystick::generic_joystick_translated]);
+
+	joylist = prepend(joylist, ["", nonejoy]);
+
+	y2debug("joylist: %1", joylist);
+
+	integer index = 0;
+	list boxitems = [];
+
+	foreach (list l, joylist, ``{
+
+	    string model = l[1]:"";
+	    if (mod == model)
+	    {
+		// preselect item
+		boxitems = add(boxitems, `item(`id(index), model, true));
+	    }
+	    else
+	    {
+		boxitems = add(boxitems, `item(`id(index), model));
+	    }
+	    index = index + 1;
+	});
+
+	y2debug("for widget: %1", boxitems);
+
+	term contents = `VBox(
+	    `VSpacing(3),
+	    `HBox(
+		`HSpacing(3),
+		// label above list of joystick types
+		`SelectionBox(`id(`os), _("&Select your joystick type:"),
+		    boxitems),
+		`HSpacing(3),
+		// button label
+		`PushButton(`id(`test), `opt(`key_F6), _("&Test")),
+		`HSpacing(3)
+	    ),
+	    `VSpacing(3)
+	);
+
+	map nextbutton = $[
+	    `finish	: Label::FinishButton(),
+	    `ok		: Label::OKButton(),
+	    `next	: Label::NextButton()
+	];
+	Wizard::ReplaceNextButton (`PushButton(`id(`next), `opt(`default),
+	    nextbutton[button]:Label::NextButton()));
+
+	Wizard::SetContents (caption, contents, helptext, true, true);
+
+	symbol s = nil;
+	do
+	{
+	    s = (symbol) UI::UserInput();
+
+	    if (s == `abort && !ReallyAbort())
+	    {
+		s = `skip_event;
+	    }
+
+	    if (s == `next && UI::QueryWidget(`id(`os), `CurrentItem) == nil)
+	    {
+		// warning message - user did not select any joystick type
+		Popup::Warning(_("Select the joystick type from the list
+before pressing Next.
+
+"));
+		s = `skip;
+	    }
+
+	    if (s == `test)
+	    {
+		integer idx = (integer) UI::QueryWidget(`id(`os), `CurrentItem);
+		string joymod = joylist[idx,0]:"";
+		if (joymod == "")
+		    // error message (no joystick selected)
+		    Popup::Message(_("Select the joystick to test."));
+		else if (Require::RequireAndConflict(["joystick"],[],
+// popup: %1 is required application
+_("<p>To test your joystick, the <b>%1</b> package is required.
+It is currently not installed. Install it now?</p>")))
+		    joy_test_popup (card_id, idx, joymod);
+	    }
+
+	} while (!contains([`next, `back, `abort, `cancel], s));
+
+	if (s == `next)
+	{
+	    string modname	= Sound::modules_conf[card_id, "module"]:"";
+	    map joy_entry	= Sound::GetJoystickSettings (modname);
+	    integer joymodidx = (integer)UI::QueryWidget(`id(`os),`CurrentItem);
+	    string joymod	= joylist[joymodidx,0]:"";
+
+	    if (joymod == "")
+	    {
+		// selected none joystick
+		joy_entry = $[];
+	    }
+	    else
+	    {
+		string model = joylist[joymodidx, 1]:"";
+
+		// do not translate model in /etc/sysconfig/joystick
+		if (model == Joystick::generic_joystick_translated)
+		{
+		    model = Joystick::generic_joystick;
+		}
+
+		y2debug("selected joy module: %1, model: %2", joymod, model);
+
+		joy_entry = add (joy_entry, "JOYSTICK_MODULE", joymod);
+		joy_entry = add (joy_entry, "model", model);
+	    }
+
+	    Joystick::joystick[card_id] = joy_entry;
+	    Joystick::modified = true;
+
+	    y2milestone("New joystick configuration: %1", joy_entry);
+	}
+
+	// restore previous `next button label (only if label was not Finish)
+	if (button != `finish)
+	{
+	    Wizard::RestoreNextButton();
+	}
+
+	return s;
+    }
 
 /* EOF */
 }

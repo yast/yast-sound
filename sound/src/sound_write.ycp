@@ -62,7 +62,6 @@
 
 
     include "sound/write_routines.ycp";
-    include "sound/alsa_routines.ycp";
 
     import "Progress";
     import "Wizard";
@@ -73,7 +72,7 @@
 
     // ==== MAIN ====
 
-    map settings	= WFM::Args(0);
+    map settings	= (map) WFM::Args(0);
     map rc_values	= settings["rc_vars"]:$[];
     list save_info	= settings["modules_conf"]:[];
     list vol_settings	= settings["volume_settings"]:[];
@@ -162,7 +161,7 @@
 
     Progress::NextStage();
 
-    if (write_only && haskey (settings, "volume_settings"))
+    if (Sound::write_only && haskey (settings, "volume_settings"))
     {
 	set_vol_settings (vol_settings);
     }
@@ -181,8 +180,11 @@
     sleep(10);
     Progress::NextStage();
 
+    // abort block for read/write dialogs
+    block<boolean> abort_block = ``{ return false; };
+
     // write joystick configuration
-    Joystick::Write (``{ return false;});
+    Joystick::Write (abort_block);
 
     if (size(configuredcards) > 0)
     {

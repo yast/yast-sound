@@ -22,9 +22,71 @@
     import "Sound";
     import "Joystick";
     import "Wizard";
-    import "Wizard_hw";
     import "Popup";
     import "Label";
+
+    /**
+     *  dialog to be displayed when user presses 'Abort' button
+     *	@return boolean yes/no
+     */
+    global define boolean ReallyAbort() ``{
+	return Popup::ReallyAbort (Sound::Changed() || Joystick::Changed());
+    }
+
+    /**
+     * quick config dialog widget
+     * @param name card model
+     * @param cname alias for modules conf
+     * @param cpos position of the card
+     * @param has_joy If true checkbox for joystick configuration is added
+     * @return term with widget
+     */
+    global define term AutoconfDlg (string name, string cname, integer cpos,
+				    boolean has_joy) ``{
+	string clab = "";
+	if (cpos < 3)
+	{
+	    clab = "\n" + sformat (Sound::STRINGS["soundCount", cpos]:"",cname);
+	}
+	else
+	{
+	    clab = "\n" + sformat(Sound::STRINGS["soundCount", 3]:"", cname,
+		cpos + 1);
+	}
+
+	term jcheckbox = (!has_joy) ? `Empty() :
+	    // push button label
+	    `Left (`CheckBox(`id(`joystick), _("&Configure joystick")));
+
+	term con = `VBox (
+	    `VSpacing (1),
+	    // this is the first part of message "The sound card 'cardname'
+	    // will be configured as the first snd card"
+	    `Label (`opt (`hstretch), _("The sound card\n")),
+	    `HBox (`HSpacing (5), `Label (`opt (`hstretch), name)),
+	    `Label (`opt (`hstretch), clab),
+            `VSpacing (1),
+	    `HBox (`HSpacing (5),
+	      `RadioButtonGroup (`id (`action), `VBox (
+		`RadioButton (`id (`quick), `opt (`hstretch, `notify),
+		    // radio button label - type of setup
+		    _("&Quick automatic setup"), true),
+                `VSpacing (0.3),
+                `RadioButton (`id (`normal), `opt (`hstretch, `notify),
+		    // radio button label - type of setup
+		    _("Normal &setup")),
+                `VSpacing (0.3),
+                `RadioButton (`id (`options), `opt (`hstretch, `notify),
+		    // radio button label - type of setup
+		    _("Advanced setup with possibility to change &options")),
+		`VSpacing (3),
+		jcheckbox
+              ))
+	    ),
+	    `VStretch ()
+        );
+	return con;
+    }
 
     /**
      *  DisplayName
@@ -39,7 +101,7 @@
     global define map DisplayName (string name, string cname, integer cpos,
 				   integer flags, boolean has_joy) ``{
 
-	string helptext	= STRINGS["DisplayName"]:"";
+	string helptext	= Sound::STRINGS["DisplayName"]:"";
 	term con	= AutoconfDlg (name, cname, cpos, has_joy);
 	// dialog header
 	Wizard::SetContents (_("Sound card configuration"), con,
@@ -82,21 +144,22 @@
 		    return $["ui" : `abort];
 		}
 	    }
-	    input = UI::UserInput();
+	    input = (symbol) UI::UserInput();
 
 	} while (input != `next && input !=`back);
 
 	symbol output = input;
 	if (input == `next)
 	{
-	    output = UI::QueryWidget(`id(`action), `CurrentButton);
+	    output = (symbol) UI::QueryWidget(`id(`action), `CurrentButton);
 	    if (output == `normal)
 	    {
 		output = `next;
 	    }
 	    if (has_joy == true)
 	    {
-		Sound::conf_joystick = UI::QueryWidget(`id(`joystick), `Value);
+		Sound::conf_joystick =
+		    (boolean)UI::QueryWidget(`id(`joystick), `Value);
 	    }
 	    else
 	    {
@@ -105,6 +168,61 @@
 	}
 	return $["ui" : output];
     }
+
+    /**
+     * quick conf dialog widget
+     * @param name card model
+     * @param cname card alias for module.conf
+     * @param cpos card position
+     * @param has_joy If true checkbox for joystick configuration is added
+     * @return term widget
+     */
+    global define term QuickconfDlg (string name, string cname, integer cpos,
+				     boolean has_joy) ``{
+        string clab = "";
+        if (cpos < 3)
+        {
+            clab = "\n" + sformat(Sound::STRINGS["soundCount", cpos]:"", cname);
+        }
+        else
+        {
+            clab = "\n" + sformat(Sound::STRINGS["soundCount", 3]:"", cname, cpos + 1);
+        }
+
+	term jcheckbox = (!has_joy) ? `Empty() :
+	    // push button label
+	    `Left (`CheckBox(`id(`joystick), _("&Configure joystick")));
+
+        term con = `VBox (
+	    `VSpacing (1),
+            // this is the first part of message "The sound card 'cardname'
+	    // will be configured as the first snd card"
+            `Label (`opt (`hstretch), _("The sound card\n")),
+            `HBox (`HSpacing (5), `Label (`opt (`hstretch), name)),
+            `Label (`opt (`hstretch), clab),
+            `VSpacing (1),
+            `HBox (`HSpacing (5),
+	      `RadioButtonGroup (`id (`action),`VBox (
+		`RadioButton (`id (`quick), `opt (`hstretch, `notify),
+		    // radio button label - type of setup
+		    _("&Quick automatic setup"), true),
+                `VSpacing (0.3),
+                `RadioButton (`id (`normal), `opt (`hstretch, `notify),
+		    // radio button label - type of setup
+		    _("Normal &setup")),
+		`VSpacing (0.3),
+                `RadioButton (`id (`intro), `opt (`hstretch, `notify),
+		    // radio button label - type of setup
+		    _("&More detailed installation of sound cards")),
+		`VSpacing(3),
+		jcheckbox
+              ))
+	    ),
+	    `VStretch ()
+        );
+        return con;
+    }
+
 
     /**
      * quick config dialog (is shown when only one card has been detected0
@@ -117,7 +235,7 @@
     global define map quickConfig(string name, string cname, integer cpos,
 				  boolean has_joy) ``{
 
-        string helptext = STRINGS["quickConfig"]:"";
+        string helptext = Sound::STRINGS["quickConfig"]:"";
         term con	= QuickconfDlg (name, cname, cpos, has_joy);
 	// dialog header
         Wizard::SetContents (_("Sound card configuration"), con,
@@ -134,7 +252,7 @@
                     return $["ui" : `abort];
                 }
             }
-            input = UI::UserInput();
+            input = (symbol) UI::UserInput();
 
         } while (input != `next && input != `back);
 
@@ -143,115 +261,16 @@
         {
 	    if (has_joy == true)
 	    {
-		Sound::conf_joystick = UI::QueryWidget(`id(`joystick), `Value);
+		Sound::conf_joystick =
+		    (boolean) UI::QueryWidget(`id(`joystick), `Value);
 	    }
 	    else
 	    {
 		Sound::conf_joystick = false;
 	    }
-            output = UI::QueryWidget(`id(`action), `CurrentButton);
+            output = (symbol) UI::QueryWidget(`id(`action), `CurrentButton);
         }
         return $["ui" : output];
-    }
-
-    /**
-     *	UI controls for volume setting dialog
-     *
-     *  @param save_entry map with card info
-     *  @param vol initial volume (0-100)
-     *  @return term volume dialog contents
-     */
-    global define term VolumeCon (map save_entry , integer vol) ``{
-
-	term slider = `IntField(`id(`volume), `opt(`notify),
-	    // volume slider label
-	    _("&Volume"), 0, 100, vol);
-
-	if (UI::HasSpecialWidget(`Slider))
-	{
-	    slider = `Slider (`id(`volume), `opt(`notify),
-		// volume slider label
-		_("&Volume"), 0, 100, vol);
-	}
-
-	term con = `HBox (
-	    `HSpacing (3),
-	    `VBox (
-		`VSpacing (),
-		`Top (`VBox(
-		    // dialog title
-		    `Left(`Label(_("Settings for sound card"))),
-		    `Label (`opt(`outputField), save_entry["model"]:"")
-		)),
-		// frame label
-		`Frame(_("Volume adjust and test"), `HBox(
-		    `HSpacing (),
-		    `VBox (
-			`VSpacing (0.5),
-			slider,
-			`VSpacing (),
-			// Test - button label
-			`PushButton (`id (`test), `opt(`key_F6), _("&Test")),
-			`VSpacing (0.5),
-			// message label
-			`Label(_("Press 'Test' to start playing sound sample")),
-			`VSpacing (0.5)
-		    ),
-		    `HSpacing ()
-		)),
-		`VStretch ()
-	    ),
-	    `HSpacing (3)
-	);
-	return con;
-    }
-
-    /**
-     *	UI controls for options setting dialog
-     *
-     *  @param cardlabel card model string
-     *  @param itemized_descriptions option list (preformated using
-     *		'create_table' with tripples: description, name, value)
-     *  @param current_option_name initially selected item name
-     *  @param current_option_value value of current option
-     *  @return term options dialog contents
-     *  @see options#OptionsDialog
-     */
-
-    global define term OptionsCon (string cardlabel, list itemized_descriptions,
-		    string current_option_name, string current_option_value) ``{
-
-	return `HBox (
-	    `HSpacing (3),
-	    `VBox (
-		`VSquash(`Top(`Label (`opt(`outputField), cardlabel))),
-                `VSpacing (),
-		`Table (`id(`table), `opt (`notify, `immediate), `header(
-		    // Table header -- option description
-		    _("Description"),
-		    // Table header -- option name
-		    _("Option"),
-		    // Table header -- value of an option
-		    `Right(_("Value"))), itemized_descriptions),
-                `VSpacing (0.5),
-		`HBox (
-		    `TextEntry (`id (`des), `opt(`notify), current_option_name,
-			current_option_value),
-		    `VBox(
-			`Label(""),
-			`HBox(
-			    // push button label - set option value
-			    `PushButton (`id (`set), _("&Set")),
-			    // restore original option values
-			    `PushButton (`id (`reset), _("R&eset all"))
-			)
-		    )
-		),
-		`Left(`ReplacePoint(`id(`reppoint), `Label(""))),
-                `VSpacing (0.5)
-            ),
-	    `HSpacing (3)
-        );
     }
 
     /**
@@ -364,155 +383,6 @@
     }
 
     /**
-     * quick config dialog widget
-     * @param name card model
-     * @param cname alias for modules conf
-     * @param cpos position of the card
-     * @param has_joy If true checkbox for joystick configuration is added
-     * @return term with widget
-     */
-    global define term AutoconfDlg (string name, string cname, integer cpos,
-				    boolean has_joy) ``{
-	string clab = "";
-	if (cpos < 3)
-	{
-	    clab = "\n" + sformat (STRINGS["soundCount", cpos]:"", cname);
-	}
-	else
-	{
-	    clab = "\n" + sformat(STRINGS["soundCount", 3]:"", cname, cpos + 1);
-	}
-
-	term jcheckbox = (!has_joy) ? `Empty() :
-	    // push button label
-	    `Left (`CheckBox(`id(`joystick), _("&Configure joystick")));
-
-	term con = `VBox (
-	    `VSpacing (1),
-	    // this is the first part of message "The sound card 'cardname'
-	    // will be configured as the first snd card"
-	    `Label (`opt (`hstretch), _("The sound card\n")),
-	    `HBox (`HSpacing (5), `Label (`opt (`hstretch), name)),
-	    `Label (`opt (`hstretch), clab),
-            `VSpacing (1),
-	    `HBox (`HSpacing (5),
-	      `RadioButtonGroup (`id (`action), `VBox (
-		`RadioButton (`id (`quick), `opt (`hstretch, `notify),
-		    // radio button label - type of setup
-		    _("&Quick automatic setup"), true),
-                `VSpacing (0.3),
-                `RadioButton (`id (`normal), `opt (`hstretch, `notify),
-		    // radio button label - type of setup
-		    _("Normal &setup")),
-                `VSpacing (0.3),
-                `RadioButton (`id (`options), `opt (`hstretch, `notify),
-		    // radio button label - type of setup
-		    _("Advanced setup with possibility to change &options")),
-		`VSpacing (3),
-		jcheckbox
-              ))
-	    ),
-	    `VStretch ()
-        );
-	return con;
-    }
-
-    /**
-     * quick conf dialog widget
-     * @param name card model
-     * @param cname card alias for module.conf
-     * @param cpos card position
-     * @param has_joy If true checkbox for joystick configuration is added
-     * @return term widget
-     */
-    global define term QuickconfDlg (string name, string cname, integer cpos,
-				     boolean has_joy) ``{
-        string clab = "";
-        if (cpos < 3)
-        {
-            clab = "\n" + sformat(STRINGS["soundCount", cpos]:"", cname);
-        }
-        else
-        {
-            clab = "\n" + sformat(STRINGS["soundCount", 3]:"", cname, cpos + 1);
-        }
-
-	term jcheckbox = (!has_joy) ? `Empty() :
-	    // push button label
-	    `Left (`CheckBox(`id(`joystick), _("&Configure joystick")));
-
-        term con = `VBox (
-	    `VSpacing (1),
-            // this is the first part of message "The sound card 'cardname'
-	    // will be configured as the first snd card"
-            `Label (`opt (`hstretch), _("The sound card\n")),
-            `HBox (`HSpacing (5), `Label (`opt (`hstretch), name)),
-            `Label (`opt (`hstretch), clab),
-            `VSpacing (1),
-            `HBox (`HSpacing (5),
-	      `RadioButtonGroup (`id (`action),`VBox (
-		`RadioButton (`id (`quick), `opt (`hstretch, `notify),
-		    // radio button label - type of setup
-		    _("&Quick automatic setup"), true),
-                `VSpacing (0.3),
-                `RadioButton (`id (`normal), `opt (`hstretch, `notify),
-		    // radio button label - type of setup
-		    _("Normal &setup")),
-		`VSpacing (0.3),
-                `RadioButton (`id (`intro), `opt (`hstretch, `notify),
-		    // radio button label - type of setup
-		    _("&More detailed installation of sound cards")),
-		`VSpacing(3),
-		jcheckbox
-              ))
-	    ),
-	    `VStretch ()
-        );
-        return con;
-    }
-
-
-    /**
-     *  dialog to be displayed when user presses 'Abort' button
-     *	@return boolean yes/no
-     */
-    global define boolean ReallyAbort() ``{
-	return Popup::ReallyAbort (Sound::Changed() || Joystick::Changed());
-    }
-
-    /**
-     * ui that displays two listbox with new and configured harwdare
-     *
-     * @param newHw list with new hardware
-     * @param confHw list with already configured hardware
-     * @return void
-     */
-    global define void selectHardware (list newHw, string confHw) ``{
-	integer index = -1;
-        newHw = maplist (string cardname, newHw, ``{
-            index = index + 1;              // select first item
-            return `item(`id(index), cardname, index == 0);
-        });
-
-	// the full meaning of message is: "Add other not detected soundcard"
-	newHw = add (newHw, `item(`id(-1), _("Other (not detected)"),
-	    size(newHw) == 0));
-
-	// label above list
-	term widget = Wizard_hw::DetectedContent(_("&Sound cards to configure"),
-	    newHw, false,
-	    // label above list
-	    sformat(_("<P><B>Already configured sound cards:</B>%1</P>"),confHw)
-	);
-
-	string helptext = STRINGS["selectHardware"]:"";
-
-	// dialog header
-	Wizard::SetContents (_("Sound card configuration"), widget, helptext,
-	    true, true);
-    }
-
-    /**
      * displays a dialog that offer to configure detected or
      * manually selected card
      * @param cards detected cards
@@ -520,7 +390,7 @@
      */
     global define map WhichDialog (list cards) ``{
 
-        string helptext = STRINGS["WhichDialog"]:"";
+        string helptext = Sound::STRINGS["WhichDialog"]:"";
         list nc		= [];
         integer i	= 0;
 
@@ -550,7 +420,7 @@
 
 	do
         {
-            ui = UI::UserInput ();
+            ui = (symbol) UI::UserInput ();
 
             if (ui == `manual)
             {
@@ -571,10 +441,10 @@
 
         integer cid = 0;
 
-        symbol way = UI::QueryWidget (`id(`rg), `CurrentButton);
+        symbol way = (symbol) UI::QueryWidget (`id(`rg), `CurrentButton);
         if (way == `auto)
         {
-            cid = UI::QueryWidget(`id(`sel), `CurrentItem);
+            cid = (integer) UI::QueryWidget(`id(`sel), `CurrentItem);
         }
         else if (way == `manual)
         {

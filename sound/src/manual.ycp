@@ -26,6 +26,49 @@
     import "Sound";
     import "Label";
 
+    include "sound/routines.ycp"; // get_module_names, get_card_names
+    include "sound/ui.ycp"; // ReallyAbort
+
+    /**
+     * returns module name for a given card model
+     * @param cardname string card name
+     * @return string module name
+     */
+    global define string get_module_by_cardname(string cardname) ``{
+
+	if (!Sound::use_alsa)
+	    return "";
+
+	integer i = -1;
+	foreach (integer module_index, list names, Sound::db_cards, ``{
+	    if (contains (names, cardname))
+	    {
+		i = module_index;
+	    }
+	});
+	return Sound::db_module_index[i]:"error";
+    }
+
+    /**
+     * returns list of card vendors
+     * @return list of items with vendors (into table)
+     */
+    global define list get_vendor_names () ``{
+
+	if (!Sound::use_alsa)
+	    return [];
+
+	Sound::LoadDatabase(true);
+	list items = maplist (string v, list cs, Sound::db_vendors, ``{
+	    if (v == "other")
+		// table entry (vendor was not defined)
+		return `item(`id(v), _("Other"));
+	    return `item(`id(v), v);
+	});
+	// table entry (all vendors)
+	return prepend (items, `item(`id("all"), _("All")));
+    }
+
     /**
      * Dialog for manual settings
      * (shows the lists of Kernel Modules and Card Models)
@@ -33,7 +76,7 @@
      */
     global define map ManualDialogModules () ``{
 
-	string helptext		= STRINGS["ManualDialog"]:"";
+	string helptext		= Sound::STRINGS["ManualDialog"]:"";
 	list module_names	= get_module_names();
 	string initial		= Sound::use_alsa ? "all" :
 				    select(module_names[0]:[], 1, "");
@@ -64,7 +107,7 @@
 
 	// set current item here
 	if (Sound::curr_driver == "")
-	    Sound::curr_driver = select(module_names[0]:[], 1, "");
+	    Sound::curr_driver = (string) select(module_names[0]:[], 1, "");
 	if (Sound::curr_model == "")
 	    Sound::curr_model = card_names[0]:"";
 
@@ -75,11 +118,11 @@
 	symbol ui = nil;
 	do
 	{
-	    ui = UI::UserInput ();
+	    ui = (symbol) UI::UserInput ();
 
 	    if (ui == `sel_drv)
 	    {
-		string drv = UI::QueryWidget (`id(`sel_drv), `CurrentItem);
+		string drv =(string)UI::QueryWidget(`id(`sel_drv),`CurrentItem);
 		card_names = get_card_names (drv);
 
 		UI::ReplaceWidget (`id(`rep_mod), `SelectionBox (`id (`sel_mod),
@@ -95,7 +138,7 @@
 	    }
 	    else if (ui == `search)
 	    {
-		string entry = UI::QueryWidget (`id(`search), `Value);
+		string entry = (string)UI::QueryWidget (`id(`search), `Value);
 		integer card_id = search_card_id (entry);
 		card_names = get_card_names ("all");
 		// always "all" field in drivers list
@@ -125,8 +168,8 @@
 
 	map ret = $["ui" : ui];
 
-	string model   = UI::QueryWidget (`id(`sel_mod), `CurrentItem);
-	string modname = UI::QueryWidget (`id(`sel_drv), `CurrentItem);
+	string model   = (string) UI::QueryWidget (`id(`sel_mod), `CurrentItem);
+	string modname = (string) UI::QueryWidget (`id(`sel_drv), `CurrentItem);
 	if (ui == `next)
 	{
 	    Sound::curr_driver = modname;
@@ -148,7 +191,7 @@
      */
     global define map ManualDialogVendors () ``{
 
-	string helptext		= STRINGS["ManualDialog"]:"";
+	string helptext		= Sound::STRINGS["ManualDialog"]:"";
 	list vendor_names	= get_vendor_names ();
 	list card_names		= get_card_names (Sound::curr_vendor);
 
@@ -177,7 +220,7 @@
 
 	// set current item here
 	if (Sound::curr_vendor == "")
-	    Sound::curr_vendor = select (vendor_names[0]:[], 1, "");
+	    Sound::curr_vendor = (string) select (vendor_names[0]:[], 1, "");
 	if (Sound::curr_model == "")
 	    Sound::curr_model = card_names[0]:"";
 
@@ -188,11 +231,12 @@
 	symbol ui = nil;
 	do
 	{
-	    ui = UI::UserInput ();
+	    ui = (symbol) UI::UserInput ();
 
 	    if (ui == `sel_ven)
 	    {
-		string vendor = UI::QueryWidget (`id(`sel_ven), `CurrentItem);
+		string vendor =
+		    (string)UI::QueryWidget (`id(`sel_ven), `CurrentItem);
 		card_names = get_card_names (vendor);
 
 		UI::ReplaceWidget (`id(`rep_mod), `SelectionBox (`id (`sel_mod),
@@ -208,7 +252,7 @@
 	    }
 	    else if (ui == `search)
 	    {
-		string entry = UI::QueryWidget (`id(`search), `Value);
+		string entry = (string)UI::QueryWidget (`id(`search), `Value);
 		integer card_id = search_card_id (entry);
 		card_names = get_card_names ("all");
 		// always "all" field in vendors list
@@ -237,8 +281,8 @@
 
 	if (ui == `next)
 	{
-	    string vendor	= UI::QueryWidget (`id(`sel_ven), `CurrentItem);
-	    string model	= UI::QueryWidget (`id(`sel_mod), `CurrentItem);
+	    string vendor =(string)UI::QueryWidget (`id(`sel_ven),`CurrentItem);
+	    string model =(string)UI::QueryWidget (`id(`sel_mod), `CurrentItem);
 	    string longmodel	= model;
 
 	    if (vendor != "all")
@@ -251,7 +295,7 @@
 	    {
 		// get vendor from cardname (for "all")
 		list allcard = splitstring (model, ",");
-		vendor = select (allcard, 1, "other");
+		vendor = allcard[1]:"other";
 		if (substring (vendor, 0,1) == " ")
 		   vendor = substring (vendor, 1);
 		model = allcard[0]:model;

@@ -21,13 +21,27 @@
     import "Label";
     import "Confirm";
 
-    include "sound/read_routines.ycp";
-    include "sound/routines.ycp";
-
     /**
      * what sound system we're using (true=alsa, false=oss)
      */
     global boolean use_alsa = true;
+
+    include "sound/texts.ycp";
+
+    /**
+     * id of current card
+     */
+    global integer card_id	= 0;
+
+    /**
+     * configuration map of current card
+     */
+    global map save_entry	= $[];
+
+    /**
+     * text constants for sound module
+     */
+    global map STRINGS		= STRINGS_();
 
     /**
      * flag for letting the module know, that it's launched from then hardware
@@ -138,6 +152,19 @@
      */
     boolean use_snd_prefix = nil;
 
+    // ----------- prototypes for routines.ycp:
+
+    global define string snd_prefix ();
+    global define boolean snd_prefix_used ();
+    global define void LoadDatabase (boolean use_ui);
+    global define list CreateModprobeCommands();
+
+    // ----------- rest of included files:
+
+    include "sound/read_routines.ycp";
+    include "sound/routines.ycp";
+
+    // ----------- function definitions:
 
     /**
      * Checks (via 'modinfo snd') if "snd_" prefix is used for module parameters
@@ -149,7 +176,7 @@
 	if (use_snd_prefix == nil)
 	{
 	    use_snd_prefix = false; // default for new kernels
-	    map modinfo = SCR::Read (.modinfo.kernel.kernel.sound.core.snd);
+	    map modinfo =(map)SCR::Read (.modinfo.kernel.kernel.sound.core.snd);
 
 	    foreach (string key, string desc, modinfo, ``{
 		// check only parameters, ignore other keys returned by modinfo
@@ -189,14 +216,6 @@
 	    }
 	});
 
-	if (use_alsa)
-	{
-	    include "sound/alsa_routines.ycp";
-	}
-	else
-	{
-	    include "sound/oss_routines.ycp";
-	}
 	y2debug("use ALSA: %1", use_alsa);
     }
 
@@ -219,7 +238,7 @@ Probe the chip now?
 "), name)))
 	{
 	    Crash::Run(command);
-	    map out = SCR::Execute(.target.bash_output, command);
+	    map out = (map) SCR::Execute(.target.bash_output, command);
 	    Crash::Finish(command);
 	    if (out["stderr"]:"" != "")
 		y2warning ("alsaconf returns error: %1", out["stderr"]:"");
@@ -239,7 +258,7 @@ Probe the chip now?
 	list chips = ["opl3sa2", "cs4236", "cs4232", "cs4231", "es18xx", "es1688", "sb16", "sb8"];
 
 	string command = "/usr/bin/alsaconf -P";
-	map out = SCR::Execute(.target.bash_output, command);
+	map out = (map) SCR::Execute(.target.bash_output, command);
 	if (out["exit"]:1 != 0)
 	    return false;
 	string out_str = deletechars (out["stdout"]:"", "\n");
@@ -288,10 +307,10 @@ could make your system unstable.
 	    `HSpacing(1)
 	));
 
-	symbol ret = UI::UserInput();
+	symbol ret = (symbol) UI::UserInput();
 	if (ret == `ok)
 	{
-	    chips = UI::QueryWidget(`id(`probelist),`SelectedItems);
+	    chips = (list) UI::QueryWidget(`id(`probelist),`SelectedItems);
 
 	    UI::OpenDialog(`HBox(
 		`VSpacing(7),
@@ -349,7 +368,7 @@ could make your system unstable.
 		}
 		// advance the progress bar
 		UI::ChangeWidget (`id(`progress), `Value,
-		    UI::QueryWidget (`id(`progress), `Value) + 1);
+		    (integer)UI::QueryWidget (`id(`progress), `Value) + 1);
 	    });
 	    UI::CloseDialog (); //progress window
 	}
@@ -433,7 +452,7 @@ could make your system unstable.
 	{
 	    return true;
 	}
-	detected_cards  = SCR::Read(.probe.sound);
+	detected_cards  = (list) SCR::Read(.probe.sound);
 	return true;
     }
 
@@ -444,6 +463,85 @@ could make your system unstable.
      */
     global define void ReadModulesConf() ``{
 	modules_conf = read_save_info();
+    }
+
+
+    /**
+     * returns list of autodetected sound cards that haven't been already
+     * configured
+     * @param save_info list of already configured cards
+     * @return list of unconfigured cards
+     */
+    global define list getConfigurableCards(list save_info) ``{
+
+        list snd = Sound::detected_cards;
+        snd = filter_configured(save_info, snd);
+
+        // create save_info entries
+        if (size(snd) > 0)
+        {
+	    if (!use_alsa)
+	    {
+		snd = maplist(map card, snd, ``{
+		    list options = card["options"]:[];
+		    map opts = $[];
+		    maplist(map op, options, ``{
+			if (op["default"]:"" != "")
+			{
+			    opts = add(opts, op["name"]:"", op["default"]:"");
+			}
+		    });
+		    string modname = "";
+		    list drivers = card["drivers"]:[];
+		    if (size(drivers) > 0)
+		    {
+			map driver = drivers[0]:$[];
+			list m = driver["modules"]:[];
+			if (size(m) > 0)
+			{
+			    modname = m[0,0]:"";
+			    modname = select(splitstring(modname, "."), 0, "");
+			}
+		    }
+		    return $[
+			"model"     : get_card_label(card),
+			"module"    : modname,
+			"unique_key": card["unique_key"]:"",
+			"options"   : opts];
+		});
+	    }
+	    else snd = maplist(map card, snd, ``{
+
+		if (card["alsaconf_detected"]:false)
+		    return card;
+		// get all the apropriate information from the database
+		map mod = get_module (card);
+		if (mod == $[])
+		{
+		    return $[];
+		}
+		map opts = $[];
+		maplist(string op, map data, mod["params"]:$[],	``{
+
+		    if (data["default"]:"" != "")
+		    {
+			string opname = check_parameter_name (op);
+			opts = add(opts, opname , data["default"]:"");
+		    }
+		});
+		map entry = $[
+		    "model"     : get_card_label(card),
+		    "module"    : mod["name"]:"",
+		    "unique_key": card["unique_key"]:"",
+		    "options"   : opts
+		];
+		return entry;
+	    });
+            // filter out modules with unspecified module name
+	    // (sound card not supported by alsa / no module found)
+	    snd = filter(map e, snd, ``(e["module"]:"" != ""));
+        }
+        return snd;
     }
 
     /**
@@ -457,6 +555,38 @@ could make your system unstable.
 
     global define boolean PollAbort() ``{
 	return UI::PollInput() == `abort;
+    }
+
+    /**
+     * opens alsa sound cards database
+     * @return void
+     */
+    global define void LoadDatabase (boolean use_ui) ``{
+	map sound_db =$[];
+	if (db_cards == nil || db_cards == $[])
+	{
+	    if (use_ui)
+	    {
+		string message = _("Loading the sound card database...");
+		UI::`OpenDialog(`opt(`decorated), `Label(message));
+	    }
+	    textdomain "sound_db";
+	    y2debug("Reading card database");
+	    sound_db	= (map)eval(SCR::Read (.target.yast2, "sndcards.ycp"));
+
+	    db_cards	= sound_db["cards"]:$[];
+	    db_modules	= sound_db["modules"]:$[];
+	    db_indices	= sound_db["indices"]:$[];
+	    db_module_index = sound_db["mod_idx"]:$[];
+
+	    db_vendors	= sound_db ["vendors"]:$[];
+
+	    textdomain "sound";
+	    if (use_ui)
+	    {
+		UI::CloseDialog();
+	    }
+	}
     }
 
     /**
@@ -551,6 +681,17 @@ could make your system unstable.
     }
 
     /**
+     * Just Set module data
+     * @param settings Sound configuration settings
+     * @return: void
+     */
+    global define void Set(map settings)  ``{
+	modules_conf	= settings["modules_conf"]:[];
+	rc_vars		= settings["rc_vars"]:$[];
+	volume_settings	= settings["volume_settings"]:[];
+    }
+
+    /**
      * Get all sound settings from the first parameter
      * (For autoinstallation use.)
      * @param settings settings to import
@@ -563,33 +704,6 @@ could make your system unstable.
 
 	Set(settings);
 
-	return true;
-    }
-
-    /**
-     * Just Set module data
-     * @param settings Sound configuration settings
-     * @return: void
-     */
-    global define void Set(map settings)  ``{
-	modules_conf	= settings["modules_conf"]:[];
-	rc_vars		= settings["rc_vars"]:$[];
-	volume_settings	= settings["volume_settings"]:[];
-    }
-
-    /**
-     * Update the SCR according to sound settings
-     * @param _unused unused parameter
-     * @param _unused2 unused parameter
-     * @return boolean True on success
-     */
-    global define boolean Write(block _unused, block _unused2) ``{
-
-	if (Mode::test == false)
-	{
-	    map settings = Export();
-	    WFM::CallFunction (`sound_write(settings));
-	}
 	return true;
     }
 
@@ -607,35 +721,17 @@ could make your system unstable.
     }
 
     /**
-     * opens alsa sound cards database
-     * @return void
+     * Update the SCR according to sound settings
+     * @return boolean True on success
      */
-    global define void LoadDatabase (boolean use_ui) ``{
-	map sound_db =$[];
-	if (db_cards == nil || db_cards == $[])
+    global define boolean Write () ``{
+
+	if (Mode::test == false)
 	{
-	    if (use_ui)
-	    {
-		string message = _("Loading the sound card database...");
-		UI::`OpenDialog(`opt(`decorated), `Label(message));
-	    }
-	    textdomain "sound_db";
-	    y2debug("Reading card database");
-	    sound_db	= eval(SCR::Read (.target.yast2, "sndcards.ycp"));
-
-	    db_cards	= sound_db["cards"]:$[];
-	    db_modules	= sound_db["modules"]:$[];
-	    db_indices	= sound_db["indices"]:$[];
-	    db_module_index = sound_db["mod_idx"]:$[];
-
-	    db_vendors	= sound_db ["vendors"]:$[];
-
-	    textdomain "sound";
-	    if (use_ui)
-	    {
-		UI::CloseDialog();
-	    }
+	    map settings = Export();
+	    WFM::CallFunction ("sound_write", [ settings ]);
 	}
+	return true;
     }
 
     /**
@@ -765,6 +861,10 @@ could make your system unstable.
 	{
 	    return true;
 	}
+	// to enable initialization, run ForceReset for first time,
+	// even if "force_reset" parameter was not set
+	// TODO: but if force_reset is set, ForceReset is run twice!
+	ForceReset ();
 
 	// fix for nm256 cards: see bug #10384: leave this card unconfigured.
 	// loading of this module fails under some notebooks, nm256 module
@@ -892,7 +992,7 @@ could make your system unstable.
 	    maplist(string ch, channels, ``{
 		p = topath (sformat(
 		    ".audio.alsa.cards.%1.channels.%2.mute", c, ch));
-		if (!SCR::Read(p))
+		if (!(boolean)SCR::Read(p))
 		{
 		    p = topath (sformat(
 			".audio.alsa.cards.%1.channels.%2.volume", c, ch));
@@ -905,16 +1005,18 @@ could make your system unstable.
 
     /**
      * sets the channel volume to value [0..100]
-     * @param card_id card #
+     * @param c_id card #
      * @param channel channel name
      * @param value volume of channel [0..100]
+     * @return success
      */
-    global define void SetVolume(integer card_id, string channel, integer value) ``{
+    global define boolean SetVolume (integer c_id, string channel,
+				     integer value) ``{
 	// two cases: we have sound system already running:
-	if (!Mode::config && size(SCR::Dir(.audio.alsa.cards)) > card_id)
+	if (!Mode::config && size(SCR::Dir(.audio.alsa.cards)) > c_id)
 	{
-            string p = sformat(".audio.alsa.cards.%1.channels.%2.volume", card_id, channel);
-	    string p2 = sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, channel);
+            string p = sformat(".audio.alsa.cards.%1.channels.%2.volume", c_id, channel);
+	    string p2 = sformat(".audio.alsa.cards.%1.channels.%2.mute", c_id, channel);
 	    SCR::Write(topath(p2), false);
             return SCR::Write(topath(p), value);
 	}
@@ -923,8 +1025,8 @@ could make your system unstable.
 	    // alsa is not running. probably autoinstallation or someone wants
 	    // to change proposed volume
 	    // store volume to volume_settings datastricure in autoinstallation
-            map oldmap = volume_settings[card_id]:$[];
-            volume_settings[card_id] = add(oldmap, channel, value);
+            map oldmap = volume_settings[c_id]:$[];
+            volume_settings[c_id] = add(oldmap, channel, value);
             return true;
 	}
     }
@@ -932,43 +1034,43 @@ could make your system unstable.
     /**
      * initialises volume after adding a new card.
      * unmutes and sets volume for some channels
-     * @param card_id card id.
+     * @param c_id card id.
      * @param modname name of sound module
      */
-    global define void  InitMixer(integer card_id, string modname) ``{
+    global define void  InitMixer(integer c_id, string modname) ``{
         map devs = lookup(db_modules[modname]:$[], "mixer",
             $["Master":70, "PCM":70, "CD":70, "Synth": 70]);
 
 	// now let's merge settings from volume_settings list
-	if (is (volume_settings[card_id]:[], list))
+	if (is (volume_settings[c_id]:[], list))
 	{
-	    foreach (list channel, volume_settings[card_id]:[], ``{
+	    foreach (list channel, volume_settings[c_id]:[], ``{
 		devs = add (devs, channel[0]:"Master", channel[1]:70);
 	    });
 	}
         list devs2 = [];
 
         foreach (string dev, integer vol, devs, ``{
-	    SetVolume (card_id, dev, vol);
+	    SetVolume (c_id, dev, vol);
 	    devs2 = add (devs2, dev);
 	});
 
-        unmute(devs2, card_id);
+        unmute(devs2, c_id);
     }
 
     /**
      * Test whether sound card supports joystick
-     * @param card_id id of sound card
-     * @return boolean True if sound card card_id supports joystick
+     * @param c_id id of sound card
+     * @return boolean True if sound card c_id supports joystick
      */
-    global define boolean HasJoystick(integer card_id) ``{
-	if (card_id == nil)
+    global define boolean HasJoystick(integer c_id) ``{
+	if (c_id == nil)
 	{
 	    return false;
 	}
 	if (use_alsa == true)
 	{
-	    map entry		= modules_conf[card_id]:$[];
+	    map entry		= modules_conf[c_id]:$[];
 	    string modname	= entry["module"]:"";
 
 	    return ( db_modules[modname, "joystick"]:$[] == $[] );

@@ -1,0 +1,212 @@
+/**
+ * File:
+ *   volume_routines.ycp
+ *
+ * Module:
+ *   Sound
+ *
+ * Summary:
+ *   Routines for sound card volume settings
+ *
+ * Authors:
+ *	Dan Veselý <dan@suse.cz>
+ *	Dan Meszaros <dmeszar@suse.cz>
+ *	Jiri Suchomel <jsuchome@suse.cz>
+ *
+ * $Id$
+ *
+ */
+
+{
+    import "Arch";
+    import "Sound";
+    import "Directory";
+    import "Mode";
+    import "Popup";
+
+    textdomain "sound";
+
+    /**
+     * sets volume in percents (0..100) for given card and card_id
+     * @param group channel
+     * @param cardid card id
+     * @param value volume 0-100
+     * @return boolean success/failure
+     */
+    global define boolean setVolume (string group, integer cardid,
+				     integer value) ``{
+	if (!Sound::use_alsa)
+	{
+	    if (Arch::sparc)
+	    {
+		string cmd =
+		 sformat("/usr/bin/aumix -d /dev/mixer%1 -w %2", cardid, value);
+		SCR::Execute(.target.bash, cmd, $[]);
+	    }
+	    else
+	    {
+		string p =
+		    sformat(".audio.oss.cards.%1.channels.%2", cardid, group);
+		SCR::Write(topath(p), value);
+	    }
+	    return true;
+	}
+
+	// rest is for ALSA
+	if (!Mode::config)
+	{
+	    string p = sformat(".audio.alsa.cards.%1.channels.%2.volume",
+		cardid, group);
+	    return SCR::Write(topath(p), value);
+	}
+	else
+	{
+	    // store volume to Sound::volume_settings for autoinstallation use
+	    map oldmap = Sound::volume_settings[cardid]:$[];
+	    Sound::volume_settings[cardid] = add(oldmap, group, value);
+	    return true;
+	}
+    }
+
+    /**
+     * stores the volume to file. stored volume will be restored after reboot
+     * (ALSA only)
+     * @param card_id card id
+     * @return boolean success/failure
+     */
+    global define boolean storeVolume(integer card_id) ``{
+	if (card_id == -1)
+	{
+	    SCR::Execute(.audio.alsa.store, 0, 0);
+	}
+	string p = sformat(".audio.alsa.cards.%1.store", card_id);
+
+	return (boolean) SCR::Execute(topath(p), 0, 0);
+    }
+
+
+    /**
+     * plays test sound to card #card_id
+     * @param card_id card id
+     * @return string with error message. empty on success
+     */
+    global define string PlayTest (integer card_id) ``{
+
+	string fname = "/usr/share/sounds/alsa/test.wav";
+	if (!Sound::use_alsa)
+	{
+	    fname="/usr/share/sounds/test.mp3";
+	}
+	if (SCR::Read(.target.size, fname) == -1)
+	{
+	    // popup message: test audio file was not found
+	    return sformat (_("Cannot find file:
+%1
+(test audio file)"),
+		fname);
+        }
+
+	if (!Sound::use_alsa)
+        {
+            SCR::Execute (.target.bash_background,
+		sformat("/usr/bin/mpg123 -a /dev/dsp%1 %2", card_id, fname));
+        }
+        else
+        {
+	    // ----- FIXME temporary sound! remove before 9.1 FIXME!
+	    fname = Directory::datadir + "/test.wav";
+            SCR::Execute (.target.bash_background,
+		sformat("/usr/bin/aplay -D plughw:%1 %2 > /dev/null 2>&1",
+		    card_id, fname));
+        }
+        return "";
+    }
+
+
+    /**
+     * sound_start_tmp starts alsa using temporary modules.conf
+     * @param restore true - call alsactl restore, false - don't
+     * @return void
+     */
+    global define void sound_start_tmp(boolean restore) ``{
+
+	// get the list of commands needed for start
+	list cmds = Sound::CreateModprobeCommands();
+
+	string snd = sformat ("/sbin/modprobe snd %1cards_limit=%2 %1major=116",
+	    Sound::snd_prefix (), size(Sound::modules_conf));
+
+	if (!Sound::use_alsa)
+	{
+	    snd = sformat("/sbin/modprobe snd snd_cards_limit=%1 snd_major=116", size(Sound::modules_conf));
+	    //FIXME parameter names for OSS?
+	}
+
+	// start 'snd' module first
+	cmds = flatten ([[snd], cmds]);
+	maplist(string cmd, cmds, ``{
+	    map res = (map) SCR::Execute(.target.bash_output, cmd, $[]);
+	    if (res["stderr"]:"" != "")
+                y2error("/sbin/modprobe error output: \n" + res["stderr"]:"");
+	});
+
+        if (Sound::use_alsa && restore)
+        {
+            SCR::Execute(.audio.alsa.restore, 0, 0);
+        }
+    }
+
+    /**
+     * removes all sound modules from kernel
+     * @return void
+     */
+    global define void sound_stop() ``{
+
+	if (Sound::use_alsa)
+	{
+	    SCR::Execute (.target.bash,
+		"/etc/init.d/alsasound stop > /dev/null 2>&1", $[]);
+	}
+	else
+	{
+	    list mods = SCR::Dir(.modinfo.kernel.drivers.sound);
+	    mods = add(mods, "emu10k1");
+	    mods = add(mods, "cs4281");
+	    map modules = (map) SCR::Read(.proc.modules);
+	    foreach(string mod, mods, ``{
+		if(haskey(modules, mod))
+		{
+		    SCR::Execute(.target.bash,sformat("/sbin/rmmod -r %1",mod));
+		}
+	    });
+	}
+    }
+
+    /**
+     * stops all programs using sound devices
+     * @return boolean true if nothing's using sound, false otherwise
+     */
+    global define boolean stop_programs() ``{
+	if (Mode::config)
+	{
+	    return true;
+	}
+	integer fuser = (integer) SCR::Execute (.target.bash, "/bin/fuser /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]);
+
+	if (fuser == 0)
+        {
+	    string msg		= Sound::STRINGS["WhichDialogMsg"]:"";
+            boolean terminate	= Sound::use_ui ? Popup::YesNo (msg) : true;
+            if (terminate)
+            {
+		SCR::Execute (.target.bash, "/bin/fuser -k /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]);
+            }
+            else
+            {
+		return false;
+            }
+        }
+	return true;
+    }
+
+}//EOF
