@@ -84,15 +84,11 @@
 
     list save_info	= [];
     boolean alsa	= Sound::use_alsa;
-    boolean write_only  = false;
 
     map settings = WFM::Args(0);
     save_info = lookup(settings, "modules_conf", []);
     rc_values = lookup(settings, "rc_vars", []);
     volume_settings = lookup(settings, "volume_settings", []);
-
-    // not really necessary for Progress stuf (it is set off in _auto client)
-    write_only = Sound::write_only;
 
     // do nothing when proposal is empty (Sound::installation is set to true in proposal mode)
     if (Sound::installation && size(save_info) == 0)
@@ -130,7 +126,8 @@
 	    _("Storing joystick settings...")];
 
 
-    if (!write_only)
+    // not really necessary for Progress stuf (it is set off in _auto client)
+    if (!Sound::write_only)
     {
 	// progres bar label
 	Progress::New (_("Saving sound card settings."), " ", size(stones) - 1,
@@ -141,28 +138,28 @@
 
     integer step = 0;
 
-    if (!write_only) { Progress::NextStage(); }
+    if (!Sound::write_only) { Progress::NextStage(); }
 
     step = step + 1;
     SaveModulesEntry(save_info, []);
 
-    if (!write_only) { sleep(100); Progress::NextStage(); }
+    if (!Sound::write_only) { sleep(100); Progress::NextStage(); }
     step = step + 1;
-    if (!write_only)
+    if (!Sound::write_only)
     {
 	Sound::StoreUniqueKeys();
     }
 
-    if (!write_only) { sleep(100); Progress::NextStage(); }
+    if (!Sound::write_only) { sleep(100); Progress::NextStage(); }
     step = step + 1;
     SaveRCValues(rc_values);
 
-    if (!write_only) { sleep(100); Progress::NextStage(); }
+    if (!Sound::write_only) { sleep(100); Progress::NextStage(); }
     step = step + 1;
 
     list configuredcards = Sound::GetSoundCardList();
 
-    if (!write_only)
+    if (!Sound::write_only)
     {
 	// stop joystick before restarting ALSA
 	SCR::Execute(.target.bash, "/etc/init.d/joystick stop", $[]);
@@ -174,7 +171,7 @@
 	}
     }
 
-    if (!write_only) { Progress::NextStage(); }
+    if (!Sound::write_only) { Progress::NextStage(); }
     if (size(WFM::Args()) >= 4)
     {
 	set_vol_settings(volume_settings);
@@ -189,9 +186,9 @@
     }
 
     SaveVolume();
-    if (!write_only) sleep(100);
+    if (!Sound::write_only) sleep(100);
 
-    if (!write_only) { sleep(100); Progress::NextStage(); }
+    if (!Sound::write_only) { sleep(100); Progress::NextStage(); }
 
     // write joystick configuration and restart service
     Joystick::Write(``{ return false;});

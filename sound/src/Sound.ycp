@@ -43,6 +43,11 @@
     global boolean proposal_created = false;
 
     /**
+     * write only mode? (-> do not restart services during writing)
+     */
+    global boolean write_only = false;
+
+    /**
      * list for storing detected cards
      */
     global list detected_cards = nil;
