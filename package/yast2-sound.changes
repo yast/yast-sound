@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Mar 19 14:58:21 CET 2004 - mvidner@suse.cz
+
+- added AGENT_LIBADD so that agents work from standalone Perl
+
+-------------------------------------------------------------------
 Wed Mar 17 16:08:24 CET 2004 - jsuchome@suse.cz
 
 - fix of joystick test: look to correct device
