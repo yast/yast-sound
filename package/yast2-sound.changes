@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Nov 18 14:30:35 CET 2004 - lslezak@suse.cz
+
+- use bracket operator instead of lookup&select
+- version 2.11.2
+
+-------------------------------------------------------------------
 Wed Oct 27 11:35:24 CEST 2004 - lslezak@suse.cz
 
 - adapted to new Mode:: API

@@ -117,9 +117,9 @@
 	integer pos = 0;
 	foreach (map<string,any> m, (list<map<string,any> >) lm, ``{
 	    res = add(res, `item(`id(pos),
-		lookup(m, lk[0]:"", ""),
-		lookup(m, lk[1]:"", ""),
-		lookup(m, lk[2]:"", "")
+		m[lk[0]:""]:"",
+		m[lk[1]:""]:"",
+		m[lk[2]:""]:""
 	    ));
 	    pos = pos + 1;
 	});
@@ -497,10 +497,10 @@
 		    list<term> tmp = [];
 		    maplist (term e, itemized_descriptions, ``{
 			if (current_option ==
-			    (integer) select((term)select (e, 0, `id(0)), 0, 0))
+			    (integer) select((term)e[0]:`id(0), 0, 0))
 			{
 			    tmp = add (tmp, `item(`id (current_option),
-				select (e, 1, ""), select (e, 2, ""), value));
+				e[1]:"", e[2]:"", value));
 			}
 			else
 			    tmp = add (tmp, e);
@@ -522,8 +522,8 @@
 		    // reset the values in items list
 		    term e = itemized_descriptions [i]:`item(`id(i),"","","");
 		    itemized_descriptions [i] =
-			`item (select (e, 0, `id(i)), select (e, 1, ""),
-			       select (e, 2, ""), options[i,"default"]:"");
+			`item (e[0]:`id(i), e[1]:"",
+			       e[2]:"", options[i,"default"]:"");
 		    i = i + 1;
 		}
 	    }
@@ -564,9 +564,9 @@
 	// convert from table entries (items) back to card
 	map opts = $[];
 	foreach (term it, vals, ``{
-	    if (select(it, 3, "") != "")
+	    if (it[3]:"" != "")
 	    {
-		opts = add(opts, select(it, 2, ""), select(it, 3, ""));
+		opts = add(opts, it[2]:"", it[3]:"");
 	    }
 	});
 

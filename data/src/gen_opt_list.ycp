@@ -1,6 +1,8 @@
 {
     include "./include/gen_routines.ycp";
 
+    import "String";
+
     define any translate_descr (string descr) {
 
 	list<string> matches = [
@@ -19,7 +21,7 @@
 
 	if (size(guess) >= 1)
 	{
-	    list l = select (guess, 0, []);
+	    list l = guess[0]:[];
 	    y2milestone ("translating %1...", descr);
 	    string s = sformat("%1 %%1 %2", l[0]:"", l[2]:"");
 	    any a	= s;
@@ -80,7 +82,7 @@
 
     map out	= (map) SCR::Execute (.target.bash_output, "uname -r", $[]);
     string kernel_ver = out["stdout"]:"";
-    kernel_ver = select(splitstring(kernel_ver, "\n"), 0, "");
+    kernel_ver = String::FirstChunk(kernel_ver, "\n");
 
 //    string generic_string = (string) SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.generic_string");
     string generic_string = (string) SCR::Read(.target.string, "./alsa-module-syntax");
