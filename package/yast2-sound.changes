@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Apr  2 15:51:52 CEST 2004 - jsuchome@suse.cz
+
+- changed license to GPL
+- 2.9.18
+
+-------------------------------------------------------------------
 Mon Mar 29 13:30:48 CEST 2004 - jsuchome@suse.cz
 
 - fix of sound card database (tiwai)
