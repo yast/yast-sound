@@ -72,6 +72,8 @@
 	    if (msgs != nil) {
 		message = lookup(msgs, lang);
 		if (message == nil)
+		    message = lookup(msgs, substring (lang, 0, 2));
+		if (message == nil)
 		    message = lookup(msgs, "default");
 		if (message == nil)
 		    message = "";             // Everything has failed.
