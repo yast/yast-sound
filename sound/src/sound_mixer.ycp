@@ -125,48 +125,56 @@
 
     integer card_id	= Args(0);
     path pth		= topath(sformat(".audio.alsa.cards.%1.channels", card_id));
-    list channels	= SCR::Dir(pth);
-    string card_name	= SCR::Read(pth);
+    list channels	= use_alsa ? SCR::Dir(pth) : ["Master"];
     list muted		= [];
 
     pth = topath(sformat(".audio.alsa.cards.%1.name", card_id));
+    string card_name	= use_alsa ? SCR::Read(pth) : sformat("%1", card_id);
 
     // get list of muted channels
-    foreach(`e, channels, 
-    ``{
-	path pth2 = topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, e));
-	if (SCR::Read(pth2))
-	{
-	    muted = add(muted, e);
-	}
-    });
-
-    y2debug(sformat("%1", muted));
-
-    // put 'Master', 'PCM' to list head
-    if (contains(channels, "PCM"))
+    if (use_alsa)
     {
-	channels = filter(`e, channels, ``(e!="PCM"));
-	channels = prepend(channels, "PCM");
-    }
+	foreach(`e, channels, 
+	``{
+	    path pth2 = topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", card_id, e));
+	    if (SCR::Read(pth2))
+	    {
+		muted = add(muted, e);
+	    }
+	});
 
-    if (contains(channels, "Master"))
+        y2debug(sformat("%1", muted));
+
+	// put 'Master', 'PCM' to list head
+	if (contains(channels, "PCM"))
+	{
+	    channels = filter(`e, channels, ``(e!="PCM"));
+	    channels = prepend(channels, "PCM");
+	}
+
+	if (contains(channels, "Master"))
+	{
+	    channels = filter(`e, channels, ``(e!="Master"));
+	    channels = prepend(channels, "Master");
+	}
+
+	channels = maplist(`e, channels, 
+	``{
+	    if (contains(muted, e))
+	    {
+		return [e, 0];
+	    }
+	    else
+	    {
+	    return [e, SCR::Read(topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", card_id, e)))];
+	    }
+	});
+    }
+    else
     {
-        channels = filter(`e, channels, ``(e!="Master"));
-        channels = prepend(channels, "Master");
+	integer vol = SCR::Read(topath(sformat(".audio.oss.cards.%1.channels.Master", card_id)));
+	channels = [["Master", vol]];
     }
-
-    channels = maplist(`e, channels, 
-    ``{
-	if (contains(muted, e))
-	{
-	    return [e, 0];
-	}
-	else
-	{
-	   return [e, SCR::Read(topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", card_id, e)))];
-	}
-    });
 
     string help = _("<P>With this dialog you can set volume for each channel of the selected sound card. 
 Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the original settings.</P>");
@@ -192,9 +200,16 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
 		SCR::Write(pth3, false);
 	    }
 	    // set volume
-	    pth = topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", card_id, ui));
-	    value = UI::QueryWidget(`id(ui), `Value);
-	    SCR::Write(pth, value);
+	    if (use_alsa)
+	    {
+		pth = topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", card_id, ui));
+		value = UI::QueryWidget(`id(ui), `Value);
+		SCR::Write(pth, value);
+	    }
+	    else
+	    {
+		SetVolume("Master", card_id, UI::QueryWidget(`id(ui), `Value));
+	    }
 	}
 	else if (ui == `abort && ReallyAbort())
 	{

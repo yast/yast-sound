@@ -48,7 +48,7 @@
      */
 	  
     global define DisplayName (string name, string cname, integer cpos, integer flags) ``{
-	string helptexti = lookup(STRINGS, "DisplayName");
+	string helptext = lookup(STRINGS, "DisplayName");
 	term con = AutoconfDlg(name, cname, cpos);
 	UI::SetWizardContents (_("Sound card configuration"), con, helptext, true, true);
 		// dialog title
@@ -319,15 +319,26 @@
 
     global define ComplexDlgCon(list cc, boolean start_alsa, boolean start_alsa_seq, boolean show_font_but) ``{
 	term butts = nil;
-	if (show_font_but)
-        {
-            butts = `HBox(
-                        `VBox
+	term alsabuts = `Empty();
+	if  (use_alsa)
+	{
+	    alsabuts = `VBox
                          (
                             `Left(`CheckBox(`id(`b_alsa), `opt(`notify), _("Start &ALSA"), start_alsa)),
                          // check button label
                             `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("&Start sequencer"), start_alsa_seq))
-                         ),
+                         );
+	}
+	if (show_font_but)
+        {
+            butts = `HBox(
+			alsabuts,
+//                        `VBox
+//                         (
+//                            `Left(`CheckBox(`id(`b_alsa), `opt(`notify), _("Start &ALSA"), start_alsa)),
+//                         // check button label
+//                            `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("&Start sequencer"), start_alsa_seq))
+//                         ),
                         `VBox
                         (
                             `PushButton (`id(`b_fonts), _("&Install soundfonts..."))
@@ -336,12 +347,7 @@
         }
 	else 
 	{
-	    butts =  `VBox
-                            (
-                                `Left(`CheckBox(`id(`b_alsa), `opt(`notify), _("Start &ALSA"), start_alsa)),
-                             // check button label
-                                `Left(`CheckBox(`id(`b_seq), `opt(`notify), _("&Start sequencer"), start_alsa_seq))
-                            );
+	    butts =  alsabuts;
 
 	}
 	term con = `HBox

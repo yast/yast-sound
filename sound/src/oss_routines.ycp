@@ -18,9 +18,27 @@
  */
 
 {
+        /**
+     * volume in percents (0..100)
+     * @return any
+     */
+    global define SetVolume (string group, integer cardid, integer value) ``{
+	if (is_sparc())
+	{
+	    string cmd = sformat("aumix -d /dev/mixer%1 -w %2", cardid, value);
+	    SCR::Execute(.target.bash, cmd, $[]);
+	}
+	else
+	{
+	    string p = sformat(".audio.oss.cards.%1.channels.%2", cardid, group);
+
+            SCR::Write(topath(p), value);
+	}
+    }
+
     global define PlayTest (integer card_id) ``{
 
-	string fname="/usr/share/sounds/alsa/test.wav";
+	string fname="/usr/share/sounds/test.mp3";
         if (SCR::Read(.target.size, fname) == -1)
         {
                   // To translators: just one file will be displayed
@@ -32,8 +50,8 @@
         }
         else
         {
-	    y2error("executing: "+ sformat("/usr/X11/bin/wavplay -d /dev/dsp%1 %2", card_id, fname));
-            SCR::Execute (.target.bash_background, sformat("/usr/X11/bin/wavplay -d /dev/dsp%1 %2", card_id, fname));
+	    y2error("executing: "+ sformat("mpg123 -a /dev/dsp%1 %2", card_id, fname));
+            SCR::Execute (.target.bash_background, sformat("mpg123 -a /dev/dsp%1 %2", card_id, fname));
         }
         return "";
     }
