@@ -516,7 +516,9 @@ could make your system unstable.
 			"options"   : opts];
 		});
 	    }
-	    else snd = maplist(map card, snd, ``{
+	    else
+	    {
+		snd = maplist(map card, snd, ``{
 
 		if (card["alsaconf_detected"]:false)
 		    return card;
@@ -542,7 +544,8 @@ could make your system unstable.
 		    "options"   : opts
 		];
 		return entry;
-	    });
+		});
+	    }
             // filter out modules with unspecified module name
 	    // (sound card not supported by alsa / no module found)
 	    snd = filter(map e, snd, ``(e["module"]:"" != ""));
