@@ -36,6 +36,7 @@
     include "sound/write_routines.ycp";
 
     boolean __sparc=nil;
+
     boolean use_alsa = !is_sparc();
     if (size(Args()) > 0 && Args(0)==.oss)
     {
@@ -313,8 +314,16 @@
     list sound_cards  = []; 
     list save_info    = read_save_info ();
 
+    /*
+     * this variable will not be touched. 
+     * it's purpose is for checking whether 
+     * changes were done to config.
+     */
+    list save_info_backup = save_info; 
 
-    map rc_vars       = $[];
+
+    map rc_vars       = read_rc_vars (["START_ALSA", "START_ALSA_SEQ"]);
+    map rc_vars_backup = rc_vars;
     integer card_id   = 0;
     integer n_cards   = 0;
     map result        = $[];
@@ -476,7 +485,9 @@
 
     map save_map = $[];
 
-    if (ui == `finish) 
+    y2error("#old: %1 #new: %2", save_info_backup, save_info);
+
+    if (ui == `finish && (save_info != save_info_backup || rc_vars != rc_vars_backup)) 
     {
 	CallFunction (`sound_write(save_info, rc_vars));
 
