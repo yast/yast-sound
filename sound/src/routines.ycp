@@ -683,6 +683,9 @@ module parameters, including invalid IO or IRQ parameters."), mod_name);
 	    map res = SCR::Execute (.target.bash_output, Directory::ybindir + "/copyfonts 2>/dev/null", $[] );
 	    integer cnt = tointeger(lookup(res, "stdout", 0));
 
+	    // restart ALSA after sound font copy
+	    y2milestone("Restarting ALSA: %1", SCR::Execute(.target.bash, "/etc/init.d/alsasound restart"));
+
 	    // step4:
 	    if (cnt > 0)
 	    {
