@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Sep 27 14:03:22 CEST 2004 - lslezak@suse.cz
+
+- version 2.10.6
+
+-------------------------------------------------------------------
 Fri Sep 24 08:51:21 CEST 2004 - jsuchome@suse.cz
 
 - do not save modules options with default value (#45646)
