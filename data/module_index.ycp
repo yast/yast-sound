@@ -71,5 +71,7 @@ $[
     50	: "snd-card-via8233",
     51	: "snd-card-virmidi",
     52	: "snd-card-wavefront",
-    53	: "snd-card-ymfpci"
+    53	: "snd-card-ymfpci",
+
+    100 : "snd-card-awacs"
 ]

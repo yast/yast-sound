@@ -50,7 +50,17 @@
     integer device_id = 0;
     integer mod_id = 0;
 
-    list l = flatten([lpci, lpnp]);
+    // finally let's include some manually defined add-ons from the
+    // id_addons.ycp file
+
+    list addons = [];
+
+    if (SCR::Read(.target.size, "./id_addons.ycp") > 0)
+    {
+	addons = SCR::Read(.target.ycp, "id_addons.ycp");
+    }
+
+    list l = flatten([lpci, lpnp, addons]);
 
     foreach(`e, l,
     ``{
@@ -70,6 +80,8 @@
     });
 
     BrowseTree(output);
+
+
 
     SCR::Write(.target.ycp, "./idlist.ycp", output);
 }
