@@ -27,6 +27,7 @@
     import  "Sound";
 
     include "sound/joysticks.ycp";
+    include "sound/ui.ycp";
 
     /**
      * Joystick configuration dialog. Configuration of joystick attached to specified sound card.

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Sep 10 17:34:21 CEST 2002 - lslezak@suse.cz
+
+- provide/obsolete package y2c_sprc
+- added missing include (#19283)
+- version 2.6.22
+
+-------------------------------------------------------------------
 Mon Sep  9 14:49:20 CEST 2002 - lslezak@suse.cz
 
 - restart sound system after sound font installation (#19197)
