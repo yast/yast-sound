@@ -290,7 +290,8 @@
 	    use_alsa = lookup (result, "use_alsa", true);
 
 	    if (ui == `cancel || ui == `abort)
-	    {
+	    {	
+		UI(`CloseDialog());
 		return;
 		//break;
 	    }
@@ -320,6 +321,7 @@
 
 	if (ui == `abort || ui == `cancel) 
 	{
+	    UI(`CloseDialog());
 	    return;
 	}
 
@@ -341,6 +343,7 @@
 	ui = lookup (result, "ui", `cancel);
 	if(ui == `abort)
 	{
+	    UI(`CloseDialog());
 	    return;
 	}
 
