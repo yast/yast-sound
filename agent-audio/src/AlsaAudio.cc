@@ -41,9 +41,10 @@ YCPValue alsaGetVolume(int card, const string& channel)
 
     if(snd_mixer_group_read(handle, &group)<0)
     {
-        y2debug("invalid group (channel) '%s'", channel.c_str());
+	string error = string("invalid group (channel) ") 
+			+ channel;
         snd_mixer_close(handle);
-        return YCPVoid();
+        return YCPError(error);
     }
     snd_mixer_close(handle);
 
@@ -80,9 +81,10 @@ YCPValue alsaGetMute(int card, const string& channel)
 
     if(snd_mixer_group_read(handle, &group)<0)
     {
-        y2debug("invalid group (channel) '%s'", channel.c_str());
+        string error = string("invalid group (channel) ")
+			+ channel.c_str();
         snd_mixer_close(handle);
-        return YCPVoid();
+        return YCPError(error);
     }
     snd_mixer_close(handle);
 
@@ -96,7 +98,8 @@ YCPValue alsaSetVolume(int card, const string& channel, int value)
     int err=snd_mixer_open(&handle, card, 0);
     if(err<0)
     {
-        return YCPBoolean(false);
+	string error = string("unable to open mixer device");
+        return YCPError(error, YCPBoolean(false));
     }
 
     snd_mixer_gid_t gid;
@@ -110,9 +113,10 @@ YCPValue alsaSetVolume(int card, const string& channel, int value)
 
     if(snd_mixer_group_read(handle, &group)<0)
     {
-        y2debug("invalid group '%s'", channel.c_str());
+	string error = string("invalid group (channel) ")	    
+			+ channel;
         snd_mixer_close(handle);
-        return YCPBoolean(false);
+        return YCPError(error, YCPBoolean(false));
     }
 
     int range = group.max - group.min;
@@ -159,9 +163,9 @@ YCPValue alsaSetMute(int card, const string& channel, bool value)
 
     if(snd_mixer_group_read(handle, &group)<0)
     {
-        y2debug("invalid group '%s'", channel.c_str());
+	string error = string("invalid group (channel) ") + channel;
         snd_mixer_close(handle);
-        return YCPBoolean(false);
+        return YCPError(error, YCPBoolean(false));
     }
 
     group.mute=value;
