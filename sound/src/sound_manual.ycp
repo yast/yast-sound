@@ -134,12 +134,12 @@
     // ==== main ====
 
     
-    list db = GetCardDatabase(); 
+//    list db = GetCardDatabase(); 
     
-    if (db==nil) 
-    {
-	UI(`MessagePopup(_("The Sound card database cannot be found!!!")));
-	return $["ui" : `back];
-    }
+//    if (db==nil) 
+//    {
+//	UI(`MessagePopup(_("The Sound card database cannot be found!!!")));
+//	return $["ui" : `back];
+//    }
     return ManualDialog ();
 }

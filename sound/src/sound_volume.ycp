@@ -278,6 +278,7 @@
 	    SetVolume ("Master", card_id, 75);
 	    ui = SuccessDialog(save_entry);
 	}
+	storeVolume(card_id);
     }
 
     if (ui == `back || ui == `cancel || ui == `abort)
@@ -288,9 +289,11 @@
     
     if(ui==`next)
     {
-	storeVolume(card_id);
+	y2error("Storing volume");
+//	storeVolume(-1);
     }	
 
+    SCR(`Execute(.audio.alsa.restore, 0 ,0));
 
     UI(`ChangeWidget (`id(`next), `Label, UI(`NextButtonLabel())));
 

@@ -19,9 +19,109 @@
  */
 
 {
-    textdomain "sound";
+    textdomain "sound";    
 
-    include "sound/ui.ycp";
+    global define volElement(string label, integer value, boolean spec) ``{
+	if(spec)
+	{
+	    return `Slider(`id(label), `opt(`notify), label, 0, 100, value);
+	}
+	else
+	{
+	    return `IntField(`id(label), `opt(`notify), label, 0, 100, value);
+	}
+    }
+
+    global define mixerWidget(list channels) ``{
+        any widget=`VBox();
+
+
+        boolean spec=UI(`HasSpecialWidget(`Slider));
+
+	integer nchan=size(channels)-2;	 // don't count in 'Master' and 'PCM'
+	integer ncols=4; //tointeger(tofloat(nchan) / 4.0 + 0.999);	 // how many columns will we have?
+
+	y2error("### %1 columns", ncols);
+
+	integer chansPerCol=tointeger(tofloat(nchan) / tofloat(ncols) +0.999); // how many channels per column
+
+	y2error("### %1 chans per column", chansPerCol);
+
+	term mainGroup=`Frame(_("&Master volume"));
+
+	// group first two elements to one Frame
+
+	integer pos=0;
+
+	term ttmp=nil;
+	if(spec)
+	{
+	    ttmp=`VBox();
+	}
+	else
+	{
+	    ttmp=`HBox();
+	}
+
+	
+
+	while(pos<2 && pos<size(channels))
+	{
+	    string lab=select(select(channels, pos), 0);
+	    integer vol=select(select(channels, pos), 1);
+	    
+	    ttmp=add(ttmp, volElement(lab, vol, spec));
+	    pos=pos+1;
+	}
+
+	ttmp=add(ttmp, `VSpacing(1));	
+
+	mainGroup=`Frame(_("&Master volume"), `HBox(`HSpacing(3), ttmp, `HSpacing(3)));
+
+	// now group elements to columns
+
+        integer counter=0;
+        any col=`HBox(`HSpacing(2));
+
+	while(pos<size(channels))
+	{
+	    if(ncols==counter)
+	    {
+		widget=add(widget, `Top(col));	
+		if(spec)
+                {
+//                    widget=add(widget, `HSpacing(2));
+                }
+                else
+                {
+                    widget=add(widget, `HStretch());
+                }
+
+                col=`HBox(`HSpacing(2));
+                counter=0;
+	    }
+
+	    string lab=select(select(channels, pos), 0);
+	    integer vol=select(select(channels, pos), 1);
+
+	    col=add(col, `HWeight(1, volElement(lab, vol, false)));
+	    col=add(col, `HSpacing(2));
+
+	    pos=pos+1;
+	    counter=counter+1;
+	}
+
+	while(counter<ncols)
+	{
+	    col=add(col, `HWeight(1, `Label(" ")));
+	    col=add(col, `HSpacing(2));
+	    counter=counter+1;
+	}
+
+        widget=add(widget, `Top(col));
+
+        return `VBox(mainGroup, `Frame(_("&Other channels"), widget));
+    }
 
     integer card_id=Args(0);
 
@@ -97,32 +197,24 @@ Press <B>Next</B> button to store volume settings, press <B>Back</B> to restore 
 	    integer value=UI(`QueryWidget(`id(ui), `Value));
 	    SCR(`Write(pth, value));
 	}
-	else if(ui==`nh)
-	{
-	    UI(`ChangeWidget(`id(`action), `CurrentButton, `new));
-	}
-	else if(ui==`ch)
-	{
-	    UI(`ChangeWidget(`id(`action), `CurrentButton, `configured));
-	}
 	else if(ui==`abort && ReallyAbort())
 	{
 	    return $["ui": `abort];
 	}
 
-    } until(ui==`back || ui==`next ||  ui==`detail);
+    } until(ui==`back || ui==`next);
 
     if(ui==`next)
     {
 	// store volume settings
 	path pth=topath(sformat(".audio.alsa.cards.%1.store", card_id));
-	SCR(`Execute(pth, nil));
+	SCR(`Execute(pth, 0, 0));
     }
     else
     {
 	// restore volume settings
         path pth=topath(sformat(".audio.alsa.cards.%1.restore", card_id));
-        SCR(`Execute(pth, nil));
+        SCR(`Execute(pth, 0, 0));
     }
 
 
