@@ -147,7 +147,7 @@
     /**
      * backup structures for sound settings
      */
-    list<map> modules_conf_b = nil;
+    global list<map> modules_conf_b = nil;
     map rc_vars_b = nil;
     list volume_settings_b = nil;
 
