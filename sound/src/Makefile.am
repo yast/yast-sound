@@ -29,7 +29,7 @@ client_DATA = 	\
 	sound_summary.ycp	\
 	sound_auto.ycp		\
 	joystick.ycp		\
-	proposal_sound.ycp
+	sound_proposal.ycp
 
 config_DATA = \
 	sound.y2cc \
