@@ -7,6 +7,6 @@ SUBDIRS = autodocs
 docdir = @DOCDIR@
 htmldir = $(docdir)
 
-html_DATA = alsamixer_agent.html
+html_DATA = audio_agent.html
 EXTRA_DIST = $(html_DATA)
 
