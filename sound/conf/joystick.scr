@@ -1,0 +1,32 @@
+/**
+ * File:
+ *   joystick.scr
+ * Summary:
+ *   SCR Agent for reading/writing /etc/sysconfig/joystick
+ *   using the rc-agent
+ * Access:
+ *   read/write
+ * Authors:
+ *   Dan Meszaros <dmeszar@suse.cz>
+ * See:
+ *   y2a_rcnf/rcagent.txt
+ *   libscr
+ * Example:
+ *   Dir(.joystick)
+ *   (["JS_GAMEPORT_MODULE_0", "JD_DEVICE_MODULE_0", ... ]) **
+ *   Read(.joystick.JS_GAMEPORT_MODULE_0)
+ *   ("emu10k1-gp")
+ **
+ *   Write(.joystick.JS_GAMEPORT_MODULE_0, "emu10k1-gp")
+ *   (true)
+ *
+ * $Id$
+ *
+ * Read/Sets the values defined in <tt>/etc/sysconfig/joystick</tt>
+ * in an easy manner.
+ */
+.joystick
+
+`ag_rcconfig(
+  RcFile("/etc/sysconfig/joystick")
+)
