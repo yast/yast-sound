@@ -4,6 +4,7 @@ Mon Jul  1 10:24:03 CEST 2002 - lslezak@suse.cz
 - merged yast2 sound packages: yast2-agent-audio,
   yast2-config-sound, yast2-db-sound
 - renamed to yast2-sound
+- version 2.6.6
 
 -------------------------------------------------------------------
 Mon Jun 24 14:24:13 CEST 2002 - lslezak@suse.cz
