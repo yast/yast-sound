@@ -28,7 +28,6 @@
     include "ui/common_popups.ycp";
     include "ui/wizard_dialog.ycp";
 
-//    include "sound/alsa_routines.ycp";
     include "sound/card_wizard.ycp";
     include "sound/read_routines.ycp";
     include "sound/routines.ycp";
@@ -68,14 +67,14 @@
     //	  card_id
     //    sound_cards  
 
+
+    map save_entry = $[];
+    boolean was_complex = false;
+
     /*
      * card selection
      *
      */
-
-
-    map save_entry = $[];
-    boolean was_complex = false;
 
     global define _snd_select() ``{
 	sound_cards = getConfigurableCards(save_info);
@@ -501,12 +500,16 @@ in order to configure sound cards."));
 
     map save_map = $[];
 
+    if (true)
+    {
+	y2error(sformat("%1", [save_info, rc_vars, true, true, get_vol_settings()]));
+    }
+
     if (ui == `finish && (save_info != save_info_backup || rc_vars != rc_vars_backup)) 
     {
 	CallFunction (`sound_write(save_info, rc_vars));
 
     // always save unique keys 
-	save_unique_keys (maplist(`e, save_info, ``(lookup(e, "unique_key", ""))));
     }
 
     UI::CloseDialog ();
