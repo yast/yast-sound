@@ -159,7 +159,7 @@
 
 	if (parse_error)
 	{
-	    y2error("parse error: %1", in);
+	    y2error("parse error: %1", input);
 	}
 
 	return l;
