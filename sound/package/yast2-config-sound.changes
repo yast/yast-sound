@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Oct  4 14:19:08 CEST 2001 - dmeszar@suse.cz
+
+- setting volume to 75% for test sample for 'daca' cards (ppc)
+  (bug #11339)
+
+-------------------------------------------------------------------
 Fri Sep 21 12:16:42 CEST 2001 - dmeszar@suse.cz
 
 - bug #7198 fixed (warning popup for nm256 sound cards 
