@@ -2234,7 +2234,7 @@ $[
 					          "descr" : 
 					[
 
-						            _("Forced joystick port enable for %1 soundcard."),
+						            _("Forced joystick port enable for %1 sound card."),
 
 						            "AZF3328"
           
@@ -2475,7 +2475,7 @@ $[
 
 					          "default" : "1",
 
-					          "descr" : _("Sofware-conversion of raw SPDIF packets (model 033 only)."),
+					          "descr" : _("Sofware conversion of raw SPDIF packets (model 033 only)."),
 
 					          "dialog" : "check"
         
@@ -3765,7 +3765,7 @@ $[
 
 					          "allows" : "{{0,1,2}}",
 
-					          "descr" : _("Toggle power-management.  (0 = off, 1 = on, 2 = auto)"),
+					          "descr" : _("Toggle power management.  (0 = off, 1 = on, 2 = auto)"),
 
 					          "skill" : "advanced"
         
