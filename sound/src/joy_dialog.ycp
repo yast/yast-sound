@@ -1,0 +1,193 @@
+/**
+ *
+ *
+ * File:
+ *   joystick.ycp
+ *
+ * Module:
+ *   Sound
+ *
+ * Authors:
+ *   Dan Meszaros <dmeszar@suse.cz>
+ *   Ladislav Slezak <lslezak@suse.cz>
+ *
+ * $Id$
+ *
+ * YaST2 joystick configuration client
+ *
+ *
+ */
+
+{
+
+    textdomain "sound";
+
+    import  "Wizard";
+    import  "Joystick";
+    import  "Sound";
+
+
+    /**
+     * Joystick configuration dialog. Configuration of joystick attached to specified sound card.
+     * @param card_id Sound card card_id
+     * @param finish Display finish label
+     * @return symbol Id of pressed button in the dialog
+     */
+
+    global define symbol joy_dialog(integer card_id, symbol button) ``{
+	string gjoy = "Generic analog joystick";
+	string gjoy_trans = _("Generic analog joystick");
+
+	if (card_id == nil)
+	{
+	    return `back; /*FIXME: return value */
+	}
+
+	string caption = _("Joystick configuration") + sformat (" (snd-card-%1)", card_id);
+	string helptext =
+_("<P>In this dialog, specify your joystick type. If your
+joystick type is not in the list, select <B>Generic analog joystick</B>
+(the first item in the list).</P>
+") +
+
+_("<P><B>Note:</B> Connect your joystick to your computer
+before pressing <B>Next</B>.</P>");
+
+
+	map joy = select(Joystick::joystick, card_id, $[]);
+
+	string mod = lookup(joy, "model", "");
+
+	y2milestone("Config of joy %1: %2", card_id, joy);
+
+	// translate model from /etc/sysconfig/joystick
+	if (mod == gjoy)
+	{
+	    mod = gjoy_trans;
+	}
+
+	// set none joystick
+	if (mod == "")
+	{
+	    mod = _("None joystick");
+	}
+
+
+	map joysticks = SCR::Read(.target.yast2, "include/sound/joysticks.ycp");
+
+	list joylist = [];
+
+	joylist = flatten (maplist(`k, `v, joysticks, ``(maplist(`l, v, ``([k, l])))));
+
+	joylist = sort(`k, `v, joylist, ``(select(k, 1, "") <= select(v, 1, "")));
+
+	joylist = prepend(joylist, ["analog", gjoy_trans]);
+	joylist = prepend(joylist, ["", _("None joystick")]);
+
+	y2debug("joylist: %1", joylist);
+
+	integer index = 0;
+	list boxitems = [];
+
+	foreach(list l, joylist, ``{
+		string modelname = select(l, 1, "");
+
+		if (mod == modelname)
+		{
+		    // preselect item
+		    boxitems = add(boxitems, `item(`id(index), modelname, true));
+		}
+		else
+		{
+		    boxitems = add(boxitems, `item(`id(index), modelname));
+		}
+
+		index = index + 1;
+	    }
+	);
+
+	y2debug("for widget: %1", boxitems);
+
+	term contents =
+	    `VBox(
+		`VSpacing(3),
+		`HBox(
+		    `HSpacing(6),
+		    `SelectionBox(`id(`os), _("&Select your joystick type:"), boxitems),
+		    `HSpacing(6)
+		),
+		`VSpacing(3)
+	    );
+
+	if (button == `finish)
+	{
+	    Wizard::ReplaceNextButton(`PushButton(`id(`next), `opt(`default), FinishButtonLabel()));
+	}
+	else if (button == `ok)
+	{
+	    Wizard::ReplaceNextButton(`PushButton(`id(`next), `opt(`default), OKButtonLabel()));
+	}
+	else if (button == `next)
+	{
+	    Wizard::ReplaceNextButton(`PushButton(`id(`next), `opt(`default), NextButtonLabel()));
+	}
+
+	Wizard::SetContents (caption, contents, helptext, true, true);
+
+	symbol s = nil;
+	do
+	{
+	    s = UI::UserInput();
+
+	    if (s == `abort && !ReallyAbort())
+	    {
+		s = `skip_event;
+	    }
+
+	    if (s == `next && UI::QueryWidget(`id(`os), `CurrentItem) == nil)
+	    {
+		UI::WarningPopup("Please select joystick type from list\nbefore pressing Next.");
+		s = `skip;
+	    }
+
+	} while (!contains([`next, `back, `abort, `cancel], s));
+
+	if (s == `next)
+	{
+	    string modname = lookup(select(Sound::modules_conf, card_id, $[]), "module", "");
+	    map joy_entry = Sound::GetJoystickSettings(modname);
+	    integer joymodidx = UI::QueryWidget(`id(`os), `CurrentItem);
+	    string joymod = select(select(joylist, joymodidx, ["", _("None joystick")]), 0, "");
+
+	    if (joymod == "")
+	    {
+		// selected none joystick
+		joy_entry = $[];
+	    }
+	    else
+	    {
+		string model = select(select(joylist, joymodidx, ["none", ""]), 1, "");
+
+		// do not translate model in /etc/sysconfig/joystick
+		if (model == gjoy_trans)
+		{
+		    model = gjoy;
+		}
+
+		y2milestone("selected modul: %1   model: %2", joymod, model);
+
+		joy_entry = add(joy_entry, "JOYSTICK_MODULE", joymod);
+		joy_entry = add(joy_entry, "model", model);
+	    }
+
+	    Joystick::joystick[card_id] = joy_entry;
+
+	    y2milestone("Joystick config: %1", joy_entry);
+	}
+
+	Wizard::RestoreNextButtonLabel();
+
+	return s;
+    }
+
+}
