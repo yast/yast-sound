@@ -27,65 +27,141 @@
     global define STRINGS_() ``{
 	// sound-system independent part
 	map ret = $["DisplayName":
-	     _("<p>If you want to configure this sound card and adjust its volume check <b>Normal setup</b>.</p><p>If you want to set a special option, check the <b>Advanced setup</b> radio button. Most users won't need this.</p><p>If you don't wish to adjust volume or set options now, check <b>Quick automatic setup</b>. You can set volume and change options later.</p>"),
+_("<p>
+If you want to configure this sound card and adjust 
+its volume check <b>Normal setup</b>.
+</p>") + 
+_("<p>If you want to 
+set a special option, check the <b>Advanced setup</b> radio 
+button. Most users won't need this.
+</p>") +
+_("<p>
+If you don't wish to adjust volume or set options now, 
+check <b>Quick automatic setup</b>. You can set volume and 
+change options later.
+</p>"),
 
 	    "quickConfig":
-	     _("<p>If you want to configure this sound card and adjust its volume check <b>Normal setup</b>.</p><p>If you don't wish to adjust volume now, check <b>Quick automatic setup</b>. You can set volume and change options later.</p><P>If you want to configure another card that was not detected, check the <B>More detailed installation of sound cards</B>.</P>"),
+_("<p>
+If you want to configure this sound card and adjust its 
+volume check <b>Normal setup</b>.
+</p>") + 
+_("<p>
+If you don't wish to adjust volume now, check <b>Quick 
+automatic setup</b>. You can set volume and change options 
+later.
+</p>") +
+_("<P>
+If you want to configure another card that was not detected, 
+check the <B>More detailed installation of sound cards</B>.
+</P>"),
 	    
 	    "ManualDialog":
 	    // to translators: please don't translate "<b>All</b>"- add there a comment saying
 	    // something like 'all sound cards'
-	    _("<p>Please <b>manually</b> choose the sound card, you want to configure. You can search for a particular sound card by entering the name in the search box.</p><p>Select <b>All</b> if you want to see the whole list of supported sound card models.</p>"),
+_("<p>
+Please <b>manually</b> choose the sound card, you want to 
+configure. You can search for a particular sound card by 
+entering the name in the search box.
+</p>") +
+_("<p>
+Select <b>All</b> if you want to see the whole list of 
+supported sound card models.
+</p>"),
       
 
 	    "WhichDialog":
-	    _("<p>Please select what kind of card you want to configure.</p><p>If the list contains <b>autodetected</b> (and not yet configured) cards, select one and go ahead. Otherwise use <b>manual selection</b>.</p>"),
+_("<p>
+Please select what kind of card you want to configure.
+</p>") +
+_("<p>
+If the list contains <b>autodetected</b> (and not yet 
+configured) cards, select one and go ahead. Otherwise 
+use <b>manual selection</b>.
+</p>"),
 
 	
 	    "WhichDialogMsg":
-	    _("There are programs running that are currently using the audio device.\n To reset the configuration these programs must be terminated. Proceed?"),
+_("There are programs running that are currently using 
+the audio device.\n To reset the configuration these 
+programs must be terminated. Proceed?"),
 
 	      // To translators: To reset the sound configuration these programs must be terminated
 	      // To translators: label message
 	    "ComplexDialogMsg":
-	    _("There are programs running that are currently using the audio device.\n To reset the configuration these programs must be terminated. Proceed?"),
+_("There are programs running that are currently using 
+the audio device.\n To reset the configuration these 
+programs must be terminated. Proceed?"),
 
 
 	    "OptionsDialog":
-	    _("<p>Here, you can modify the options for the sound modules.\n If you are not <b>absolutely sure</b> what you are doing, please leave this dialog untouched. </p><p>Choose the option you want to set, use the <b>Set</b> button to enable new value. If there are known possible values for the selected option, you can choose it in <B>Possible value</B> combo box. You can reset all values by pressing <b>Reset</b>. Numeric values can be entered as decimal or hexadecimal (hexadecimal with a <b>0x</b> prefix).</p>"),
+_("<p>
+Here, you can modify the options for the sound modules. 
+If you are not <b>absolutely sure</b> what you are doing, 
+please leave this dialog untouched. 
+</p>") + 
+_("<p>
+Choose the option you want to set, use the <b>Set</b> button
+to enable new value. If there are known possible values for 
+the selected option, you can choose it in 
+<B>Possible value</B> combo box. You can reset all values 
+by pressing <b>Reset</b>. Numeric values can be entered as 
+decimal or hexadecimal (hexadecimal with a <b>0x</b> prefix).
+</p>"),
 
 	    "VolumeDialog":
-	    _("<p>Please adjust the volume.</p><p>You can test your sound card by pressing the <b>Test</b> button.</p><p>After the configuration is done you can use <b>amixer</b> (or any program of your choice) for adjusting the volume.</p><p><b>WARNING/SPECIAL NOTE:</b>Please start testing your sound card with <b>very</b> low volume settings to prevent an accident with too much loud noise.</p>"),
+_("<p>
+Please adjust the volume.
+</p>") +
+_("<p>
+You can test your sound card by pressing the <b>Test</b> 
+button.
+</p>") + 
+_("<p>
+After the configuration is done you can use <b>amixer</b> 
+(or any program of your choice) for adjusting the volume.
+</p>") + 
+_("<p><b>WARNING/SPECIAL NOTE:</b>Please start testing your
+sound card with <b>very</b> low volume settings to prevent 
+an accident with too much loud noise.
+</p>"),
 
 	    "SuccessDialog":
-	    _("<P>Automatic configuration finished successfully.</P>"),
+_("<P>
+Automatic configuration finished successfully.
+</P>"),
  
 	    "nm256hackWarning":
-	    _("Configuring this sound card on some Sony VAIO notebooks may be unsuccessful with running X. You may avoid these problems by specifying snd_vaio_hack option value to 1 or configuring this card outside X. Proceed?"),
+_("Configuring this sound card on some Sony VAIO notebooks 
+may be unsuccessful with running X. You may avoid these 
+problems by specifying snd_vaio_hack option value to 1 or 
+configuring this card outside X. Proceed?"),
 
 	    "SaveModuleEntry":
-	    _("Error while saving '/etc/modules.conf'.\n"),
+_("Error while saving '/etc/modules.conf'.\n"),
 
 	    "saveFinal1":
-	    _("These errors occurred during saving configuration:\n%1"),
+_("These errors occurred during saving configuration:\n%1"),
     
 	    "saveFinal2":
-	    _("The sound card was successfully configured.\nYou can now use it immediately."),
+_("The sound card was successfully configured.\nYou can now 
+use it immediately."),
 
 	    "saveFinal3":
-	    _("The sound configuration was saved."),
+_("The sound configuration was saved."),
 
 	    "saveRCValues":
-	    _("Error while saving file: %1 \n"),
+_("Error while saving file: %1 \n"),
 
 	    "SetAllChannels":
-	    _("Error while setting volume.\n"),
+_("Error while setting volume.\n"),
 
 	    "ConfigSaveWarn":
-	    _("Sound volume and the configuration\nfor the sound card will be saved now."),
+_("Sound volume and the configuration\nfor the sound card 
+will be saved now."),
 
 	    "ConfigSaveWarn2":
-	    _("The sound configuration will be saved now."),
+_("The sound configuration will be saved now."),
 
 	    "soundCount":
 	    [
@@ -100,42 +176,88 @@
 	    _("Install Soundfonts"),
 
 	    "soundFontQuestion":
-	    _("Would you like to let YaST2 install the Wavetable-Soundfonts from your Soundblaster Live! / AWE driver CD ?"),
+_("Would you like to let YaST2 install the 
+Wavetable-Soundfonts from your Soundblaster Live! / AWE driver CD ?"),
 
 	    "soundFontAppeal":
-	    _("Please insert the driver CD for the Soundblaster Live! / AWE card in the cdrom drive."),
+_("Please insert the driver CD for the Soundblaster Live! / AWE 
+card in the cdrom drive."),
 
 	    "soundFontFinal":
 	    // To translators: the messaage below will look like this: "14 soundfont-files have been installed in /usr/lli/asdf"
-	    _("%1 soundfont-files have been installed in %2."),
+_("%1 soundfont-files have been installed in %2."),
 	    
 	    "soundFontNotFound":
-	    _("No Soundfont-files found."),
+_("No Soundfont-files found."),
 
 	    "soundFontRetry":
-	    _("Would you like to change the CD and retry ?"),
+_("Would you like to change the CD and retry ?"),
 
 	    "opl3sa_nm256_warn":
-	    _("'%1' and '%2' sound cards were autodetected on your system. For proper functionality, please skip the '%1' sound card and configure only the '%2'."),
+_("'%1' and '%2' sound cards were autodetected on your system. 
+For proper functionality, please skip the '%1' sound card and 
+configure only the '%2'."),
 
 	    "selectHardware":
-	    _("<P>Hardware detection found new sound card. To configure it, select the appropriate 
-item in list and press the <B>Configure<B> button.</P><P>Press the <B>Edit</B> button to configure already 
-installed cards</P><P>To save current configuration, press the <B>Finish</B> button.</P>")
+_("<P>
+Hardware detection found new sound card. To configure it, 
+select the appropriate item in list and press the 
+<B>Configure<B> button.
+</P>") + 
+_("<P>
+Press the <B>Edit</B> button to configure already installed cards
+</P>") + 
+_("<P>
+To save current configuration, press the <B>Finish</B> button.
+</P>")
 	    ];
 	// sound system dependent part:
 	if ( use_alsa )
 	{
 	    ret = add(ret, "ComplexDialog",
-            _("<p>The complete sound cards list. Use the <b>Finish</b> button to save sound card information.</p><p>Use <b>Delete</b> button to remove configured sound card. <b>Add sound card</b> button can be used for adding sound card.</p><p>Use the <b>start ALSA</b> check button to enable (resp. disable) ALSA start-up during boot time. Check the <b>start sequencer</b> if you want to load modules for playing MIDI files during boot-time (these modules can be loaded on demand).</p>"));
+_("<p>
+The complete sound cards list. Use the <b>Finish</b> button 
+to save sound card information.
+</p>") +
+_("<p>
+Use <b>Delete</b> button to remove configured sound card. 
+<b>Add sound card</b> button can be used for adding sound 
+card.
+</p>") + 
+_("<p>
+Use the <b>start ALSA</b> check button to enable (resp. 
+disable) ALSA start-up during boot time. Check the <b>start 
+sequencer</b> if you want to load modules for playing MIDI 
+files during boot-time (these modules can be loaded on demand).
+</p>"));
 	    ret = add(ret, "ErrorDialog",
             _("<p>An error has occurred. </p>")+
-            _("<p>You should check that you have correctly installed the <b>ALSA</b> package (from the series 'snd') and that you are running this as a root.</p><p>If the the problem persists, you can try to pass some <b>options</b> to the ALSA module. If you still can't get your sound card working, you can try <i>OSS/Free</i> or another module.</p><p>In this case launch YaST2 sound configuration module from shell using the <PRE>yast2 sound .oss</PRE> command.</p>"));
+_("<p>
+You should check that you have correctly installed the 
+<b>ALSA</b> package (from the series 'snd').
+</p>") + 
+_("<p>
+If the the problem persists, you can try to pass some 
+<b>options</b> to the ALSA module. If you still can't get 
+your sound card working, you can try <i>OSS/Free</i> or 
+another module.
+</p>") + 
+_("<p>
+In this case launch YaST2 sound configuration module from 
+shell using the <PRE>yast2 sound .oss</PRE> command.
+</p>"));
 	}
 	else
 	{
 	    ret = add(ret, "ComplexDialog",
-            _("<p>The complete sound cards list. Use the <b>Finish</b> button to save sound card information.</p><p>Use <b>Delete</b> button to remove configured sound card. <b>Add sound card</b> button can be used for adding sound card.</p>"));
+_("<p>
+The complete sound cards list. Use the <b>Finish</b> button 
+to save sound card information.
+</p>") + 
+_("<p>
+Use <b>Delete</b> button to remove configured sound card. 
+<b>Add sound card</b> button can be used for adding sound card.
+</p>"));
             ret = add(ret, "ErrorDialog",
             _("<p>An error has occurred. </p>")+
             _("<p>You can try to pass some <b>options</b> to the module.</p>"));
