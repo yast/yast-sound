@@ -61,17 +61,16 @@
 
 	joystick = [];
 
-	string tmp = "";
-
 	while (pos < 4)
 	{
 	    map j = $[];
 
 	    // go thru 'vars' list and read all variable values
 	    foreach(string v, vars, ``{
-		tmp = (string) SCR::Read (
+		string tmp = (string) SCR::Read (
 		    topath(sformat(".sysconfig.joystick.%1_%2", v, pos)));
-		j = add(j, v, tmp);
+		if (tmp != nil)
+		    j = add(j, v, tmp);
 	    });
 
 	    // read model comment
