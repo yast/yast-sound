@@ -182,7 +182,7 @@ configure an other card than the one that is displayed on the right.</p>"));
 	    );
 	
 	UI(`SetWizardContents (_("Sound card configuration"), con, helptext, true, true));
-	
+	UI(`ChangeWidget(`id(`next), `Label, _("&Next")));
 	return $["ui" : UI(`UserInput ())];
     }
 
@@ -312,20 +312,25 @@ configure an other card than the one that is displayed on the right.</p>"));
     }
 
 
+    boolean skipped = false;
+
     while (cont) {
-    
+
 				// wizards ...
 	while ((card_id >= 0) && (card_id < size (sound_cards))) {
 	
-	    result = OneCardWizard (select (sound_cards, card_id), size (save_info), ui);
+	    
+	    result = OneCardWizard (select (sound_cards, card_id), size (save_info), condition (skipped, `next, ui));
 
 	    ui       = lookup (result, "ui", `cancel);
 	    use_alsa = lookup (result, "use_alsa", true);
 
 	    if (ui == `cancel)
 		break;
-	    else if (ui == `skip)
+	    else if (ui == `skip) {
 		card_id = card_id + 1;
+		skipped = true;
+	    }
 	    else if (ui == `back) {
 		map rem = lookup (result, "return", $[]);
 		save_info = filter (`e, save_info, ``(e != rem));
@@ -337,6 +342,7 @@ configure an other card than the one that is displayed on the right.</p>"));
 		save_info = add (save_info, new);
 		configured_unique = add (configured_unique, lookup (select (sound_cards, card_id), "unique_key", ""));
 		card_id = card_id + 1;
+		skipped = false;
 	    }
 	
 	}
