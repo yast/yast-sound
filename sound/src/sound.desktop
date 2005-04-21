@@ -16,7 +16,7 @@ X-SuSE-YaST-Geometry=
 X-SuSE-YaST-SortKey=
 X-SuSE-YaST-AutoInstClonable=true
 
-Icon=soundcard
+Icon=yast-sound
 Exec=/sbin/yast2 sound
 
 Name=Sound
