@@ -216,7 +216,7 @@ its parameters using the 'Advanced setup'.");
 	term con = `HVCenter (
 	    `VBox (
 		// error message
-		`Label (_("An error occured during the installation of")),
+		`Label (_("An error occurred during the installation of")),
 		`VSpacing (),
 		`Label (`opt(`outputField), save_entry["model"]:""),
 		`VSpacing (),

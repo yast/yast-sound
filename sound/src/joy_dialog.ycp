@@ -66,7 +66,7 @@ define boolean update_sound_card_joy_config (integer card_id, boolean start) ``{
  * @param card_id Sound card card_id
  * @param joymodidx model id
  * @param joymod joystick module
- * @return boolean false when Abort was pressed or some problems occured
+ * @return boolean false when Abort was pressed or some problems occurred
  */
 define boolean joy_test_popup (integer card_id, integer joymodidx,
 				      string joymod) ``{
