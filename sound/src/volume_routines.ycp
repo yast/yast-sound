@@ -35,6 +35,8 @@
      */
     define boolean setVolume (string group, integer cardid, integer value) ``{
 
+	y2debug("setVolume(group: %1, cardid: %2, value: %3", group, cardid, value);
+
 	if (!Sound::use_alsa)
 	{
 	    if (Arch::sparc ())
