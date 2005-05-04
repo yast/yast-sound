@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed May  4 09:25:46 CEST 2005 - lslezak@suse.cz
+
+- renamed variables 'default'
+- 2.12.1
+
+-------------------------------------------------------------------
 Thu Apr 28 12:58:18 CEST 2005 - lslezak@suse.cz
 
 - properly initialize mixer settings (#61709)

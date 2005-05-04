@@ -277,11 +277,11 @@
     /**
      * widget for choosing one value from list
      * @param vals string with values eg. "12,3,4,6"
-     * @param default string default value (preselected in combo)
+     * @param preselected string default value (preselected in combo)
      * @return term combobox widget
      */
-    define term gen_list(list<string> vals, string default) ``{
-	list<term> vls = maplist (string e, vals, ``(`item(`id(e), e, default == e)));
+    define term gen_list(list<string> vals, string preselected) ``{
+	list<term> vls = maplist (string e, vals, ``(`item(`id(e), e, preselected == e)));
 	// combo box label
 	return `ComboBox(`id(`poss),`opt(`notify), _("&Possible value:"), vls);
     }
@@ -290,17 +290,17 @@
      * when the selected option in table is changed, we need to update
      * combo with values
      * @param values list of values
-     * @param default item
+     * @param default_item default item
      * @return void
      */
-    define void updatePossibleValues(string values, string default) ``{
+    define void updatePossibleValues(string values, string default_item) ``{
 	list l = string2vallist(values);
 	if (l == [])
 	{
 	    UI::ReplaceWidget(`id(`reppoint), defWidget());
 	    return;
 	}
-	term widg = gen_list((list<string>)l, default);
+	term widg = gen_list((list<string>)l, default_item);
 
 	UI::ReplaceWidget(`id(`reppoint), widg);
     }
