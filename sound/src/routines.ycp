@@ -497,17 +497,17 @@
     /**
      * Itemize list for selection box
      * @param l list with values
-     * @param default value to select as default
+     * @param default_value value to select as default
      * @return list items to be shown in list widget
      */
-    define list itemize_list (list l, integer default) ``{
+    define list itemize_list (list l, integer default_value) ``{
         integer i = 0;
         list itemized_list = [];
         integer s = size (l);
         while (i < s)
         {
             itemized_list = add (itemized_list,
-		`item (`id(i), l[i]:"", (i == default)));
+		`item (`id(i), l[i]:"", (i == default_value)));
             i = i + 1;
         }
         return itemized_list;
