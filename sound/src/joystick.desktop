@@ -20,7 +20,7 @@ Icon=yast-joystick
 Exec=/sbin/yast2 joystick 
 
 Name=Joystick
-GenericName=Configure joystick attached to sound card
+GenericName=Configure a joystick attached to the sound card
 GenericName[cs]=Konfigurovat joystick připojený ke zvukové kartě
 GenericName[de]=An Soundkarte angeschlossenen Joystick konfigurieren
 GenericName[es]=Configurar el joystick conectado a la tarjeta de sonido
