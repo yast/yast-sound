@@ -195,10 +195,6 @@
 	    // set automatic start at boot
 	    ret = ret && HWConfig::SetValue(file, "STARTMODE", "auto");
 
-	    // TODO LATER: for now save options to modprobe.d only, later to hwcfg
-	    // string options = MergeOptions(entry["options"]:$[]);
-	    // ret = ret && HWConfig::SetValue(file, "MODULE_OPTIONS", options);
-
 	    string modcomment = createAliasComment(entry["model"]: "", entry["unique_key"]:"");
 	    string comment = "# YaST configured sound card " + entry["alias"]:"" + "\n" + modcomment;
 	    ret = ret && HWConfig::SetComment(file, "MODULE", comment);
@@ -291,10 +287,10 @@
 
 		    if (bus == "pci")
 		    {
-			string file = "pci-" + bus_id;
+			string file = "bus-pci-" + bus_id;
 
 			y2milestone("Removing file: %1", file);
-			HWConfig::RemoveConfig(file);
+			ret = ret && HWConfig::RemoveConfig(file);
 		    }
 		    else
 		    {
@@ -305,14 +301,16 @@
 			    if (file != nil)
 			    {
 				y2milestone("Removing file: %1", file);
-				HWConfig::RemoveConfig(file);
+				ret = ret && HWConfig::RemoveConfig(file);
 			    }
 			}
 		    }
 		}
 	    );
 	}
+	return ret;
     }
+
     /**
      * Saves all '/etc/modprobe.d/sound' entries
      * @param save_info cards save info
