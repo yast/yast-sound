@@ -17,6 +17,7 @@
 
 {
     import "Sound";
+    import "HWConfig";
 
     include "sound/routines.ycp";// for is_snd_alias()
 
@@ -187,6 +188,78 @@
 	    }
 	}
 	return saved;
+    }
+
+    define list<map> read_hwconfig() {
+
+	list<map> ret = [];
+
+	// get list of all config files
+	list<string> cfiles = HWConfig::ConfigFiles();
+
+	// scan each config file - search for sound card config
+	foreach(string cfile, cfiles, {
+	    string com = HWConfig::GetComment(cfile, "MODULE");
+
+	    if (com != nil)
+	    {
+		list<string> coms = splitstring(com, "\n");
+		boolean sound_card_found = false;
+		map entry = $[];
+
+		foreach(string comline, coms, {
+
+			if (regexpmatch(comline, "^# YaST configured sound card snd-card-[0-9]*"))
+			{
+			    string alias = regexpsub(comline, "^# YaST configured sound card (snd-card-[0-9]*)", "\\1");
+
+			    if (alias != nil)
+			    {
+				entry["alias"] = alias;
+				sound_card_found = true;
+			    }
+			}
+			else if (regexpmatch(comline, "^# ....\\............:.*"))
+			{
+			    string uniq = regexpsub(comline, "^# (....\\............):(.*)", "\\1");
+			    string name = regexpsub(comline, "^# (....\\............):(.*)", "\\2");
+
+			    if (uniq != nil)
+			    {
+				entry["unique_key"] = uniq;
+			    }
+
+			    if (name != nil)
+			    {
+				entry["model"] = name;
+			    }
+			    else
+			    {
+				entry["model"] = _("Unknown");
+			    }
+			}
+		    }
+		);
+
+		string m = HWConfig::GetValue(cfile, "MODULE");
+		if (m != nil)
+		{
+		    entry["module"] = m;
+		}
+
+		// TODO add bus ID
+
+		// TODO: read module options
+		if (sound_card_found)
+		{
+		    y2internal("Found sound card hwconfig (%1): %2", cfile, entry);
+		    ret = add(ret, entry);
+		}
+	    }
+	}
+	);
+
+	return ret;
     }
 
 }//EOF

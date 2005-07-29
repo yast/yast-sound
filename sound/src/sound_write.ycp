@@ -77,7 +77,7 @@
 
     define void logmixer(string when) {
 	// log mixer settings
-	y2debug("Mixer (%1): %2", when, SCR::Execute(.target.bash_output, "/usr/bin/amixer"));
+	y2milestone("Mixer (%1): %2", when, SCR::Execute(.target.bash_output, "/usr/bin/amixer"));
     }
 
     // ==== MAIN ====

@@ -509,6 +509,7 @@ could make your system unstable.
      */
     global define void ReadModulesConf() ``{
 	modules_conf = read_save_info();
+//	modules_conf = read_hwconfig();
     }
 
 
