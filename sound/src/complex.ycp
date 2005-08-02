@@ -34,32 +34,6 @@
     include "sound/mixer.ycp";
     include "sound/options.ycp"; // sound_options
 
-    define string richTextDescription(string title, list<string> properties) {
-	string items = "";
-
-	if (properties != nil && size(properties) > 0)
-	{
-	    foreach(string prop, properties, {
-		    items = items + "<LI>" + prop + "</LI>";
-		}
-	    );
-	}
-
-	string ret = "";
-
-	if (title != nil && title != "")
-	{
-	    ret = "<P><B>" + title + "</B></P>";
-	}
-
-	if (items != "")
-	{
-	    ret = ret + "<P><UL>" + items + "</UL></P>";
-	}
-
-	return ret;
-    }
-
     /**
      * creates summary table with card labels and thier states
      * (running/not running/dissappeared)
@@ -67,8 +41,8 @@
      */
     define list<map<string,any> > createHWTable() ``{
 
-	y2internal("unconfigured_cards: %1", Sound::unconfigured_cards);
-	y2internal("modules_conf: %1", Sound::modules_conf);
+	y2milestone("unconfigured_cards: %1", Sound::unconfigured_cards);
+	y2milestone("modules_conf: %1", Sound::modules_conf);
 
 	list<map<string,any> > ret = [];
 
@@ -90,7 +64,7 @@
 		    map<string,any> r = $[
 			"id" : card["unique_key"]:"",
 			"table_descr" : [ card["options","index"]:"", card["model"]:"" ],
-			"rich_descr" : richTextDescription(card["model"]:"", descr)
+			"rich_descr" : WizardHW::CreateRichTextDescription(card["model"]:"", descr)
 		    ];
 
 		    ret = add(ret, r);
@@ -111,7 +85,7 @@
 		    map<string,any> r = $[
 			"id" : card["unique_key"]:"",
 			"table_descr" : [ _("Not Configured"), card["model"]:"" ],
-			"rich_descr" : richTextDescription(card["model"]:"", [_("The device is not configured"), _("Press <B>Edit</B> to configure")])
+			"rich_descr" : WizardHW::CreateRichTextDescription(card["model"]:"", WizardHW::UnconfiguredDevice()])
 		    ];
 
 		    ret = add(ret, r);
@@ -270,7 +244,7 @@ define symbol Edit()
     integer idx_conf = getCardIndex((list<map<string,any> >)Sound::modules_conf, Sound::selected_uniq);
     integer idx_det = getCardIndex2((list<map<string,any> >)Sound::unconfigured_cards, Sound::selected_uniq);
 
-    y2internal("uniq (%1) in configured: %2, in detected: %3", Sound::selected_uniq, idx_conf, idx_det);
+    y2debug("uniq (%1) in configured: %2, in detected: %3", Sound::selected_uniq, idx_conf, idx_det);
 
     // the card is already configured
     if (idx_conf != nil)

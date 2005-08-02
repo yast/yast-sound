@@ -272,7 +272,7 @@
 		// TODO: read module options
 		if (sound_card_found)
 		{
-		    y2internal("Found sound card hwconfig (%1): %2", cfile, entry);
+		    y2debug("Found sound card hwconfig (%1): %2", cfile, entry);
 		    ret = add(ret, entry);
 		}
 	    }
