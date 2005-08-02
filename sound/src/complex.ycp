@@ -31,10 +31,145 @@
     import "Label";
     import "Popup";
     import "Mode";
+    import "WizardHW";
 
     import "Sound";
     include "sound/mixer.ycp";
     include "sound/options.ycp"; // sound_options
+
+    define string richTextDescription(string title, list<string> properties) {
+	string items = "";
+
+	if (properties != nil && size(properties) > 0)
+	{
+	    foreach(string prop, properties, {
+		    items = items + "<LI>" + prop + "</LI>";
+		}
+	    );
+	}
+
+	string ret = "";
+
+	if (title != nil && title != "")
+	{
+	    ret = "<P><B>" + title + "</B></P>";
+	}
+
+	if (items != "")
+	{
+	    ret = ret + "<P><UL>" + items + "</UL></P>";
+	}
+
+	return ret;
+    }
+
+    /**
+     * creates summary table with card labels and thier states
+     * (running/not running/dissappeared)
+     * @return list table contents
+     */
+    define list<map<string,any> > createHWTable() ``{
+
+	y2internal("unconfigured_cards: %1", Sound::unconfigured_cards);
+	y2internal("modules_conf: %1", Sound::modules_conf);
+
+	list<map<string,any> > ret = [];
+
+	if (Sound::modules_conf != nil && size(Sound::modules_conf) > 0)
+	{
+	    foreach(map card, Sound::modules_conf, {
+		    list<string> descr = [];
+
+		    if (card["options","index"]:"" != nil)
+		    {
+			descr = add(descr, sformat(_("Configured as sound card number %1"), card["options","index"]:""));
+		    }
+
+		    if (card["module"]:nil != nil)
+		    {
+			descr = add(descr, sformat(_("Driver %1"), card["module"]:""));
+		    }
+
+		    map<string,any> r = $[
+			"id" : card["unique_key"]:"",
+			"table_descr" : [ card["options","index"]:"", card["model"]:"" ],
+			"rich_descr" : richTextDescription(card["model"]:"", descr)
+		    ];
+
+		    ret = add(ret, r);
+		}
+	    );
+	}
+
+	if (Sound::unconfigured_cards != nil && size(Sound::unconfigured_cards) > 0)
+	{
+	    foreach(map card, Sound::unconfigured_cards, {
+		    list<string> descr = [];
+
+		    if (card["module"]:nil != nil)
+		    {
+			descr = add(descr, sformat(_("Driver %1"), card["module"]:""));
+		    }
+
+		    map<string,any> r = $[
+			"id" : card["unique_key"]:"",
+			"table_descr" : [ _("Not Configured"), card["model"]:"" ],
+			"rich_descr" : richTextDescription(card["model"]:"", [_("The device is not configured"), _("Press <B>Edit</B> to configure")])
+		    ];
+
+		    ret = add(ret, r);
+		}
+	    );
+	}
+
+	y2debug("table content: %1", ret);
+
+	return ret;
+    }
+
+    define integer getCardIndex(list<map<string, any> > scards, string uniq) {
+	integer ret = nil;
+
+	if (scards != nil)
+	{
+	    foreach(map<string, any> scard, scards, {
+		    if (scard["unique_key"]:nil == uniq)
+		    {
+			if (scard["options", "index"]:nil != nil)
+			{
+			    ret = tointeger(scard["options", "index"]:nil);
+			}
+		    }
+		}
+	    );
+	}
+
+	y2debug("found at index: %1", ret);
+
+	return ret;
+    }
+
+    define integer getCardIndex2(list<map<string, any> > scards, string uniq) {
+	integer ret = nil;
+
+	if (scards != nil)
+	{
+	    integer i = 0;
+	    foreach(map<string, any> scard, scards, {
+		    if (scard["unique_key"]:nil == uniq)
+		    {
+			ret = i;
+		    }
+
+		    i = i + 1;
+		}
+	    );
+	}
+
+	y2debug("found at index: %1", ret);
+
+	return ret;
+    }
 
     /**
      * creates summary table with card labels and thier states
@@ -60,7 +195,7 @@
 		string mname = card["module"]:"";
 		if( haskey ((map)SCR::Read(.proc.modules), mname) )
 		{
-		    // to translators: "(The card is) running
+		    // to translators: (The card is) running
 		    state = _("Running");
 		}
 	    }
@@ -110,6 +245,291 @@
         UI::ChangeWidget(`id(`b_options),   `Enabled, val);
 	UI::ChangeWidget(`id(`b_volume),    `Enabled, val);
     }
+
+    string selected_card = "";
+
+define void SetItems() {
+    // create description for WizardHW
+    list<map<string,any> > items = createHWTable();
+    y2debug("items: %1", items);
+
+    WizardHW::SetContents(items);
+}
+
+define symbol Mixer()
+{
+    symbol ret = nil;
+
+    map res = mixerDialog(Sound::card_id);
+
+    ret = (symbol)res["ui"]:nil;
+
+    if (ret == `cancel)
+    {
+	ret = `abort;
+    }
+
+    return ret;
+}
+
+define symbol EditConfigured()
+{
+    symbol ret = nil;
+    integer idx_conf = getCardIndex((list<map<string,any> >)Sound::modules_conf, Sound::selected_uniq);
+
+    // the card is already configured
+    if (idx_conf != nil)
+    {
+	y2debug("Configuring card %1", Sound::selected_uniq);
+	map entry = Sound::modules_conf[idx_conf]:$[];
+
+	map res = sound_options(entry);
+	if (res["ui"]:nil == `next)
+	{
+	    map oldentry = entry;
+
+	    entry = res["return"]:$[];
+	    entry = add_common_options(entry, idx_conf);
+
+	    // update card data
+	    Sound::modules_conf = maplist(map card, Sound::modules_conf,
+		{
+		    if (card["unique_key"]:"" != Sound::selected_uniq)
+		    {
+			return card;
+		    }
+		    else
+		    {
+			return entry;
+		    }
+		}
+	    );
+	    if (oldentry != entry)
+	    {
+		// popup question text
+		if (Popup::YesNo(_("To apply changes, the sound system
+must be restarted.
+Restart sound system now?
+")))
+		{
+		    sound_stop();
+		    sound_start_tmp(true);
+		}
+	    }
+	    ret = `next;
+	}
+	else if (res["ui"]:nil == `abort || res["ui"]:nil == `cancel)
+	{
+	    ret = `abort;
+	}
+	else
+	{
+	    ret = (symbol)res["ui"]:nil;
+	}
+    }
+
+    return ret;
+}
+
+define symbol Edit()
+{
+    symbol ret = nil;
+    integer idx_conf = getCardIndex((list<map<string,any> >)Sound::modules_conf, Sound::selected_uniq);
+    integer idx_det = getCardIndex2((list<map<string,any> >)Sound::unconfigured_cards, Sound::selected_uniq);
+
+    y2internal("uniq (%1) in configured: %2, in detected: %3", Sound::selected_uniq, idx_conf, idx_det);
+
+    // the card is already configured
+    if (idx_conf != nil)
+    {
+	y2debug("reconfiguring card %1", Sound::selected_uniq);
+	Sound::card_id = idx_det;
+	ret = `edit_conf;
+    }
+    else if (idx_det != nil)
+    {
+	y2debug("adding new card %1", Sound::selected_uniq);
+	Sound::card_id = idx_det;
+	ret = `edit_new;
+    }
+    else
+    {
+	y2error("card %1 was not found!", Sound::selected_uniq);
+	ret = `abort;
+    }
+
+    return ret;
+}
+
+define void SequencerPopup() {
+    term dlg =
+    `HBox(
+	`HSpacing(1),
+	`VBox(
+	    `VSpacing(0.5),
+	    // frame label
+	    `Frame(_("Advanced Options"),
+		`VBox(
+		    `VSpacing(0.5),
+		    `Left(`CheckBox(`id(`sequencer),
+			// check box label
+			_("&Start sequencer"), Sound::rc_vars["LOAD_ALSA_SEQ"]:"no" == "yes")
+		    ),
+		    `VSpacing(0.5)
+		)
+	    ),
+	    `VSpacing(`opt(`vstretch), 1),
+	    `HBox(
+		`HSpacing(2),
+		`PushButton(`id(`ok), `opt(`default, `key_F10), Label::OKButton()),
+		`HSpacing(1),
+		`PushButton(`id(`cancel), `opt(`key_F9), Label::CancelButton()),
+		`HSpacing(2)
+	    ),
+	    `VSpacing(0.5)
+	),
+	`HSpacing(1)
+    );
+
+    UI::OpenDialog(`opt(`decorated), dlg);
+
+    symbol ui = (symbol)UI::UserInput();
+
+    if (ui == `ok)
+    {
+	// get current value
+	string value = ((boolean)UI::QueryWidget(`id(`sequencer), `Value)) ? "yes" : "no";
+
+	// set the value
+	Sound::rc_vars = add(Sound::rc_vars, "LOAD_ALSA_SEQ", value);
+    }
+
+    UI::CloseDialog();
+}
+
+/**
+ * A dialog showing the detected cards and allowing to configure them.
+ * @return any The value of the resulting UserInput.
+ */
+define map HardwareDialog() {
+
+    boolean show_fonts = false;
+    maplist(map card, Sound::modules_conf, ``{
+	if (HasFonts(card)) show_fonts = true;
+    });
+
+    list<list> extra_buttons = [
+	// menu item
+	[`mixer, _("&Volume")],
+	// menu item
+	[`seq, _("&Start sequencer")]
+    ];
+
+    if (show_fonts)
+    {
+	// menu item
+	extra_buttons = add(extra_buttons, [ `fonts, _("&Install soundfonts...") ]);
+    }
+
+    // dialog title
+    WizardHW::CreateHWDialog(_("Sound configuration"),
+	Sound::STRINGS["ComplexDialog"]:"",
+	// table header
+	[_("Number"), _("Card Model")],
+	extra_buttons
+    );
+
+    Wizard::SetNextButton(`next, Label::FinishButton());
+
+    symbol ret = `_dummy;
+
+    do {
+	SetItems();
+
+	if (!Mode::config())
+	{
+	    SCR::Execute(.audio.alsa.restore, 0, 0);
+	}
+
+	// initialize selected_card
+	if (selected_card == "")
+	{
+	    selected_card = WizardHW::SelectedItem();
+	}
+
+	// set previously selected card
+	WizardHW::SetSelectedItem(selected_card);
+
+	map<string,any> ev = WizardHW::WaitForEvent();
+	y2milestone("WaitForEvent: %1", ev);
+
+	symbol ui = (symbol)ev["event","ID"]:nil;
+
+	// remember the selected card
+	selected_card = ev["selected"]:"";
+
+	if (ui == `add)
+	{
+	    ret = `add;
+	}
+	else if (ui == `cancel || ui == `abort)
+	{
+	    if (ReallyAbort())
+	    {
+		ret = `abort;
+		break;
+	    }
+	    else
+	    {
+		ui = `skip_event;
+	    }
+	}
+	else if (ui == `delete)
+	{
+	    string uniq = WizardHW::SelectedItem();
+	    integer idx = getCardIndex((list<map<string,any> >)Sound::modules_conf, uniq);
+
+	    if (idx != nil)
+	    {
+		Sound::card_id = idx;
+		ret = `delete;
+	    }
+	}
+	else if (ui == `edit)
+	{
+	    Sound::selected_uniq = WizardHW::SelectedItem();
+	    ret = `edit;
+	}
+	else if (ui == `mixer)
+	{
+	    string uniq = WizardHW::SelectedItem();
+	    integer idx = getCardIndex((list<map<string,any> >)Sound::modules_conf, uniq);
+
+	    if (idx != nil)
+	    {
+		Sound::card_id = idx;
+		ret = `mixer;
+	    }
+	}
+	else if (ui == `fonts)
+	{
+	    InstallFonts("", true);
+	}
+	else if (ui == `seq)
+	{
+	    SequencerPopup();
+	}
+	else
+	{
+	    ret = ui;
+	}
+    } while (!contains([`back, `abort, `next, `add, `edit, `delete, `mixer],ret));
+
+    Wizard::RestoreNextButton();
+
+    return $[ "ui": ret ];
+}
+
 
     /**
      * shows list of soundcards
@@ -302,7 +722,8 @@ define map sound_complex() ``{
     list to_delete	= [];
     boolean config_mode = false;
 
-    return ComplexDialog ();
+    return HardwareDialog();
+//    return ComplexDialog ();
 }
 
 }//EOF

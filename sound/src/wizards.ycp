@@ -261,7 +261,7 @@
  * Main workflow of sound configuration (without read and write)
  * @return sequence result
  */
-define symbol MainSequence(string initial) ``{
+define symbol MainSequence() ``{
 
     map m_aliases = $[
 	    "intro"	: ``(_snd_select()),
@@ -276,6 +276,10 @@ define symbol MainSequence(string initial) ``{
 	    "delete"	: ``(_snd_delete()),
 	    "select"	: ``(_snd_add()),
 
+	    "edit"	: [``(Edit()), true],
+	    "editconf"	: ``(EditConfigured()),
+	    "mixer"	: ``(Mixer()),
+
 	    // quick configuration
 	    "quick"	: ``(_snd_quick()),
 	    "quick2"	: ``(_snd_quick2(true)),
@@ -283,7 +287,7 @@ define symbol MainSequence(string initial) ``{
 	];
 
     map m_sequence = $[
-	    "ws_start"	: initial,
+	    "ws_start"	: "complex",
 	    "quick"	:
 		$[
 		    `quick	    :	"quick2",
@@ -339,9 +343,25 @@ define symbol MainSequence(string initial) ``{
 		$[
 		    `next	    :	`finish,
 		    `abort	    :	`abort,
-		    `add_manual     :	"manual2",
-		    `add_select	    :	"select",
-		    `delete	    :	"delete"
+		    `add	    :	"manual2",
+		    `edit	    :   "edit",
+		    `delete	    :	"delete",
+		    `mixer	    :	"mixer"
+		],
+	    "mixer"	:
+		$[
+		    `next	    :	"complex",
+		    `abort	    :	`abort
+		],
+	    "edit"	:
+		$[
+		    `edit_new	    :	"config2",
+		    `edit_conf	    :	"editconf",
+		    `abort	    :	`abort
+		],
+	    "editconf"	:
+		$[
+		    `next	    :	"complex"
 		],
 	    "select"	:
 		$[
@@ -413,20 +433,8 @@ define symbol SoundSequence () ``{
 	    return `back;
 	}
     }
-    string initial = "intro";
 
-    // when running this module as non-root, go to complex-dialog
-    if (size(Sound::unconfigured_cards) == 1 && size(Sound::modules_conf) == 0)
-    {
-	Sound::card_id = 0;
-	initial = "quick";
-    }
-    else if (size(Sound::unconfigured_cards) == 0)
-    {
-	initial = "complex";
-    }
-
-    symbol ui = MainSequence (initial);
+    symbol ui = MainSequence();
 
     if (ui == `back || ui == `abort)
     {
