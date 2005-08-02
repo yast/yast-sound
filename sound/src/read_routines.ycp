@@ -110,6 +110,9 @@
 	integer position = -1;
 	map mod_occur	= $[];			// alsa modules
 
+	list<map> detected_cards = (list<map>)SCR::Read(.probe.sound);
+	y2debug("detected_cards: %1", detected_cards);
+
 	foreach (string a, aliases, ``{
 
 	    position		= position + 1;
@@ -147,6 +150,7 @@
 		uniq	= isa_uniq();
 		model	= read_card_name_from_alsa (position);
 	    }
+
 	    map entry = $[
 		"alias"		: a,
 		"module"	: modname,
@@ -154,6 +158,22 @@
 		"unique_key"	: uniq,
 		"model"		: model
 	    ];
+
+	    foreach(map dcard, detected_cards, {
+		    if (dcard["unique_key"]:"" == uniq)
+		    {
+			y2debug("Found uniq %1: %2", uniq, dcard);
+			if (haskey(dcard, "bus_hwcfg") && haskey(dcard, "sysfs_bus_id"))
+			{
+			    entry["bus"] = dcard["bus_hwcfg"]:"";
+			    entry["bus_id"] = dcard["sysfs_bus_id"]:"";
+			}
+		    }
+		}
+	    );
+
+	    y2debug("entry: %1", entry);
+
 	    save = add (save, entry);
 	});
         return save;
