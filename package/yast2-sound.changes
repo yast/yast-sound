@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Tue Aug  2 16:28:37 CEST 2005 - lslezak@suse.cz
+
+- use WizardHW module for the first dialog
+- removed obsolete dialogs
+- workflow and help texts adapted
+- assign unique ID for virtual or manually configured cards
+- assign bus ID to configured cards
+- 2.12.3
+
+-------------------------------------------------------------------
 Thu Jul 28 10:04:21 CEST 2005 - lslezak@suse.cz
 
 - updated desktop files
