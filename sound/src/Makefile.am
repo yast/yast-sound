@@ -16,7 +16,6 @@ ynclude_DATA = \
 	volume.ycp \
 	options.ycp \
 	complex.ycp \
-	select.ycp \
 	manual.ycp \
 	joy_dialog.ycp\
 	joysticks.ycp		\
