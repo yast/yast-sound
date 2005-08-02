@@ -28,79 +28,10 @@
     include "sound/volume.ycp";
     include "sound/options.ycp";
     include "sound/complex.ycp";
-    include "sound/select.ycp";
     include "sound/manual.ycp";
 
 
     boolean was_complex = false;
-
-    /**
-     * card selection dialog
-     * @return symbol next dialog
-     */
-    define symbol _snd_select() ``{
-
-	Sound::UpdateUnconfiguredCards();
-	if ((size(Sound::unconfigured_cards) == 0) && (!was_complex))
-	{
-	    return `detail;
-	}
-
-	list nh	= maplist (map e, Sound::unconfigured_cards, ``(e["model"]:""));
-        list ch	= maplist (map e, Sound::modules_conf, ``(e["model"]:""));
-
-	map res		= sound_select (nh, Sound::modules_conf);
-	symbol ui	= res["ui"]:`abort;
-
-	Sound::card_id	= res["id"]:0;
-	if (Sound::card_id == -1)
-	{
-	    return `manual;
-	}
-	return res["ui"]:`abort;
-    }
-
-    /**
-     * quick configuration step #1 dialog
-     * @return symbol next dialog
-     */
-    define symbol _snd_quick() ``{
-	Sound::save_entry	= Sound::unconfigured_cards[0]:$[];
-	Sound::card_id	= 0;
-	boolean has_joy = false;
-	string modname	= Sound::save_entry["module"]:"";
-	if (Sound::db_modules [modname, "joystick"]:$[] != $[])
-	{
-	    has_joy = true;
-	}
-
-	string model	= Sound::save_entry["model"]:"";
-	map res	= quickConfig (model, "snd-card-0", Sound::card_id, has_joy);
-
-	symbol ui = res["ui"]:`back;
-	if (ui == `quick || ui == `normal)
-	    Thinkpad600E_cs4236_hack (0);
-
-	return ui;
-    }
-
-    /**
-     * quick config step #2 dialog
-     * @param type boolean quick/normal config
-     * @return symbol next dialog
-     */
-    define symbol _snd_quick2(boolean type) ``{
-	Sound::save_entry  = add_common_options(Sound::save_entry, 0);
-	Sound::save_entry  = add_alias(Sound::save_entry, 0);
-	map res	    = sound_volume(Sound::save_entry, 0, true, type, []);
-	symbol ui	= res["ui"]:`back;
-	if (ui == `next)
-	{
-	    Sound::modules_conf = [Sound::save_entry];
-	}
-	return ui;
-    }
-
 
     /**
      * dialog for manual card selection
@@ -120,25 +51,6 @@
 	{
 	    Sound::save_entry	= $[];
 	}
-	return ui;
-    }
-
-    /**
-     * add card from complex dialog
-     * @return symbol next dialog
-     */
-    define symbol _snd_add() ``{
-	list<string> nh	= maplist (map card, Sound::unconfigured_cards, ``(
-	    card["model"]:""));
-
-	map res		= WhichDialog(nh);
-	symbol ui	= res["ui"]:`back;
-        Sound::card_id	= res["card_id"]:-1;
-
-        if (Sound::card_id == -1 && ui == `next)
-        {
-            return `manual;
-        }
 	return ui;
     }
 
@@ -264,78 +176,26 @@
 define symbol MainSequence() ``{
 
     map m_aliases = $[
-	    "intro"	: ``(_snd_select()),
-
-	    "config1"	: ``(_snd_config()),
-	    "config2"	: ``(_snd_config()),
-
-	    "manual1"	: ``(_snd_manual()),
-	    "manual2"	: ``(_snd_manual()),
-
+	    "config"	: ``(_snd_config()),
+	    "manual"	: ``(_snd_manual()),
 	    "complex"	: ``(_snd_complex()),
 	    "delete"	: ``(_snd_delete()),
-	    "select"	: ``(_snd_add()),
-
 	    "edit"	: [``(Edit()), true],
 	    "editconf"	: ``(EditConfigured()),
 	    "mixer"	: ``(Mixer()),
-
-	    // quick configuration
-	    "quick"	: ``(_snd_quick()),
-	    "quick2"	: ``(_snd_quick2(true)),
-	    "quick3"	: ``(_snd_quick2(false)),
 	];
 
     map m_sequence = $[
 	    "ws_start"	: "complex",
-	    "quick"	:
-		$[
-		    `quick	    :	"quick2",
-		    `normal	    :	"quick3",
-		    `abort	    :	`abort,
-		    `intro	    :	"intro"
-		],
-	    "quick2"	:
-		$[
-		    `next	    :	`finish,
-		    `abort	    :	`abort
-		],
-	    "quick3"	:
-		$[
-		    `next	    :	`finish,
-		    `abort	    :	`abort
-		],
-
-	    "intro"	:
-		$[
-		    `next	    :	`finish,
-		    `configure	    :   "config1",
-		    `manual	    :	"manual1",
-		    `detail	    :	"complex",
-		    `abort	    :	`abort
-		],
-
-	    "config1"	:
-		$[
-		    `next	    :	"intro",
-		    `detail	    :	"intro",
-		    `abort	    :   `abort
-		],
-	    "manual1"	:
-		$[
-		    `next	    :	"config1",
-		    `abort	    :	`abort
-		],
-
-	    "config2"	:
+	    "config"	:
 		$[
 		    `next	    :	"complex",
 		    `detail	    :	"complex",
 		    `abort	    :   `abort
 		],
-	    "manual2"	:
+	    "manual"	:
 		$[
-		    `next	    :	"config2",
+		    `next	    :	"config",
 		    `abort	    :	`abort
 		],
 
@@ -343,7 +203,7 @@ define symbol MainSequence() ``{
 		$[
 		    `next	    :	`finish,
 		    `abort	    :	`abort,
-		    `add	    :	"manual2",
+		    `add	    :	"manual",
 		    `edit	    :   "edit",
 		    `delete	    :	"delete",
 		    `mixer	    :	"mixer"
@@ -355,19 +215,13 @@ define symbol MainSequence() ``{
 		],
 	    "edit"	:
 		$[
-		    `edit_new	    :	"config2",
+		    `edit_new	    :	"config",
 		    `edit_conf	    :	"editconf",
 		    `abort	    :	`abort
 		],
 	    "editconf"	:
 		$[
 		    `next	    :	"complex"
-		],
-	    "select"	:
-		$[
-		    `abort	    :	`abort,
-		    `next	    :	"config2",
-		    `manual	    :	"manual2"
 		],
 	    "delete"	:
 		$[
