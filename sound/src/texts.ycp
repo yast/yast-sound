@@ -7,7 +7,7 @@
  *   Sound
  *
  * Authors:
- *   Dan Veselý <dan@suse.cz>
+ *   Dan Vesely <dan@suse.cz>
  *   Dan Meszaros <dmeszar@suse.cz>
  *
  * Summary:
@@ -259,43 +259,37 @@ To save the current configuration, press <B>Finish</B>.
 	if ( Sound::use_alsa )
 	{
 	    ret = add(ret, "ComplexDialog",
-_("<p>
-This is the complete sound card list. Use the <b>Finish</b> button 
+_("<p><b>Sound Cards</b></p>
+<p>This is the complete sound card list. Use the <b>Finish</b> button 
 to save sound card information.
 </p>
 ") +
 
-_("<p>
-Use <b>Delete</b> to remove a configured sound card. 
-Use <b>Add sound card</b> to add a sound card.
-</p>
+_("<P>Select an unconfigured card from the list and press <B>Edit</B> to
+configure it. If the card was not autodetected, press <B>Add</B> button and
+configure the card manually.</P>") +
+
+_("<p> Use <b>Delete</b> to remove a configured sound card. </p> ") +
+
+_("<P>
+To change the configuration of a card, select the card.
+Then press <B>Edit</B>.
+</P>
 ") +
 
 _("<p>
-Check <b>Start Sequencer</b> to load modules for playing MIDI 
-files during boot. These modules can be loaded on demand.
+In <b>Advanced</b> menu you can set volume of the selected card or configure
+module loading for playing MIDI files. These modules can be loaded on demand.
 </p>\n"));
 
 	    ret = add(ret, "ErrorDialog",
 _("<p>An error has occurred. </p>") +
 
 _("<p>
-Check you have correctly installed the 
-<b>ALSA</b> package (from the series 'snd').
-</p>
-") +
-
-_("<p>
 If the the problem persists, try passing 
 <b>options</b> to the ALSA module. If your sound card still
 will not work, try <i>OSS/Free</i> or 
 another module.
-</p>
-") +
-
-_("<p>
-In this case, launch the YaST2 sound configuration module from 
-shell using the <PRE>yast2 sound .oss</PRE> command.
 </p>
 "));
 	}

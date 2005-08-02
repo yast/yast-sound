@@ -388,6 +388,7 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
     if (Sound::use_ui)
     {
 	Wizard::RestoreNextButton();
+	Wizard::EnableAbortButton();
     }
 
     return $["ui" : ui, "return" : size (err_msg) == 0];

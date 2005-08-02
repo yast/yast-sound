@@ -165,6 +165,8 @@
     map rc_vars_b = nil;
     list volume_settings_b = nil;
 
+    global string selected_uniq = "";
+
 
     /* default value of settings modified */
     global boolean modified = false;
