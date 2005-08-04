@@ -84,7 +84,7 @@
 
 		    map<string,any> r = $[
 			"id" : card["unique_key"]:"",
-			"table_descr" : [ _("Not Configured"), card["model"]:"" ],
+			"table_descr" : [ _("Not configured"), card["model"]:"" ],
 			"rich_descr" : WizardHW::CreateRichTextDescription(card["model"]:"", WizardHW::UnconfiguredDevice())
 		    ];
 

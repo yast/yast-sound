@@ -266,10 +266,11 @@ to save sound card information.
 ") +
 
 _("<P>Select an unconfigured card from the list and press <B>Edit</B> to
-configure it. If the card was not autodetected, press <B>Add</B> button and
-configure the card manually.</P>") +
+configure it. If the card was not detected, press <B>Add</B> and
+configure the card manually.</P>
+") +
 
-_("<p> Use <b>Delete</b> to remove a configured sound card. </p> ") +
+_("<p>Use <b>Delete</b> to remove a configured sound card. </p> ") +
 
 _("<P>
 To change the configuration of a card, select the card.
@@ -278,9 +279,10 @@ Then press <B>Edit</B>.
 ") +
 
 _("<p>
-In <b>Advanced</b> menu you can set volume of the selected card or configure
+Use <b>Advanced</b> to set volume of the selected card or configure
 module loading for playing MIDI files. These modules can be loaded on demand.
-</p>\n"));
+</p>
+"));
 
 	    ret = add(ret, "ErrorDialog",
 _("<p>An error has occurred. </p>") +
