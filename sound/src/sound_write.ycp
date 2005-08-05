@@ -199,7 +199,7 @@
 	// restart ALSA
 	if (size(configuredcards) > 0)
 	{
-	    SCR::Execute(.target.bash, "/etc/init.d/alsasound restart", $[]);
+	    SCR::Execute(.target.bash, "/etc/init.d/alsasound reload", $[]);
 	    logmixer("after restart");
 	}
     }

@@ -169,7 +169,7 @@
 	if (Sound::use_alsa)
 	{
 	    SCR::Execute (.target.bash,
-		"/etc/init.d/alsasound stop > /dev/null 2>&1", $[]);
+		"/etc/init.d/alsasound unload > /dev/null 2>&1", $[]);
 	}
 	else
 	{

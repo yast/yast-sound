@@ -719,7 +719,7 @@ module parameters, including invalid IO or IRQ parameters."), modname);
 
 	    // restart ALSA after sound font copy
 	    y2milestone("Restarting ALSA: %1",
-		SCR::Execute(.target.bash, "/etc/init.d/alsasound restart"));
+		SCR::Execute(.target.bash, "/etc/init.d/alsasound reload"));
 
 	    // step4:
 	    if (cnt > 0)
