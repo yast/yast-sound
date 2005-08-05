@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Aug  5 08:57:54 CEST 2005 - lslezak@suse.cz
+
+- use new alsasound initscript commands (unload/reload)
+- 2.12.5
+
+-------------------------------------------------------------------
 Thu Aug  4 11:16:16 CEST 2005 - lslezak@suse.cz
 
 - merged proofread texts
