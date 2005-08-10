@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Aug 10 10:51:49 CEST 2005 - lslezak@suse.cz
+
+- properly initialize mixer during installation (#102663)
+- use title style capitalization in dialog headers
+- 2.12.6
+
+-------------------------------------------------------------------
 Fri Aug  5 08:57:54 CEST 2005 - lslezak@suse.cz
 
 - use new alsasound initscript commands (unload/reload)

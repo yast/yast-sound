@@ -412,7 +412,7 @@
 	}
 
 	// dialog title
-	Wizard::SetContents (_("Sound card advanced options"), con, help_text,
+	Wizard::SetContents (_("Sound Card Advanced Options"), con, help_text,
 	    true, true);
 
 	if (size (itemized_descriptions) > 0)

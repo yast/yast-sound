@@ -1145,25 +1145,31 @@ could make your system unstable.
      * @param modname name of sound module
      */
     global define void  InitMixer(integer c_id, string modname) ``{
+	y2milestone("InitMixer: %1, %2", c_id, modname);
         map devs = db_modules[modname, "mixer"]:$["Master":70, "PCM":70, "CD":70, "Synth": 70];
+	y2milestone("Mixer devices: %1", devs);
 
 	// now let's merge settings from volume_settings list
 	if (is (volume_settings[c_id]:nil, list))
 	{
-	    y2debug("volume_settings[c_id]:nil: %1", volume_settings[c_id]:nil);
+	    y2debug("cvolume_settings[c_id]:nil: %1", volume_settings[c_id]:nil);
 	    foreach (list channel, volume_settings[c_id]:[], ``{
 		y2debug("devs: %1", devs);
 		y2debug("channel: %1", channel);
 		devs = add (devs, channel[0]:"Master", channel[1]:70);
 	    });
 	}
+	y2milestone("Mixer devices after merge: %1", devs);
+
         list devs2 = [];
 
         foreach (string dev, integer vol, (map<string,integer>)devs, ``{
 	    SetVolume (c_id, dev, vol);
+	    y2milestone("Set volume: card: %1, channel: %2, volume: %3", c_id, dev, vol);
 	    devs2 = add (devs2, dev);
 	});
 
+	y2milestone("unmute devices: %1", devs2);
         unmute(devs2, c_id);
     }
 

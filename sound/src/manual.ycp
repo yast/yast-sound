@@ -202,7 +202,7 @@
 	);
 
 	// dialog title
-	Wizard::SetContentsButtons (_("Manual sound card selection"), contents,
+	Wizard::SetContentsButtons (_("Manual Sound Card Selection"), contents,
 	    helptext, Label::BackButton(), Label::NextButton());
 
 	if (Sound::curr_model == "")

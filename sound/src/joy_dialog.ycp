@@ -410,7 +410,7 @@ and press some of its buttons several times.
 	});
 
 	// dialog header
-	string caption = _("Joystick configuration") +
+	string caption = _("Joystick Configuration") +
 	    sformat (" - %1 (snd-card-%2)", cardname, card_id);
 
 	string helptext =

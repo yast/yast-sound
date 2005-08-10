@@ -339,7 +339,7 @@ define map HardwareDialog() {
     }
 
     // dialog title
-    WizardHW::CreateHWDialog(_("Sound configuration"),
+    WizardHW::CreateHWDialog(_("Sound Configuration"),
 	Sound::STRINGS["ComplexDialog"]:"",
 	// table header
 	[_("Number"), _("Card Model")],

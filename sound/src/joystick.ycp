@@ -100,7 +100,7 @@
 	else if (size(filtered) == 0)		// no sound card
 	{
 	    // dialog label
-	    Wizard::SetContents(_("Joystick configuration"), `Empty(), "",
+	    Wizard::SetContents(_("Joystick Configuration"), `Empty(), "",
 	        false, false);
 
 	    string message = (size(cards) > 0) ?
@@ -155,7 +155,7 @@
 
 	    Wizard::SetContents(
 	        // dialog caption
-	        _("Configured sound cards with joystick support"),
+	        _("Configured Sound Cards With Joystick Support"),
 	        dialog, helptext, true, true);
 
 	    Wizard::SetNextButton(`next, Label::FinishButton() );
