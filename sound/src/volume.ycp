@@ -104,7 +104,7 @@
 	term con		= VolumeCon(save_entry, vol);
 
 	// dialog title
-	Wizard::SetContents (_("Sound card volume"), con, help_text, true,true);
+	Wizard::SetContents (_("Sound Card Volume"), con, help_text, true,true);
 
 	if (Mode::config())
 	{
@@ -163,7 +163,7 @@
 		{
 		    con = VolumeCon(save_entry, vol);
 		    // dialog header
-		    Wizard::SetContents (_("Sound card volume"), con,
+		    Wizard::SetContents (_("Sound Card Volume"), con,
 			help_text, true, true);
 		    continue;
 		}

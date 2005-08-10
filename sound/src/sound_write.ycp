@@ -71,6 +71,7 @@
     import "Wizard";
     import "Service";
     import "Package";
+    import "Mode";
 
     import "Sound";
     import "Joystick";
@@ -78,6 +79,8 @@
     define void logmixer(string when) {
 	// log mixer settings
 	y2milestone("Mixer (%1): %2", when, SCR::Execute(.target.bash_output, "/usr/bin/amixer"));
+	y2milestone("volume_settings: %1", Sound::volume_settings);
+	y2milestone("asound size: %1", SCR::Read(.target.size, "/etc/asound.state"));
     }
 
     // ==== MAIN ====
@@ -111,7 +114,7 @@
 
     list stones2 = [
 	    // progress bar item
-	    _("Saving sound card settings."),
+	    _("Saving sound card settings..."),
 	    // progress bar item
 	    _("Saving card information..."),
 	    // progress bar item
@@ -119,7 +122,7 @@
 	    // progress bar item
 	    _("Starting sound card..."),
 	    // progress bar item
-	    _("Storing volume settings"),
+	    _("Storing volume settings..."),
 	    // progress bar item
 	    _("Storing joystick settings...")];
 
@@ -128,9 +131,9 @@
     if (!Sound::write_only)
     {
 	// progres bar label
-	Progress::New (_("Saving sound card settings."), " ", size(stones) - 1,
+	Progress::New (_("Saving sound card settings"), " ", size(stones) - 1,
 		// progres bar label
-		stones, stones2, _("Saving sound card settings."));
+		stones, stones2, _("Saving sound card settings"));
         if (Sound::use_ui)
 	    Wizard::DisableAbortButton();
     }
@@ -173,22 +176,11 @@
 
     SaveRCValues(rc_values);
 
-    logmixer("after SaveRCValues");
+    y2milestone("Sound::write_only: %1", Sound::write_only);
+
     sleep(10);
     Progress::NextStage();
 
-    y2debug("volume_settings: %1", Sound::volume_settings);
-
-    // initialize mixer settings before alsasound restart (which creates asound.state file)
-    if (SCR::Read(.target.size, "/etc/asound.state") == -1 || Sound::write_only)
-    {
-	integer i = 0;
-	maplist (map e, (list<map>) save_info, ``{
-	    Sound::InitMixer (i, e["module"]:"");
-	    i = i + 1;
-	});
-	y2debug("Mixer initialized");
-    }
 
     list configuredcards = Sound::GetSoundCardList();
     if (!Sound::write_only)
@@ -200,16 +192,31 @@
 	if (size(configuredcards) > 0)
 	{
 	    SCR::Execute(.target.bash, "/etc/init.d/alsasound reload", $[]);
-	    logmixer("after restart");
 	}
     }
 
     Progress::NextStage();
 
-    logmixer("before SaveVolume");
+    // initialize mixer settings
+    if (Mode::installation() || SCR::Read(.target.size, "/etc/asound.state") == -1 || Sound::write_only)
+    {
+	integer i = 0;
+	maplist (map e, (list<map>) save_info, ``{
+	    Sound::InitMixer (i, e["module"]:"");
+	    i = i + 1;
+	});
+	y2milestone("Mixer is initialized");
+    }
+    else
+    {
+	y2milestone("Mixer was not initialized during saving");
+    }
+
+    logmixer("Mixer status before saving the volume");
+    y2milestone("volume_settings: %1", Sound::volume_settings);
 
     SaveVolume();
-    logmixer("after SaveVolume");
+    logmixer("Mixer status after saving the volume");
 
     if (Sound::write_only && haskey (settings, "volume_settings"))
     {
@@ -225,7 +232,6 @@
     // write joystick configuration
     Joystick::Write (abort_block);
 
-    logmixer("before service adjust");
     if (size(configuredcards) > 0)
     {
 	// enable alsasound service in runlevels 2,3,5
@@ -237,7 +243,6 @@
 	Service::Adjust("joystick", "disable");
 	Service::Adjust("alsasound", "disable");
     }
-    logmixer("after service adjust");
 
     return true;// TODO return value!
 }
