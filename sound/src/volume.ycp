@@ -271,8 +271,6 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
     string err_msg		= "";
     list<map> modules_conf_backup	= Sound::modules_conf;
 
-    if (Sound::use_ui) Wizard::DisableAbortButton();
-
     if (Sound::use_ui)
     {
         stop_programs();
@@ -388,7 +386,6 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
     if (Sound::use_ui)
     {
 	Wizard::RestoreNextButton();
-	Wizard::EnableAbortButton();
     }
 
     return $["ui" : ui, "return" : size (err_msg) == 0];
