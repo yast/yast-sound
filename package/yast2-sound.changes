@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Aug 12 09:13:32 CEST 2005 - lslezak@suse.cz
+
+- updated sound card database (for kernel 2.6.13-rc6) (#104324)
+- enable Abort button in the error dialog (#102534)
+- 2.12.7
+
+-------------------------------------------------------------------
 Wed Aug 10 10:51:49 CEST 2005 - lslezak@suse.cz
 
 - properly initialize mixer during installation (#102663)
