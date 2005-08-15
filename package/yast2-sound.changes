@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Aug 15 17:07:59 CEST 2005 - lslezak@suse.cz
+
+- merged proofread texts
+- 2.12.8
+
+-------------------------------------------------------------------
 Fri Aug 12 09:13:32 CEST 2005 - lslezak@suse.cz
 
 - updated sound card database (for kernel 2.6.13-rc6) (#104324)

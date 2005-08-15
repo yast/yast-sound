@@ -131,9 +131,9 @@
     if (!Sound::write_only)
     {
 	// progres bar label
-	Progress::New (_("Saving sound card settings"), " ", size(stones) - 1,
+	Progress::New (_("Saving sound card settings..."), " ", size(stones) - 1,
 		// progres bar label
-		stones, stones2, _("Saving sound card settings"));
+		stones, stones2, _("Saving sound card settings..."));
         if (Sound::use_ui)
 	    Wizard::DisableAbortButton();
     }

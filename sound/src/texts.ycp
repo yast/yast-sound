@@ -260,7 +260,7 @@ To save the current configuration, press <B>Finish</B>.
 	{
 	    ret = add(ret, "ComplexDialog",
 _("<p><b>Sound Cards</b></p>
-<p>This is the complete sound card list. Use the <b>Finish</b> button 
+<p>This is the complete sound card list. Use <b>Finish</b> 
 to save sound card information.
 </p>
 ") +
@@ -279,7 +279,7 @@ Then press <B>Edit</B>.
 ") +
 
 _("<p>
-Use <b>Advanced</b> to set volume of the selected card or configure
+Use <b>Advanced</b> to set the volume of the selected card or configure
 module loading for playing MIDI files. These modules can be loaded on demand.
 </p>
 "));

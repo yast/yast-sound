@@ -155,7 +155,7 @@
 
 	    Wizard::SetContents(
 	        // dialog caption
-	        _("Configured Sound Cards With Joystick Support"),
+	        _("Configured Sound Cards with Joystick Support"),
 	        dialog, helptext, true, true);
 
 	    Wizard::SetNextButton(`next, Label::FinishButton() );
