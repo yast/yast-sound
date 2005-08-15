@@ -281,7 +281,7 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
     term con = mixerWidget (channels);
 
     // dialog header
-    Wizard::SetContents (sformat(_("Volume Settings for Card '%1'"), card_id),
+    Wizard::SetContents (sformat(_("Volume Settings for Card %1"), card_id),
 	con, help, true, true);
     Wizard::RestoreNextButton();
 
