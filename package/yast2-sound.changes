@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Aug 19 15:20:13 CEST 2005 - lslezak@suse.cz
+
+- mixer - initialize also "Front", "Headphone" and "Master Mono"
+  channels (#105486)
+- 2.12.9
+
+-------------------------------------------------------------------
 Mon Aug 15 17:07:59 CEST 2005 - lslezak@suse.cz
 
 - merged proofread texts
