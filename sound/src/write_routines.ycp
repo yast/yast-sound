@@ -335,6 +335,9 @@
 
 	removeOldEntries (als);
 
+	// remove deleted sound cards
+	RemoveHWConfig();
+
 	if (size(save_info) >0)
 	{
 	    if (!Sound::use_alsa)
@@ -354,9 +357,6 @@
             err_msg = err_msg + Sound::STRINGS["SaveModuleEntry"]:"";
             return $["return": false, "err_msg": err_msg];
         }
-
-	// remove deleted sound cards
-	RemoveHWConfig();
 
 	// write the settings
 	HWConfig::Flush();

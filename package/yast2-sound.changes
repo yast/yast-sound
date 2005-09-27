@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Sep 27 15:07:29 CEST 2005 - lslezak@suse.cz
+
+- remove cards before writing configured cards (#116483)
+- version 2.13.0
+
+-------------------------------------------------------------------
 Fri Aug 19 15:20:13 CEST 2005 - lslezak@suse.cz
 
 - mixer - initialize also "Front", "Headphone" and "Master Mono"
