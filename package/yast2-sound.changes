@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Wed Nov 16 16:31:38 CET 2005 - lslezak@suse.cz
+
+- save configuration to hwcfg-vpid-* file which is independent
+  on card location (slot number) (#128629)
+- wait after module loading before sound card check (#96965)
+- added IO address 0x538 for opl3sa2 module to the option list
+  (#132504)
+- 2.13.1
+
+-------------------------------------------------------------------
 Tue Sep 27 15:07:29 CEST 2005 - lslezak@suse.cz
 
 - remove cards before writing configured cards (#116483)

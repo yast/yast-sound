@@ -167,6 +167,10 @@
 			{
 			    entry["bus"] = dcard["bus_hwcfg"]:"";
 			    entry["bus_id"] = dcard["sysfs_bus_id"]:"";
+			    entry["vendor_id"] = dcard["vendor_id"]:0;
+			    entry["sub_vendor_id"] = dcard["sub_vendor_id"]:0;
+			    entry["device_id"] = dcard["device_id"]:0;
+			    entry["sub_device_id"] = dcard["sub_device_id"]:0;
 			}
 		    }
 		}
@@ -217,6 +221,39 @@
 	// get list of all config files
 	list<string> cfiles = HWConfig::ConfigFiles();
 
+	// read module options
+	list<map> mod_opts = read_save_info();
+	y2milestone("mod_opts: %1", mod_opts);
+
+	map<string, map> cardopts = $[];
+	map<string, any> ids = $[];
+	foreach(map op, mod_opts, {
+		cardopts[op["alias"]:""] = op["options"]:$[];
+
+		map idmap = $[];
+
+		if (op["vendor_id"]:0 != 0 && op["device_id"]:0 != 0)
+		{
+		    idmap["vendor_id"] = op["vendor_id"]:0;
+		    idmap["device_id"] = op["device_id"]:0;
+		}
+		if (op["sub_vendor_id"]:0 != 0 && op["sub_device_id"]:0 != 0)
+		{
+		    idmap["sub_vendor_id"] = op["sub_vendor_id"]:0;
+		    idmap["sub_device_id"] = op["sub_device_id"]:0;
+		}
+		if (op["bus"]:"" != "")
+		{
+		    idmap["bus"] = op["bus"]:"";
+		}
+
+		ids[op["unique_key"]:""] = idmap;
+	    }
+	);
+
+	y2milestone("read module options: %1", cardopts);
+	y2milestone("read IDs: %1", ids);
+
 	// scan each config file - search for sound card config
 	foreach(string cfile, cfiles, {
 	    string com = HWConfig::GetComment(cfile, "MODULE");
@@ -235,7 +272,23 @@
 
 			    if (alias != nil)
 			    {
+				entry["hwcfg"] = cfile;
 				entry["alias"] = alias;
+
+				// if the file uses the old config then force update
+				if (regexpmatch(cfile, "^bus-pci-"))
+				{
+				    y2milestone("detected old configuration file (%1), forced update of the configuration", cfile);
+				    Sound::SetModified();
+				}
+
+				map opts = cardopts[alias]:$[];
+
+				if (size(opts) > 0)
+				{
+				    entry["options"] = opts;
+				}
+
 				sound_card_found = true;
 			    }
 			}
@@ -247,6 +300,10 @@
 			    if (uniq != nil)
 			    {
 				entry["unique_key"] = uniq;
+
+				// add vendor/device ID
+				map idmap = ids[uniq]:$[];
+				entry = union(entry, idmap);
 			    }
 
 			    if (name != nil)
@@ -269,10 +326,9 @@
 
 		// TODO add bus ID
 
-		// TODO: read module options
 		if (sound_card_found)
 		{
-		    y2debug("Found sound card hwconfig (%1): %2", cfile, entry);
+		    y2milestone("Found sound card hwconfig (%1): %2", cfile, entry);
 		    ret = add(ret, entry);
 		}
 	    }
