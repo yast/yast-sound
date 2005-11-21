@@ -510,8 +510,8 @@ could make your system unstable.
      * @return void
      */
     global define void ReadModulesConf() ``{
-	modules_conf = read_save_info();
-//	modules_conf = read_hwconfig();
+	modules_conf = read_hwconfig();
+	y2milestone("read_hwconfig: %1", modules_conf);
     }
 
 
@@ -585,8 +585,14 @@ could make your system unstable.
 		    "unique_key": card["unique_key"]:"",
 		    "options"   : opts,
 		    "bus"	: card["bus_hwcfg"]:"",
-		    "bus_id"	: card["sysfs_bus_id"]:""
+		    "bus_id"	: card["sysfs_bus_id"]:"",
+
+		    "vendor_id"		: card["vendor_id"]:0,
+		    "sub_vendor_id"	: card["sub_vendor_id"]:0,
+		    "device_id"		: card["device_id"]:0,
+		    "sub_device_id"	: card["sub_device_id"]:0
 		];
+
 		return entry;
 		});
 	    }

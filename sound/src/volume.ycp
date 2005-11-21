@@ -298,6 +298,8 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
     {
 	sound_stop();
 	sound_start_tmp(true);
+	// wait a while - sound card initialization takes some time
+	sleep(1500);
 	err_msg = check_module(save_entry, card_id);
     }
 

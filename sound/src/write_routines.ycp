@@ -100,6 +100,20 @@
 	return file;
     }
 
+    define string tounprefixedhexstring(integer i) {
+	if (i == nil)
+	{
+	    return "";
+	}
+
+	string hex = tohexstring(i);
+
+	// remove '0x' prefix, ignore bus type prefix if it is present
+	integer i = (size(hex) > 6) ? 3 : 2;
+
+	return substring(hex, i);
+    }
+
     /**
      * Saves one '/etc/modules.conf' entry
      * @param entry card config
@@ -111,7 +125,15 @@
         path mod_alias_comment	=
             add ( add (.modprobe_sound.alias, entry ["alias"]:"off"),"comment");
 
-	y2debug("entry: %1", entry);
+	y2milestone("Save card: %1", entry);
+
+	// remove the old configuration file
+	if (entry["hwcfg"]:"" != "")
+	{
+	    string rm = "rm -f /etc/sysconfig/hardware/hwcfg-" + entry["hwcfg"]:"";
+	    y2milestone("Removing old configuration file: %1", rm);
+	    SCR::Execute(.target.bash, rm);
+	}
 
 	// save hwcfg config file
 	string file = "";
@@ -119,72 +141,18 @@
 	{
 	    y2milestone("The soundcard is not attached to PCI");
 
-	    // get all static configurations
-	    list<string> configs = HWConfig::ConfigFiles();
-	    configs = filter(string f, configs, {return regexpmatch(f, "^static-[0-9]*");});
-	    y2milestone("found static configs: %1", configs);
-
-	    // search existing config file
-	    if (size(configs) > 0)
-	    {
-		integer greatest = -1;
-		boolean found = false;
-
-		// search existing config
-		foreach(string f, configs, {
-			if (!found)
-			{
-			    // read MODULE comment
-			    string comment = HWConfig::GetComment(f, "MODULE");
-
-			    if (comment != nil && comment != "")
-			    {
-				y2debug("comment: %1", comment);
-				y2debug("alias: %1", entry["alias"]:"");
-				y2debug("unique_key: %1", entry["unique_key"]:"");
-				// search for sound alias and uniqID
-				if (regexpmatch(comment, entry["alias"]:"") && regexpmatch(comment, entry["unique_key"]:""))
-				{
-				    file = f;
-				    found = true;
-				    y2milestone("Found flags in file: %1", f);
-				}
-			    }
-
-			    if (!found)
-			    {
-				// not found, check config number
-				string num = regexpsub(f, "^static-([0-9]*)", "\\1");
-
-				if (num != nil)
-				{
-				    integer num_i = tointeger(num);
-				    if (num_i != nil && num_i > greatest)
-				    {
-					greatest = num_i;
-				    }
-				}
-			    }
-			}
-		    }
-		);
-
-		if (file == nil || file == "")
-		{
-		    y2debug("file empty, greatest: %1", greatest);
-		    // not found - create new config
-		    file = sformat("static-%1", greatest + 1);
-		}
-	    }
-	    else
-	    {
-		file = "static-0";
-	    }
+	    file = "static-sound-" + entry["index"]:"0";
 	}
 	else
 	{
-	    file = "bus-pci-" + entry["bus_id"]:"";
+	    file = sformat("vpid-%1-%2", tounprefixedhexstring(entry["vendor_id"]:0), tounprefixedhexstring(entry["device_id"]:0));
+
+	    if (haskey(entry, "sub_vendor_id") && haskey(entry, "sub_device_id"))
+	    {
+		file = file + sformat("-%1-%2", tounprefixedhexstring(entry["sub_vendor_id"]:0), tounprefixedhexstring(entry["sub_device_id"]:0));
+	    }
 	}
+
 	y2milestone("using hwcfg file: hwcfg-%1", file);
 
         boolean ret = true;
@@ -194,6 +162,8 @@
 	    ret = ret && HWConfig::SetValue(file, "MODULE", entry["module"]:"");
 	    // set automatic start at boot
 	    ret = ret && HWConfig::SetValue(file, "STARTMODE", "auto");
+
+	    HWConfig::Flush();
 
 	    string modcomment = createAliasComment(entry["model"]: "", entry["unique_key"]:"");
 	    string comment = "# YaST configured sound card " + entry["alias"]:"" + "\n" + modcomment;
@@ -278,35 +248,22 @@
     define boolean RemoveHWConfig() {
 	boolean ret = true;
 
+	y2debug("Sound::removed_info: %1", Sound::removed_info);
+
 	if (Sound::removed_info != nil)
 	{
 	    foreach(map info, Sound::removed_info, {
-		    string bus = info["bus_hwcfg"]:"";
-		    string bus_id = info["sysfs_bus_id"]:"";
-		    string uk = info["unique_key"]:"";
+		    string file = info["hwcfg"]:"";
 
-		    if (bus == "pci")
+		    if (file != "")
 		    {
-			string file = "bus-pci-" + bus_id;
-
 			y2milestone("Removing file: %1", file);
 			ret = ret && HWConfig::RemoveConfig(file);
 		    }
-		    else
-		    {
-			if (uk != nil && uk != "")
-			{
-			    string file = FindStaticHWConfig(uk);
-
-			    if (file != nil)
-			    {
-				y2milestone("Removing file: %1", file);
-				ret = ret && HWConfig::RemoveConfig(file);
-			    }
-			}
-		    }
 		}
 	    );
+
+	    HWConfig::Flush();
 	}
 	return ret;
     }
@@ -331,8 +288,8 @@
 	{
 	    als = (list)SCR::Read(mod_alias);
 	}
-	// remove old entries
 
+	// remove old entries
 	removeOldEntries (als);
 
 	// remove deleted sound cards
