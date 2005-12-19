@@ -2334,7 +2334,7 @@
         "precise_ptr" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "1",
-          "descr" : _("Enable precise pointer, or disable."),
+          "descr" : _("Enable precise pointer or disable."),
           "dialog" : "check"
         ]
       ]
