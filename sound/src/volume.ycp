@@ -298,9 +298,22 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
     {
 	sound_stop();
 	sound_start_tmp(true);
-	// wait a while - sound card initialization takes some time
-	sleep(1500);
+
 	err_msg = check_module(save_entry, card_id);
+
+	integer attempt = 0;
+	while(size(err_msg) > 0 && attempt < 5)
+	{
+	    y2milestone("starting extra attempt: %1", attempt);
+
+	    // wait for a while and do the second test
+	    sleep(1000);
+	    err_msg = check_module(save_entry, card_id);
+
+	    y2milestone("result of the extra attempt: %1", err_msg);
+
+	    attempt = attempt + 1;
+	}
     }
 
     symbol ui = nil;
