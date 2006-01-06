@@ -18,6 +18,7 @@
 {
     import "Sound";
     import "HWConfig";
+    import "Confirm";
 
     include "sound/routines.ycp";// for is_snd_alias()
 
@@ -110,8 +111,20 @@
 	integer position = -1;
 	map mod_occur	= $[];			// alsa modules
 
-	list<map> detected_cards = (list<map>)SCR::Read(.probe.sound);
-	y2debug("detected_cards: %1", detected_cards);
+	list<map> det_cards = [];
+
+	/* Confirmation: label text (detecting hardware: xxx) */
+	if (!Confirm::Detection (_("Sound Cards")))
+	{
+	    det_cards = [];
+	    Sound::skip_detection = true;
+	}
+	else
+	{
+	    det_cards = (list<map>)SCR::Read(.probe.sound);
+	}
+
+	y2debug("Detected cards: %1", det_cards);
 
 	foreach (string a, aliases, ``{
 
@@ -159,7 +172,7 @@
 		"model"		: model
 	    ];
 
-	    foreach(map dcard, detected_cards, {
+	    foreach(map dcard, det_cards, {
 		    if (dcard["unique_key"]:"" == uniq)
 		    {
 			y2debug("Found uniq %1: %2", uniq, dcard);
