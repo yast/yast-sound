@@ -18,7 +18,6 @@
     import "Crash";
     import "Progress";
     import "Label";
-    import "Confirm";
     import "String";
 
     /**
@@ -157,6 +156,11 @@
      * even if they are not defined in control file
      */
     global boolean configure_detected	= false;
+
+    /**
+     * Do not detect sounc cards, skip hardware probing
+     */
+    global boolean skip_detection = false;
 
     /**
      * backup structures for sound settings
@@ -488,8 +492,7 @@ could make your system unstable.
 	    detected_cards = [];
 	}
 
-	/* Confirmation: label text (detecting hardware: xxx) */
-	if (!Confirm::Detection (_("Sound Cards")))
+	if (skip_detection)
 	{
 	    detected_cards = [];
 	    return true;
@@ -1158,7 +1161,7 @@ could make your system unstable.
 	// now let's merge settings from volume_settings list
 	if (is (volume_settings[c_id]:nil, list))
 	{
-	    y2debug("cvolume_settings[c_id]:nil: %1", volume_settings[c_id]:nil);
+	    y2milestone("cvolume_settings[c_id]:nil: %1", volume_settings[c_id]:nil);
 	    foreach (list channel, volume_settings[c_id]:[], ``{
 		y2debug("devs: %1", devs);
 		y2debug("channel: %1", channel);
