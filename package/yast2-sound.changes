@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jan  9 08:49:02 CET 2006 - lslezak@suse.cz
+
+- use Package:: module (Require:: is obsoleted)
+- 2.13.5
+
+-------------------------------------------------------------------
 Fri Jan  6 10:02:21 CET 2006 - lslezak@suse.cz
 
 - properly skip sound card detection in the manual mode (#137908)
