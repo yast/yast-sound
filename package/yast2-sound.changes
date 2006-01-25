@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jan 25 10:52:36 CET 2006 - lslezak@suse.cz
+
+- updated the sound card database
+- 2.13.6
+
+-------------------------------------------------------------------
 Mon Jan  9 08:49:02 CET 2006 - lslezak@suse.cz
 
 - use Package:: module (Require:: is obsoleted)

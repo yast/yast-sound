@@ -89,7 +89,6 @@ $[
     68	: "snd-virmidi",
     69	: "snd-wavefront",
     70	: "snd-vxpocket",
-    71	: "snd-vxp440",
     72	: "snd-ymfpci",
     73	: "snd-atiixp",
     74	: "snd-atiixp-modem",
@@ -97,6 +96,7 @@ $[
     76	: "snd-emu10k1x",
     77	: "snd-ca0106",
     78	: "snd-hda-intel",
+    79  : "snd-pcxhr",
 
     100 : "snd-powermac"
 ]
