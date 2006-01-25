@@ -458,10 +458,12 @@ snd-ice1712	id	enable:(enable),unique
 snd-ice1712	enable	allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
 snd-ice1712	omni	enable:(enable),allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
 snd-ice1712	cs8427_timeout	enable:(enable)	allows:{{1,1000}},default=500,skill:advanced
+snd-ice1712	model	enable:(enable)
 
 snd-ice1724	index	enable:(enable),allows:{{0,7}},unique,skill:required,dialog:list
 snd-ice1724	id	enable:(enable),unique
 snd-ice1724	enable	allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
+snd-ice1724	model	enable:(enable)
 
 snd-ymfpci	index	enable:(enable),allows:{{0,7}},unique,skill:required,dialog:list
 snd-ymfpci	id	enable:(enable),unique
@@ -481,6 +483,7 @@ snd-intel8x0	enable	allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
 snd-intel8x0	ac97_clock	enable:(enable),default:0
 snd-intel8x0	ac97_quirk	enable:(enable),allows:{{-1,7}},dialog:list,default:-1
 snd-intel8x0	buggy_irq	enable:(enable),allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
+snd-intel8x0	buggy_semaphore	enable:(enable),allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
 
 snd-azt3328	index	enable:(enable),allows:{{0,7}},unique,skill:required,dialog:list
 snd-azt3328	id	enable:(enable),unique
@@ -600,11 +603,6 @@ snd-vxpocket	id	enable:(enable),unique
 snd-vxpocket	enable	allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
 snd-vxpocket	ibl	enable:(enable)
 
-snd-vxp440	index	enable:(enable),allows:{{0,7}},unique,skill:required,dialog:list
-snd-vxp440	id	enable:(enable),unique
-snd-vxp440	enable	allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
-snd-vxp440	ibl	enable:(enable)
-
 snd-pdaudiocf	index	enable:(enable),allows:{{0,7}},unique,skill:required,dialog:list
 snd-pdaudiocf	id	enable:(enable),unique
 snd-pdaudiocf	enable	allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
@@ -650,6 +648,14 @@ snd-pdplus	debug_level	global
 snd-usb-usx2y	index	enable:(enable),allows:{{0,7}},unique,skill:required,dialog:list
 snd-usb-usx2y	id	enable:(enable),unique
 snd-usb-usx2y	enable	allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
+
 snd-hda-intel	index	enable:(enable),allows:{{0,7}},unique,skill:required,dialog:list
 snd-hda-intel	id	enable:(enable),unique
 snd-hda-intel	enable	allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
+snd-hda-intel	model	enable:(enable)
+snd-hda-intel	position_fix	enable:(enable),allows:{{0,auto},{1,none},{2,posbuf},{3,fifo}},default:0,dialog:check
+snd-hda-intel	single_cmd	enable:(enable),allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
+
+snd-pcxhr	id	enable:(enable),unique
+snd-pcxhr	enable	allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
+snd-pcxhr	mono	enable:(enable),allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
