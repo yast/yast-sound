@@ -1,7 +1,7 @@
 @HEADER-COMMENT@
-# neededforbuild alsa alsa-devel gpp libgpp yast2-devel-packages
 
 @HEADER@
+BuildRequires:	alsa-devel gcc-c++ yast2-devel-packages
 Requires:	yast2 alsa
 
 Provides:	yast2-config-sound yast2-agent-audio yast2-agent-audio-devel
