@@ -518,6 +518,16 @@
       "SIS966, SiS",
       "MCP51 (HDA), NVidia"
     ],
+    79 : [
+      "PCXHR, Digigram"
+    ],
+    80 : [
+      "AD1889, Analog Devices"
+    ],
+    81 : [
+      "CS5535, National Semiconductor",
+      "CS5536, AMD"
+    ],
     100 : [
       "PowerBook, Apple",
       "PowerMac, Apple",
@@ -647,6 +657,9 @@
       17272 : 74,
       17275 : 78
     ],
+    4107 : $[
+      46 : 81
+    ],
     4115 : $[
       24577 : 19,
       24579 : 19,
@@ -654,6 +667,7 @@
       24581 : 18
     ],
     4130 : $[
+      8339 : 81,
       29765 : 38,
       29766 : 39,
       29805 : 38
@@ -738,6 +752,9 @@
       12377 : 66,
       12392 : 75,
       12936 : 78
+    ],
+    4564 : $[
+      6281 : 80
     ],
     4653 : $[
       20700 : 11,
@@ -967,6 +984,8 @@
     77 : "snd-ca0106",
     78 : "snd-hda-intel",
     79 : "snd-pcxhr",
+    80 : "snd-ad1889",
+    81 : "snd-cs5535audio",
     100 : "snd-powermac"
   ],
   "modules" : $[
@@ -1068,6 +1087,11 @@
 	   _("Enable only for the onboard CS4248 of IBM Thinkpad 360/750/755 series."),
           "dialog" : "check"
         ]
+      ]
+    ],
+    "snd-ad1889" : $[
+      "description" : "Analog Devices AD1889 ALSA sound driver",
+      "params" : $[
       ]
     ],
     "snd-ali5451" : $[
@@ -1720,6 +1744,11 @@
 	   _("Force to enable Thinkpad's CLKRUN control."),
           "dialog" : "check"
         ]
+      ]
+    ],
+    "snd-cs5535audio" : $[
+      "description" : "CS5535 Audio",
+      "params" : $[
       ]
     ],
     "snd-dt019x" : $[
@@ -3708,6 +3737,7 @@
       "Virtual rawmidi device"
     ],
     "AMD" : [
+      "CS5536",
       "AMD768",
       "AMD8111",
       "AMD768 (modem)",
@@ -3751,7 +3781,8 @@
       "AD1815",
       "AD1816A",
       "AD1847",
-      "AD1848"
+      "AD1848",
+      "AD1889"
     ],
     "Apple" : [
       "PowerBook",
@@ -3896,6 +3927,7 @@
     "Digigram" : [
       "VX442",
       "miXart",
+      "PCXHR",
       "VX222/Mic",
       "VXPocket V2",
       "VXPocket 440"
@@ -4101,6 +4133,9 @@
       "NForce2 Modem",
       "NForce2s Modem",
       "NForce3 Modem"
+    ],
+    "National Semiconductor" : [
+      "CS5535"
     ],
     "NeoMagic" : [
       "NM256AV",
