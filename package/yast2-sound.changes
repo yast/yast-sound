@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Feb 20 10:00:06 CET 2006 - lslezak@suse.cz
+
+- updated BuildRequires (replaced yast2-devel-packages macro)
+- 2.13.8
+
+-------------------------------------------------------------------
 Tue Jan 31 15:03:35 CET 2006 - lslezak@suse.cz
 
 - updated the sound card database
