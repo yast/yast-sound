@@ -2351,7 +2351,7 @@
         "single_cmd" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _("Use single command to communicate with codecs (for debugging only). (bool)"),
+          "descr" : _("Use single command to communicate with codecs (for debugging only) (bool)"),
           "dialog" : "check"
         ]
       ]
@@ -2441,7 +2441,7 @@
         "buggy_semaphore" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _("Enable workaround for hardwares with problematic codec semaphores. (bool)"),
+          "descr" : _("Enable work-around for hardwares with problematic codec semaphores (bool)"),
           "dialog" : "check"
         ]
       ]
