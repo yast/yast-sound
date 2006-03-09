@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Mar  9 13:13:23 CET 2006 - lslezak@suse.cz
+
+- merged proofread texts
+- 2.13.9
+
+-------------------------------------------------------------------
 Mon Feb 20 10:00:06 CET 2006 - lslezak@suse.cz
 
 - updated BuildRequires (replaced yast2-devel-packages macro)
