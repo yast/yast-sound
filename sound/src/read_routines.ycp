@@ -22,6 +22,8 @@
 
     include "sound/routines.ycp";// for is_snd_alias()
 
+    textdomain "sound";
+
     /**
      * tries to determine card model name from audio.alsa agent
      * @param card_id card id
