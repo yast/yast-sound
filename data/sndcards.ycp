@@ -2441,7 +2441,7 @@
         "buggy_semaphore" : $[
           "allows" : "{{0,Disabled},{1,Enabled}}",
           "default" : "0",
-          "descr" : _("Enable work-around for hardwares with problematic codec semaphores (bool)"),
+          "descr" : _("Enable work-around for hardware with problematic codec semaphores (bool)"),
           "dialog" : "check"
         ]
       ]
