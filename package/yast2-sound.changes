@@ -2,6 +2,7 @@
 Thu May  4 14:34:07 CEST 2006 - lslezak@suse.cz
 
 - merged proofread texts
+- read_routines.ycp - added textdomain
 - 2.13.10
 
 -------------------------------------------------------------------
