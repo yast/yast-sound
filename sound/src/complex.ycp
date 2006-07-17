@@ -189,50 +189,65 @@ define symbol EditConfigured()
     {
 	y2debug("Configuring card %1", Sound::selected_uniq);
 	map entry = Sound::modules_conf[idx_conf]:$[];
+	map oldentry = entry;
 
-	map res = sound_options(entry);
-	if (res["ui"]:nil == `next)
+	do
 	{
-	    map oldentry = entry;
-
-	    entry = res["return"]:$[];
-	    entry = add_common_options(entry, idx_conf);
-
-	    // update card data
-	    Sound::modules_conf = maplist(map card, Sound::modules_conf,
-		{
-		    if (card["unique_key"]:"" != Sound::selected_uniq)
-		    {
-			return card;
-		    }
-		    else
-		    {
-			return entry;
-		    }
-		}
-	    );
-	    if (oldentry != entry)
+	    map res = sound_options(entry);
+	    if (res["ui"]:nil == `next)
 	    {
-		// popup question text
-		if (Popup::YesNo(_("To apply changes, the sound system
+		entry = res["return"]:$[];
+		entry = add_common_options(entry, idx_conf);
+
+		// update card data
+		Sound::modules_conf = maplist(map card, Sound::modules_conf,
+		    {
+			if (card["unique_key"]:"" != Sound::selected_uniq)
+			{
+			    return card;
+			}
+			else
+			{
+			    return entry;
+			}
+		    }
+		);
+
+		y2milestone("updated config: %1", Sound::modules_conf);
+
+		if (oldentry != entry)
+		{
+		    // popup question text
+		    if (Popup::YesNo(_("To apply changes, the sound system
 must be restarted.
 Restart sound system now?
 ")))
-		{
-		    sound_stop();
-		    sound_start_tmp(true);
+		    {
+			y2milestone("Restarting sound system...");
+			sound_stop();
+			boolean started = sound_start_tmp(true);
+			y2milestone("... restart done: %1", started);
+
+			if (!started)
+			{
+			    Report::Error(_("Restart of the sound systen has failed.\nCheck options of the driver."));
+			    ret = `again;
+			    continue;
+			}
+		    }
 		}
+		ret = `next;
 	    }
-	    ret = `next;
+	    else if (res["ui"]:nil == `abort || res["ui"]:nil == `cancel)
+	    {
+		ret = `abort;
+	    }
+	    else
+	    {
+		ret = (symbol)res["ui"]:nil;
+	    }
 	}
-	else if (res["ui"]:nil == `abort || res["ui"]:nil == `cancel)
-	{
-	    ret = `abort;
-	}
-	else
-	{
-	    ret = (symbol)res["ui"]:nil;
-	}
+	while (ret == `again);
     }
 
     return ret;
@@ -244,7 +259,7 @@ define symbol Edit()
     integer idx_conf = getCardIndex((list<map<string,any> >)Sound::modules_conf, Sound::selected_uniq);
     integer idx_det = getCardIndex2((list<map<string,any> >)Sound::unconfigured_cards, Sound::selected_uniq);
 
-    y2debug("uniq (%1) in configured: %2, in detected: %3", Sound::selected_uniq, idx_conf, idx_det);
+    y2milestone("uniq (%1) in configured: %2, in detected: %3", Sound::selected_uniq, idx_conf, idx_det);
 
     // the card is already configured
     if (idx_conf != nil)
