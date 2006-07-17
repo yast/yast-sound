@@ -97,6 +97,8 @@ $[
     77	: "snd-ca0106",
     78	: "snd-hda-intel",
     79  : "snd-pcxhr",
+    80	: "snd-ad1889",
+    81	: "snd-cs5535audio",
 
     100 : "snd-powermac"
 ]
