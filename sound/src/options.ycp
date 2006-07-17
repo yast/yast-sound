@@ -280,10 +280,9 @@
      * @param preselected string default value (preselected in combo)
      * @return term combobox widget
      */
-    define term gen_list(list<string> vals, string preselected) ``{
+    define list<term> gen_list(list<string> vals, string preselected) ``{
 	list<term> vls = maplist (string e, vals, ``(`item(`id(e), e, preselected == e)));
-	// combo box label
-	return `ComboBox(`id(`poss),`opt(`notify), _("&Possible value:"), vls);
+	return vls;
     }
 
     /**
@@ -293,16 +292,70 @@
      * @param default_item default item
      * @return void
      */
-    define void updatePossibleValues(string values, string default_item) ``{
-	list l = string2vallist(values);
-	if (l == [])
-	{
-	    UI::ReplaceWidget(`id(`reppoint), defWidget());
-	    return;
-	}
-	term widg = gen_list((list<string>)l, default_item);
+    define list<term> getPossibleValues(string values, string default_item) ``{
+	list<string> values_list = string2vallist(values);
 
-	UI::ReplaceWidget(`id(`reppoint), widg);
+	if (!contains(values_list, default_item))
+	{
+	    values_list = prepend(values_list, default_item);
+	}
+
+	list<term> widg = gen_list(values_list, default_item);
+	return widg;
+    }
+
+    define map OptionPopup(string headline, string name, string value, boolean new_option, string possible_values)
+    {
+	y2milestone("possible_values: %1", possible_values);
+
+	term yes_button = `PushButton( `id(`ok), `opt(`default, `key_F10), Label::OKButton());
+	term no_button  = `PushButton( `id(`cancel), `opt (`key_F9), Label::CancelButton());
+
+	term button_box = `HBox(
+	     `HStretch (),
+	     `HWeight( 1, yes_button),
+	     `HSpacing(2),
+	     `HWeight( 1, no_button ),
+	     `HStretch ()
+	);
+
+	list<term> items = getPossibleValues(possible_values, value);
+
+	term content = `VBox(
+	    `Heading(headline),
+	    `VSpacing(0.2),
+	    new_option ?
+		`VBox(
+		    `Left(`TextEntry(`id(`option_name), _("Name of the &Option"), name)),
+		    `VSpacing(0.2)
+		)
+		: `Empty(),
+	    (size(string2vallist(possible_values)) > 0) ?
+		`ComboBox(`id(`option_value), `opt(`editable, `hstretch), new_option ? _("&Value") :  _("&Option: ") + name, items)
+		: `Left(`TextEntry(`id(`option_value), new_option ? _("&Value") :  _("&Option: ") + name, value)),
+	    `VSpacing(0.2),
+	    button_box
+	);
+
+	UI::OpenDialog(`opt(`decorated), content);
+
+	any ret = UI::UserInput();
+	string option_name = new_option ? (string)UI::QueryWidget(`id(`option_name), `Value) : name;
+	string option_value = (string)UI::QueryWidget(`id(`option_value), `Value);
+
+	UI::CloseDialog();
+
+	return $[ "ui":ret, "option_name":option_name, "option_value":option_value ];
+    }
+
+    define map ChangePopup(string option, string value, string possible_values)
+    {
+	return OptionPopup(_("Change the Option"), option, value, false, possible_values);
+    }
+
+    define map AddPopup()
+    {
+	return OptionPopup(_("Add a New Option"), "", "", true, "");
     }
 
     /**
@@ -351,23 +404,36 @@
 		    `Right(_("Value"))), itemized_descriptions),
                 `VSpacing (0.5),
 		`HBox (
-		    `TextEntry (`id (`des), `opt(`notify), current_option_name,
-			current_option_value),
-		    `VBox(
-			`Label(""),
-			`HBox(
-			    // push button label - set option value
-			    `PushButton (`id (`set), _("&Set")),
-			    // restore original option values
-			    `PushButton (`id (`reset), _("R&eset all"))
-			)
-		    )
+		    `PushButton (`id (`add), Label::AddButton()),
+		    `PushButton (`id (`edit), Label::EditButton()),
+		    `PushButton (`id (`delete), Label::DeleteButton()),
+		    `HSpacing(3),
+		    // restore original option values
+		    `PushButton (`id (`reset), _("R&eset all"))
 		),
-		`Left(`ReplacePoint(`id(`reppoint), `Label(""))),
-                `VSpacing (0.5)
+                `VSpacing (1)
             ),
 	    `HSpacing (3)
         );
+    }
+
+    define void RefreshDelete(boolean enabled)
+    {
+	y2milestone("Delete button enabled: %1", enabled);
+	UI::ChangeWidget(`id(`delete), `Enabled, enabled);
+    }
+
+    define void RefreshUI(list<term> items, integer index, boolean enable_delete)
+    {
+	// refresh the table
+	UI::ChangeWidget(`id(`table), `Items, items);
+
+	if (index != nil)
+	{
+	    UI::ChangeWidget(`id(`table), `CurrentItem, index);
+	}
+
+	RefreshDelete(enable_delete);
     }
 
     /**
@@ -379,11 +445,15 @@
      *	      values in map are strings
      * @return map result
      */
-    define map OptionsDialog (string cardlabel, map opts) ``{
+    define map OptionsDialog (string cardlabel, map opts, string driver) ``{
 
 	string help_text = Sound::STRINGS["OptionsDialog"]:"";
 
 	map origOptions = opts;
+
+	map module_params = get_module_params(driver);
+	list<string> all_options = maplist(string name, map o, (map<string,map>)module_params, {return name;});
+
 	list options = maplist (string name, map<string,any> o,
 	    (map <string, map <string, any> >) opts, ``($[
 	    // label: description of option is not available
@@ -400,16 +470,8 @@
 	integer current_option = 0;
 	string current_option_name = options[current_option, "name"]:"";
 
-	term con = `VBox (
-	    // To translators: label message
-	    `HVCenter (`Label (_("There are no options for this module")))
-	);
-
-	if (size (itemized_descriptions) > 0)
-	{
-	    con = OptionsCon (cardlabel, itemized_descriptions,
+	term con = OptionsCon (cardlabel, itemized_descriptions,
 		    current_option_name, options[current_option, "value"]:"");
-	}
 
 	// dialog title
 	Wizard::SetContents (_("Sound Card Advanced Options"), con, help_text,
@@ -420,7 +482,13 @@
 	    UI::ChangeWidget(`id(`table), `CurrentItem, 0);
 	    UI::SetFocus (`id(`table));
 	}
+	else
+	{
+	    Popup::Message(_("There are no options for this module"));
+	}
 
+
+	// set initial Delete state
 	symbol ui = `table;
 
 	if (size (itemized_descriptions) == 0)
@@ -428,89 +496,107 @@
 
 	repeat
 	{
+	    current_option = (integer) UI::QueryWidget (`id(`table), `CurrentItem);
+	    term curr_opt = (term) UI::QueryWidget(`id(`table), `Item(current_option));
+	    current_option_name = curr_opt[2]:"";
+	    string current_option_value = curr_opt[3]:"";
+
 	    if (ui == `table)
 	    {
-		current_option =
-		    (integer) UI::QueryWidget (`id(`table), `CurrentItem);
-		term curr_opt = (term) UI::QueryWidget(`id(`table), `Item(current_option));
-		current_option_name = curr_opt[2]:"";
-		UI::ChangeWidget(`id(`des), `Label,
-		    // name of currently selected option: eg. 'Option: snd_asdf'
-		    sformat ("%1 %2", _("&Option: "),current_option_name));
-
-		UI::ChangeWidget(`id(`des), `Value, curr_opt[3]:"");
-
-		// update possible values
-		map optmap = origOptions[current_option_name]:$[];
-		string vals = "";
-		if (size(optmap) == 0)
-		{
-		    vals = "";
-		}
-		else
-		{
-		    vals = optmap["allows"]:"";
-		}
-
-		updatePossibleValues (vals, curr_opt[3]:"");
+		// enable/disable Delete button
+		RefreshDelete(!contains(all_options, current_option_name));
 	    }
-	    if (ui == `poss)
+	    else if (ui == `add)
 	    {
-		current_option =
-		    (integer) UI::QueryWidget (`id(`table), `CurrentItem);
-		term curr_opt = (term) UI::QueryWidget(`id(`table), `Item(current_option));
-                current_option_name = curr_opt[2]:"";
+		map result  = AddPopup();
+		y2milestone("New option: %1", result);
 
-		string value = sformat("%1",UI::QueryWidget(`id(`poss),`Value));
+		if (result["ui"]:`cancel == `ok)
+		{
+		    // update table
+		    string value = result["option_value"]:"";
+		    string name = result["option_name"]:"";
 
-		UI::ChangeWidget(`id(`des), `Value, value);
+		    if (name != "")
+		    {
+			integer index = size(itemized_descriptions);
+
+			// remember the new value
+			itemized_descriptions = add(itemized_descriptions,
+			    `item(`id(index), "", name, value)
+			);
+
+			RefreshUI(itemized_descriptions, index, !contains(all_options, name));
+		    }
+		}
 	    }
-	    if (ui == `set)	// set button pressed
+	    else if (ui == `edit)
 	    {
-		string value = (string) UI::QueryWidget(`id(`des), `Value);
+		string possible_values = origOptions[current_option_name, "allows"]:"";
 
-		if (size (value) == 0)  // we don't care  about empty values
+		while (true)
 		{
-		    UI::ChangeWidget(`id(`table), `Item(current_option, 2), "");
-		    ui = `skip_event;
-		    continue;
-		}
+		    map result  = ChangePopup(current_option_name, current_option_value, possible_values);
+		    y2milestone("Modified option: %1", result);
 
-		// Should the value be checked, if it is in 'possible values'?
-		list<string> possible_values = string2vallist(
-		    origOptions [current_option_name, "allows"]:"");
+		    if (result["ui"]:`cancel == `ok)
+		    {
+			string value = result["option_value"]:"";
 
-		string err = check_value (value,
-		    options [current_option, "type"]:"string", possible_values);
-
-		if (size (err) > 0)	// error - wrong value
-		{
-		    Popup::Message (err);
-		    UI::ChangeWidget(`id(`des), `Value, "");
-		}
-		else			// value is correct
-		{
-		    UI::ChangeWidget(`id(`table),`Item(current_option,2),value);
-
-		    list<term> tmp = [];
-		    maplist (term e, itemized_descriptions, ``{
-			if (current_option == e[0,0]:0)
+			// check the value
+			string err = check_value(value, options [current_option, "type"]:"string", string2vallist(possible_values));
+			if (size (err) > 0)	// error - wrong value
 			{
-			    tmp = add (tmp, `item(`id (current_option),
-				e[1]:"", e[2]:"", value));
+			    // display message and display the popup again in the loop
+			    Popup::Message(err);
 			}
 			else
-			    tmp = add (tmp, e);
-		    });
-		    itemized_descriptions = tmp;
+			{
+			    UI::ChangeWidget(`id(`table), `Item(current_option, 2), value);
+
+			    // update the value
+			    list<term> tmp = [];
+			    maplist (term e, itemized_descriptions, ``{
+				if (current_option == e[0,0]:0)
+				{
+				    tmp = add (tmp, `item(`id (current_option),
+					e[1]:"", e[2]:"", value));
+				}
+				else
+				    tmp = add (tmp, e);
+			    });
+			    itemized_descriptions = tmp;
+			    break;
+			}
+		    }
+		    else
+		    {
+			break;
+		    }
 		}
+	    }
+	    else if (ui == `delete)
+	    {
+		y2milestone("Removed option: %1", current_option_name);
+
+		// update the value
+		list<term> tmp = [];
+		maplist (term e, itemized_descriptions, ``{
+		    if (current_option != e[0,0]:0)
+		    {
+			tmp = add (tmp, e);
+		    }
+		});
+		itemized_descriptions = tmp;
+
+		y2internal("itemized_descriptions[0,2]: %1", itemized_descriptions[0,2]:"");
+		// set Delete status according to the new first item
+		RefreshUI(itemized_descriptions, nil, !contains(all_options, itemized_descriptions[0,2]:""));
 	    }
 	    else if (ui == `reset &&
 		    // popup question
 		    Popup::YesNo(_("Do you really want to reset all values?")))
 	    {
-		UI::ChangeWidget(`id(`des), `Value, "");
-
 		integer i = 0;
 		while (i < size (itemized_descriptions))
 		{
@@ -535,6 +621,8 @@
 	    ui = (symbol) UI::UserInput();
 	} until (ui == `back || ui == `next || ui == `cancel);
 
+	y2milestone("ui: %1, itemized_descriptions: %2", ui, itemized_descriptions);
+
 	return $["ui" : ui, "return" : itemized_descriptions];
     }
 
@@ -548,14 +636,14 @@
 	string modname	= save_entry["module"]:"";
 	string label	= save_entry["model"]:"";
 	map params	= get_module_params (modname);
-
-	map p2		= restore_mod_params (params,save_entry["options"]:$[]);
+	y2internal("params: %1", params);
 	params		= restore_mod_params (params,save_entry["options"]:$[]);
+	y2internal("params: %1", params);
 
 	Wizard::RestoreNextButton();
 
 	// now show the dialog
-	map result	= OptionsDialog (label, params);
+	map result	= OptionsDialog (label, params, modname);
 	list<term> vals	= result["return"]:[];
 
 	// convert from table entries (items) back to card
@@ -566,6 +654,8 @@
 		opts = add(opts, it[2]:"", it[3]:"");
 	    }
 	});
+
+	y2milestone("New options: %1", opts);
 
 	save_entry = add(save_entry, "options", opts);
 

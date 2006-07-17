@@ -728,10 +728,26 @@ module parameters, including invalid IO or IRQ parameters."), modname);
      *
      */
     define map restore_mod_params(map params, map values) ``{
-	return mapmap(string parname, map parmap, (map<string,map<string,any> >)params, ``{
+	map ret = mapmap(string parname, map parmap, (map<string,map<string,any> >)params, ``{
 	    parmap = add (parmap, "value", values[parname]:"");
 	    return $[parname : parmap];
 	});
+
+
+	list<string> ignore_options = [ "index", "enable" ];
+	// add option from values map which are not contained in parms map
+	foreach(string key, string value, (map<string,string>) values,
+	    {
+		if (!haskey(params, key) && !contains(ignore_options, key))
+		{
+		    ret = add(ret, key, $[ "value" : value ]);
+		    y2milestone("Added extra option: %1='%2'", key, value);
+		}
+	    }
+	);
+
+	y2internal("ret: %1", ret);
+	return ret;
     }
 
     /**
