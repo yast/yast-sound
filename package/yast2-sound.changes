@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Aug 24 09:22:30 CEST 2006 - lslezak@suse.cz
+
+- fixed CD device detection in sound font installation
+  code (#171060)
+- 2.13.11.1
+
+-------------------------------------------------------------------
 Thu May  4 15:00:47 CEST 2006 - lslezak@suse.cz
 
 - read_routines.ycp - added textdomain
