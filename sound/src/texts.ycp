@@ -279,7 +279,7 @@ Then press <B>Edit</B>.
 ") +
 
 _("<p>
-Use <b>Advanced</b> to set the volume of the selected card or configure
+Use <b>Other</b> to set the volume of the selected card or configure
 module loading for playing MIDI files. These modules can be loaded on demand.
 </p>
 "));
