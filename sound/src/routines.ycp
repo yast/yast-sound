@@ -527,7 +527,7 @@
      * @return string key for legacy isa cards
      */
     define string isa_uniq() ``{
-	return "uniq.virtual";
+	return "uniq.unknown_key";
     }
 
     /**
@@ -746,7 +746,7 @@ module parameters, including invalid IO or IRQ parameters."), modname);
 	    }
 	);
 
-	y2internal("ret: %1", ret);
+	y2milestone("ret: %1", ret);
 	return ret;
     }
 

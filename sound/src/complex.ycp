@@ -183,12 +183,13 @@ define symbol EditConfigured()
 {
     symbol ret = nil;
     integer idx_conf = getCardIndex((list<map<string,any> >)Sound::modules_conf, Sound::selected_uniq);
+    integer idx_list = getCardIndex2((list<map<string,any> >)Sound::modules_conf, Sound::selected_uniq);
 
     // the card is already configured
-    if (idx_conf != nil)
+    if (idx_conf != nil && idx_list != nil)
     {
-	y2debug("Configuring card %1", Sound::selected_uniq);
-	map entry = Sound::modules_conf[idx_conf]:$[];
+	y2milestone("Configuring card %1", Sound::selected_uniq);
+	map entry = Sound::modules_conf[idx_list]:$[];
 	map oldentry = entry;
 
 	do
@@ -256,7 +257,7 @@ Restart sound system now?
 define symbol Edit()
 {
     symbol ret = nil;
-    integer idx_conf = getCardIndex((list<map<string,any> >)Sound::modules_conf, Sound::selected_uniq);
+    integer idx_conf = getCardIndex2((list<map<string,any> >)Sound::modules_conf, Sound::selected_uniq);
     integer idx_det = getCardIndex2((list<map<string,any> >)Sound::unconfigured_cards, Sound::selected_uniq);
 
     y2milestone("uniq (%1) in configured: %2, in detected: %3", Sound::selected_uniq, idx_conf, idx_det);
@@ -264,20 +265,20 @@ define symbol Edit()
     // the card is already configured
     if (idx_conf != nil)
     {
-	y2debug("reconfiguring card %1", Sound::selected_uniq);
-	Sound::card_id = idx_det;
+	y2milestone("reconfiguring card %1", Sound::selected_uniq);
+	Sound::card_id = idx_conf;
 	ret = `edit_conf;
     }
     else if (idx_det != nil)
     {
-	y2debug("adding new card %1", Sound::selected_uniq);
+	y2milestone("adding new card %1", Sound::selected_uniq);
 	Sound::card_id = idx_det;
 	ret = `edit_new;
     }
     else
     {
 	y2error("card %1 was not found!", Sound::selected_uniq);
-	ret = `abort;
+	ret = `not_found;
     }
 
     return ret;
@@ -409,7 +410,8 @@ define map HardwareDialog() {
 	else if (ui == `delete)
 	{
 	    string uniq = WizardHW::SelectedItem();
-	    integer idx = getCardIndex((list<map<string,any> >)Sound::modules_conf, uniq);
+	    integer idx = getCardIndex2((list<map<string,any> >)Sound::modules_conf, uniq);
+	    y2milestone("Sound card index: %1", idx);
 
 	    if (idx != nil)
 	    {

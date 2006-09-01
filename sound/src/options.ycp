@@ -589,7 +589,7 @@
 		});
 		itemized_descriptions = tmp;
 
-		y2internal("itemized_descriptions[0,2]: %1", itemized_descriptions[0,2]:"");
+		y2milestone("itemized_descriptions[0,2]: %1", itemized_descriptions[0,2]:"");
 		// set Delete status according to the new first item
 		RefreshUI(itemized_descriptions, nil, !contains(all_options, itemized_descriptions[0,2]:""));
 	    }
@@ -636,9 +636,9 @@
 	string modname	= save_entry["module"]:"";
 	string label	= save_entry["model"]:"";
 	map params	= get_module_params (modname);
-	y2internal("params: %1", params);
+	y2milestone("params: %1", params);
 	params		= restore_mod_params (params,save_entry["options"]:$[]);
-	y2internal("params: %1", params);
+	y2milestone("params: %1", params);
 
 	Wizard::RestoreNextButton();
 

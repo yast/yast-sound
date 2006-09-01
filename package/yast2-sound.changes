@@ -1,4 +1,19 @@
 -------------------------------------------------------------------
+Tue Aug 29 10:11:57 CEST 2006 - lslezak@suse.cz
+
+- properly compute index of the selected card - fixed problem
+  with more sound cards (#177962)
+- fixed abort when an internal error occurrs (#201337)
+- fixed static hwcfg file and unique key handling for non-PCI
+  sound devices(#202086)
+- use the default values for kernel module options instead of
+  empty string (option=,,1 is not valid)
+- don't try to set volume if there is no sound card configured
+- fixed button label in the help text (#201127)
+- .spec file: don't pack libpy2ag_audio.la file
+- 2.13.13
+
+-------------------------------------------------------------------
 Mon Jul 17 10:05:45 CEST 2006 - lslezak@suse.cz
 
 - expert dialog - use standard Add/Edit/Delete buttons in the
