@@ -34,11 +34,13 @@
 	}
 
 	// Do not show any progress during Read()
-	Progress::off ();
+	boolean progress_orig = Progress::set(false);
+
 	UI::OpenDialog(`VBox(`Label(_("Detecting sound cards..."))));
 	boolean success = Sound::Propose ();
 	UI::CloseDialog();
-	Progress::on ();
+
+	Progress::set(progress_orig);
 
 
 	string proposal = Sound::Summary ();
