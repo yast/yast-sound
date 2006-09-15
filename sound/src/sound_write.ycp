@@ -112,7 +112,7 @@
 	    // progress bar item
 	    _("Store joystick settings")];
 
-    list stones2 = [
+    list<string> stones2 = [
 	    // progress bar item
 	    _("Saving sound card settings..."),
 	    // progress bar item
