@@ -331,6 +331,43 @@ define void SequencerPopup() {
 }
 
 /**
+ * Configure the selected sound card as the primary (default) card.
+ * @param card_index index of the selected card in the internal structure
+ * @param alsa_index index of the selected card in ALSA
+*/
+void SetPrimaryCard(integer card_index, integer alsa_index)
+{
+    y2milestone("Setting card %1 (snd-card-%2) as the primary card", card_index, alsa_index);
+    y2debug("Before configuration: %1", Sound::modules_conf);
+
+    integer index = 0;
+    Sound::modules_conf = maplist(map sound_card, Sound::modules_conf,
+	{
+	    // the new primary sound_card
+	    if (index == card_index)
+	    {
+		sound_card["options", "index"] = "0";
+		sound_card["alias"] = "snd-card-0";
+		y2milestone("New primary card: %1", sound_card);
+	    }
+	    // the old primary sound_card
+	    else if (sound_card["options", "index"]:"" == "0")
+	    {
+		sound_card["options", "index"] = tostring(alsa_index);
+		sound_card["alias"] = sformat("snd-card-%1", alsa_index);
+		y2milestone("Previous primary card: %1", sound_card);
+	    }
+
+	    index = index + 1;
+
+	    return sound_card;
+	}
+    );
+
+    y2debug("After configuration: %1", Sound::modules_conf);
+}
+
+/**
  * A dialog showing the detected cards and allowing to configure them.
  * @return any The value of the resulting UserInput.
  */
@@ -343,9 +380,11 @@ define map HardwareDialog() {
 
     list<list> extra_buttons = [
 	// menu item
-	[`mixer, _("&Volume")],
+	[`mixer, _("&Volume...")],
 	// menu item
-	[`seq, _("&Start sequencer")]
+	[`seq, _("&Start Sequencer")],
+	// menu item
+	[`primary, _("Set as the &Primary Card")]
     ];
 
     if (show_fonts)
@@ -442,6 +481,21 @@ define map HardwareDialog() {
 	else if (ui == `seq)
 	{
 	    SequencerPopup();
+	}
+	// configure the current card as primary
+	else if (ui == `primary)
+	{
+	    string uniq = WizardHW::SelectedItem();
+	    // sound card index
+	    integer idx = getCardIndex2((list<map<string,any> >)Sound::modules_conf, uniq);
+	    // alsa index (snd-card-X)
+	    integer idx2= getCardIndex((list<map<string,any> >)Sound::modules_conf, uniq);
+
+	    if (idx != nil && idx2 != 0)
+	    {
+		// set the primary card
+		SetPrimaryCard(idx, idx2);
+	    }
 	}
 	else
 	{
