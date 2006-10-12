@@ -24,8 +24,9 @@
     import "Sound";
     import "Progress";
 
-    Progress::off();
+    boolean progress_orig = Progress::set(false);
     Sound::Read(false);
-    Progress::on();
+    Progress::set(progress_orig);
     return Sound::Summary();
 }
+

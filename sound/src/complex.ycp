@@ -183,56 +183,72 @@ define symbol EditConfigured()
 {
     symbol ret = nil;
     integer idx_conf = getCardIndex((list<map<string,any> >)Sound::modules_conf, Sound::selected_uniq);
+    integer idx_list = getCardIndex2((list<map<string,any> >)Sound::modules_conf, Sound::selected_uniq);
 
     // the card is already configured
-    if (idx_conf != nil)
+    if (idx_conf != nil && idx_list != nil)
     {
-	y2debug("Configuring card %1", Sound::selected_uniq);
-	map entry = Sound::modules_conf[idx_conf]:$[];
+	y2milestone("Configuring card %1", Sound::selected_uniq);
+	map entry = Sound::modules_conf[idx_list]:$[];
+	map oldentry = entry;
 
-	map res = sound_options(entry);
-	if (res["ui"]:nil == `next)
+	do
 	{
-	    map oldentry = entry;
-
-	    entry = res["return"]:$[];
-	    entry = add_common_options(entry, idx_conf);
-
-	    // update card data
-	    Sound::modules_conf = maplist(map card, Sound::modules_conf,
-		{
-		    if (card["unique_key"]:"" != Sound::selected_uniq)
-		    {
-			return card;
-		    }
-		    else
-		    {
-			return entry;
-		    }
-		}
-	    );
-	    if (oldentry != entry)
+	    map res = sound_options(entry);
+	    if (res["ui"]:nil == `next)
 	    {
-		// popup question text
-		if (Popup::YesNo(_("To apply changes, the sound system
+		entry = res["return"]:$[];
+		entry = add_common_options(entry, idx_conf);
+
+		// update card data
+		Sound::modules_conf = maplist(map card, Sound::modules_conf,
+		    {
+			if (card["unique_key"]:"" != Sound::selected_uniq)
+			{
+			    return card;
+			}
+			else
+			{
+			    return entry;
+			}
+		    }
+		);
+
+		y2milestone("updated config: %1", Sound::modules_conf);
+
+		if (oldentry != entry)
+		{
+		    // popup question text
+		    if (Popup::YesNo(_("To apply changes, the sound system
 must be restarted.
 Restart sound system now?
 ")))
-		{
-		    sound_stop();
-		    sound_start_tmp(true);
+		    {
+			y2milestone("Restarting sound system...");
+			sound_stop();
+			boolean started = sound_start_tmp(true);
+			y2milestone("... restart done: %1", started);
+
+			if (!started)
+			{
+			    Report::Error(_("Restart of the sound systen has failed.\nCheck options of the driver."));
+			    ret = `again;
+			    continue;
+			}
+		    }
 		}
+		ret = `next;
 	    }
-	    ret = `next;
+	    else if (res["ui"]:nil == `abort || res["ui"]:nil == `cancel)
+	    {
+		ret = `abort;
+	    }
+	    else
+	    {
+		ret = (symbol)res["ui"]:nil;
+	    }
 	}
-	else if (res["ui"]:nil == `abort || res["ui"]:nil == `cancel)
-	{
-	    ret = `abort;
-	}
-	else
-	{
-	    ret = (symbol)res["ui"]:nil;
-	}
+	while (ret == `again);
     }
 
     return ret;
@@ -241,28 +257,28 @@ Restart sound system now?
 define symbol Edit()
 {
     symbol ret = nil;
-    integer idx_conf = getCardIndex((list<map<string,any> >)Sound::modules_conf, Sound::selected_uniq);
+    integer idx_conf = getCardIndex2((list<map<string,any> >)Sound::modules_conf, Sound::selected_uniq);
     integer idx_det = getCardIndex2((list<map<string,any> >)Sound::unconfigured_cards, Sound::selected_uniq);
 
-    y2debug("uniq (%1) in configured: %2, in detected: %3", Sound::selected_uniq, idx_conf, idx_det);
+    y2milestone("uniq (%1) in configured: %2, in detected: %3", Sound::selected_uniq, idx_conf, idx_det);
 
     // the card is already configured
     if (idx_conf != nil)
     {
-	y2debug("reconfiguring card %1", Sound::selected_uniq);
-	Sound::card_id = idx_det;
+	y2milestone("reconfiguring card %1", Sound::selected_uniq);
+	Sound::card_id = idx_conf;
 	ret = `edit_conf;
     }
     else if (idx_det != nil)
     {
-	y2debug("adding new card %1", Sound::selected_uniq);
+	y2milestone("adding new card %1", Sound::selected_uniq);
 	Sound::card_id = idx_det;
 	ret = `edit_new;
     }
     else
     {
 	y2error("card %1 was not found!", Sound::selected_uniq);
-	ret = `abort;
+	ret = `not_found;
     }
 
     return ret;
@@ -315,6 +331,43 @@ define void SequencerPopup() {
 }
 
 /**
+ * Configure the selected sound card as the primary (default) card.
+ * @param card_index index of the selected card in the internal structure
+ * @param alsa_index index of the selected card in ALSA
+*/
+void SetPrimaryCard(integer card_index, integer alsa_index)
+{
+    y2milestone("Setting card %1 (snd-card-%2) as the primary card", card_index, alsa_index);
+    y2debug("Before configuration: %1", Sound::modules_conf);
+
+    integer index = 0;
+    Sound::modules_conf = maplist(map sound_card, Sound::modules_conf,
+	{
+	    // the new primary sound_card
+	    if (index == card_index)
+	    {
+		sound_card["options", "index"] = "0";
+		sound_card["alias"] = "snd-card-0";
+		y2milestone("New primary card: %1", sound_card);
+	    }
+	    // the old primary sound_card
+	    else if (sound_card["options", "index"]:"" == "0")
+	    {
+		sound_card["options", "index"] = tostring(alsa_index);
+		sound_card["alias"] = sformat("snd-card-%1", alsa_index);
+		y2milestone("Previous primary card: %1", sound_card);
+	    }
+
+	    index = index + 1;
+
+	    return sound_card;
+	}
+    );
+
+    y2debug("After configuration: %1", Sound::modules_conf);
+}
+
+/**
  * A dialog showing the detected cards and allowing to configure them.
  * @return any The value of the resulting UserInput.
  */
@@ -327,9 +380,11 @@ define map HardwareDialog() {
 
     list<list> extra_buttons = [
 	// menu item
-	[`mixer, _("&Volume")],
+	[`mixer, _("&Volume...")],
 	// menu item
-	[`seq, _("&Start sequencer")]
+	[`seq, _("&Start Sequencer")],
+	// menu item
+	[`primary, _("Set as the &Primary Card")]
     ];
 
     if (show_fonts)
@@ -394,7 +449,8 @@ define map HardwareDialog() {
 	else if (ui == `delete)
 	{
 	    string uniq = WizardHW::SelectedItem();
-	    integer idx = getCardIndex((list<map<string,any> >)Sound::modules_conf, uniq);
+	    integer idx = getCardIndex2((list<map<string,any> >)Sound::modules_conf, uniq);
+	    y2milestone("Sound card index: %1", idx);
 
 	    if (idx != nil)
 	    {
@@ -425,6 +481,21 @@ define map HardwareDialog() {
 	else if (ui == `seq)
 	{
 	    SequencerPopup();
+	}
+	// configure the current card as primary
+	else if (ui == `primary)
+	{
+	    string uniq = WizardHW::SelectedItem();
+	    // sound card index
+	    integer idx = getCardIndex2((list<map<string,any> >)Sound::modules_conf, uniq);
+	    // alsa index (snd-card-X)
+	    integer idx2= getCardIndex((list<map<string,any> >)Sound::modules_conf, uniq);
+
+	    if (idx != nil && idx2 != 0)
+	    {
+		// set the primary card
+		SetPrimaryCard(idx, idx2);
+	    }
 	}
 	else
 	{

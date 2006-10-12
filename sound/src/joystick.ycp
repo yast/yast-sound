@@ -232,14 +232,14 @@
     Wizard::SetDesktopIcon("joystick");
 
     // read sound card configuration
-    Progress::off();
+    boolean progress_orig = Progress::set(false);
 
     if (!Sound::Read(false))
 	return `abort;
 
     Sound::StoreSettings ();
 
-    Progress::on();
+    Progress::set(progress_orig);
 
     // read joystick configuration
     Joystick::Read(abort_block);

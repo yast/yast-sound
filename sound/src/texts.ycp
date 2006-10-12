@@ -279,10 +279,14 @@ Then press <B>Edit</B>.
 ") +
 
 _("<p>
-Use <b>Advanced</b> to set the volume of the selected card or configure
+Use <b>Other</b> to set the volume of the selected card or configure
 module loading for playing MIDI files. These modules can be loaded on demand.
 </p>
-"));
+") +
+
+_("<p>The sound device with index 0 is the default device used by system and applications.
+Use <b>Other</b> to set the selected sound device as the primary device.</p>")
+);
 
 	    ret = add(ret, "ErrorDialog",
 _("<p>An error has occurred. </p>") +

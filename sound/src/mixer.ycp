@@ -320,7 +320,7 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
 	{
 	    PlayTest(card_id);
 	}
-	else if (ui == `abort && ReallyAbort())
+	else if ((ui == `abort || ui == `cancel) && ReallyAbort())
 	{
 	    return $["ui": `abort];
 	}

@@ -82,7 +82,7 @@
 		vol_settings	= Sound::volume_settings;
 
 	    // remember info about removed card
-	    map removed_card = Sound::detected_cards[Sound::card_id]:$[];
+	    map removed_card = Sound::modules_conf[Sound::card_id]:$[];
 	    map removed_info = $[];
 
 	    // get hwcfg file from list of configured cards
@@ -227,11 +227,12 @@ define symbol MainSequence() ``{
 		$[
 		    `edit_new	    :	"config",
 		    `edit_conf	    :	"editconf",
-		    `abort	    :	`abort
+		    `not_found	    :	"complex"
 		],
 	    "editconf"	:
 		$[
-		    `next	    :	"complex"
+		    `next	    :	"complex",
+		    `abort	    :	`abort
 		],
 	    "delete"	:
 		$[

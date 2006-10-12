@@ -141,7 +141,7 @@
 	{
 	    y2milestone("The soundcard is not attached to PCI");
 
-	    file = "static-sound-" + entry["index"]:"0";
+	    file = "static-sound-" + entry["options","index"]:"0";
 	}
 	else
 	{
@@ -248,7 +248,7 @@
     define boolean RemoveHWConfig() {
 	boolean ret = true;
 
-	y2debug("Sound::removed_info: %1", Sound::removed_info);
+	y2milestone("Sound::removed_info: %1", Sound::removed_info);
 
 	if (Sound::removed_info != nil)
 	{
@@ -259,6 +259,10 @@
 		    {
 			y2milestone("Removing file: %1", file);
 			ret = ret && HWConfig::RemoveConfig(file);
+		    }
+		    else
+		    {
+			y2warning("Missing hwcfg entry in: %1", info);
 		    }
 		}
 	    );

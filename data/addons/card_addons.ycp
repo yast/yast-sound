@@ -369,5 +369,9 @@
     ["snd-ymfpci",	    "YMF740, Yamaha"],
     ["snd-ymfpci",	    "YMF740C, Yamaha"],
     ["snd-ymfpci",	    "YMF744, Yamaha"],
-    ["snd-ymfpci",	    "YMF754, Yamaha"]
+    ["snd-ymfpci",	    "YMF754, Yamaha"],
+    ["snd-pcxhr",	    "PCXHR, Digigram"],
+    ["snd-ad1889",	    "AD1889, Analog Devices"],
+    ["snd-cs5535audio",	    "CS5535, National Semiconductor"],
+    ["snd-cs5535audio",	    "CS5536, AMD"],
 ]

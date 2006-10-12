@@ -137,7 +137,7 @@
 	// check whether the uniqe key is already used
 	integer idx = 0;
 	while (contains(uniques, uniq_k)) {
-	    uniq_k = isa_uniq() + tostring(idx);
+	    uniq_k = "uniq.unknownkey" + tostring(idx);
 	    idx = idx + 1;
 	};
 
