@@ -1,0 +1,6 @@
+"Enable VIA-workaround for %1 soundcard."	"Enable VIA work-around for %1 sound card."
+"ISA PnP detection for %1 soundcards"	"ISA PnP detection for %1 sound cards"
+"Capture IBL size for %1 soundcard."	"Capture IBL size for %1 sound card."
+"Enable workaround for buggy interrupts on some motherboards."	"Enable work-around for buggy interrupts on some motherboards."
+"Enable workaround for hardwares with problematic codec semaphores."	"Enable work-around for hardware with problematic codec semaphores"
+

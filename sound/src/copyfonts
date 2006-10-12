@@ -4,21 +4,16 @@
 # $Id$
 # dan meszaros <dmeszar@suse.cz>
 
-# first get the path to cdrom
-CDROMDEVICE=`grep ^/dev/cdrom /etc/fstab | awk '{print $2}' | head -n1`
-if [ -z $CDROMDEVICE ]; then
-    CDROMDEVICE=`grep ^/dev/dvd /etc/fstab | awk '{print $2}' | head -n1`
-fi
+# source directory
+SRC_DIR=$1
 
-# mount cdrom
-mount $CDROMDEVICE
 SOUNDFONTDIR="/usr/share/sfbank/creative"
 
 # create target directory
 mkdir -p $SOUNDFONTDIR 
 
 # create list of unique sound font found on the whole cd
-cd $CDROMDEVICE
+cd $SRC_DIR
 for F in `find . -name '*.[sS][fF]2' -type f `
 do 
     echo -e "${F##*/}\t$F"
@@ -28,10 +23,9 @@ while read NAM FILE
 do
     if [ "$NAM" != "$OLD" ]
     then
-        cp $FILE $SOUNDFONTDIR
+        cp -a $FILE $SOUNDFONTDIR
         OLD=$NAM
 	echo "line"
-	
     fi
 done | wc -l 
 
@@ -40,13 +34,13 @@ cd $SOUNDFONTDIR
 # find the largest file in $SOUNDFONTDIR
 HIGHEST=`ls -S1 *.[sS][fF]2 | head -n1`
 
-# remove old link
-rm -f default.sf2
+# is there any sound font except the default one?
+if [ "$HIGHEST" != "default.sf2" ]
+then
+    # remove old link
+    rm -f default.sf2
 
-#create link to the largest font file
-ln -s $HIGHEST default.sf2
-
-umount $CDROMDEVICE
-
-#echo $CNT
+    #create link to the largest font file
+    ln -s $HIGHEST default.sf2
+fi
 

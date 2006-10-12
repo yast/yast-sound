@@ -132,10 +132,12 @@
      * @param restore true - call alsactl restore, false - don't
      * @return void
      */
-    define void sound_start_tmp(boolean restore) ``{
+    define boolean sound_start_tmp(boolean restore) ``{
+	boolean ret = true;
 
 	// get the list of commands needed for start
 	list cmds = Sound::CreateModprobeCommands();
+	y2milestone("modprobe commands: %1", cmds);
 
 	string snd = sformat ("/sbin/modprobe snd cards_limit=%1 major=116",
 	    size (Sound::modules_conf));
@@ -151,13 +153,18 @@
 	maplist(string cmd, (list<string>) cmds, ``{
 	    map res = (map) SCR::Execute(.target.bash_output, cmd, $[]);
 	    if (res["stderr"]:"" != "")
+	    {
                 y2error("/sbin/modprobe error output: \n" + res["stderr"]:"");
+		ret = false;
+	    }
 	});
 
         if (Sound::use_alsa && restore)
         {
             SCR::Execute(.audio.alsa.restore, 0, 0);
         }
+
+	return ret;
     }
 
     /**

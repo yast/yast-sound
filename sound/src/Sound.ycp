@@ -876,6 +876,8 @@ could make your system unstable.
 	// first filter out entries with other module
 	list mod_entries = filter (map e, modules_conf, ``(
 	    e["module"]:"off" == modname));
+
+	y2debug("modules_conf: %1", modules_conf);
 	// create list of options (list of maps)
 	list<map<string,string> > mod_opts = maplist (map e, (list<map>) mod_entries, ``(e["options"]:$[]));
 	list<string> opts = [];
@@ -891,27 +893,60 @@ could make your system unstable.
 	map res = $[];
 	// get the default module parameters from database
 	map params      = get_module_params (modname);
+	y2milestone("Default module parameters: %1", params);
 	// for each option collect their values
+
+	y2milestone("options: %1", opts);
+	y2milestone("module options: %1", mod_opts);
+
 	foreach (string opname, opts, ``{
-	    boolean coma = false;
 	    string value = "";
+	    // is the value first?
+	    boolean first_value = true;
+
+	    // all options are default, not configured by user
+	    boolean only_default = true;
+
 	    foreach (map card_opts, mod_opts, ``{
-	        if (coma)
+		// add the separator if needed
+	        if (!first_value)
 	        {
 	            value = value + ",";
 	        }
-		if (card_opts[opname]:"" != params[opname,"default"]:"")
+
+		// value for the card
+		string card_option_value = card_opts[opname]:"";
+		string default_value = params[opname,"default"]:"";
+
+		y2debug("card_option_value: '%1'", card_option_value);
+		y2debug("default_value: '%1'", default_value);
+
+		if (card_option_value != default_value && card_option_value != "")
 		{
-		    value = value + card_opts[opname]:"";
+		    only_default = false;
 		}
-		if (card_opts[opname]:"" != "")
-		    coma = true;
+
+		// use default if if the value is not defined
+		if (card_option_value == "")
+		{
+		    card_option_value = default_value;
+		}
+
+		value = value + card_option_value;
+
+		first_value = false;
 	    });
-	    if (value != "")
+
+	    y2debug("only_default: %1", only_default);
+
+	    // don't add the default options, but always add 'index' and 'enable'
+	    if (!only_default || opname == "index" || opname == "enable")
 	    {
 		res = add (res, opname, value);
 	    }
 	});
+
+	y2milestone("collected options: %1", res);
 	return res;
     }
 

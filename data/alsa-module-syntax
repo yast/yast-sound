@@ -457,7 +457,7 @@ snd-ice1712	index	enable:(enable),allows:{{0,7}},unique,skill:required,dialog:li
 snd-ice1712	id	enable:(enable),unique
 snd-ice1712	enable	allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
 snd-ice1712	omni	enable:(enable),allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
-snd-ice1712	cs8427_timeout	enable:(enable)	allows:{{1,1000}},default=500,skill:advanced
+snd-ice1712	cs8427_timeout	enable:(enable),allows:{{1,1000}},default:500,skill:advanced
 snd-ice1712	model	enable:(enable)
 
 snd-ice1724	index	enable:(enable),allows:{{0,7}},unique,skill:required,dialog:list
@@ -561,7 +561,7 @@ snd-opl4-lib	volume_boost	default:8
 snd-virmidi	index	enable:(enable),allows:{{0,7}},unique,skill:required,dialog:list
 snd-virmidi	id	enable:(enable),unique
 snd-virmidi	enable	allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
-snd-virmidi	midi_devs	enable:(enable),allows:{{1,8}}
+snd-virmidi	midi_devs	enable:(enable),allows:{{1,4}}
 
 snd-dummy	index	enable:(enable),allows:{{0,7}},unique,skill:required,dialog:list
 snd-dummy	id	enable:(enable),unique
@@ -659,3 +659,12 @@ snd-hda-intel	single_cmd	enable:(enable),allows:{{0,Disabled},{1,Enabled}},defau
 snd-pcxhr	id	enable:(enable),unique
 snd-pcxhr	enable	allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
 snd-pcxhr	mono	enable:(enable),allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
+
+snd-ad1889	id	enable:(enable),unique
+snd-ad1889	enable	allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
+snd-ad1889	index	enable:(enable),allows:{{0,7}},unique,skill:required,dialog:list
+
+snd-cs5535audio	id	enable:(enable),unique
+snd-cs5535audio	enable	allows:{{0,Disabled},{1,Enabled}},default:0,dialog:check
+snd-cs5535audio	index	enable:(enable),allows:{{0,7}},unique,skill:required,dialog:list
+

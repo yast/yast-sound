@@ -97,8 +97,8 @@ to rebuild the database, just do:
 
     cd source/sound/data/
     export Y2DIR=.
-    make clean #optionally
-    make -f Makefile.generate
+    make -f Makefile.generate clean	# remove the old DB
+    make -f Makefile.generate		# generate the new one
 
 this will generate db and copy it to sndcards.ycp 
 
@@ -106,21 +106,21 @@ NOTE: no changes should be done to po/y2d_snd/po/sound_db.ycp.generated
 they will be overwriten by the next generation!! see chapter 4. for details
 about how to add stuff manually to the database.
 
-NOTE: use i386 arch for building database
+  Proofread (fixed) text should be included in 'proofread_strings' file. The
+file contains lines with original and proofread text, syntax is:
+"original text" "proofread/modified text"
+
+
+NOTE: use i386 arch for building the database, don't use Xen kernel - some ALSA
+drivers are missing in Xen kernel, the databe would not be complete!
 
 3.1 files used for db generation
 ================================
 
-/lib/modules/`uname -r`/isapnpmap:
-/lib/modules/`uname -r`/modules.pcimap: used for building the 'indices' structure
+alsa-module-syntax	- contains allowed values module parameters
+proofread_strings	- contains text replacements (proofread messages)
 
-/lib/modules/`uname -r`/modules.generic_string: used for building
-		    the 'cards' list and 'modules' data
-
-for parameters' description modinfo on module is used.
-after /lib/modules/`uname -r`/modules.generic_string, be very carefull when 
-updating the db- this file may contain syntactical error. in this case ask
-tiwai@suse.de for fix.
+Descriptions of module parameters are read using modinfo utility.
 
 4. supplying data manually
 ==========================

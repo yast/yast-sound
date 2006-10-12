@@ -112,7 +112,7 @@
 	    // progress bar item
 	    _("Store joystick settings")];
 
-    list stones2 = [
+    list<string> stones2 = [
 	    // progress bar item
 	    _("Saving sound card settings..."),
 	    // progress bar item
@@ -212,15 +212,18 @@
 	y2milestone("Mixer was not initialized during saving");
     }
 
-    logmixer("Mixer status before saving the volume");
-    y2milestone("volume_settings: %1", Sound::volume_settings);
-
-    SaveVolume();
-    logmixer("Mixer status after saving the volume");
-
-    if (Sound::write_only && haskey (settings, "volume_settings"))
+    if (size(configuredcards) > 0)
     {
-	set_vol_settings (vol_settings);
+	logmixer("Mixer status before saving the volume");
+	y2milestone("volume_settings: %1", Sound::volume_settings);
+
+	SaveVolume();
+	logmixer("Mixer status after saving the volume");
+
+	if (Sound::write_only && haskey (settings, "volume_settings"))
+	{
+	    set_vol_settings (vol_settings);
+	}
     }
 
     sleep(10);

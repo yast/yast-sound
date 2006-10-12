@@ -21,6 +21,7 @@
     import "Mode";
     import "Popup";
     import "Sound";
+    import "Label";
 
     textdomain "sound";
 
@@ -30,6 +31,94 @@
 
     // list of all sound modules (table items)
     list all_module_items = [];
+
+    define list<map> detect_cdrom()
+    {
+	list<map> ret = [];
+	list<map> cdroms = (list<map>)SCR::Read(.probe.cdrom);
+
+	if (cdroms != nil)
+	{
+	    foreach(map cd, cdroms,
+		{
+		    ret = add(ret, $[ "model":cd["model"]:_("Unknown CD-ROM device"),
+			"dev_name":cd["dev_name"]:"/dev/cdrom"]);
+		}
+	    );
+	}
+
+	y2milestone("Detected CD-ROM devices: %1", ret);
+
+	return ret;
+    }
+
+    define map CDpopup(string headline, string question, list<map> cdroms)
+    {
+	list<term> items = [];
+
+	foreach(map cd, cdroms,
+	    {
+		string dev = cd["dev_name"]:"/dev/cdrom";
+		string model = cd["model"]:_("Unknown CD-ROM Device");
+
+		items = add(items, `item(`id(dev), sformat("%1 (%2)", model, dev)) );
+	    }
+	);
+
+
+	term yes_button = `PushButton( `id(`ok), `opt(`default, `key_F10), Label::ContinueButton());
+	term no_button  = `PushButton( `id(`cancel), `opt (`key_F9), Label::CancelButton());
+
+	term button_box = `HBox(
+	     `HStretch (),
+	     `HWeight( 1, yes_button),
+	     `HSpacing(2),
+	     `HWeight( 1, no_button ),
+	     `HStretch ()
+	);
+
+	term content = `VBox(
+	    `Heading(headline),
+	    `VSpacing(0.2),
+	    `Left(`Label(question)),
+	    `VSpacing(0.2),
+	    `Left(`ComboBox(`id(`device), _("CD-ROM &Device"), items)),
+	    `VSpacing(0.2),
+	    button_box
+	);
+
+	UI::OpenDialog(`opt(`decorated), content);
+
+	any ret = UI::UserInput();
+	string device = (string)UI::QueryWidget(`id(`device), `Value);
+
+	UI::CloseDialog();
+
+	return $[ "ui":ret, "dev_name":device ];
+    }
+
+    /**
+     * Mount specified device
+     * @param device device name to mount
+     * @return string mount point where device was mounted (in /tmp subdirectory)
+     *         or nil when mount failed
+     */
+    define string mount_device(string device) ``{
+	string tmpdir = (string) SCR::Read(.target.tmpdir);
+	string mpoint = tmpdir + "/mount";
+
+	// create mount point directory
+	SCR::Execute(.target.mkdir, mpoint);
+
+	// mount device
+	boolean result = (boolean) SCR::Execute(.target.mount, [device, mpoint], "-o ro");
+
+	return (result == true) ? mpoint : nil;
+    }
+
+    define boolean umount_device(string mount_point) ``{
+	    return (boolean) SCR::Execute(.target.umount, mount_point);
+    }
 
     /**
      * returns cards manufactured by given vendor (ALSA only) or driver
@@ -438,7 +527,7 @@
      * @return string key for legacy isa cards
      */
     define string isa_uniq() ``{
-	return "uniq.virtual";
+	return "uniq.unknown_key";
     }
 
     /**
@@ -639,10 +728,26 @@ module parameters, including invalid IO or IRQ parameters."), modname);
      *
      */
     define map restore_mod_params(map params, map values) ``{
-	return mapmap(string parname, map parmap, (map<string,map<string,any> >)params, ``{
+	map ret = mapmap(string parname, map parmap, (map<string,map<string,any> >)params, ``{
 	    parmap = add (parmap, "value", values[parname]:"");
 	    return $[parname : parmap];
 	});
+
+
+	list<string> ignore_options = [ "index", "enable" ];
+	// add option from values map which are not contained in parms map
+	foreach(string key, string value, (map<string,string>) values,
+	    {
+		if (!haskey(params, key) && !contains(ignore_options, key))
+		{
+		    ret = add(ret, key, $[ "value" : value ]);
+		    y2milestone("Added extra option: %1='%2'", key, value);
+		}
+	    }
+	);
+
+	y2milestone("ret: %1", ret);
+	return ret;
     }
 
     /**
@@ -703,24 +808,64 @@ module parameters, including invalid IO or IRQ parameters."), modname);
 
 	while (true)
 	{
-	    // step 2: insert CD
-	    if (!Popup::ContinueCancelHeadline (
-		    Sound::STRINGS["soundFontTitle"]:"",
-		    Sound::STRINGS["soundFontAppeal"]:""))
+	    list<map> detected_cds = detect_cdrom();
+	    string cdrom_device = "";
+
+	    if (size(detected_cds) == 0)
 	    {
+		// no CD device present, exit
 		return;
 	    }
+	    // one CD device present, use it
+	    else if (size(detected_cds) == 1)
+	    {
+		// step 2: insert CD
+		if (!Popup::ContinueCancelHeadline (
+			Sound::STRINGS["soundFontTitle"]:"",
+			Sound::STRINGS["soundFontAppeal"]:""))
+		{
+		    return;
+		}
 
-	    // step3: do something
-	    map res = (map) SCR::Execute (.target.bash_output,
-		Directory::ybindir + "/copyfonts", $[] );
+		cdrom_device = detected_cds[0,"dev_name"]:"/dev/cdrom";
+	    }
+	    // more CD devices, ask user which one use
+	    else
+	    {
+		// step 2: ask for a CD device
 
-	    y2debug ("copyfonts output: %1", res);
-	    integer cnt = tointeger(res["stdout"]:"0");
+		map ui = CDpopup(Sound::STRINGS["soundFontTitle"]:"", Sound::STRINGS["soundFontAppeal"]:"", detected_cds);
 
-	    // restart ALSA after sound font copy
-	    y2milestone("Restarting ALSA: %1",
-		SCR::Execute(.target.bash, "/etc/init.d/alsasound reload"));
+		if (ui["ui"]:`unknown != `ok)
+		{
+		    return;
+		}
+
+		cdrom_device = ui["dev_name"]:"/dev/cdrom";
+	    }
+
+	    y2milestone("Using cdrom device: %1", cdrom_device);
+
+	    string mpoint = mount_device(cdrom_device);
+	    y2milestone("Device mounted: %1", mpoint);
+
+	    // number of found sound font files
+	    integer cnt = 0;
+	    if (mpoint != nil)
+	    {
+		// step3: do something
+		map res = (map) SCR::Execute (.target.bash_output,
+		    Directory::ybindir + "/copyfonts " + mpoint, $[] );
+
+		y2milestone("copyfonts output: %1", res);
+		cnt = tointeger(res["stdout"]:"0");
+
+		y2milestone("Device unmounted: %1", umount_device(mpoint));
+
+		// restart ALSA after sound font copy
+		y2milestone("Restarting ALSA: %1",
+		    SCR::Execute(.target.bash, "/etc/init.d/alsasound reload"));
+	    }
 
 	    // step4:
 	    if (cnt > 0)

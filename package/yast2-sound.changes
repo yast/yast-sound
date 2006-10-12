@@ -1,4 +1,53 @@
 -------------------------------------------------------------------
+Thu Sep 21 07:33:38 CEST 2006 - lslezak@suse.cz
+
+- new option - select the primary sound card (fate #300352)
+- updated the sound card DB
+- 2.13.15
+
+-------------------------------------------------------------------
+Thu Sep 14 15:55:29 CEST 2006 - lslezak@suse.cz
+
+- use Progress::set() instead of Progress::on()/off()
+- 2.13.14
+
+-------------------------------------------------------------------
+Thu Sep 14 00:47:47 CEST 2006 - ro@suse.de
+
+- added yast2-core-devel to BuildRequires 
+
+-------------------------------------------------------------------
+Tue Aug 29 10:11:57 CEST 2006 - lslezak@suse.cz
+
+- properly compute index of the selected card - fixed problem
+  with more sound cards (#177962)
+- fixed abort when an internal error occurrs (#201337)
+- fixed static hwcfg file and unique key handling for non-PCI
+  sound devices(#202086)
+- use the default values for kernel module options instead of
+  empty string (option=,,1 is not valid)
+- don't try to set volume if there is no sound card configured
+- fixed button label in the help text (#201127)
+- .spec file: don't pack libpy2ag_audio.la file
+- 2.13.13
+
+-------------------------------------------------------------------
+Mon Jul 17 10:05:45 CEST 2006 - lslezak@suse.cz
+
+- expert dialog - use standard Add/Edit/Delete buttons in the
+  dialog, allow to add a driver option which is not in the yast
+  sound card database (#128054), changed layout of the dialog
+- close volume dialog by WM (X button in the title) (#148687)
+- fixed CD device detection in sound font installation
+  code (#171060)
+- fixed sound card DB generator: read all tags from
+  alsa-module-syntax file, properly mark texts for translation,
+  replace modinfo text by proofread message if it's available,
+  updated documentation
+- updated the sound card DB
+- 2.13.12
+
+-------------------------------------------------------------------
 Thu May  4 15:00:47 CEST 2006 - lslezak@suse.cz
 
 - read_routines.ycp - added textdomain
