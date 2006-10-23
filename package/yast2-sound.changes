@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Oct 23 16:02:05 CEST 2006 - lslezak@suse.cz
+
+- help text - added 'aoss' wrapper description (fate #300351,
+  bug #117806)
+- 2.13.16
+
+-------------------------------------------------------------------
 Thu Sep 21 07:33:38 CEST 2006 - lslezak@suse.cz
 
 - new option - select the primary sound card (fate #300352)
