@@ -286,6 +286,10 @@ module loading for playing MIDI files. These modules can be loaded on demand.
 
 _("<p>The sound device with index 0 is the default device used by system and applications.
 Use <b>Other</b> to set the selected sound device as the primary device.</p>")
+
++ _("The applications which use OSS (Open Sound System) can use the software
+mixer by using aoss wrapper. Use command <tt>aoss &lt;application&gt;</tt> to
+start the application.")
 );
 
 	    ret = add(ret, "ErrorDialog",
