@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Nov 10 07:28:38 CET 2006 - lslezak@suse.cz
+
+- added a RNC schema for Autoyast profile validation (#219011)
+- 2.14.0
+
+-------------------------------------------------------------------
 Mon Oct 23 16:02:05 CEST 2006 - lslezak@suse.cz
 
 - help text - added 'aoss' wrapper description (fate #300351,
