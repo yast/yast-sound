@@ -407,7 +407,7 @@
 		    `PushButton (`id (`add), Label::AddButton()),
 		    `PushButton (`id (`edit), Label::EditButton()),
 		    `PushButton (`id (`delete), Label::DeleteButton()),
-		    `HSpacing(3),
+		    `HStretch(),
 		    // restore original option values
 		    `PushButton (`id (`reset), _("R&eset all"))
 		),
