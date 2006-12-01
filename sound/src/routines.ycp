@@ -309,7 +309,9 @@
 	    {
 		Sound::LoadDatabase(true);
 		list<term> mods = maplist (string k, map v, (map<string,map<string,any> >)Sound::db_modules, ``{
-		    return `item(`id(k), v["description"]:k);
+		    // format description of a kernel driver, %1 is a description
+		    // (e.g. Sound Blaster 16), %2 is a module name (e.g. snd-sb16)
+		    return `item(`id(k), sformat(_("%1 (%2)"), v["description"]:k, k));
 		});
 
 		mods = sort(term a, term b, mods, ``{

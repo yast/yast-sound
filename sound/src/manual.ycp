@@ -263,7 +263,7 @@
 			    // selection box title
 			    _("Sound Card &Vendor") :
 			    // selection box title
-			    _("Sound card &driver"),
+			    _("Sound Card &Driver"),
 			keys_names));
 
 		UI::ChangeWidget(`id(`sel_keys), `CurrentItem, new_key);

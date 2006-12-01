@@ -296,7 +296,7 @@ define void SequencerPopup() {
 		    `VSpacing(0.5),
 		    `Left(`CheckBox(`id(`sequencer),
 			// check box label
-			_("&Start sequencer"), Sound::rc_vars["LOAD_ALSA_SEQ"]:"no" == "yes")
+			_("&Start Sequencer (Load MIDI Drivers)"), Sound::rc_vars["LOAD_ALSA_SEQ"]:"no" == "yes")
 		    ),
 		    `VSpacing(0.5)
 		)
@@ -397,7 +397,7 @@ define map HardwareDialog() {
     WizardHW::CreateHWDialog(_("Sound Configuration"),
 	Sound::STRINGS["ComplexDialog"]:"",
 	// table header
-	[_("Number"), _("Card Model")],
+	[_("Index"), _("Card Model")],
 	extra_buttons
     );
 
