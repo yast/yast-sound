@@ -5,6 +5,7 @@ Thu Nov 30 13:29:42 CET 2006 - lslezak@suse.cz
 - display "Index" in the table header (#211555)
 - enahced description of "Start Sequencer" option (#211559)
 - display kernel module name in driver list
+- use sliders in the mixer dialog, display [OK] button (#211563)
 
 -------------------------------------------------------------------
 Fri Nov 10 07:28:38 CET 2006 - lslezak@suse.cz
