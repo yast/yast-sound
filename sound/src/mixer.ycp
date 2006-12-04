@@ -98,7 +98,7 @@
      * @return term widget
      */
     define term volElement(string label, integer value, boolean spec) ``{
-	if (spec)
+	if (UI::HasSpecialWidget(`Slider))
 	{
 	    return `Slider(`id(label), `opt(`notify), translateChannelName(label), 0, 100, value);
 	}
@@ -281,9 +281,8 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
     term con = mixerWidget (channels);
 
     // dialog header
-    Wizard::SetContents (sformat(_("Volume Settings for Card %1"), card_id),
-	con, help, true, true);
-    Wizard::RestoreNextButton();
+    Wizard::SetContentsButtons (sformat(_("Volume Settings for Card %1"), card_id),
+	con, help, Label::BackButton(), Label::OKButton() );
 
     any	ui = nil; // value can be `next `abort... or string (channel name)
     integer value = 0;
