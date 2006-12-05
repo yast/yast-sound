@@ -81,7 +81,7 @@
     /**
      * settings to save using .audio.alsa ... mixer
      */
-    global list volume_settings = [];
+    global list<list<list> > volume_settings = [];
 
     /**
      * rc settings
@@ -167,7 +167,7 @@
      */
     global list<map> modules_conf_b = nil;
     map rc_vars_b = nil;
-    list volume_settings_b = nil;
+    list<list<list> > volume_settings_b = nil;
 
     global string selected_uniq = "";
 
@@ -743,6 +743,94 @@ could make your system unstable.
 	return true;
     }
 
+    global list<list<map> > ExportVolumeSettings(list<list<list> > volume_setup)
+    {
+	y2milestone("ExportVolumeSettings: %1", volume_setup);
+	list<list<map> > ret = [];
+
+	if (volume_setup == nil)
+	{
+	    return ret;
+	}
+
+	foreach(list card, (list<list>)volume_setup,
+	    {
+		list<map> channels = [];
+
+		foreach(list channel, (list<list>)card,
+		    {
+			map ch = $[
+			    "name"	: channel[0]:"unknown",
+			    "volume"	: channel[1]:0,
+			    "mute"	: channel[2]:false
+			];
+
+			channels = add(channels, ch);
+		    }
+		);
+
+		ret = add(ret, channels);
+	    }
+	);
+
+	y2milestone("Exported volume setting: %1", ret);
+
+	return ret;
+    }
+
+    global list<list<list> > ImportVolumeSettings(list volume_setup)
+    {
+	list<list<list> > ret = [];
+
+	y2milestone("ImportVolumeSettings: %1", volume_setup);
+
+	if (volume_setup == nil)
+	{
+	    return ret;
+	}
+
+	foreach(list card, (list<list>)volume_setup,
+	    {
+		list<list> channels = [];
+
+		foreach(any channel, card,
+		    {
+			list ch = [];
+
+			if (is(channel, map))
+			{
+			    map channel_map = (map)channel;
+
+			    // convert map to list
+			    ch = add(ch, channel_map["name"]:"unknown");
+			    ch = add(ch, channel_map["volume"]:0);
+			    ch = add(ch, channel_map["mute"]:false);
+			}
+			else if (is(channel, list))
+			{
+			    // use the list
+			    ch = (list)channel;
+			}
+			else
+			{
+			    // wrong type
+			    y2error("Wrong channel configuration '%1', expected list or map!", channel);
+			}
+
+			channels = add(channels, ch);
+		    }
+		);
+
+		ret = add(ret, channels);
+	    }
+	);
+
+	y2milestone("Imported volume setting: %1", ret);
+
+	return ret;
+    }
+
+
     /**
      * Just Set module data
      * @param settings Sound configuration settings
@@ -751,7 +839,7 @@ could make your system unstable.
     global define void Set(map settings)  ``{
 	modules_conf		= settings["modules_conf"]:[];
 	rc_vars			= settings["rc_vars"]:$[];
-	volume_settings		= settings["volume_settings"]:[];
+	volume_settings		= ImportVolumeSettings(settings["volume_settings"]:[]);
 	configure_detected	= settings["configure_detected"]:false;
     }
 
@@ -780,7 +868,7 @@ could make your system unstable.
 	return $[
 	    "modules_conf"	: modules_conf,
 	    "rc_vars"		: rc_vars,
-	    "volume_settings"	: volume_settings,
+	    "volume_settings"	: ExportVolumeSettings(volume_settings),
 	    "configure_detected": configure_detected
 	];
     }
@@ -843,13 +931,21 @@ could make your system unstable.
 		sformat(_("Configured as %1."), card["alias"]:"snd-card-0"))
 	));
 
-	foreach(map card, detected_cards, ``{
-	    if (!contains(keys, card["unique_key"]:"..."))
-	    {
-		retlist = add (retlist, Summary::Device (
-		    get_card_label(card), Summary::NotConfigured()));
-	    }
-	});
+	if (detected_cards != nil)
+	{
+	    foreach(map card, detected_cards, ``{
+		if (!contains(keys, card["unique_key"]:"..."))
+		{
+		    retlist = add (retlist, Summary::Device (
+			get_card_label(card), Summary::NotConfigured()));
+		}
+	    });
+	}
+	else
+	{
+	    y2milestone("detected_cards: nil");
+	}
+
 	return Summary::DevicesList (retlist);
     }
 
@@ -1149,7 +1245,12 @@ could make your system unstable.
 		{
 		    p = topath (sformat(
 			".audio.alsa.cards.%1.channels.%2.volume", c, ch));
-		    volume_settings[tointeger(c)] = [ch, SCR::Read(p), "false"];
+
+		    // add the channel
+		    list<list> tmp = volume_settings[tointeger(c)]:[];
+		    tmp = add(tmp, [ch, SCR::Read(p), "false"]);
+
+		    volume_settings[tointeger(c)] = tmp;
 		}
 	    });
 	});
@@ -1177,7 +1278,37 @@ could make your system unstable.
 	    // alsa is not running. probably autoinstallation or someone wants
 	    // to change proposed volume
 	    // store volume to volume_settings datastricure in autoinstallation
-            volume_settings [c_id] = [ channel, value ];
+
+	    list<list> tmp = volume_settings[c_id]:[];
+
+	    boolean found = false;
+	    list<list> updated_channels = [];
+	    foreach(list ch, tmp,
+		{
+		    list new_ch = ch;
+
+		    if (new_ch[0]:"" == channel)
+		    {
+			new_ch[1] = value;
+			found = true;
+		    }
+
+		    updated_channels = add(updated_channels, new_ch);
+		}
+	    );
+
+	    if (found)
+	    {
+		// the channel has been found, use the updates list
+		tmp = updated_channels;
+	    }
+	    else
+	    {
+		// the channel has not been found, add it to the list
+		tmp = add(tmp, [ channel, value, false ]);
+	    }
+
+            volume_settings [c_id] = tmp;
             return true;
 	}
     }

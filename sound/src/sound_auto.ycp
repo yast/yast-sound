@@ -77,12 +77,15 @@
 	});
 	// ------------------------------------------------
 	// now configure cards not included in control file
+
+	y2milestone("configure_detected: %1", settings["configure_detected"]:false);
+
 	if (settings["configure_detected"]:false)
 	{
 	    // Now update Sound data, so the configured cards can be recognized
 	    // Import is not used, because it would remove detected cards
 	    Sound::modules_conf		= eval (save_info);
-	    Sound::volume_settings	= eval (settings["volume_settings"]:[]);
+	    Sound::volume_settings	= eval (Sound::ImportVolumeSettings(settings["volume_settings"]:[]));
 
 	    Sound::UpdateUnconfiguredCards ();
 	    foreach (map card, Sound::unconfigured_cards, ``{
@@ -97,7 +100,7 @@
 		    y2milestone ("Added sound card '%1'", card["model"]:"");
 		}
 	    });
-	    settings["volume_settings"]	= Sound::volume_settings;
+	    settings["volume_settings"]	= Sound::ExportVolumeSettings(Sound::volume_settings);
 	}
 	settings["modules_conf"]	= eval (save_info);
 	return settings;

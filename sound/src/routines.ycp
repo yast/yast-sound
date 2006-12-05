@@ -22,6 +22,7 @@
     import "Popup";
     import "Sound";
     import "Label";
+    import "Arch";
 
     textdomain "sound";
 
@@ -352,7 +353,7 @@
 		]
      * @return list as above
      */
-    define list get_vol_settings() ``{
+    define list<list<list> > get_vol_settings() ``{
 
 	if (!Sound::use_alsa)
 	    return [];
@@ -360,10 +361,10 @@
 	Sound::LoadDatabase(true);
 	integer bound	= size(SCR::Dir(.audio.alsa.cards));
 	integer i	= 0;
-	list retlist	= [];
+	list<list<list> > retlist	= [];
 	while (i < bound)
 	{
-	    list sublist = [];
+	    list<list> sublist = [];
 	    string modname = Sound::modules_conf[i,"module"]:"snd-dummy";
 	    list<string> chans = Sound::db_modules[modname, "mixer_elements"]:[];
 
@@ -386,6 +387,7 @@
 		sublist = add(sublist, [e, SCR::Read(pth1), SCR::Read(pth2)]);
 	    });
 	    retlist = add (retlist, sublist);
+
 	    i = i + 1;
 	}
 	return retlist;
@@ -658,6 +660,8 @@
 	    // we must supply the 'name' key with the module name
 	    ret = add(ret, "name", modname);
 	}
+
+	y2milestone("card: '%1', using module %2", card["model"]:"", ret["name"]:"");
 
 	return ret;
     }

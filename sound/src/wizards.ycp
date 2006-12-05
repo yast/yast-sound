@@ -77,7 +77,7 @@
 
             // we have to remember volume/mute settings because after a
 	    // card removal everything is muted and set to 0.
-            list vol_settings = get_vol_settings();
+            list<list<list> > vol_settings = get_vol_settings();
 	    if (Mode::config())
 		vol_settings	= Sound::volume_settings;
 

@@ -1,0 +1,19 @@
+{
+    // testedfiles: Sound.ycp
+    include "testsuite.ycp";
+
+    import "Sound";
+
+
+    // Important: import of the new and the old format must produce the same output!
+
+    list input_old_format = [[ ["Master", 80, false], ["CD", 90, false] ]];
+
+    TEST(``(Sound::ImportVolumeSettings(nil)), [], nil);
+    TEST(``(Sound::ImportVolumeSettings([])), [], nil);
+    TEST(``(Sound::ImportVolumeSettings(input_old_format)), [], nil);
+
+    list input_new_format = [ [$["mute":false, "name":"Master", "volume":80], $["mute":false, "name":"CD", "volume":90]] ]; 
+
+    TEST(``(Sound::ImportVolumeSettings(input_new_format)), [], nil);
+}

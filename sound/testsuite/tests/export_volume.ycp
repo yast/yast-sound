@@ -1,0 +1,11 @@
+{
+    // testedfiles: Sound.ycp
+    include "testsuite.ycp";
+
+    import "Sound";
+
+    list<list<list> > input = [[ ["Master", 80, false], ["CD", 90, false] ]];
+    TEST(``(Sound::ExportVolumeSettings(nil)), [], nil);
+    TEST(``(Sound::ExportVolumeSettings([])), [], nil);
+    TEST(``(Sound::ExportVolumeSettings(input)), [], nil);
+}
