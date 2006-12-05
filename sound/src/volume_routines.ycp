@@ -66,10 +66,37 @@
 	}
 	else
 	{
-	    // store volume to Sound::volume_settings for autoinstallation use
-	    map oldmap = Sound::volume_settings[cardid]:$[];
-	    // if current size of volume_settings < cardid, there will be nil!
-	    Sound::volume_settings[cardid] = add (oldmap, group, value);
+	    list<list> tmp = Sound::volume_settings[cardid]:[];
+
+	    boolean found = false;
+	    list<list> updated_channels = [];
+	    foreach(list ch, tmp,
+		{
+		    list new_ch = ch;
+
+		    if (new_ch[0]:"" == group)
+		    {
+			new_ch[1] = value;
+			found = true;
+		    }
+
+		    updated_channels = add(updated_channels, new_ch);
+		}
+	    );
+
+	    if (found)
+	    {
+		// the channel has been found, use the updates list
+		tmp = updated_channels;
+	    }
+	    else
+	    {
+		// the channel has not been found, add it to the list
+		tmp = add(tmp, [ group, value, false ]);
+	    }
+
+            Sound::volume_settings[cardid] = tmp;
+
 	    return true;
 	}
     }

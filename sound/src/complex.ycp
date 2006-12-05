@@ -29,10 +29,12 @@
     import "Popup";
     import "Mode";
     import "WizardHW";
+    import "Report";
 
     import "Sound";
     include "sound/mixer.ycp";
     include "sound/options.ycp"; // sound_options
+    include "sound/volume.ycp";  // VolumeDialog
 
     /**
      * creates summary table with card labels and thier states
@@ -166,8 +168,18 @@ define void SetItems() {
 define symbol Mixer()
 {
     symbol ret = nil;
+    map res = $[];
 
-    map res = mixerDialog(Sound::card_id);
+    if (Mode::config())
+    {
+	symbol dialog_result = VolumeDialog(Sound::modules_conf[Sound::card_id]:$[], true, Sound::card_id);
+
+	res["ui"] = dialog_result;
+    }
+    else
+    {
+	res =  mixerDialog(Sound::card_id);
+    }
 
     ret = (symbol)res["ui"]:nil;
 

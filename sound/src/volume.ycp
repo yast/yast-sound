@@ -68,7 +68,7 @@
 		    `Label (`opt(`outputField), save_entry["model"]:"")
 		)),
 		// frame label
-		`Frame(_("Volume adjust and test"), `HBox(
+		`Frame(_("Volume Adjust and Test"), `HBox(
 		    `HSpacing (),
 		    `VBox (
 			`VSpacing (0.5),
@@ -99,8 +99,22 @@
     define symbol VolumeDialog (map save_entry, boolean finish,
 				       integer card_id) ``{
 
+	string modname = save_entry["module"]:"snd-dummy";
+	string master_elem = Sound::db_modules[modname, "main_volume"]:"Master";
+
 	string help_text	= Sound::STRINGS["VolumeDialog"]:"";
 	integer vol		= 50;
+
+	list<list> channels = Sound::volume_settings[card_id]:[];
+	foreach(list ch, channels,
+	    {
+		if (ch[0]:"" == master_elem)
+		{
+		    vol = ch[1]:50;
+		}
+	    }
+	);
+
 	term con		= VolumeCon(save_entry, vol);
 
 	// dialog title
@@ -122,8 +136,6 @@
 	    InstallFonts("", false);
 	}
 
-	string modname = save_entry["module"]:"snd-dummy";
-	string master_elem = Sound::db_modules[modname, "main_volume"]:"Master";
         setVolume (master_elem, card_id, vol);
 	// some cards use Headphone instead of Master (bug #26539):
 	setVolume ("Headphone", card_id, vol);
@@ -156,7 +168,7 @@
 		    }
 		}
 	    }
-	    else if (ui == `next && Sound::conf_joystick)
+	    else if (ui == `next && Sound::conf_joystick && !Mode::config())
 	    {
 		symbol ret = joy_dialog(card_id, `next);
 		if (ret == `back)
