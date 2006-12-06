@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Dec  6 16:38:51 CET 2006 - lslezak@suse.cz
+
+- updated RNC file to match the new export format (#219399)
+
+-------------------------------------------------------------------
 Thu Nov 30 13:29:42 CET 2006 - lslezak@suse.cz
 
 - align action buttons to the left in the advanced dialog (#211557)
