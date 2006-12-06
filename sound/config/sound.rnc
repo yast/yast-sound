@@ -3,49 +3,37 @@ namespace a = "http://relaxng.org/ns/compatibility/annotations/1.0"
 namespace config = "http://www.suse.com/1.0/configns"
 
 LOAD_ALSA_SEQ = element LOAD_ALSA_SEQ { text }
+sound =
+  element sound {
+    element configure_detected { BOOLEAN }? &
+    element rc_vars { LOAD_ALSA_SEQ* }? &
+    element autoinstall { BOOLEAN }? &
+    element configure_detected { BOOLEAN }? &
+    modules_conf? & volume_settings?
+  }
 module_conf =
-  element module_conf { snd_alias? & model? & snd_module? & snd_options? & unique_key? }
+  element module_conf {
+      element alias      { text }? &
+      element model      { text }? &
+      element module     { text }? &
+      element unique_key { text }? &
+      element options    { Anything }?
+  }
 modules_conf =
   element modules_conf {
     module_conf*
   }
-new =
-  element new {
-    text
-  }
-snd_options = element options {
-    Anything*
-}
 
-rc_vars = element rc_vars { LOAD_ALSA_SEQ* }
-snd_enable = element snd_enable { text }
-snd_index = element snd_index { text }
-sound =
-  element sound {
-    configure_detected? & modules_conf? & rc_vars? & volume_settings?
-  }
-state = element state { text }
 unique_key = element unique_key { text }
-unknown-state = element unknown-state { text }
-volume_component_settings =
-  element volume_component_settings {
-    attribute config:type { text }?,
-    text
-  }
-volume_entry =
-  element volume_entry {
-    Anything*
-  }
 volume_settings =
   element volume_settings {
-    volume_entry*
+    LIST,
+    element volume_entry {
+        LIST,
+        element volume_component {
+            element mute   { BOOLEAN }? &
+            element name   { text }? &
+            element volume { INTEGER }?
+        }*
+    }
   }
-configure_detected =
-  element configure_detected { BOOLEAN }
-enable = element enable { text }
-index = element index { text }
-isapnp = element isapnp { text }
-joystick = element joystick { text }
-snd_module = element module { text }
-snd_alias  = element alias  { text }
-model = element model { text }
