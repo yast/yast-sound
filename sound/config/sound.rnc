@@ -8,7 +8,6 @@ sound =
     element configure_detected { BOOLEAN }? &
     element rc_vars { LOAD_ALSA_SEQ* }? &
     element autoinstall { BOOLEAN }? &
-    element configure_detected { BOOLEAN }? &
     modules_conf? & volume_settings?
   }
 module_conf =
@@ -35,5 +34,5 @@ volume_settings =
             element name   { text }? &
             element volume { INTEGER }?
         }*
-    }
+    }*
   }
