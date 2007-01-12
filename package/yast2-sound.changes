@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Jan 12 13:24:37 CET 2007 - lslezak@suse.cz
+
+- updated the sound card database (snd-intel-hda PCI IDs)
+  (feature #301421)
+- 2.13.18
+
+-------------------------------------------------------------------
 Fri Jan 12 07:03:38 CET 2007 - lslezak@suse.cz
 
 - 2.13.17
