@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Jan 17 10:06:30 CET 2007 - lslezak@suse.cz
+
+- remove the options for unused modules from /etc/modprobe.d/sound
+  file (#164704)
+- 2.15.1
+
+-------------------------------------------------------------------
 Wed Dec  6 16:38:51 CET 2006 - lslezak@suse.cz
 
 - updated RNC file to match the new export format (#219399)
