@@ -187,10 +187,23 @@
 	path mod_options = .modprobe_sound.options;
 
 	// create distinct list of all modules
-	list mods = toset(maplist(map card, (list<map<string,any> >) save_info,
+	list<string> mods = toset(maplist(map card, (list<map<string,any> >) save_info,
 	    ``(card["module"]:"off")));
 
-	foreach(string modname, (list<string>) mods, ``{
+	// remove the options for unused modules
+	list<string> configured_options = SCR::Dir(.modprobe_sound.options);
+
+	foreach(string op, configured_options,
+	    {
+		if (!contains(mods, op))
+		{
+		    y2milestone("Removing options for unused module %1", op);
+		    SCR::Write( add(.modprobe_sound.options, op), nil);
+		}
+	    }
+	);
+
+	foreach(string modname, mods, ``{
 	    map res = Sound::CollectOptions(modname);
 	    SCR::Write( add (mod_options, modname ), res);
 	});
