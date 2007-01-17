@@ -74,6 +74,9 @@
 	    );
 	}
 
+	// sort the cards by index
+	ret = sort(map<string,any> card1, map<string,any> card2, ret, {return tointeger(card1["table_descr", 0]:"0") < tointeger(card2["table_descr", 0]:"0");});
+
 	if (Sound::unconfigured_cards != nil && size(Sound::unconfigured_cards) > 0)
 	{
 	    foreach(map card, Sound::unconfigured_cards, {

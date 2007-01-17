@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jan 17 10:37:51 CET 2007 - lslezak@suse.cz
+
+- sound_auto.ycp - use Progress::set()
+- sort the cards by index in the overview dialog
+
+-------------------------------------------------------------------
 Wed Jan 17 10:06:30 CET 2007 - lslezak@suse.cz
 
 - remove the options for unused modules from /etc/modprobe.d/sound
