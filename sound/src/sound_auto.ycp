@@ -148,7 +148,7 @@
 	/* Write givven settings */
 	else if (func == "Write") {
 		import "Progress";
-		Progress::off();
+		boolean progress_orig = Progress::set(false);
 		map settings = Sound::Export();
 		Sound::write_only = true;
 		// detect the cards on the system, so we could write them
@@ -156,7 +156,7 @@
 		settings = UpdateCardsToTargetSystem (settings);
 		Sound::Import (settings);
 		ret = WFM::CallFunction ("sound_write", [ settings ]);
-		Progress::on();
+		Progress::set(progress_orig);
 		return ret;
 	}
 	/* Unknown function */
