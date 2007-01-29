@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Jan 29 15:39:43 CET 2007 - lslezak@suse.cz
+
+- use snd-aoa driver on PPC with layout-id property (#217300)
+- updated soundcard DB
+- 2.15.2
+
+-------------------------------------------------------------------
 Wed Jan 17 10:37:51 CET 2007 - lslezak@suse.cz
 
 - sound_auto.ycp - use Progress::set()

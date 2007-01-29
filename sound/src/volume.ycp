@@ -275,7 +275,7 @@ its parameters using the 'Advanced setup'.");
 define map sound_volume (map save_entry, integer card_id, boolean finish,
 				boolean quick, list save_info) ``{
 
-    y2debug("sound_volume(%1, %2, %3, %4, %5) started", save_entry, card_id, finish, quick, save_info);
+    y2milestone("sound_volume(%1, %2, %3, %4, %5) started", save_entry, card_id, finish, quick, save_info);
 
     Sound::LoadDatabase (true);
 
