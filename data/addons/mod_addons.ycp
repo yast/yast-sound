@@ -11,5 +11,9 @@ $[
 		"allows": "{{0},{1}}"
 	    ]
 	]
-    ]
+    ],
+    "snd-aoa":
+    $[
+	"description" : "Apple on-board (Layout ID)"
+    ],
 ]
