@@ -974,6 +974,16 @@ could make your system unstable.
 	    outlist = add(outlist, modprobe);
 	});
 
+	// add the extra module
+	if (contains(mods, "snd-aoa"))
+	{
+	    y2milestone("Adding extra module: snd-aoa-i2sbus, snd-aoa-fabric-layout");
+	    outlist = add(outlist, "/sbin/modprobe -C /dev/null snd-aoa-i2sbus");
+	    outlist = add(outlist, "/sbin/modprobe -C /dev/null snd-aoa-fabric-layout");
+	}
+
+	y2milestone("Modprobe commands: %1", outlist);
+
 	return outlist;
 
     }

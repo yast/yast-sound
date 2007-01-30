@@ -22,6 +22,7 @@
     import "Popup";
     import "Sound";
     import "Label";
+    import "Arch";
 
     textdomain "sound";
 
@@ -238,6 +239,8 @@
      *  @return map modified save_entry
      */
     define map add_common_options(map entry, integer card_id) ``{
+
+	y2milestone("add_common_options: card: %1, entry: %2", card_id, entry);
 
 	map opts = entry["options"]:$[];
 
@@ -619,6 +622,24 @@
         return true;
     }
 
+    boolean layout_id()
+    {
+	boolean ret = false;
+
+	if (Arch::ppc64() && Arch::board_mac())
+	{
+	    map out = (map)SCR::Execute(.target.bash_output, "/usr/bin/find /proc/device-tree -name layout-id");
+
+	    if (out["exit"]:-1 == 0 && size(out["stdout"]:"") > 0)
+	    {
+		y2milestone("Layout-id property detected: %1", out["stdout"]:"");
+		ret = true;
+	    }
+	}
+
+	return ret;
+    }
+
     /**
      * Looks up in the database for the module
      * @param card map read from .probe.sound
@@ -648,6 +669,13 @@
 	}
 
 	string modname = Sound::db_module_index [m2]:"";
+
+	// ppc hack - use snd-aoa instead of snd-powermac (#217300)
+	if (modname == "snd-powermac" && layout_id())
+	{
+	    y2milestone("Card '%1': Using snd-aoa driver instead of snd-powermac", card["model"]:"");
+	    modname = "snd-aoa";
+	}
 
 	map ret = Sound::db_modules [modname]:$[];
 

@@ -534,6 +534,12 @@ $[
       "PowerMac, Apple",
       "iBook, Apple",
       "iMac, Apple"
+    ],
+    101 : [
+      "PowerBook (Layout ID), Apple",
+      "PowerMac (Layout ID), Apple",
+      "iBook (Layout ID), Apple",
+      "iMac (Layout ID), Apple"
     ]
   ],
   "indices" : $[
@@ -989,7 +995,8 @@ $[
     79 : "snd-pcxhr",
     80 : "snd-ad1889",
     81 : "snd-cs5535audio",
-    100 : "snd-powermac"
+    100 : "snd-powermac",
+    101 : "snd-aoa"
   ],
   "modules" : $[
     "snd-ad1816a" : $[
@@ -1189,6 +1196,9 @@ $[
           ]
         ]
       ]
+    ],
+    "snd-aoa" : $[
+      "description" : "Apple on-board (Layout ID)"
     ],
     "snd-atiixp" : $[
       "description" : "ATI IXP AC97 controller",
@@ -3744,7 +3754,11 @@ $[
       "PowerBook",
       "PowerMac",
       "iBook",
-      "iMac"
+      "iMac",
+      "PowerBook (Layout ID)",
+      "PowerMac (Layout ID)",
+      "iBook (Layout ID)",
+      "iMac (Layout ID)"
     ],
     "AudioExecl" : [
       "AV 510",
