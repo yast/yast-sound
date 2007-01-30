@@ -629,7 +629,7 @@
     {
 	boolean ret = false;
 
-	if (Arch::ppc64() && Arch::board_mac())
+	if (Arch::board_mac())
 	{
 	    map out = (map)SCR::Execute(.target.bash_output, "/usr/bin/find /proc/device-tree -name layout-id");
 
