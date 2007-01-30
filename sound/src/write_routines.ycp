@@ -163,6 +163,26 @@
 	    // set automatic start at boot
 	    ret = ret && HWConfig::SetValue(file, "STARTMODE", "auto");
 
+	    // this is a hack for snd-aoa driver, additional modules are needed (#217300)
+	    if (entry["module"]:"" == "snd-aoa")
+	    {
+		// write the extra module to hwconfig file
+		ret = ret && HWConfig::SetValue(file, "MODULE_EXTRA", "snd-aoa-i2sbus");
+		ret = ret && HWConfig::SetValue(file, "MODULE_EXTRA2", "snd-aoa-fabric-layout");
+
+		// write the extra module (snd-aoa-i2sbus) to /etc/init.d/sound, add "00" suffix to the alias
+		path extra_alias = add(.modprobe_sound.alias, (entry["alias"]:"off") + "00");
+		ret = ret && SCR::Write(extra_alias, "snd-aoa-i2sbus");
+		string extra_comment = createAliasComment(entry["model"]: "", entry["unique_key"]:"");
+		ret = ret && SCR::Write(extra_alias + "comment", "# Extra driver for sound card:\n" + extra_comment);
+
+		// write the extra module (snd-aoa-fabric-layout) to /etc/init.d/sound, add "01" suffix to the alias
+		path extra_alias2 = add(.modprobe_sound.alias, (entry["alias"]:"off") + "01");
+		ret = ret && SCR::Write(extra_alias2, "snd-aoa-fabric-layout");
+		string extra_comment2 = createAliasComment(entry["model"]: "", entry["unique_key"]:"");
+		ret = ret && SCR::Write(extra_alias2 + "comment", "# Extra driver for sound card:\n" + extra_comment);
+	    }
+
 	    HWConfig::Flush();
 
 	    string modcomment = createAliasComment(entry["model"]: "", entry["unique_key"]:"");

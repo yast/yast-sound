@@ -100,5 +100,6 @@ $[
     80	: "snd-ad1889",
     81	: "snd-cs5535audio",
 
-    100 : "snd-powermac"
+    100 : "snd-powermac",
+    101 : "snd-aoa"
 ]

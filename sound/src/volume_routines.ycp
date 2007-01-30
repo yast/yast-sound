@@ -9,7 +9,7 @@
  *   Routines for sound card volume settings
  *
  * Authors:
- *	Dan Veselý <dan@suse.cz>
+ *	Dan Vesely <dan@suse.cz>
  *	Dan Meszaros <dmeszar@suse.cz>
  *	Jiri Suchomel <jsuchome@suse.cz>
  *
@@ -177,6 +177,24 @@
 	{
 	    SCR::Execute (.target.bash,
 		"/etc/init.d/alsasound unload > /dev/null 2>&1", $[]);
+
+	    boolean aoa_used = false;
+	    foreach(map card, Sound::modules_conf,
+		{
+		    if (card["module"]:"" == "snd-aoa")
+		    {
+			aoa_used = true;
+		    }
+		}
+	    );
+
+	    if (aoa_used)
+	    {
+		// unload the extra module
+		y2milestone("Unloading snd-aoa-i2sbus driver");
+		SCR::Execute(.target.bash, "/sbin/rmmod snd-aoa-i2sbus");
+		SCR::Execute(.target.bash, "/sbin/rmmod snd-aoa-fabric-layout");
+	    }
 	}
 	else
 	{
