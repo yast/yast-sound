@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jan 31 07:28:59 CET 2007 - lslezak@suse.cz
+
+- search for layout-id also on 32-bit ppc (#217300)
+- 2.14.2
+
+-------------------------------------------------------------------
 Tue Jan 30 13:02:24 CET 2007 - lslezak@suse.cz
 
 - use snd-aoa driver on PPC with layout-id property (#217300)
