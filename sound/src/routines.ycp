@@ -660,18 +660,45 @@
 	map m1 = Sound::db_indices[vendor_id]:$[];
 	if (m1 == $[])
 	{
-	    y2debug("vendor_id not found...");
-	    return $[];
+	    y2warning("vendor_id (%1) not found...", vendor_id);
 	}
 
 	integer m2 = m1[device_id]:-1;
 	if (m2 == -1)
 	{
-	    y2debug("device_id not found");
-	    return $[];
+	    y2warning("device_id (%1) not found", device_id);
 	}
 
-	string modname = Sound::db_module_index [m2]:"";
+	string modname = "";
+
+	if (haskey(Sound::db_module_index, m2))
+	{
+	    modname = Sound::db_module_index [m2]:"";
+	}
+	else
+	{
+	    y2warning("Missing driver name in DB for card: %1", card);
+	    // driver for the sound card is not known
+	    // use value from hwinfo if present
+	    modname = card["drivers",0,"modules",0,0]:"";
+
+	    // covert module name - hwinfo might use _ in module name prefix (e.g. snd_via82xx)
+	    if (substring(modname, 0, size("snd_")) == "snd_")
+	    {
+		modname = "snd-" + substring(modname, size("snd_"));
+	    }
+
+	    if (modname != "")
+	    {
+		y2warning("Using driver provided by hwinfo: %1", modname);
+	    }
+	    else
+	    {
+		y2internal("Module for the card is unknown");
+		// TODO: manual configuration is needed
+	    }
+	}
+
 
 	// ppc hack - use snd-aoa instead of snd-powermac (#217300)
 	if (modname == "snd-powermac" && layout_id())
@@ -688,7 +715,7 @@
 	    ret = add(ret, "name", modname);
 	}
 
-	y2milestone("card: '%1', using module %2", card["model"]:"", ret["name"]:"");
+	y2milestone("card: '%1', using module %2", card["model"]:"", modname);
 
 	return ret;
     }
