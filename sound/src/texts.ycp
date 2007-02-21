@@ -259,11 +259,7 @@ To save the current configuration, press <B>Finish</B>.
 	if ( Sound::use_alsa )
 	{
 	    ret = add(ret, "ComplexDialog",
-_("<p><big><b>Sound Cards</b><big></p>
-<p>This is the complete sound card list. Use <b>Finish</b> 
-to save sound card information.
-</p>
-") +
+_("<p><big><b>Sound Cards</b><big></p>") +
 
 _("<P>Select an unconfigured card from the list and press <B>Edit</B> to
 configure it. If the card was not detected, press <B>Add</B> and
@@ -279,6 +275,7 @@ Then press <B>Edit</B>.
 _("<p>
 Use <b>Other</b> to set the volume of the selected card or configure
 module loading for playing MIDI files (<b>Start Sequencer</b>).
+Use <b>Play Test Sound</b> to test the selected card.
 </p>
 ") +
 
