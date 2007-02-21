@@ -35,6 +35,7 @@
     include "sound/mixer.ycp";
     include "sound/options.ycp"; // sound_options
     include "sound/volume.ycp";  // VolumeDialog
+    include "sound/volume_routines.ycp"; // PlayTest()
 
     /**
      * creates summary table with card labels and thier states
@@ -397,6 +398,8 @@ define map HardwareDialog() {
 	// menu item
 	[`mixer, _("&Volume...")],
 	// menu item
+	[`play_test, _("Play &Test Sound")],
+	// menu item
 	[`seq, _("&Start Sequencer")],
 	// menu item
 	[`primary, _("Set as the &Primary Card")]
@@ -510,6 +513,27 @@ define map HardwareDialog() {
 	    {
 		// set the primary card
 		SetPrimaryCard(idx, idx2);
+	    }
+	}
+	else if (ui == `play_test)
+	{
+	    string uniq = WizardHW::SelectedItem();
+	    // alsa index (snd-card-X)
+	    integer card_id = getCardIndex((list<map<string,any> >)Sound::modules_conf, uniq);
+
+	    if (card_id != nil && card_id >= 0)
+	    {
+		y2milestone("Playing test: card: %1", card_id);
+		string msg = PlayTest(card_id);
+
+		if (msg != "")
+		{
+		    Popup::Message (msg);
+		}
+	    }
+	    else
+	    {
+		y2warning("Invalid index '%1' for card: %2", card_id, uniq);
 	    }
 	}
 	else

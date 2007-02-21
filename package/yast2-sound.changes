@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Feb 21 07:32:44 CET 2007 - lslezak@suse.cz
+
+- added "Play Test Sound" item to the main menu (#244905)
+- 2.15.4
+
+-------------------------------------------------------------------
 Mon Feb 12 16:15:33 CET 2007 - lslezak@suse.cz
 
 - use the driver provided by hwinfo if the card is not in the yast

@@ -139,17 +139,14 @@
 		fname);
         }
 
-	if (!Sound::use_alsa)
-        {
-            SCR::Execute (.target.bash_background,
-		sformat("/usr/bin/mpg123 -a /dev/dsp%1 %2", card_id, fname));
-        }
-        else
-        {
-            SCR::Execute (.target.bash_background,
-		sformat("/usr/bin/aplay -q -N -D default:%1 %2 > /dev/null 2>&1",
-		    card_id, fname));
-        }
+	string command = (!Sound::use_alsa) ?
+	    sformat("/usr/bin/mpg123 -a /dev/dsp%1 %2", card_id, fname)
+	    : sformat("/usr/bin/aplay -q -N -D default:%1 %2 > /dev/null 2>&1", card_id, fname);
+
+	y2milestone("Executing: %1", command);
+
+        SCR::Execute(.target.bash_background, command);
+
         return "";
     }
 
