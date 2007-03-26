@@ -1331,7 +1331,7 @@ could make your system unstable.
      */
     global define void  InitMixer(integer c_id, string modname) ``{
 	y2milestone("InitMixer: %1, %2", c_id, modname);
-        map devs = db_modules[modname, "mixer"]:$["Master":70, "PCM":70, "CD":70, "Synth":70, "Front":70, "Headphone":70, "Master Mono":70 ];
+        map devs = db_modules[modname, "mixer"]:$["Master":70, "PCM":70, "CD":70, "Synth":70, "Front":70, "Headphone":70, "Master Mono":70, "iSpeaker":70 ];
 	y2milestone("Mixer devices: %1", devs);
 
 	// now let's merge settings from volume_settings list
