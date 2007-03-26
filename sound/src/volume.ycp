@@ -143,6 +143,8 @@
 	setVolume ("Master Mono", card_id, vol);
 	// some systems use Front (#72971)
 	setVolume ("Front", card_id, vol);
+	// some systems use iSpeaker (#251844)
+	setVolume ("iSpeaker", card_id, vol);
 
 	symbol ui = nil;
 	do
@@ -156,6 +158,7 @@
 		setVolume ("Headphone", card_id, vol);
 		setVolume ("Master Mono", card_id, vol);
 		setVolume ("Front", card_id, vol);
+		setVolume ("iSpeaker", card_id, vol);
 	    }
 	    else if (ui == `test)
 	    {
@@ -376,6 +379,11 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
 	    {
 		setVolume ("Master Mono", card_id, Sound::default_volume);
 	    }
+	    if (haskey (devs, "iSpeaker"))
+	    {
+		setVolume ("iSpeaker", card_id, Sound::default_volume);
+	    }
+
 
 	    if (Sound::conf_joystick == true && Sound::use_ui)
 	    {

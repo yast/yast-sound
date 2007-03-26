@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Mar 26 11:12:36 CEST 2007 - lslezak@suse.cz
+
+- set "iSpeaker" channel volume (#251844)
+- 2.15.5
+
+-------------------------------------------------------------------
 Wed Feb 21 07:32:44 CET 2007 - lslezak@suse.cz
 
 - added "Play Test Sound" item to the main menu (#244905)
