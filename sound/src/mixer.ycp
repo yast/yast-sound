@@ -69,7 +69,11 @@
 	// channel name - label for IntField widget in mixer dialog
 	"AC97"		: _("AC97"),
 	// channel name - label for IntField widget in mixer dialog
-	"Music"		: _("Music")
+	"Music"		: _("Music"),
+	// channel name - label for IntField widget in mixer dialog
+	"Front"		: _("Front"),
+	// channel name - label for IntField widget in mixer dialog
+	"iSpeaker"	: _("iSpeaker")
     ];
 
     /**
