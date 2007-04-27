@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Apr 27 12:26:42 CEST 2007 - lslezak@suse.cz
+
+- translate "iSpeaker" and "Front" channel names (#252595)
+- 2.15.6
+
+-------------------------------------------------------------------
 Mon Mar 26 11:12:36 CEST 2007 - lslezak@suse.cz
 
 - set "iSpeaker" channel volume (#251844)
