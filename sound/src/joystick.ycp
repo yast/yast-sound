@@ -28,6 +28,7 @@
     import "Sequencer";
     import "Sound";
     import "Wizard";
+    import "CommandLine";
 
     include "sound/joy_dialog.ycp";
     include "sound/write_routines.ycp";
@@ -199,57 +200,68 @@
 
 
     /**********************  MAIN  ************************/
+    symbol StartGUI()
+    {
+	// sequence of dialogs
+	map sequence = $[
+	    "ws_start" : "detect",
 
-    // sequence of dialogs
-    map sequence = $[
-	"ws_start" : "detect",
+	    "detect" : $[
+		`next	: "save",
+		`abort	: `abort,
+		`config	: "joystick"
+	    ],
 
-	"detect" : $[
-	    `next	: "save",
-	    `abort	: `abort,
-	    `config	: "joystick"
-	],
+	    "joystick" : $[
+		`abort	: `abort,
+		`next	: "detect"
+	    ],
 
-	"joystick" : $[
-	    `abort	: `abort,
-	    `next	: "detect"
-	],
+	    "save" : $[
+		`next	: `ws_finish
+	    ]
+	];
 
-	"save" : $[
-	    `next	: `ws_finish
-	]
+	// aliases for dialogs
+	map aliases = $[
+	    "detect"	: ``(joystick_configuration()),
+	    "joystick"	: [ ``(joy_dialog(selected_card, label)), true ],
+	    "save"		: ``(saveconfig())
+	];
+
+	// create wizard dialog
+	Wizard::CreateDialog();
+	Wizard::SetDesktopIcon("joystick");
+
+	// read sound card configuration
+	boolean progress_orig = Progress::set(false);
+
+	if (!Sound::Read(false))
+	    return `abort;
+
+	Sound::StoreSettings ();
+
+	Progress::set(progress_orig);
+
+	// read joystick configuration
+	Joystick::Read(abort_block);
+
+	y2debug("Read joystick configuration: %1", Joystick::joystick);
+
+	// start wizard sequencer
+	Sequencer::Run (aliases, sequence);
+
+	// close dialog
+	Wizard::CloseDialog();
+    }
+
+
+
+    map cmdline_description = $[
+	"id"	: "joystick",
+	"guihandler"        : StartGUI,
     ];
 
-    // aliases for dialogs
-    map aliases = $[
-	"detect"	: ``(joystick_configuration()),
-	"joystick"	: [ ``(joy_dialog(selected_card, label)), true ],
-	"save"		: ``(saveconfig())
-    ];
-
-    // create wizard dialog
-    Wizard::CreateDialog();
-    Wizard::SetDesktopIcon("joystick");
-
-    // read sound card configuration
-    boolean progress_orig = Progress::set(false);
-
-    if (!Sound::Read(false))
-	return `abort;
-
-    Sound::StoreSettings ();
-
-    Progress::set(progress_orig);
-
-    // read joystick configuration
-    Joystick::Read(abort_block);
-
-    y2debug("Read joystick configuration: %1", Joystick::joystick);
-
-    // start wizard sequencer
-    Sequencer::Run (aliases, sequence);
-
-    // close dialog
-    Wizard::CloseDialog();
+    return CommandLine::Run(cmdline_description);
 
 }//EOF
