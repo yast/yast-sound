@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu May 24 10:26:39 CEST 2007 - lslezak@suse.cz
+
+- added minimal commandline mode support to 'joystick' (#269895)
+- 2.15.7
+
+-------------------------------------------------------------------
 Fri Apr 27 12:26:42 CEST 2007 - lslezak@suse.cz
 
 - translate "iSpeaker" and "Front" channel names (#252595)
