@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri May 25 13:30:04 CEST 2007 - jsrain@suse.cz
+
+- removed outdated translations from .desktop-files (#271209)
+
+-------------------------------------------------------------------
 Thu May 24 10:26:39 CEST 2007 - lslezak@suse.cz
 
 - added minimal commandline mode support to 'joystick' (#269895)
