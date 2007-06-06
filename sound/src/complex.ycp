@@ -419,7 +419,14 @@ define map HardwareDialog() {
 	extra_buttons
     );
 
-    Wizard::SetNextButton(`next, Label::FinishButton());
+    if (!Mode::installation() && !Mode::config())
+    {
+	Wizard::SetNextButton(`next, Label::FinishButton());
+    }
+    else
+    {
+	Wizard::SetNextButton(`next, Label::AcceptButton());
+    }
 
     symbol ret = `_dummy;
 
