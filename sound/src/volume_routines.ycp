@@ -235,6 +235,14 @@
 	}
     }
 
+    boolean GlobExists(string glob)
+    {
+	map out = (map)SCR::Execute(.target.bash_output, sformat("echo -n %1", glob));
+	y2debug("output: %1", out);
+
+	return out["stdout"]:"" != glob;
+    }
+
     /**
      * stops all programs using sound devices
      * @return boolean true if nothing's using sound, false otherwise
@@ -244,7 +252,23 @@
 	{
 	    return true;
 	}
-	integer fuser = (integer) SCR::Execute (.target.bash, "/bin/fuser /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]);
+
+	// list of files to check, * must be present!
+	list<string> audio_files = ["/dev/dsp*", "/dev/audio*", "/dev/mixer*", "/dev/midi*", "/dev/mixer*"];
+
+	audio_files = filter(string file, audio_files, {return GlobExists(file);});
+	y2milestone("Checking audio files: %1", audio_files);
+
+	if (size(audio_files) == 0)
+	{
+	    y2milestone("No audio device file found, skipping fuser call");
+	    return true;
+	}
+
+	string fuser_options = mergestring(audio_files, " ");
+	y2milestone("fuser options: %1", fuser_options);
+
+	integer fuser = (integer) SCR::Execute (.target.bash, "/bin/fuser " + fuser_options, $[]);
 
 	if (fuser == 0)
         {
@@ -252,7 +276,7 @@
             boolean terminate	= Sound::use_ui ? Popup::YesNo (msg) : true;
             if (terminate)
             {
-		SCR::Execute (.target.bash, "/bin/fuser -k /dev/dsp* /dev/audio* /dev/mixer* /dev/midi* /dev/mixer*", $[]);
+		SCR::Execute (.target.bash, "/bin/fuser -k " + fuser_options, $[]);
             }
             else
             {

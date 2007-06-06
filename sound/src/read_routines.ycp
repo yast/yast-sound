@@ -214,18 +214,33 @@
      * @return list
      */
     define list<map> read_save_info () ``{
+	list<map> saved = [];
 
 	// First, read from /etc/modprobe.d/sound
-        list<map> saved	= read_modprobe (.modprobe_sound);
-	if (saved == [])
+	if (SCR::Read(.target.size, "/etc/modprobe.d/sound") >= 0)
 	{
-	    // Nothing was there. So, try /etc/modprobe.conf...
-	    saved	= read_modprobe (.modules);
-	    if (saved != [])
+	    saved = read_modprobe (.modprobe_sound);
+	}
+	else
+	{
+	    y2milestone("/etc/modprobe.d/sound doesn't exist");
+
+	    // try /etc/modprobe.conf...
+	    if (SCR::Read(.target.size, "/etc/modprobe.conf") >= 0)
 	    {
-		Sound::used_modprobe_conf	= true;
+		saved = read_modprobe (.modules);
+
+		if (saved != [])
+		{
+		    Sound::used_modprobe_conf	= true;
+		}
+	    }
+	    else
+	    {
+		y2milestone("/etc/modprobe.conf doesn't exist");
 	    }
 	}
+
 	return saved;
     }
 

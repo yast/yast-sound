@@ -211,7 +211,17 @@
 	    ``(card["module"]:"off")));
 
 	// remove the options for unused modules
-	list<string> configured_options = SCR::Dir(.modprobe_sound.options);
+	list<string> configured_options = [];
+
+	if (SCR::Read(.target.size, "/etc/modprobe.d/sound") >=0 )
+	{
+	    configured_options = SCR::Dir(.modprobe_sound.options);
+	}
+	else
+	{
+	    // the file doesn't exist, create an empty file
+	    SCR::Execute(.target.bash, "/usr/bin/touch /etc/modprobe.d/sound");
+	}
 
 	foreach(string op, configured_options,
 	    {
@@ -234,14 +244,17 @@
      * @param als list with old aliases
      */
     define void removeOldEntries(list als) ``{
-	maplist(string e, (list<string>) als, ``{
-	    if (is_snd_alias(e) ||
-		issubstring(e, "sound-service-") ||
-		issubstring(e, "sound-slot-"))
-		{
-		    SCR::Write( add (.modprobe_sound.alias, e), nil);
-		}
-	});
+	if (SCR::Read(.target.size, "/etc/modprobe.d/sound") >=0 )
+	{
+	    maplist(string e, (list<string>) als, ``{
+		if (is_snd_alias(e) ||
+		    issubstring(e, "sound-service-") ||
+		    issubstring(e, "sound-slot-"))
+		    {
+			SCR::Write( add (.modprobe_sound.alias, e), nil);
+		    }
+	    });
+	}
     }
 
     /**
@@ -321,7 +334,7 @@
 	list als=[];
 
         string err_msg = "";
-	if (contains(SCR::Dir(mod), "alias"))
+	if (SCR::Read(.target.size, "/etc/modprobe.d/sound") >=0 && contains(SCR::Dir(mod), "alias"))
 	{
 	    als = (list)SCR::Read(mod_alias);
 	}
