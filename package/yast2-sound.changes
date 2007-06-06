@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Wed Jun  6 15:01:09 CEST 2007 - lslezak@suse.cz
+
+- removed empty index.html file
+- check existence of the files (#256442)
+- use [Accept] button instead of [Finish] in the main dialog
+  during installation (#270519)
+- 2.15.8
+
+-------------------------------------------------------------------
 Fri May 25 13:30:04 CEST 2007 - jsrain@suse.cz
 
 - removed outdated translations from .desktop-files (#271209)
