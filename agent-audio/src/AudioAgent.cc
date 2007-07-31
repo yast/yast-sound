@@ -116,7 +116,7 @@ YCPBoolean AudioAgent::Write(const YCPPath &path, const YCPValue& value, const Y
 			+ value->toString().c_str()
 			+ ") passed to Write(): .audio"
 			+ path->toString().c_str();
-	y2error(error.c_str());
+	y2error("Error: %s", error.c_str());
 	return YCPBoolean(false);
     }
 

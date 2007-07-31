@@ -115,7 +115,7 @@ YCPBoolean ossSetVolume(const string card, const string channel, const int value
 			+ string(mixerfile) 
 			+ "' : " 
 			+ string(strerror(errno))).c_str();
-	y2error(error.c_str());
+	y2error("Error: %s", error.c_str());
 	return YCPBoolean(false);
     }
 
@@ -123,7 +123,7 @@ YCPBoolean ossSetVolume(const string card, const string channel, const int value
 	string error = string("ioctl failed : ")
 			+ strerror(errno);
 	close(mixer_fd);
-	y2error(error.c_str());
+	y2error("Error: %s", error.c_str());
 	return YCPBoolean(false);
     }
 

@@ -1,7 +1,7 @@
 $[
     "snd-powermac":
     $[
-	"description" : "PowerMac on-board",
+	"description" : "Apple PowerPC on-board",
 	"params":
 	$[
 	    "snd_enable_beep":
@@ -14,6 +14,6 @@ $[
     ],
     "snd-aoa":
     $[
-	"description" : "Apple on-board (Layout ID)"
+	"description" : "Apple PowerPC on-board (Layout ID)"
     ],
 ]

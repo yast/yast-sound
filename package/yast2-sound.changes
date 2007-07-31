@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Jul 31 08:07:49 CEST 2007 - lslezak@suse.cz
+
+- use 'Apple PowerPC' for all PowerPC models (#295616)
+- updated sound card DB
+- fixed formatting error message in audio-agent
+- 2.15.9
+
+-------------------------------------------------------------------
 Wed Jun  6 15:01:09 CEST 2007 - lslezak@suse.cz
 
 - removed empty index.html file
