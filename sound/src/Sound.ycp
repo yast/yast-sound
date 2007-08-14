@@ -513,8 +513,8 @@ could make your system unstable.
      * @return void
      */
     global define void ReadModulesConf() ``{
-	modules_conf = read_hwconfig();
-	y2milestone("read_hwconfig: %1", modules_conf);
+	modules_conf = read_save_info();
+	y2milestone("read_save_info: %1", modules_conf);
     }
 
 

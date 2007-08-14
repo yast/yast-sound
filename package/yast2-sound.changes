@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Aug 14 16:24:54 CEST 2007 - lslezak@suse.cz
+
+- don't read/write hwcfg files (#290430)
+- updated .rnc schema file (#253614)
+- updated sound card DB
+- 2.15.10
+
+-------------------------------------------------------------------
 Tue Jul 31 08:07:49 CEST 2007 - lslezak@suse.cz
 
 - use 'Apple PowerPC' for all PowerPC models (#295616)
