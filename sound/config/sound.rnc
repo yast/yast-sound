@@ -3,36 +3,55 @@ namespace a = "http://relaxng.org/ns/compatibility/annotations/1.0"
 namespace config = "http://www.suse.com/1.0/configns"
 
 LOAD_ALSA_SEQ = element LOAD_ALSA_SEQ { text }
-sound =
-  element sound {
-    element configure_detected { BOOLEAN }? &
-    element rc_vars { LOAD_ALSA_SEQ* }? &
-    element autoinstall { BOOLEAN }? &
-    modules_conf? & volume_settings?
-  }
 module_conf =
   element module_conf {
-      element alias      { text }? &
-      element model      { text }? &
-      element module     { text }? &
-      element unique_key { text }? &
-      element options    { Anything }?
+      element alias         { text }? &
+      element model         { text }? &
+      element module        { text }? &
+      element options       { Anything* }? &
+      element unique_key    { text }? &
+      element bus           { text }? &
+      element device_id     { INTEGER }? &
+      element hwcfg         { text }? &
+      element sub_device_id { INTEGER }? &
+      element sub_vendor_id { INTEGER }? &
+      element vendor_id     { INTEGER }?
   }
 modules_conf =
   element modules_conf {
     module_conf*
   }
+new =
+  element new {
+    text
+  }
 
+rc_vars = element rc_vars { LOAD_ALSA_SEQ* }
+snd_enable = element snd_enable { text }
+snd_index = element snd_index { text }
+sound =
+  element sound {
+    configure_detected? & modules_conf? & rc_vars? & volume_settings?
+  }
+state = element state { text }
 unique_key = element unique_key { text }
+unknown-state = element unknown-state { text }
+volume_component_settings =
+  element volume_component_settings {
+    attribute config:type { text }?,
+    text
+  }
+volume_entry =
+  element volume_entry {
+    Anything*
+  }
 volume_settings =
   element volume_settings {
-    LIST,
-    element volume_entry {
-        LIST,
-        element volume_component {
-            element mute   { BOOLEAN }? &
-            element name   { text }? &
-            element volume { INTEGER }?
-        }*
-    }*
+    volume_entry*
   }
+configure_detected =
+  element configure_detected { BOOLEAN }
+enable = element enable { text }
+index = element index { text }
+isapnp = element isapnp { text }
+joystick = element joystick { text }
