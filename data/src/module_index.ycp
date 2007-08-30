@@ -101,5 +101,6 @@ $[
     81	: "snd-cs5535audio",
 
     100 : "snd-powermac",
-    101 : "snd-aoa"
+    101 : "snd-aoa",
+    102 : "snd_ps3",
 ]

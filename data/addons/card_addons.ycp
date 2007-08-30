@@ -372,4 +372,5 @@
     ["snd-ad1889",	    "AD1889, Analog Devices"],
     ["snd-cs5535audio",	    "CS5535, National Semiconductor"],
     ["snd-cs5535audio",	    "CS5536, AMD"],
+    ["snd_ps3",		    "PS3 Soundcard, Sony"],
 ]

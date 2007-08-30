@@ -3,5 +3,7 @@
     ["snd-powermac",	    "0x30401",	"0x30010"],
     ["snd-powermac",	    "0x30401",	"0x30011"],
     ["snd-powermac",	    "0x30401",	"0x30012"],
-    ["snd-powermac",	    "0x30401",	"0x30013"]
+    ["snd-powermac",	    "0x30401",	"0x30013"],
+    // PS3
+    ["snd_ps3",		    "0x0104D",	"0x31004"]
 ]

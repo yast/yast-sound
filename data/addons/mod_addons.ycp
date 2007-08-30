@@ -16,4 +16,8 @@ $[
     $[
 	"description" : "Apple PowerPC on-board (Layout ID)"
     ],
+    "snd_ps3":
+    $[
+	"description" : "PS3 Soundcard"
+    ],
 ]
