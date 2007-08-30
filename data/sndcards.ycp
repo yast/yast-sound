@@ -534,6 +534,9 @@ $[
     ],
     101 : [
       "PowerPC (Layout ID), Apple"
+    ],
+    102 : [
+      "PS3 Soundcard, Sony"
     ]
   ],
   "indices" : $[
@@ -687,6 +690,9 @@ $[
       28691 : 39,
       28696 : 63,
       29954 : 78
+    ],
+    4173 : $[
+      200708 : 102
     ],
     4183 : $[
       3 : 44
@@ -1008,7 +1014,8 @@ $[
     80 : "snd-ad1889",
     81 : "snd-cs5535audio",
     100 : "snd-powermac",
-    101 : "snd-aoa"
+    101 : "snd-aoa",
+    102 : "snd_ps3"
   ],
   "modules" : $[
     "snd-ad1816a" : $[
@@ -3694,6 +3701,9 @@ $[
           "dialog" : "check"
         ]
       ]
+    ],
+    "snd_ps3" : $[
+      "description" : "PS3 Soundcard"
     ]
   ],
   "vendors" : $[
@@ -4191,7 +4201,8 @@ $[
     ],
     "Sony" : [
       "VAIO N505VX",
-      "VAIO PCG-F480"
+      "VAIO PCG-F480",
+      "PS3 Soundcard"
     ],
     "Sound Core" : [
       "PDAudio-CF"

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Aug 30 09:03:05 CEST 2007 - lslezak@suse.cz
+
+- support for PS3 sound card (automatic configuration) (#305927)
+- updated sound card DB
+- 2.15.11
+
+-------------------------------------------------------------------
 Tue Aug 14 16:24:54 CEST 2007 - lslezak@suse.cz
 
 - don't read/write hwcfg files (#290430)
