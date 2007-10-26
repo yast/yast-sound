@@ -1,0 +1,41 @@
+
+
+// This is a mapping for required packages
+// some devices need a firmware or a special tool to work properly
+
+{
+    return
+    $[
+	// "driver name" : [ list of required packages ]
+
+	"snd-ymfpci"   : [ "alsa-firmware" ],
+	"snd-maestro3" : [ "alsa-firmware" ],
+	"snd-darla20"  : [ "alsa-firmware" ],
+	"snd-darla24"  : [ "alsa-firmware" ],
+	"snd-echo3g"   : [ "alsa-firmware" ],
+	"snd-gina20"   : [ "alsa-firmware" ],
+	"snd-gina24"   : [ "alsa-firmware" ],
+	"snd-indigodj" : [ "alsa-firmware" ],
+	"snd-indigoio" : [ "alsa-firmware" ],
+	"snd-indigo"   : [ "alsa-firmware" ],
+	"snd-layla20"  : [ "alsa-firmware" ],
+	"snd-layla24"  : [ "alsa-firmware" ],
+	"snd-mia"      : [ "alsa-firmware" ],
+	"snd-monoa"    : [ "alsa-firmware" ],
+	"snd-mixart"   : [ "alsa-firmware" ],
+	"snd-emu10k1"  : [ "alsa-firmware", "awesfx" ],
+	"snd-sb16"     : [ "alsa-firmware", "alsa-tools" ],
+	"snb-sbawe"    : [ "alsa-firmware", "alsa-tools", "awesfx" ],
+	"snd-wavefront": [ "alsa-firmware" ],
+	"snd-pcxhr"    : [ "alsa-firmware" ],
+	"snd-hdsp"     : [ "alsa-firmware" ],
+	"snd-korg1212" : [ "alsa-firmware" ],
+	"snd-vx222"    : [ "alsa-firmware" ],
+	"snd-sscape"   : [ "alsa-tools" ],
+
+	// The below are for hotplugged devices, so usually YaST is not involed
+	"snd-vxpocket" : [ "alsa-firmware" ],
+	"snd-usb-usx2y" : [ "alsa-firmware", "alsa-tools" ],
+
+    ];
+}

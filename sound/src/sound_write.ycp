@@ -72,6 +72,7 @@
     import "Service";
     import "Package";
     import "Mode";
+    import "Report";
 
     import "Sound";
     import "Joystick";
@@ -81,6 +82,49 @@
 	y2milestone("Mixer (%1): %2", when, SCR::Execute(.target.bash_output, "/usr/bin/amixer"));
 	y2milestone("volume_settings: %1", Sound::volume_settings);
 	y2milestone("asound size: %1", SCR::Read(.target.size, "/etc/asound.state"));
+    }
+
+    define boolean install_packages(list<string> modules)
+    {
+	list<string> packages_to_install = [];
+
+	foreach(string driver, modules,
+	    {
+		list<string> req_packages = Sound::RequiredPackagesToInstall(driver);
+		packages_to_install = (list<string>)union(packages_to_install, req_packages);
+	    }
+	);
+
+	y2milestone("Collected packages to install: %1", packages_to_install);
+
+	if (size(packages_to_install) > 0)
+	{
+	    list<string> not_available = [];
+
+	    foreach(string pkg, packages_to_install,
+		{
+		    boolean avail = Package::Available(pkg);
+
+		    if (!avail)
+		    {
+			not_available = add(not_available, pkg);
+		    }
+		}
+	    );
+
+	    if (size(not_available) > 0)
+	    {
+		Report::Error(sformat(_("These required packages are not available: %1
+Some sound device may not work or some features may not be supported.
+
+Enable or add an additional software repository containing the packages."), mergestring(not_available, ", ")));
+		return false;
+	    }
+
+	    return Package::InstallAll(packages_to_install);
+	}
+
+	return true;
     }
 
     // ==== MAIN ====
@@ -98,6 +142,8 @@
 	return true;
     }
 
+    boolean install = !Sound::AllRequiredPackagesInstalled();
+
     list<string> stones = [
 	    // progress bar item
 	    _("Save module configuration"),
@@ -110,7 +156,8 @@
 	    // progress bar item
 	    _("Store volume"),
 	    // progress bar item
-	    _("Store joystick settings")];
+	    _("Store joystick settings")
+	    ];
 
     list<string> stones2 = [
 	    // progress bar item
@@ -124,7 +171,17 @@
 	    // progress bar item
 	    _("Storing volume settings..."),
 	    // progress bar item
-	    _("Storing joystick settings...")];
+	    _("Storing joystick settings..."),
+	    ];
+
+    if (install)
+    {
+	// progress bar item
+	stones = add(stones, _("Install required packages"));
+
+	// progress bar item
+	stones2 = add(stones2, _("Installing required packages..."));
+    }
 
 
     // not really necessary for Progress stuf (it is set off in _auto client)
@@ -234,6 +291,12 @@
 
     // write joystick configuration
     Joystick::Write (abort_block);
+
+    if (install)
+    {
+	Progress::NextStage();
+	install_packages(reqmodules);
+    }
 
     if (size(configuredcards) > 0)
     {
