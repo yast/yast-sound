@@ -42,6 +42,7 @@ rm -rf %{buildroot}/@plugindir@/libpy2ag_audio.la
 
 # database
 @ydatadir@/sndcards.ycp
+@ydatadir@/alsa_packages.ycp
 
 # agents
 @plugindir@/libpy2ag_audio.so*
