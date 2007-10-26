@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Oct 26 12:21:46 CEST 2007 - lslezak@suse.cz
+
+- fixed build problem (unpackaged alsa_packages.ycp file)
+- 2.16.1
+
+-------------------------------------------------------------------
 Fri Oct 26 10:27:16 CEST 2007 - lslezak@suse.cz
 
 - added package DB, install packages required by the configured
