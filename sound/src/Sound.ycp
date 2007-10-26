@@ -19,6 +19,7 @@
     import "Progress";
     import "Label";
     import "String";
+    import "Package";
 
     /**
      * what sound system we're using (true=alsa, false=oss)
@@ -114,6 +115,8 @@
      *
      */
     global map db_module_index = nil;
+
+    global map db_packages = nil;
 
     /**
      * flag for showing/not showing ui stuff (eg when loading alsa database)
@@ -652,6 +655,55 @@ could make your system unstable.
     }
 
     /**
+     * opens alsa sound cards database
+     * @return void
+     */
+    global void LoadPackageDatabase()
+    {
+	y2milestone("Reading required packages database...");
+	db_packages = (map)eval(SCR::Read (.target.yast2, "alsa_packages.ycp"));
+	y2milestone("Loaded package list for %1 drivers", size(db_packages));
+    }
+
+    global list<string> RequiredPackages(string driver)
+    {
+	if (db_packages == nil)
+	{
+	    LoadPackageDatabase();
+	}
+
+	list<string> ret = db_packages[driver]:[];
+	y2milestone("Driver %1 requires packages: %2", driver, ret);
+
+	return ret;
+    }
+
+    global list<string> RequiredPackagesToInstall(string driver)
+    {
+	list<string> req_pkgs = RequiredPackages(driver);
+	req_pkgs = filter(string pkg, req_pkgs, {return !Package::PackageInstalled(pkg);});
+
+	y2milestone("Required packages to install for driver %1: %2", driver, req_pkgs);
+	return req_pkgs;
+    }
+
+    global string RequiredPackagesToInstallSummary(string driver)
+    {
+	list<string> req_pkgs = RequiredPackagesToInstall(driver);
+	string pkg_summary = "";
+
+	if (size(req_pkgs) > 0)
+	{
+	    // summary string, %1 is a list of packages
+	    pkg_summary = sformat(_("Required packages to install: %1"),
+		// separator for constructing package list
+		mergestring(req_pkgs, _(", ")));
+	}
+
+	return pkg_summary;
+    }
+
+    /**
      * Read all sound settings from the SCR
      * @param interactive if user could be asked for actions
      *	(currently only for detecting with alsaconf)
@@ -902,6 +954,25 @@ could make your system unstable.
 
 	return mods;
     }
+
+    global boolean AllRequiredPackagesInstalled()
+    {
+	list<string> all_mods = RequiredKernelModules();
+	boolean ret = true;
+
+	foreach(string mod, all_mods,
+	    {
+		if (size(RequiredPackagesToInstall(mod)) > 0)
+		{
+		    ret = false;
+		}
+	    }
+	);
+
+	y2milestone("All required packages are installed: %1", ret);
+	return ret;
+    }
+
     /**
      * Update the SCR according to sound settings
      * @return boolean True on success
@@ -925,11 +996,20 @@ could make your system unstable.
 	list keys = maplist (map card, modules_conf, ``(
 	    card["unique_key"]:"..."));
 
-	list<string> retlist = maplist (map card, modules_conf, ``(
-	    Summary::Device (card["model"]:"Sound card",
-		// summary text: '(sound card is) Configured as snd-card-1'
-		sformat(_("Configured as %1."), card["alias"]:"snd-card-0"))
-	));
+	list<string> retlist = maplist (map card, modules_conf,
+	    {
+		string package_summary = RequiredPackagesToInstallSummary(card["module"]:"");
+
+		if (package_summary != "")
+		{
+		    package_summary = "<BR>" + package_summary;
+		}
+
+		Summary::Device (card["model"]:"Sound card",
+		    // summary text: '(sound card is) Configured as snd-card-1'
+		    sformat(_("Configured as %1."), card["alias"]:"snd-card-0") + package_summary);
+	    }
+	);
 
 	if (detected_cards != nil)
 	{

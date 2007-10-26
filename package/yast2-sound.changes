@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Oct 26 10:27:16 CEST 2007 - lslezak@suse.cz
+
+- added package DB, install packages required by the configured
+  driver (#329690)
+- 2.16.0
+
+-------------------------------------------------------------------
 Thu Aug 30 09:03:05 CEST 2007 - lslezak@suse.cz
 
 - support for PS3 sound card (automatic configuration) (#305927)

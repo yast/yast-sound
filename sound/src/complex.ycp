@@ -64,6 +64,13 @@
 			descr = add(descr, sformat(_("Driver %1"), card["module"]:""));
 		    }
 
+		    string pkgs = Sound::RequiredPackagesToInstallSummary(card["module"]:"");
+
+		    if (size(pkgs) > 0)
+		    {
+			descr = add(descr, pkgs);
+		    }
+
 		    map<string,any> r = $[
 			"id" : card["unique_key"]:"",
 			"table_descr" : [ card["options","index"]:"", card["model"]:"" ],

@@ -327,9 +327,14 @@ define symbol SoundSequence () ``{
 
     if (ui == `finish && !Mode::config())
     {
-	if (!Sound::installation && ( Sound::Changed() || Sound::GetModified() || Joystick::Changed()))
+	if ((!Sound::installation) && ( Sound::Changed() || Sound::GetModified() || Joystick::Changed()
+	    || (!Sound::AllRequiredPackagesInstalled())))
 	{
 	    Sound::Write ();
+	}
+	else
+	{
+	    y2milestone("Not writing the configuration");
 	}
     }
 
