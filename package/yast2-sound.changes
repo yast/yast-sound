@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Oct 22 15:08:32 CEST 2007 - lslezak@suse.cz
+
+- Initialize "Speaker" and "Beep" channels (needed on Lenovo
+  Thinkpad R61) (#309247)
+- 2.13.19
+
+-------------------------------------------------------------------
 Fri Jan 12 13:24:37 CET 2007 - lslezak@suse.cz
 
 - updated the sound card database (snd-intel-hda PCI IDs)
