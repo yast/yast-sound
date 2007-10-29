@@ -4,7 +4,19 @@ namespace config = "http://www.suse.com/1.0/configns"
 
 LOAD_ALSA_SEQ = element LOAD_ALSA_SEQ { text }
 module_conf =
-  element module_conf { snd_alias? & model? & snd_module? & snd_options? & unique_key? }
+  element module_conf {
+      element alias         { text }? &
+      element model         { text }? &
+      element module        { text }? &
+      element options       { Anything* }? &
+      element unique_key    { text }? &
+      element bus           { text }? &
+      element device_id     { INTEGER }? &
+      element hwcfg         { text }? &
+      element sub_device_id { INTEGER }? &
+      element sub_vendor_id { INTEGER }? &
+      element vendor_id     { INTEGER }?
+  }
 modules_conf =
   element modules_conf {
     module_conf*
@@ -13,9 +25,6 @@ new =
   element new {
     text
   }
-snd_options = element options {
-    Anything*
-}
 
 rc_vars = element rc_vars { LOAD_ALSA_SEQ* }
 snd_enable = element snd_enable { text }
@@ -46,6 +55,3 @@ enable = element enable { text }
 index = element index { text }
 isapnp = element isapnp { text }
 joystick = element joystick { text }
-snd_module = element module { text }
-snd_alias  = element alias  { text }
-model = element model { text }
