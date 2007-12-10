@@ -274,7 +274,7 @@ Then press <B>Edit</B>.
 
 _("<p>
 Use <b>Other</b> to set the volume of the selected card or configure
-module loading for playing MIDI files (<b>Start Sequencer</b>).
+the module loading for playing MIDI files (<b>Start Sequencer</b>).
 Use <b>Play Test Sound</b> to test the selected card.
 </p>
 ") +

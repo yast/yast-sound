@@ -254,7 +254,9 @@ Restart sound system now?
 
 			if (!started)
 			{
-			    Report::Error(_("Restart of the sound systen has failed.\nCheck options of the driver."));
+			    Report::Error(_("Restart of the sound system has failed.
+Check options of the driver.
+"));
 			    ret = `again;
 			    continue;
 			}

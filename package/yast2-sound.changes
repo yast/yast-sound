@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Dec 10 15:54:40 CET 2007 - lslezak@suse.cz
+
+- merged proofread texts (2007-18-23)
+
+-------------------------------------------------------------------
 Fri Oct 26 12:21:46 CEST 2007 - lslezak@suse.cz
 
 - fixed build problem (unpackaged alsa_packages.ycp file)
