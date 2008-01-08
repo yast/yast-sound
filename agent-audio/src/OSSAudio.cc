@@ -28,10 +28,6 @@ typedef struct {
     unsigned char right;
 } stereovolume;
 
-/* channels' names, to be used for channel to nubmer mapping sometime */
-char *ossChannels[] = SOUND_DEVICE_LABELS;
-int ossChannels_num = SOUND_MIXER_NRDEVICES;
-
 /**
  * convert channel string to oss device number
  * FIXME: use ossChannels for convertion [make a map in constructor -> search]

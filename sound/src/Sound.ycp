@@ -1005,7 +1005,7 @@ could make your system unstable.
 		    package_summary = "<BR>" + package_summary;
 		}
 
-		Summary::Device (card["model"]:"Sound card",
+		return Summary::Device (card["model"]:"Sound card",
 		    // summary text: '(sound card is) Configured as snd-card-1'
 		    sformat(_("Configured as %1."), card["alias"]:"snd-card-0") + package_summary);
 	    }
