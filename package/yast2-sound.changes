@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Jan  8 15:47:02 CET 2008 - lslezak@suse.cz
+
+- fixed installation proposal ('nil' summary) (#346792)
+- 2.16.2
+
+-------------------------------------------------------------------
 Mon Dec 10 15:54:40 CET 2007 - lslezak@suse.cz
 
 - merged proofread texts (2007-18-23)
