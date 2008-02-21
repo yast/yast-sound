@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Feb 21 15:55:40 CET 2008 - lslezak@suse.cz
+
+- merged proofread texts (proofed-sle10-sp2-2008-02-12)
+- 2.13.21
+
+-------------------------------------------------------------------
 Mon Oct 29 13:58:43 CET 2007 - lslezak@suse.cz
 
 - fixed RNC schema for validating AutoYaST profile (#253614)
