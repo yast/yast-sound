@@ -41,7 +41,7 @@
 	{
 	    foreach(map cd, cdroms,
 		{
-		    ret = add(ret, $[ "model":cd["model"]:_("Unknown CD-ROM device"),
+		    ret = add(ret, $[ "model":cd["model"]:_("Unknown CD-ROM Device"),
 			"dev_name":cd["dev_name"]:"/dev/cdrom"]);
 		}
 	    );
