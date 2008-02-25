@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Mon Feb 25 14:36:24 CET 2008 - lslezak@suse.cz
+
+- automatically update list of the cards for the current vendor
+  (#31772)
+- use UI::ChangeWidget() instead of UI::ReplaceWidget()
+- fixed missing symbols in audio agent
+- 2.16.3
+
+-------------------------------------------------------------------
 Tue Jan  8 15:47:02 CET 2008 - lslezak@suse.cz
 
 - fixed installation proposal ('nil' summary) (#346792)
