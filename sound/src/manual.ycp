@@ -177,7 +177,7 @@
 	term contents = `VBox (
 	    `HBox (
 		`ReplacePoint (`id (`rep_keys),
-		    `SelectionBox (`id (`sel_keys), `opt(`notify),
+		    `SelectionBox (`id (`sel_keys), `opt(`notify, `immediate),
 			(keys == "vendors") ?
 			    // selection box title
 			    _("Sound Card &Vendor") :
@@ -257,14 +257,8 @@
 		else continue;
 
 		keys_names	= (keys=="vendors")? vendor_names: module_names;
-		UI::ReplaceWidget (`id(`rep_keys),
-		    `SelectionBox (`id (`sel_keys), `opt(`notify),
-			(keys == "vendors") ?
-			    // selection box title
-			    _("Sound Card &Vendor") :
-			    // selection box title
-			    _("Sound Card &Driver"),
-			keys_names));
+
+		UI::ChangeWidget(`id(`sel_keys), `Items, keys_names);
 
 		UI::ChangeWidget(`id(`sel_keys), `CurrentItem, new_key);
 		Sound::curr_model	= new_model;
@@ -276,9 +270,7 @@
 		    (string) UI::QueryWidget (`id(`sel_keys), `CurrentItem),
 		    keys);
 
-		UI::ReplaceWidget (`id(`rep_mod), `SelectionBox (`id (`sel_mod),
-		    // To translators: selection box title
-		    _("Sound card &model"), card_names));
+		UI::ChangeWidget(`id(`sel_mod), `Items, card_names);
 
 		if (contains (card_names, Sound::curr_model))
 		    UI::ChangeWidget(`id(`sel_mod), `CurrentItem,
@@ -296,10 +288,7 @@
 		UI::ChangeWidget (`id(`sel_keys),`CurrentItem, "all");
 		if (card_id >= 0)
 		{
-		    UI::ReplaceWidget (`id(`rep_mod),
-			// To translators: selection box title
-			`SelectionBox (`id (`sel_mod), _("Sound card &model"),
-			    card_names));
+		    UI::ChangeWidget(`id(`sel_mod), `Items, card_names);
 
 		    UI::ChangeWidget(`id(`sel_mod), `CurrentItem,
 			card_names[card_id]:"");
