@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Mar  3 12:36:38 CET 2008 - lslezak@suse.cz
+
+- added ICH9 and ICH10 audio to the database (#365079)
+- updated the sound card database (added new PCI IDs) (#365931)
+- 2.13.22
+
+-------------------------------------------------------------------
 Thu Feb 21 15:55:40 CET 2008 - lslezak@suse.cz
 
 - merged proofread texts (proofed-sle10-sp2-2008-02-12)
