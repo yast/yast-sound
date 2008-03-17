@@ -434,7 +434,7 @@ define map HardwareDialog() {
     }
     else
     {
-	Wizard::SetNextButton(`next, Label::AcceptButton());
+	Wizard::SetNextButton(`next, Label::OKButton());
     }
 
     symbol ret = `_dummy;

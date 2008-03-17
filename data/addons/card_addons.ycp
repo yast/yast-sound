@@ -165,6 +165,8 @@
     ["snd-hda-intel",	    "ICH7 (HDA), Intel"],
     ["snd-hda-intel",	    "ESB2 (HDA), Intel"],
     ["snd-hda-intel",	    "ICH8 (HDA), Intel"],
+    ["snd-hda-intel",	    "ICH9 (HDA), Intel"],
+    ["snd-hda-intel",	    "ICH10 (HDA), Intel"],
     ["snd-hda-intel",	    "SB450, ATI"],
     ["snd-hda-intel",	    "VT8251, VIA"],
     ["snd-hda-intel",	    "M5461, ULI"],
