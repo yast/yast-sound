@@ -22,3 +22,4 @@ Exec=/sbin/yast2 joystick
 Name=Joystick
 GenericName=Configure a joystick attached to the sound card
 X-KDE-SubstituteUID=true
+StartupNotify=true
