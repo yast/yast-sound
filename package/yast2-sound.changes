@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Mar 28 13:01:02 CET 2008 - ug@suse.de
+
+- autoyast rnc file fixed
+
+-------------------------------------------------------------------
 Mon Mar 17 16:03:29 CET 2008 - lslezak@suse.cz
 
 - unified button labels (use "OK" instead of "Accept")
