@@ -43,10 +43,12 @@ volume_component_settings =
   }
 volume_entry =
   element volume_entry {
+    LIST,
     Anything*
   }
 volume_settings =
   element volume_settings {
+    LIST,
     volume_entry*
   }
 configure_detected =
