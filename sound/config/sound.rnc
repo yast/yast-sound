@@ -44,7 +44,11 @@ volume_component_settings =
 volume_entry =
   element volume_entry {
     LIST,
-    Anything*
+    element volume_component {
+        element mute { BOOLEAN }? &
+        element name { text }? &
+        element volume { INTEGER }?
+    }*
   }
 volume_settings =
   element volume_settings {
