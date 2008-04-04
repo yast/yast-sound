@@ -2,7 +2,10 @@
 
 @HEADER@
 BuildRequires:	alsa-devel gcc-c++ doxygen perl-XML-Writer update-desktop-files yast2 yast2-core-devel yast2-devtools yast2-testsuite 
-Requires:	yast2 alsa
+
+# GetInstArgs::automatic_configuration
+Requires:	yast2 >= 2.16.46
+Requires:	alsa
 
 Provides:	yast2-config-sound yast2-agent-audio yast2-agent-audio-devel
 Obsoletes:	yast2-config-sound yast2-agent-audio yast2-agent-audio-devel
