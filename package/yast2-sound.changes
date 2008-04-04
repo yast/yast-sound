@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Apr  4 18:34:16 CEST 2008 - locilka@suse.cz
+
+- Enhanced user-feedback during automatic configuration.
+- Adjusted RPM dependencies.
+- 2.16.5
+
+-------------------------------------------------------------------
 Fri Mar 28 13:01:02 CET 2008 - ug@suse.de
 
 - autoyast rnc file fixed

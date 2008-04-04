@@ -16,6 +16,7 @@
 
     import "Sound";
     import "Progress";
+    import "GetInstArgs";
 
     Sound::installation = true;
 
@@ -36,9 +37,14 @@
 	// Do not show any progress during Read()
 	boolean progress_orig = Progress::set(false);
 
-	UI::OpenDialog(`VBox(`Label(_("Detecting sound cards..."))));
+	// Automatic configuration has its own progress
+	if (! GetInstArgs::automatic_configuration())
+	    UI::OpenDialog(`VBox(`Label(_("Detecting sound cards..."))));
+
 	boolean success = Sound::Propose ();
-	UI::CloseDialog();
+
+	if (! GetInstArgs::automatic_configuration())
+	    UI::CloseDialog();
 
 	Progress::set(progress_orig);
 
