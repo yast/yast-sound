@@ -1396,14 +1396,14 @@ Mon Apr 30 16:21:03 CEST 2001 - dmeszar@suse.cz
 - sound fonts loading enabled, abort dialog unified, summary spaces fixed
 
 -------------------------------------------------------------------
-Tue Apr 24 16:08:09 CEST 2001 - ro@suse.de
-
-- fixed time-stamps in tar
-
--------------------------------------------------------------------
 Tue Apr 24 07:26:02 PDT 2001 - dmeszar@suse.cz
 
 - sound fonts loading temporarily removed
+
+-------------------------------------------------------------------
+Tue Apr 24 16:08:09 CEST 2001 - ro@suse.de
+
+- fixed time-stamps in tar
 
 -------------------------------------------------------------------
 Tue Apr 24 03:39:14 PDT 2001 - dmeszar@suse.cz
