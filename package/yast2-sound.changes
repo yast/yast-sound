@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Apr  8 09:40:59 CEST 2008 - lslezak@suse.cz
+
+- package the files needed for regenerating the sound card database
+  into the source tarball
+- 2.16.6
+
+-------------------------------------------------------------------
 Fri Apr  4 18:34:16 CEST 2008 - locilka@suse.cz
 
 - Enhanced user-feedback during automatic configuration.

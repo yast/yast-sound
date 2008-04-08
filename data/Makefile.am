@@ -8,4 +8,4 @@ SUBDIRS = addons doc include src
 
 ydata_DATA = sndcards.ycp alsa_packages.ycp
 
-EXTRA_DIST = $(ydata_DATA) Makefile.generate
+EXTRA_DIST = $(ydata_DATA) Makefile.generate alsa-module-syntax proofread_strings translate_strings.pl
