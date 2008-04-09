@@ -366,7 +366,7 @@
 	list<list<list> > retlist	= [];
 	while (i < bound)
 	{
-	    list<list> sublist = [];
+	    list<list> volumelist = [];
 	    string modname = Sound::modules_conf[i,"module"]:"snd-dummy";
 	    list<string> chans = Sound::db_modules[modname, "mixer_elements"]:[];
 
@@ -386,9 +386,9 @@
 	    foreach (string e, chans, ``{
 		path pth1 = topath(sformat(".audio.alsa.cards.%1.channels.%2.volume", i, e));
 		path pth2 = topath(sformat(".audio.alsa.cards.%1.channels.%2.mute", i, e));
-		sublist = add(sublist, [e, SCR::Read(pth1), SCR::Read(pth2)]);
+		volumelist = add(volumelist, [e, SCR::Read(pth1), SCR::Read(pth2)]);
 	    });
-	    retlist = add (retlist, sublist);
+	    retlist = add (retlist, volumelist);
 
 	    i = i + 1;
 	}
