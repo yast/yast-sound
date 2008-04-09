@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Apr  9 09:59:41 CEST 2008 - lslezak@suse.cz
+
+- variable 'sublist' renamed ('sublist' is going to be a new
+  builtin function)
+
+-------------------------------------------------------------------
 Tue Apr  8 09:40:59 CEST 2008 - lslezak@suse.cz
 
 - package the files needed for regenerating the sound card database
