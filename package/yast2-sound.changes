@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Apr 14 12:46:08 CEST 2008 - lslezak@suse.cz
+
+- updated the sound card database, added "snd-oxygen" driver to
+  the database
+- 2.16.8
+
+-------------------------------------------------------------------
 Wed Apr  9 09:59:41 CEST 2008 - lslezak@suse.cz
 
 - variable 'sublist' renamed ('sublist' is going to be a new
