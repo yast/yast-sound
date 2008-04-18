@@ -3,6 +3,11 @@
 // This is a mapping for required packages
 // some devices need a firmware or a special tool to work properly
 
+/***************************************************
+* NOTE: DO NOT FORGET TO EDIT extra-packages file
+*       to ensure the packages are on the medium!!
+***************************************************/
+
 {
     return
     $[
