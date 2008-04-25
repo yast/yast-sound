@@ -100,6 +100,42 @@
         return ret;
     }
 
+    // write 'option snd slots=<driver_list>' to the config
+    void WriteSlotsOption(map<integer,string> slots)
+    {
+	// get the indices
+	list<integer> keys = [];
+
+	foreach(integer key, string val, slots,
+	    {
+		keys = add(keys, key);
+	    }
+	);
+
+	keys = sort(keys);
+
+	y2milestone("Sorted keys: %1", keys);
+
+	list<string> drivers = [];
+
+	foreach(integer k, keys,
+	    {
+		string drv = slots[k]:"";
+
+		if (drv != "")
+		{
+		    drivers = add(drivers, drv);
+		}
+	    }
+	);
+
+	string slot_option = mergestring(drivers, ",");
+	y2milestone("Writing slots option: %1", slot_option);
+
+	// write 'snd' options
+	SCR::Write( add(.modprobe_sound.options, "snd"), $[ "slots" : slot_option ]);
+    }
+
     /**
      * saves modules options. this function has to collect parameters that use
      * different cards that use single module and create a coma separated list of values
@@ -138,10 +174,41 @@
 	    }
 	);
 
+	map<integer,string> slots = $[];
+
 	foreach(string modname, mods, ``{
 	    map res = Sound::CollectOptions(modname);
+
+	    // remove "index" option, do not write it
+	    string index = res["index"]:"";
+	    res = remove(res, "index");
+
+	    // remove old "enable" option if it's present
+	    res = remove(res, "enable");
+
+	    list<string> indices = splitstring(index, ",");
+
+	    foreach(string idx, indices,
+		{
+		    integer i = tointeger(idx);
+
+		    if (i != nil && i >= 0)
+		    {
+			y2debug("adding %1 : %2", i, modname);
+			slots = add(slots, i, modname);
+		    }
+		}
+	    );
+
+	    // at first remove the current options (writing empty options leaves the old options untouched)
+	    SCR::Write( add (mod_options, modname ), nil);
+
 	    SCR::Write( add (mod_options, modname ), res);
 	});
+
+	y2milestone("Collected slots: %1", slots);
+
+	WriteSlotsOption(slots);
     }
 
     /**
