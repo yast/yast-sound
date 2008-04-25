@@ -19,6 +19,7 @@
     import "Sound";
     import "HWConfig";
     import "Confirm";
+    import "String";
 
     include "sound/routines.ycp";// for is_snd_alias()
 
@@ -80,6 +81,64 @@
 	return result;
     }
 
+    // sort module aliases according to snd slots option
+    list<string> sort_aliases(path config_path, path alias_path, list<string> aliases)
+    {
+	// read 'snd' options
+	map<string,string> snd_opts = (map<string,string>)SCR::Read(add(config_path, "snd"));
+	y2milestone("snd optionss: %1", snd_opts);
+
+	list<string> slots_option = splitstring(snd_opts["slots"]:"", ",");
+	slots_option = maplist(string slotopt, slots_option,
+	    {
+		return String::CutBlanks(slotopt);
+	    }
+	);
+
+	// alias -> driver mapping
+	map<string,string> alias_mapping = $[];
+
+	// read aliases
+	foreach(string a, aliases,
+	    {
+		y2milestone("Reading alias %1", a);
+		string modname	= (string)SCR::Read(add(alias_path, a));
+		alias_mapping = add(alias_mapping, a, modname);
+	    }
+	);
+
+	// driver -> [ aliases ]
+	map<string, list<string> > driver_mapping = $[];
+
+	// create a reverse mapping
+	foreach(string alias, string driver, alias_mapping,
+	    {
+		list<string> a_list = driver_mapping[driver]:[];
+		a_list = add(a_list, alias);
+
+		driver_mapping[driver] = a_list;
+	    }
+	);
+
+	y2milestone("Driver mapping: %1", driver_mapping);
+
+	list<string> sorted_aliases = [];
+
+	// sort aliases
+	foreach(string slot, slots_option,
+	    {
+		list<string> aliases = driver_mapping[slot]:[];
+
+		sorted_aliases = add(sorted_aliases, aliases[0]:"");
+
+		aliases = remove(aliases, 0);
+		driver_mapping[slot] = aliases;
+	    }
+	);
+
+	return sorted_aliases;
+    }
+
 
     /**
      * reads already saved info from given file
@@ -126,9 +185,15 @@
 	    det_cards = (list<map>)SCR::Read(.probe.sound);
 	}
 
-	y2debug("Detected cards: %1", det_cards);
+	y2milestone("Detected cards: %1", det_cards);
+
+	// sort the aliases according to the slots option
+	aliases = sort_aliases(mod_options, mod_alias, aliases);
+
+	y2milestone("Sorted aliases acording to slots: %1", aliases);
 
 	foreach (string a, aliases, ``{
+	    y2milestone("Reading alias %1", a);
 
 	    position		= position + 1;
 	    string modname	= (string) SCR::Read (add (mod_alias, a));
@@ -165,6 +230,9 @@
 		uniq	= isa_uniq();
 		model	= read_card_name_from_alsa (position);
 	    }
+
+	    // add index option
+	    options["index"] = tostring(position);
 
 	    map entry = $[
 		"alias"		: a,

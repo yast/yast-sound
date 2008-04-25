@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Apr 25 08:54:59 CEST 2008 - lslezak@suse.cz
+
+- do not write 'index' option, write 'slots' option of 'snd' driver
+  to define the order of the configured soundcards (bnc#381695)
+- 2.16.9
+
+-------------------------------------------------------------------
 Mon Apr 14 12:46:08 CEST 2008 - lslezak@suse.cz
 
 - updated the sound card database, added "snd-oxygen" driver to

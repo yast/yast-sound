@@ -630,11 +630,6 @@ could make your system unstable.
 	map sound_db =$[];
 	if (db_cards == nil || db_cards == $[])
 	{
-	    if (use_ui)
-	    {
-		string message = _("Loading the sound card database...");
-		UI::OpenDialog(`opt(`decorated), `Label(message));
-	    }
 	    textdomain "sound_db";
 	    y2debug("Reading card database");
 	    sound_db	= (map)eval(SCR::Read (.target.yast2, "sndcards.ycp"));
@@ -647,10 +642,6 @@ could make your system unstable.
 	    db_vendors	= sound_db ["vendors"]:$[];
 
 	    textdomain "sound";
-	    if (use_ui)
-	    {
-		UI::CloseDialog();
-	    }
 	}
     }
 
@@ -1115,8 +1106,8 @@ could make your system unstable.
 
 	    y2debug("only_default: %1", only_default);
 
-	    // don't add the default options, but always add 'index' and 'enable'
-	    if (!only_default || opname == "index" || opname == "enable")
+	    // don't add the default options
+	    if (!only_default || opname == "index")
 	    {
 		res = add (res, opname, value);
 	    }
@@ -1137,6 +1128,10 @@ could make your system unstable.
         list mods = toset (maplist (map e, modules_conf,``(e["module"]:"off")));
 	maplist (string modname, (list<string>) mods, ``{
 	    map opts = CollectOptions(modname);
+
+	    // ignore "index" options
+	    opts = remove(opts, "index");
+
 	    string optstr = "";
 	    maplist(string k, string v, (map<string,string>) opts, ``{
 		optstr = optstr+ sformat(" %1=%2", k, v);

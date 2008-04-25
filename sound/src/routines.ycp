@@ -258,15 +258,11 @@
 	    entry = add(entry, "options", opts);
 	    return entry;
 	}
-	// check existence of 'common' parameters: 'enable' and 'index'
+	// check existence of 'common' parameters: 'index'
 	string modname = entry["module"]:"";
 	foreach (string key, string value, (map<string,string>) SCR::Read (
 	    topath (sformat(".modinfo.kernel.drivers.sound.%1", modname))), ``{
 
-	    if (key == "enable")
-	    {
-		opts [key] = "1";
-	    }
 	    if (key == "index")
 	    {
 		opts [key] = sformat ("%1",card_id);
