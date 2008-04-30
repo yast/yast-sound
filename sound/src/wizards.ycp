@@ -104,6 +104,7 @@
 		removed_info["bus_hwcfg"] = removed_card["bus_hwcfg"]:"";
 		removed_info["sysfs_bus_id"] = removed_card["sysfs_bus_id"]:"";
 		removed_info["unique_key"] = removed_card["unique_key"]:"";
+		removed_info["module"] = removed_card["module"]:"";
 
 		if (!contains(Sound::removed_info, removed_info))
 		{
