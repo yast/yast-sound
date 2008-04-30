@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Wed Apr 30 10:48:36 CEST 2008 - lslezak@suse.cz
+
+- save non-PCI and non-USB sound cards to MODULES_LOADED_ON_BOOT
+  sysconfig variable (bnc#331659)
+- remove empty 'options snd' config line when there is no sound
+  card configured
+- 2.16.10
+
+-------------------------------------------------------------------
 Fri Apr 25 08:54:59 CEST 2008 - lslezak@suse.cz
 
 - do not write 'index' option, write 'slots' option of 'snd' driver

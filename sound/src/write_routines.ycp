@@ -76,8 +76,9 @@
         boolean ret = true;
         if (haskey (entry, "alias"))
         {
+	    string module_name = entry["module"]:"" ;
 	    // this is a hack for snd-aoa driver, additional modules are needed (#217300)
-	    if (entry["module"]:"" == "snd-aoa")
+	    if (module_name == "snd-aoa")
 	    {
 		// write the extra module (snd-aoa-i2sbus) to /etc/init.d/sound, add "00" suffix to the alias
 		path extra_alias = add(.modprobe_sound.alias, (entry["alias"]:"off") + "00");
@@ -94,8 +95,36 @@
 
 	    string modcomment = createAliasComment(entry["model"]: "", entry["unique_key"]:"");
 
-            ret = ret && SCR::Write(mod_alias, entry["module"]:"off");
+            ret = ret && SCR::Write(mod_alias, module_name);
 	    ret = ret && SCR::Write(mod_alias_comment, modcomment);
+
+	    // load the module automatically on boot
+	    if (entry["bus"]:"" != "pci" && entry["bus"]:"" != "usb" && module_name != "")
+	    {
+		y2milestone("The soundcard is not attached to PCI or USB");
+
+		string on_boot_sysconfig = (string)SCR::Read(.sysconfig.kernel.MODULES_LOADED_ON_BOOT);
+		y2milestone("/etc/sysconfig/kernel:MODULES_LOADED_ON_BOOT: %1", on_boot_sysconfig);
+
+		list<string> on_boot_modules = splitstring(on_boot_sysconfig, " ");
+		on_boot_modules = filter(string mod, on_boot_modules, {return mod != nil && mod != "";});
+		y2milestone("Load modules: %1", on_boot_modules);
+
+		// add the module to sysconfig if it is missing
+		if (!contains(on_boot_modules, module_name))
+		{
+		    y2milestone("Adding %1 to MODULES_LOADED_ON_BOOT", module_name);
+		    if (on_boot_sysconfig != "")
+		    {
+			on_boot_sysconfig = on_boot_sysconfig + " ";
+		    }
+
+		    on_boot_sysconfig = on_boot_sysconfig + module_name;
+		    y2milestone("New MODULES_LOADED_ON_BOOT value: %1", on_boot_sysconfig);
+
+		    ret = ret && SCR::Write(.sysconfig.kernel.MODULES_LOADED_ON_BOOT, on_boot_sysconfig);
+		}
+	    }
         }
         return ret;
     }
@@ -130,10 +159,60 @@
 	);
 
 	string slot_option = mergestring(drivers, ",");
-	y2milestone("Writing slots option: %1", slot_option);
 
-	// write 'snd' options
-	SCR::Write( add(.modprobe_sound.options, "snd"), $[ "slots" : slot_option ]);
+	// write 'snd' options or remove the option line if there is no sound card
+	if (slot_option != "")
+	{
+	    y2milestone("Writing slots option: %1", slot_option);
+	    SCR::Write(add(.modprobe_sound.options, "snd"), $[ "slots" : slot_option ]);
+	}
+	else
+	{
+	    y2milestone("Removing slots option");
+	    SCR::Write(add(.modprobe_sound.options, "snd"), nil);
+	}
+    }
+
+    void RemovedUnusuedModulesFromSysconfig()
+    {
+	// remove unused modules from MODULES_LOADED_ON_BOOT
+	string on_boot_sysconfig = (string)SCR::Read(.sysconfig.kernel.MODULES_LOADED_ON_BOOT);
+	y2milestone("/etc/sysconfig/kernel:MODULES_LOADED_ON_BOOT: %1", on_boot_sysconfig);
+
+	list<string> on_boot_modules = splitstring(on_boot_sysconfig, " ");
+	on_boot_modules = filter(string mod, on_boot_modules, {return mod != nil && mod != "";});
+	y2debug("Module list: %1", on_boot_modules);
+
+	list<string> removed_modules = toset(maplist(map card, Sound::removed_info,
+	    {return card["module"]:"";}));
+	removed_modules = filter(string mod, removed_modules, {return mod != nil && mod != "";});
+
+	boolean modified = false;
+	foreach(string removed_module, removed_modules,
+	    {
+		// remove the module from sysconfig if it is there
+		if (contains(on_boot_modules, removed_module))
+		{
+		    y2milestone("Removing %1 from MODULES_LOADED_ON_BOOT", removed_module);
+
+		    // remove the module
+		    on_boot_modules = filter(string mod, on_boot_modules, {return mod != removed_module;});
+		    modified = true;
+		}
+	    }
+	);
+
+	// write the change
+	if (modified)
+	{
+	    on_boot_sysconfig = mergestring(on_boot_modules, " ");
+	    y2milestone("New MODULES_LOADED_ON_BOOT value: %1", on_boot_sysconfig);
+	    SCR::Write(.sysconfig.kernel.MODULES_LOADED_ON_BOOT, on_boot_sysconfig);
+	}
+	else
+	{
+	    y2milestone("Nothing removed from MODULES_LOADED_ON_BOOT");
+	}
     }
 
     /**
@@ -142,8 +221,8 @@
      * @param save_info save info
      * @return void
      */
-
     define void SaveModulesOptions(list save_info) ``{
+	y2milestone("SaveModulesOptions: %1", save_info);
 
 	path mod_options = .modprobe_sound.options;
 
@@ -163,6 +242,10 @@
 	    // the file doesn't exist, create an empty file
 	    SCR::Execute(.target.bash, "/usr/bin/touch /etc/modprobe.d/sound");
 	}
+
+	// must be called before SaveOneModulesEntry()
+	// to write the module back if it is used by another configured card!!
+	RemovedUnusuedModulesFromSysconfig();
 
 	foreach(string op, configured_options,
 	    {
