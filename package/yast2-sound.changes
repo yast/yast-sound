@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri May 16 16:40:22 CEST 2008 - jsrain@suse.cz
+
+- added categories Settings and System into desktop file
+  (bnc #382778)
+
+-------------------------------------------------------------------
 Wed Apr 30 10:48:36 CEST 2008 - lslezak@suse.cz
 
 - save non-PCI and non-USB sound cards to MODULES_LOADED_ON_BOOT
