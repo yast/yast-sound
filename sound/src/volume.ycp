@@ -145,6 +145,8 @@
 	setVolume ("Front", card_id, vol);
 	// some systems use iSpeaker (#251844)
 	setVolume ("iSpeaker", card_id, vol);
+	// set also Speaker channel (bnc#330409)
+	setVolume ("Speaker", card_id, vol);
 
 	symbol ui = nil;
 	do
@@ -159,6 +161,7 @@
 		setVolume ("Master Mono", card_id, vol);
 		setVolume ("Front", card_id, vol);
 		setVolume ("iSpeaker", card_id, vol);
+		setVolume ("Speaker", card_id, vol);
 	    }
 	    else if (ui == `test)
 	    {
@@ -382,6 +385,10 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
 	    if (haskey (devs, "iSpeaker"))
 	    {
 		setVolume ("iSpeaker", card_id, Sound::default_volume);
+	    }
+	    if (haskey (devs, "Speaker"))
+	    {
+		setVolume ("Speaker", card_id, Sound::default_volume);
 	    }
 
 
