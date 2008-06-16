@@ -428,14 +428,8 @@ define map HardwareDialog() {
 	extra_buttons
     );
 
-    if (!Mode::installation() && !Mode::config())
-    {
-	Wizard::SetNextButton(`next, Label::FinishButton());
-    }
-    else
-    {
-	Wizard::SetNextButton(`next, Label::OKButton());
-    }
+    Wizard::SetNextButton(`next, Label::OKButton());
+    Wizard::SetAbortButton(`abort, Label::CancelButton());
 
     symbol ret = `_dummy;
 
