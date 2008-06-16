@@ -66,7 +66,7 @@
 <P>To configure a joystick, select the sound card and press <B>Configure Joystick</B>.</P>
 ");
 
-	if (label == `finish)
+	if (label == `ok)
 	{
 	    // one joystick already configured - end
 	    return `next;
@@ -93,7 +93,7 @@
 	if (size(filtered) == 1)			// one sound card
 	{
 	    selected_card	= filtered[0, "card_no"]:0;
-	    label		= `finish;
+	    label		= `ok;
 
 	    // skip to configuration dialog if exactly one card was found
 	    return `config;
@@ -159,7 +159,7 @@
 	        _("Configured Sound Cards with Joystick Support"),
 	        dialog, helptext, true, true);
 
-	    Wizard::SetNextButton(`next, Label::FinishButton() );
+	    Wizard::SetNextButton(`next, Label::NextButton() );
 
 	    // preselect first card
 	    UI::ChangeWidget (`id(`cards),`CurrentItem,filtered[0,"card_no"]:0);
@@ -232,6 +232,8 @@
 	// create wizard dialog
 	Wizard::CreateDialog();
 	Wizard::SetDesktopIcon("joystick");
+
+	Wizard::SetAbortButton(`abort, Label::CancelButton());
 
 	// read sound card configuration
 	boolean progress_orig = Progress::set(false);

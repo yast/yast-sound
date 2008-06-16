@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jun 16 13:58:48 CEST 2008 - lslezak@suse.cz
+
+- use OK/Cancel buttons in the main dialog (bnc#398485, bnc#398489)
+- 2.17.0
+
+-------------------------------------------------------------------
 Fri May 23 13:12:53 CEST 2008 - lslezak@suse.cz
 
 - set also volume of "Speaker" channel (bnc#330409)
