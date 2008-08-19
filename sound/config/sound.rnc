@@ -11,6 +11,7 @@ module_conf =
       element options       { Anything* }? &
       element unique_key    { text }? &
       element bus           { text }? &
+      element bus_id        { text }? &
       element device_id     { INTEGER }? &
       element hwcfg         { text }? &
       element sub_device_id { INTEGER }? &
@@ -19,6 +20,7 @@ module_conf =
   }
 modules_conf =
   element modules_conf {
+    LIST,
     module_conf*
   }
 new =
