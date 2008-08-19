@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Aug 19 16:10:10 CEST 2008 - sschober@suse.de
+
+- rnc file fixed for autoyast 
+
+-------------------------------------------------------------------
 Mon Jun 16 13:58:48 CEST 2008 - lslezak@suse.cz
 
 - use OK/Cancel buttons in the main dialog (bnc#398485, bnc#398489)
