@@ -115,9 +115,10 @@
 	    if (size(not_available) > 0)
 	    {
 		Report::Error(sformat(_("These required packages are not available: %1
-Some sound device may not work or some features may not be supported.
+Some sound devices may not work or some features may not be supported.
 
-Enable or add an additional software repository containing the packages."), mergestring(not_available, ", ")));
+Enable or add an additional software repository containing the packages.
+"), mergestring(not_available, ", ")));
 		return false;
 	    }
 
