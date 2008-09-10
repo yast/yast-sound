@@ -274,10 +274,9 @@ Then press <B>Edit</B>.
 
 _("<p>
 Use <b>Other</b> to set the volume of the selected card or configure
-the module loading for playing MIDI files (<b>Start Sequencer</b>).
+the module loaded for playing MIDI files (<b>Start Sequencer</b>).
 Use <b>Play Test Sound</b> to test the selected card.
-</p>
-") +
+</p>\n") +
 
 _("<p>The sound device with index 0 is the default device used by system and applications.
 Use <b>Other</b> to set the selected sound device as the primary device.</p>")
