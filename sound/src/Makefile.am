@@ -35,6 +35,7 @@ desktop_DATA = \
 	joystick.desktop
 
 module_DATA = Sound.ycp	\
+	PulseAudio.ycp	\
 	Joystick.ycp
 
 ybin_SCRIPTS = copyfonts

@@ -264,6 +264,7 @@ define symbol SoundSequence () ``{
 	    return `abort;
 	block<boolean> abort = ``{ return false;};
 	Joystick::Read(abort);
+	PulseAudio::Read();
 	Sound::StoreSettings();
     }
 
@@ -336,6 +337,12 @@ define symbol SoundSequence () ``{
 	else
 	{
 	    y2milestone("Not writing the configuration");
+	}
+
+	if (PulseAudio::Modified())
+	{
+	    y2milestone("Writing changed PulseAudio configuration...");
+	    PulseAudio::Write();
 	}
     }
 

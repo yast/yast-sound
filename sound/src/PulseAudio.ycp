@@ -1,0 +1,102 @@
+/* ------------------------------------------------------------------------------
+ * Copyright (c) 2008 Novell, Inc. All Rights Reserved.
+ *
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of version 2 of the GNU General Public License as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, contact Novell, Inc.
+ *
+ * To contact Novell about this file by physical or electronic mail, you may find
+ * current contact information at www.novell.com.
+ * ------------------------------------------------------------------------------
+ */
+
+/**
+ * File:	modules/PulseAudio.ycp
+ * Package:	PulseAudio configuration
+ * Summary:	Configuration of PulseAudio in desktop applications
+ * Authors:	Ladislav Slezák <lslezak@novell.com>
+ *
+ * $Id:$
+ */
+
+{
+
+module "PulseAudio";
+textdomain "sound";
+
+boolean pa_enabled = nil;
+boolean modified = false;
+
+global boolean Read()
+{
+    modified = false;
+    y2warning("PulseAudio::Read() is not implemented!");
+    return true;
+}
+
+global boolean Write()
+{
+    y2warning("PulseAudio::Write() is not implemented!");
+    return true;
+}
+
+global string Summary()
+{
+    if (pa_enabled == nil)
+    {
+	y2warning("PulseAudio is not configured");
+	// summary string
+	return _("PulseAudio is not configured");
+    }
+
+    // summary string, %1 is "enabled" or "disabled"
+    return sformat(_("PulseAudio is %1"),
+	// part of a summary text (disabled/enabled status)
+	pa_enabled ? _("enabled") : _("disabled"));
+}
+
+global void Reset()
+{
+    y2milestone("Resetting PulseAudio configuration");
+    pa_enabled = nil;
+    modified = false;
+}
+
+global void Enable(boolean enable)
+{
+    if (enable == nil)
+    {
+	y2error("PulseAudio::Enable(): nil argument");
+    }
+    else
+    {
+	modified = enable != pa_enabled;
+	pa_enabled = enable;
+	y2milestone("Enabling PulseAudio support: %1", pa_enabled);
+
+	if (modified)
+	{
+	    y2milestone("PulseAudio config has been changed");
+	}
+    }
+}
+
+global boolean Modified()
+{
+    return modified;
+}
+
+global boolean Enabled()
+{
+    return pa_enabled;
+}
+
+}

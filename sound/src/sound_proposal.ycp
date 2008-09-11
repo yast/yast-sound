@@ -17,6 +17,7 @@
     import "Sound";
     import "Progress";
     import "GetInstArgs";
+    import "PulseAudio";
 
     Sound::installation = true;
 
@@ -87,6 +88,7 @@
     else if ( func == "Write" )
     {
 	Sound::Write ();
+	PulseAudio::Write();
     }
 
     return ret;

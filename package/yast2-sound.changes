@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Sep 11 10:36:21 CEST 2008 - lslezak@suse.cz
+
+- PulseAudio support in UI (Other->PulseAudio Configuration)
+  (fate#304936), (UI only, the setting is not saved/activated yet)
+- 2.17.2
+
+-------------------------------------------------------------------
 Wed Sep 10 10:57:29 CEST 2008 - lslezak@suse.cz
 
 - merged proofread texts (2008-09-08)

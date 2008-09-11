@@ -33,6 +33,7 @@ import "Joystick";
 import "Report";
 import "CommandLine";
 import "RichText";
+import "PulseAudio";
 
 include "sound/wizards.ycp";
 
@@ -76,7 +77,7 @@ define boolean SoundRead () ``{
 
     Sound::use_ui = false;
     block<boolean> abort_block = ``{return false;};
-    boolean ret = Sound::Read (false) && Joystick::Read(abort_block);
+    boolean ret = Sound::Read (false) && Joystick::Read(abort_block) && PulseAudio::Read();
     return ret;
 }
 
