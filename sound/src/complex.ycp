@@ -30,6 +30,7 @@
     import "Mode";
     import "WizardHW";
     import "Report";
+    import "PulseAudio";
 
     import "Sound";
     include "sound/mixer.ycp";
@@ -309,6 +310,50 @@ define symbol Edit()
     return ret;
 }
 
+void PulseAudioPopup()
+{
+    term dlg =
+    `HBox(
+	`HSpacing(1),
+	`VBox(
+	    `VSpacing(0.5),
+	    // frame label
+	    `Frame(_("PulseAudio Configuration"),
+		`VBox(
+		    `VSpacing(0.5),
+		    `Left(`CheckBox(`id(`pulseaudio),
+			// check box label
+			_("&Enable PulseAudio Support"), PulseAudio::Enabled() != false)
+		    ),
+		    `VSpacing(0.5)
+		)
+	    ),
+	    `VSpacing(`opt(`vstretch), 1),
+	    `ButtonBox(
+		`PushButton(`id(`ok), `opt(`default, `key_F10), Label::OKButton()),
+		`PushButton(`id(`cancel), `opt(`key_F9), Label::CancelButton())
+	    ),
+	    `VSpacing(0.5)
+	),
+	`HSpacing(1)
+    );
+
+    UI::OpenDialog(`opt(`decorated), dlg);
+
+    symbol ui = (symbol)UI::UserInput();
+
+    if (ui == `ok)
+    {
+	// get the current value
+	boolean value = (boolean)UI::QueryWidget(`id(`pulseaudio), `Value);
+
+	// set the value
+	PulseAudio::Enable(value);
+    }
+
+    UI::CloseDialog();
+}
+
 define void SequencerPopup() {
     term dlg =
     `HBox(
@@ -327,12 +372,9 @@ define void SequencerPopup() {
 		)
 	    ),
 	    `VSpacing(`opt(`vstretch), 1),
-	    `HBox(
-		`HSpacing(2),
+	    `ButtonBox(
 		`PushButton(`id(`ok), `opt(`default, `key_F10), Label::OKButton()),
-		`HSpacing(1),
-		`PushButton(`id(`cancel), `opt(`key_F9), Label::CancelButton()),
-		`HSpacing(2)
+		`PushButton(`id(`cancel), `opt(`key_F9), Label::CancelButton())
 	    ),
 	    `VSpacing(0.5)
 	),
@@ -411,7 +453,9 @@ define map HardwareDialog() {
 	// menu item
 	[`seq, _("&Start Sequencer")],
 	// menu item
-	[`primary, _("Set as the &Primary Card")]
+	[`primary, _("Set as the &Primary Card")],
+	// menu item
+	[`pulseaudio, _("PulseAudio Configuration")],
     ];
 
     if (show_fonts)
@@ -524,6 +568,10 @@ define map HardwareDialog() {
 		// set the primary card
 		SetPrimaryCard(idx, idx2);
 	    }
+	}
+	else if (ui == `pulseaudio)
+	{
+	    PulseAudioPopup();
 	}
 	else if (ui == `play_test)
 	{

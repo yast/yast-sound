@@ -35,6 +35,7 @@
     import "Mode";
     import "Summary";
     import "Wizard";
+    import "PulseAudio";
 
     any ret = nil;
     string func = "";
@@ -143,6 +144,7 @@
 		ret = Sound::Export();
 	}
 	else if (func == "Read") {
+		PulseAudio::Read();
 		ret = Sound::Read (false);
 	}
 	/* Write givven settings */
