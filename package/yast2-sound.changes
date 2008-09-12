@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Sep 12 14:46:02 CEST 2008 - lslezak@suse.cz
+
+- fixed build - added missing PulseAudio.* files in .spec file
+- 2.17.3
+
+-------------------------------------------------------------------
 Thu Sep 11 10:36:21 CEST 2008 - lslezak@suse.cz
 
 - PulseAudio support in UI (Other->PulseAudio Configuration)

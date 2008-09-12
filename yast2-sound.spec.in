@@ -41,6 +41,7 @@ rm -rf %{buildroot}/@plugindir@/libpy2ag_audio.la
 @ybindir@/copyfonts
 @moduledir@/Sound.*
 @moduledir@/Joystick.*
+@moduledir@/PulseAudio.*
 @schemadir@/autoyast/rnc/sound.rnc
 
 # database
