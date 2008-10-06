@@ -264,10 +264,17 @@
 
 	    // remove "index" option, do not write it
 	    string index = res["index"]:"";
-	    res = remove(res, "index");
+
+	    if (haskey(res, "index"))
+	    {
+		res = remove(res, "index");
+	    }
 
 	    // remove old "enable" option if it's present
-	    res = remove(res, "enable");
+	    if (haskey(res, "enable"))
+	    {
+		res = remove(res, "enable");
+	    }
 
 	    list<string> indices = splitstring(index, ",");
 
@@ -389,6 +396,7 @@
      * @return map return struct: $["return": boolean, "err_msg": string]
      */
     define map SaveModulesEntry (list save_info, list system) ``{
+	y2milestone("SaveModulesEntry: %1, %2", save_info, system);
 
 	path mod		= .modprobe_sound;
 	path mod_alias		= .modprobe_sound.alias;

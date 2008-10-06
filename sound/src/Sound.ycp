@@ -1129,8 +1129,11 @@ could make your system unstable.
 	maplist (string modname, (list<string>) mods, ``{
 	    map opts = CollectOptions(modname);
 
-	    // ignore "index" options
-	    opts = remove(opts, "index");
+	    if (haskey(opts, "index"))
+	    {
+		// ignore "index" options
+		opts = remove(opts, "index");
+	    }
 
 	    string optstr = "";
 	    maplist(string k, string v, (map<string,string>) opts, ``{
