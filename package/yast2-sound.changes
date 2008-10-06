@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Oct  6 15:10:59 CEST 2008 - lslezak@suse.cz
+
+- the sound card DB has been updated to kernel-2.6.27-rc7-12
+  (bnc#432575)
+- 2.17.4
+
+-------------------------------------------------------------------
 Mon Oct  6 13:27:42 CEST 2008 - visnov@suse.cz
 
 - adapt to new Confirm::Detection API (bnc #431276)
