@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Oct  6 13:27:42 CEST 2008 - visnov@suse.cz
+
+- adapt to new Confirm::Detection API (bnc #431276)
+
+-------------------------------------------------------------------
 Fri Sep 12 14:46:02 CEST 2008 - lslezak@suse.cz
 
 - fixed build - added missing PulseAudio.* files in .spec file
