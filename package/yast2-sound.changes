@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Oct  6 17:18:43 CEST 2008 - lslezak@suse.cz
+
+- fixed storing additional module parameters (bnc#404900)
+  (check the key before removal from a map)
+- 2.17.5
+
+-------------------------------------------------------------------
 Mon Oct  6 15:10:59 CEST 2008 - lslezak@suse.cz
 
 - the sound card DB has been updated to kernel-2.6.27-rc7-12
