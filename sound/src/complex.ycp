@@ -312,6 +312,14 @@ define symbol Edit()
 
 void PulseAudioPopup()
 {
+    if (!Mode::config() && PulseAudio::Enabled() == nil)
+    {
+	y2error("PulseAudio status is nil - the setup script is missing?");
+	// error popup message
+	Popup::Error(_("PulseAudio is not installed or cannot be configured."));
+	return;
+    }
+
     term dlg =
     `HBox(
 	`HSpacing(1),
@@ -323,7 +331,7 @@ void PulseAudioPopup()
 		    `VSpacing(0.5),
 		    `Left(`CheckBox(`id(`pulseaudio),
 			// check box label
-			_("&Enable PulseAudio Support"), PulseAudio::Enabled() != false)
+			_("&Enable PulseAudio Support"), PulseAudio::Enabled() == true)
 		    ),
 		    `VSpacing(0.5)
 		)

@@ -32,19 +32,68 @@
 module "PulseAudio";
 textdomain "sound";
 
+import "FileUtils";
+import "Summary";
+
 boolean pa_enabled = nil;
 boolean modified = false;
 
+// path to the configuration script
+const string pa_setup_script = "/usr/bin/setup-pulseaudio";
+
 global boolean Read()
 {
+    // reset the modification flag
     modified = false;
-    y2warning("PulseAudio::Read() is not implemented!");
+
+    if (FileUtils::Exists(pa_setup_script))
+    {
+	map out = (map)SCR::Execute(.target.bash_output, pa_setup_script + " --status");
+	y2milestone("Read status: %1", out);
+
+	pa_enabled = regexpmatch(out["stdout"]:"", "^enabled");
+
+	y2milestone("PulseAudio is %1", pa_enabled ? "enabled" : "disabled");
+    }
+    else
+    {
+	y2warning("PulseAudio setup script %1 is not present!", pa_setup_script);
+	return false;
+    }
+
     return true;
 }
 
 global boolean Write()
 {
-    y2warning("PulseAudio::Write() is not implemented!");
+    y2milestone("PulseAudio::Write(): pa_enabled: %1, modified: %2", pa_enabled, modified);
+
+    if (pa_enabled != nil && modified)
+    {
+	if (FileUtils::Exists(pa_setup_script))
+	{
+	    y2milestone("%1 PulseAudio support", pa_enabled ? "Enabling" : "Disabling");
+
+	    map out = (map)SCR::Execute(.target.bash_output, pa_setup_script +
+		(pa_enabled ? " --enable" : " --disable"));
+
+	    y2milestone("Write status: %1", out);
+
+	    // reset the modification flag
+	    modified = false;
+	}
+	else
+	{
+	    y2error("PulseAudio setup script %1 is not present, cannot activate the configuration!", pa_setup_script);
+	    return false;
+	}
+    }
+    else
+    {
+	y2error("PulseAudio is not configured, cannot save activate configuration");
+	return false;
+    }
+
     return true;
 }
 
@@ -52,15 +101,16 @@ global string Summary()
 {
     if (pa_enabled == nil)
     {
-	y2warning("PulseAudio is not configured");
-	// summary string
-	return _("PulseAudio is not configured");
+	return "";
     }
 
-    // summary string, %1 is "enabled" or "disabled"
-    return sformat(_("PulseAudio is %1"),
-	// part of a summary text (disabled/enabled status)
-	pa_enabled ? _("enabled") : _("disabled"));
+    list<string> retlist = [
+	Summary::Device("PulseAudio",
+		// part of a summary text (PulseAudio is disabled/enabled)
+		(pa_enabled ? _("Enabled") : _("Disabled"))
+	)];
+
+    return Summary::DevicesList(retlist);
 }
 
 global void Reset()
@@ -68,6 +118,36 @@ global void Reset()
     y2milestone("Resetting PulseAudio configuration");
     pa_enabled = nil;
     modified = false;
+}
+
+global map Export()
+{
+    if (pa_enabled == nil)
+    {
+	return $[];
+    }
+
+    return $[
+	"pulse_audio_status" : pa_enabled
+    ];
+}
+
+global boolean Import(map settings)
+{
+    if (haskey(settings, "pulse_audio_status"))
+    {
+	pa_enabled = settings["pulse_audio_status"]:false;
+	modified = true;
+
+	y2milestone("Imported PulseAudio configuration: pa_enabled: %1", pa_enabled);
+    }
+    else
+    {
+	y2milestone("The imported configuration doesn't contain PulseAudio configuration.");
+	pa_enabled = nil;
+    }
+
+    return true;
 }
 
 global void Enable(boolean enable)
