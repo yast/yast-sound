@@ -109,11 +109,12 @@
 
 	/* Create a  summary*/
 	if(func == "Import") {
-		ret = Sound::Import(param);
+		ret = Sound::Import(param) && PulseAudio::Import(param);
 	}
 	/* Create a  summary*/
 	else if(func == "Summary") {
-		ret = Sound::Summary();
+		ret = Sound::Summary() + PulseAudio::Summary();
+		y2milestone("Sound card configuration summary: %1", ret);
 	}
 	else if (func == "GetModified") {
 		ret = Sound::GetModified();
@@ -125,6 +126,7 @@
 	/* Reset configuration */
 	else if (func == "Reset") {
 		Sound::Import($[]);
+		PulseAudio::Reset();
 		ret = $[];
 	}
 	/* Change configuration (run AutoSequence) TODO */
@@ -142,6 +144,11 @@
 	/* Return actual state */
 	else if (func == "Export") {
 		ret = Sound::Export();
+		// add PulseAudio config if it's defined
+		if (PulseAudio::Enabled() != nil)
+		{
+		    ret = union((map)ret, PulseAudio::Export());
+		}
 	}
 	else if (func == "Read") {
 		PulseAudio::Read();

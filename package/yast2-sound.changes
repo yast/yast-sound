@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Oct  7 17:10:01 CEST 2008 - lslezak@suse.cz
+
+- use 'setup-pulseaudio' script for configuring PulseAudio
+  (bnc#425475)
+- 2.17.6
+
+-------------------------------------------------------------------
 Mon Oct  6 17:18:43 CEST 2008 - lslezak@suse.cz
 
 - fixed storing additional module parameters (bnc#404900)
