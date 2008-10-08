@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Oct  8 13:05:31 CEST 2008 - lslezak@suse.cz
+
+- Install additional packages automatically when
+  'Automatic Configuration' was selected in the first stage
+  (bnc#433046)
+- 2.17.7
+
+-------------------------------------------------------------------
 Tue Oct  7 17:10:01 CEST 2008 - lslezak@suse.cz
 
 - use 'setup-pulseaudio' script for configuring PulseAudio

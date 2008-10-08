@@ -87,6 +87,8 @@
     }
     else if ( func == "Write" )
     {
+	// do not confirm package installation in the automatic mode
+	Sound::SetConfirmPackages(!GetInstArgs::automatic_configuration());
 	Sound::Write ();
 	PulseAudio::Write();
     }
