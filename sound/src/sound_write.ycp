@@ -122,7 +122,15 @@ Enable or add an additional software repository containing the packages.
 		return false;
 	    }
 
-	    return Package::InstallAll(packages_to_install);
+	    if (Sound::ConfirmPackages())
+	    {
+		return Package::InstallAll(packages_to_install);
+	    }
+	    else
+	    {
+		// do not ask the user, install the packages immediately
+		return Package::DoInstall(packages_to_install);
+	    }
 	}
 
 	return true;
