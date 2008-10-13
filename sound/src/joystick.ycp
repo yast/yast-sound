@@ -62,7 +62,7 @@
     define symbol joystick_configuration() ``{
 
 	// helptext
-	string helptext = _("<P>Two or more sound cards in your system support joysticks.<P>
+	string helptext = _("<P>Two or more sound cards in your system support joysticks.</P>
 <P>To configure a joystick, select the sound card and press <B>Configure Joystick</B>.</P>
 ");
 
