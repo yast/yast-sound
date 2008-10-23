@@ -278,6 +278,9 @@ the module loaded for playing MIDI files (<b>Start Sequencer</b>).
 Use <b>Play Test Sound</b> to test the selected card.
 </p>\n") +
 
+_("<P>PulseAudio daemon can used to play sounds,
+use <B>PulseAudio Configuration</B> to enable or disable it.</P>") +
+
 _("<p>The sound device with index 0 is the default device used by system and applications.
 Use <b>Other</b> to set the selected sound device as the primary device.</p>")
 

@@ -463,7 +463,7 @@ define map HardwareDialog() {
 	// menu item
 	[`primary, _("Set as the &Primary Card")],
 	// menu item
-	[`pulseaudio, _("PulseAudio Configuration")],
+	[`pulseaudio, _("PulseAudio &Configuration...")],
     ];
 
     if (show_fonts)
