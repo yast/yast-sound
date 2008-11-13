@@ -33,8 +33,9 @@ snd_enable = element snd_enable { text }
 snd_index = element snd_index { text }
 sound =
   element sound {
-    configure_detected? & modules_conf? & rc_vars? & volume_settings?
+    configure_detected? & modules_conf? & rc_vars? & volume_settings? & pulse_audio_status?
   }
+pulse_audio_status = element pulse_audio_status { BOOLEAN }
 state = element state { text }
 unique_key = element unique_key { text }
 unknown-state = element unknown-state { text }
