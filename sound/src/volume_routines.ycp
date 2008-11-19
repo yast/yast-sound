@@ -141,7 +141,8 @@
 
 	string command = (!Sound::use_alsa) ?
 	    sformat("/usr/bin/mpg123 -a /dev/dsp%1 %2", card_id, fname)
-	    : sformat("/usr/bin/aplay -q -N -D default:%1 %2 > /dev/null 2>&1", card_id, fname);
+	    // unset ALSA_CONFIG_PATH (bnc#440981)
+	    : sformat("ALSA_CONFIG_PATH= /usr/bin/aplay -q -N -D default:%1 %2 > /dev/null 2>&1", card_id, fname);
 
 	y2milestone("Executing: %1", command);
 
