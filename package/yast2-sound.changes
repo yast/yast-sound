@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Nov 19 12:26:21 CET 2008 - lslezak@suse.cz
+
+- unset $ALSA_CONFIG_PATH when playing the test sound - do not
+  use the pulseaudio plugin, the PA daemon might not be running
+  (bnc#440981)
+- 2.17.11
+
+-------------------------------------------------------------------
 Thu Nov 13 16:29:22 CET 2008 - ug@suse.de
 
 - rnc file fixed
