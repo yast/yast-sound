@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Nov 25 17:27:35 CET 2008 - lslezak@suse.cz
+
+- fixed "Really Abort" popup behavior in the "Add" dialog
+  (bnc#447408)
+- 2.17.12
+
+-------------------------------------------------------------------
 Wed Nov 19 12:26:21 CET 2008 - lslezak@suse.cz
 
 - unset $ALSA_CONFIG_PATH when playing the test sound - do not

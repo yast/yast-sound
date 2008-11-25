@@ -196,8 +196,8 @@
 		// checkbox label
 		_("Show List of Kernel Modules"), false))
 	    : `VSpacing(),
-	    // textentry label
-	    `TextEntry (`id(`search), `opt(`notify), _("&Search")),
+	    // input field - label
+	    `InputField(`id(`search), `opt(`notify, `hstretch), _("&Search")),
 	    `VSpacing ()
 	);
 
@@ -296,8 +296,7 @@
 	    }
 	    else if (ui == `abort || ui == `cancel)
 	    {
-		if (!ReallyAbort())
-		    ui = nil;
+		ui = ReallyAbort() ? `abort : `dummy;
 	    }
 	} while (!contains([`next, `back, `abort], ui));
 
