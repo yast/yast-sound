@@ -109,6 +109,9 @@
 
 	/* Create a  summary*/
 	if(func == "Import") {
+		// detect the cards on the system, so we could write them
+		// correctly:
+		param = UpdateCardsToTargetSystem (param);
 		ret = Sound::Import(param) && PulseAudio::Import(param);
 	}
 	/* Create a  summary*/
@@ -139,7 +142,19 @@
 	}
 	/* Return required package list */
 	else if (func == "Packages") {
-		ret = $[];
+		list<string> packages_to_install = [];
+
+		list<string> reqmodules = Sound::RequiredKernelModules();
+		foreach(string driver, reqmodules,
+		    {
+			list<string> req_packages = Sound::RequiredPackagesToInstall(driver);
+			packages_to_install = (list<string>)union(packages_to_install, req_packages);
+		    }
+		);
+
+		y2milestone("Collected packages to install: %1", packages_to_install);
+
+		ret = $[ "install" : packages_to_install ];
 	}
 	/* Return actual state */
 	else if (func == "Export") {
@@ -154,16 +169,12 @@
 		PulseAudio::Read();
 		ret = Sound::Read (false);
 	}
-	/* Write givven settings */
+	/* Write given settings */
 	else if (func == "Write") {
 		import "Progress";
 		boolean progress_orig = Progress::set(false);
 		map settings = Sound::Export();
 		Sound::write_only = true;
-		// detect the cards on the system, so we could write them
-		// correctly:
-		settings = UpdateCardsToTargetSystem (settings);
-		Sound::Import (settings);
 		ret = WFM::CallFunction ("sound_write", [ settings ]);
 		Progress::set(progress_orig);
 		return ret;
@@ -174,7 +185,7 @@
 		ret = false;
 	}
 
-	y2debug("ret=%1", ret);
+	y2milestone("ret=%1", ret);
 	y2milestone("Sound auto finished");
 	y2milestone("----------------------------------------");
 
