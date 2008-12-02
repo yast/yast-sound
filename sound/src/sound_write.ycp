@@ -183,7 +183,7 @@ Enable or add an additional software repository containing the packages.
 	    _("Storing joystick settings..."),
 	    ];
 
-    if (install)
+    if (install && !Mode::autoinst())
     {
 	// progress bar item
 	stones = add(stones, _("Install required packages"));
@@ -206,27 +206,34 @@ Enable or add an additional software repository containing the packages.
 
     Progress::NextStage();
 
-    // get required sound and joystick kernel modules
-    list<string> reqmodules = Sound::RequiredKernelModules();
-    list<string> reqjoymodules = Joystick::RequiredKernelModules();
+    list<string> reqmodules = [];
 
-    if (reqmodules == nil)
+    // in autoyast installation the packages are installed by autoyast
+    // see sound_auto.ycp - it's called with "Packages" argument
+    if (!Mode::autoinst())
     {
-	reqmodules = [];
-    }
+	// get required sound and joystick kernel modules
+	reqmodules = Sound::RequiredKernelModules();
+	list<string> reqjoymodules = Joystick::RequiredKernelModules();
 
-    if (reqjoymodules == nil)
-    {
-	reqjoymodules = [];
-    }
+	if (reqmodules == nil)
+	{
+	    reqmodules = [];
+	}
 
-    // merge lists, remove duplicates
-    reqmodules = (list<string>) union(reqmodules, reqjoymodules);
+	if (reqjoymodules == nil)
+	{
+	    reqjoymodules = [];
+	}
 
-    if (size(reqmodules) > 0)
-    {
-	// ensure that all required kernel modules are installed
-	Package::InstallKernel(reqmodules);
+	// merge lists, remove duplicates
+	reqmodules = (list<string>) union(reqmodules, reqjoymodules);
+
+	if (size(reqmodules) > 0)
+	{
+	    // ensure that all required kernel modules are installed
+	    Package::InstallKernel(reqmodules);
+	}
     }
 
     // save config to /etc/modprobe.d/sound
@@ -301,7 +308,7 @@ Enable or add an additional software repository containing the packages.
     // write joystick configuration
     Joystick::Write (abort_block);
 
-    if (install)
+    if (install && !Mode::autoinst())
     {
 	Progress::NextStage();
 	install_packages(reqmodules);

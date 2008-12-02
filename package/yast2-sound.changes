@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Dec  2 12:48:10 CET 2008 - lslezak@suse.cz
+
+- fixed package installation in autoyast installation mode
+  (bnc#450416)
+- 2.17.13
+
+-------------------------------------------------------------------
 Tue Nov 25 17:27:35 CET 2008 - lslezak@suse.cz
 
 - fixed "Really Abort" popup behavior in the "Add" dialog
