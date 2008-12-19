@@ -30,7 +30,16 @@
      *	@return boolean yes/no
      */
     define boolean ReallyAbort() ``{
-	return Popup::ReallyAbort (Sound::Changed() || Joystick::Changed());
+	boolean config_changed = Sound::Changed() || Joystick::Changed();
+	y2milestone("Sound or joystick config changed: %1", config_changed);
+
+	// no change, abort immediately
+	if (!config_changed)
+	{
+	    return true;
+	}
+
+	return Popup::ReallyAbort(config_changed);
     }
 
     /**
