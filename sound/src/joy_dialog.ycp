@@ -506,6 +506,7 @@ before pressing <B>Test</B> or <B>Next</B>.</P>");
 
 	Wizard::SetContents (caption, contents, helptext, true, true);
 	Wizard::SetNextButton(`next, nextbutton[button]:Label::NextButton() );
+	if (!Mode::installation()) Wizard::HideBackButton();
 
 	symbol s = nil;
 	do
@@ -581,6 +582,8 @@ before pressing Next.
 	{
 	    Wizard::RestoreNextButton();
 	}
+
+	if (!Mode::installation()) Wizard::RestoreBackButton();
 
 	return s;
     }

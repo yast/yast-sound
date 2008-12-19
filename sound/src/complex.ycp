@@ -482,6 +482,7 @@ define map HardwareDialog() {
 
     Wizard::SetNextButton(`next, Label::OKButton());
     Wizard::SetAbortButton(`abort, Label::CancelButton());
+    if (!Mode::installation()) Wizard::HideBackButton();
 
     symbol ret = `_dummy;
 
@@ -609,6 +610,7 @@ define map HardwareDialog() {
     } while (!contains([`back, `abort, `next, `add, `edit, `delete, `mixer],ret));
 
     Wizard::RestoreNextButton();
+    if (!Mode::installation()) Wizard::RestoreBackButton();
 
     return $[ "ui": ret ];
 }
