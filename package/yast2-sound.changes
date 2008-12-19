@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Dec 19 09:43:03 CET 2008 - lslezak@suse.cz
+
+- removed the progress dialog at start up (bnc#447573)
+
+-------------------------------------------------------------------
 Tue Dec  2 12:48:10 CET 2008 - lslezak@suse.cz
 
 - fixed package installation in autoyast installation mode

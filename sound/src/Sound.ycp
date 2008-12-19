@@ -707,35 +707,6 @@ could make your system unstable.
 	// sound Read dialog caption:
 	string caption = _("Initializing Sound Configuration");
 
-	integer steps = 5;
-
-	Progress::New( caption, " ", steps, [
-		// progress stage
-		_("Read card database"),
-		// progress stage
-		_("Read previously saved configuration"),
-		// progress stage
-		_("Detect sound cards"),
-		// progress stage
-		_("Read sysconfig values"),
-		// progress stage
-		_("Read volume settings"),
-	    ], [
-		// progress step label
-		_("Reading card database..."),
-		// progress step label
-		_("Reading previously saved configuration..."),
-		// progress step label
-		_("Detecting sound cards..."),
-		// progress step label
-		_("Reading sysconfig values..."),
-		// progress step label
-		_("Reading volume settings..."),
-		// progress step label
-		_("Finished")
-	    ],
-	    ""
-	);
 	if (Mode::test())
 	{
 	    DetectHardware();
@@ -747,44 +718,25 @@ could make your system unstable.
 	if (interactive && PollAbort ()) return false;
 
 	// load cards database
-	Progress::NextStage ();
 	LoadDatabase (interactive);
 
 	// load data from /etc/modules.conf
-	Progress::NextStage ();
 	ReadModulesConf();
 
-	if (interactive && PollAbort()) return false;
-
 	// detect sound cards
-	Progress::NextStage ();
 	DetectHardware();
-
-	if (interactive && PollAbort()) return false;
 
 	// check old isa cards (bug25285)
 	if (interactive && detected_cards == [] && modules_conf == [])
 	    DetectOldCards();
 
-
-	if (interactive && PollAbort()) return false;
-	// read rc.config values
-	Progress::NextStage ();
 	rc_vars = read_rc_vars ();
 
-	if (interactive && PollAbort()) return false;
-
-	// load volume settings
-	Progress::NextStage ();
 	volume_settings = get_vol_settings();
-
-	if (interactive && PollAbort()) return false;
 
 	// create list of unconfigured cards
 	UpdateUnconfiguredCards();
 
-	// increase the progress to "finish"
-	Progress::NextStage ();
 	return true;
     }
 
