@@ -30,6 +30,8 @@
     import "Wizard";
     import "Label";
     import "Popup";
+    import "String";
+    import "Report";
 
     include "sound/ui.ycp"; // ReallyAbort
     include "sound/routines.ycp"; // get_module_params, restore_mod_params
@@ -308,15 +310,9 @@
     {
 	y2milestone("possible_values: %1", possible_values);
 
-	term yes_button = `PushButton( `id(`ok), `opt(`default, `key_F10), Label::OKButton());
-	term no_button  = `PushButton( `id(`cancel), `opt (`key_F9), Label::CancelButton());
-
-	term button_box = `HBox(
-	     `HStretch (),
-	     `HWeight( 1, yes_button),
-	     `HSpacing(2),
-	     `HWeight( 1, no_button ),
-	     `HStretch ()
+	term button_box = `ButtonBox (
+	    `PushButton( `id(`ok), `opt(`okButton, `default, `key_F10), Label::OKButton()),
+	    `PushButton( `id(`cancel), `opt(`cancelButton, `key_F9), Label::CancelButton())
 	);
 
 	list<term> items = getPossibleValues(possible_values, value);
@@ -339,9 +335,50 @@
 
 	UI::OpenDialog(`opt(`decorated), content);
 
-	any ret = UI::UserInput();
-	string option_name = new_option ? (string)UI::QueryWidget(`id(`option_name), `Value) : name;
-	string option_value = (string)UI::QueryWidget(`id(`option_value), `Value);
+	any ret = nil;
+	string option_name = "";
+	string option_value = "";
+
+	while(true)
+	{
+	    ret = UI::UserInput();
+
+	    // validate the input
+	    option_name = new_option ? (string)UI::QueryWidget(`id(`option_name), `Value) : name;
+	    option_value = (string)UI::QueryWidget(`id(`option_value), `Value);
+
+	    // do not validate if the Cancel button has been pressed
+	    if (ret == `cancel)
+	    {
+		break;
+	    }
+
+	    // all non-ASCII characters from value
+	    string extra_chars = deletechars(option_value, String::CGraph());
+
+	    if (extra_chars != "")
+	    {
+		Report::Error(sformat(_("Value of the option contains invalid\ncharacters '%1'.\n\nEnter a valid value."), extra_chars));
+		UI::SetFocus(`id(`option_value));
+		continue;
+	    }
+
+	    // check the option name if it's entered by user
+	    if (new_option)
+	    {
+		// all non-ASCII characters from name
+		extra_chars = deletechars(option_name, String::CGraph());
+
+		if (extra_chars != "")
+		{
+		    Report::Error(sformat(_("Name of the option contains invalid\ncharacters '%1'.\n\nEnter a valid name."), extra_chars));
+		    UI::SetFocus(`id(`option_name));
+		    continue;
+		}
+	    }
+
+	    break;
+	}
 
 	UI::CloseDialog();
 
