@@ -5,6 +5,8 @@ Fri Dec 19 15:18:05 CET 2008 - lslezak@suse.cz
 - abort immediately when there is no change (bnc#458317)
 - sound, joystick - hide the Back button in the overview dialog
   (bnc#440561, bnc#440559)
+- allow entering only ASCII characters in the kernel module options
+  dialog (bnc#447018)
 
 -------------------------------------------------------------------
 Tue Dec  2 12:48:10 CET 2008 - lslezak@suse.cz
