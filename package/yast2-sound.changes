@@ -5,6 +5,11 @@ Fri Jan  9 15:55:15 CET 2009 - lslezak@suse.cz
 - 2.17.14
 
 -------------------------------------------------------------------
+Thu Dec 18 11:10:21 CET 2008 - ro@suse.de
+
+- fix build for non-alsa case (s390) 
+
+-------------------------------------------------------------------
 Tue Dec  2 12:48:10 CET 2008 - lslezak@suse.cz
 
 - fixed package installation in autoyast installation mode
