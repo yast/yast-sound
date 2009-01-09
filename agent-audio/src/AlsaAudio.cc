@@ -324,9 +324,9 @@ YCPValue alsaGetCardName(int card_id)
 
 #else // __HAVE_ALSA
 
-YCPValue alsaSetVolume(int card, const string& channel, int value)
+YCPBoolean alsaSetVolume(int card, const string& channel, int value)
 {
-    return YCPVoid();
+    return YCPBoolean(false);
 }
 
 YCPValue alsaGetVolume(int card, const string& channel)
@@ -334,9 +334,9 @@ YCPValue alsaGetVolume(int card, const string& channel)
     return YCPVoid();
 }
 
-YCPValue alsaSetMute(int card, const string& channel, bool value)
+YCPBoolean alsaSetMute(int card, const string& channel, bool value)
 {
-    return YCPVoid();
+    return YCPBoolean(false);
 }
 
 YCPValue alsaGetMute(int card, const string& channel)
@@ -344,14 +344,16 @@ YCPValue alsaGetMute(int card, const string& channel)
     return YCPVoid();
 }
 
-YCPValue alsaGetChannels(int card)
+YCPList alsaGetChannels(int card)
 {
-    return YCPVoid();
+    YCPList outlist;
+    return outlist;
 }
 
-YCPValue alsaGetCards()
+YCPList alsaGetCards()
 {
-    return YCPVoid();
+    YCPList list;
+    return list;
 }
 
 YCPValue alsaGetCardName(int card_id)
