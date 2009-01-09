@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jan  9 15:55:15 CET 2009 - lslezak@suse.cz
+
+- fixed snd slots option for snd-aoa driver (PPC) (bnc#460338)
+- 2.17.14
+
+-------------------------------------------------------------------
 Tue Dec  2 12:48:10 CET 2008 - lslezak@suse.cz
 
 - fixed package installation in autoyast installation mode
