@@ -22,8 +22,7 @@
 #ifndef __ALSAAUDIO
 #define __ALSAAUDIO
 
-#include <Y2.h>
-#include <scr/SCRAgent.h>
+#include <YCP.h>
 
 using std::string;
 using std::vector;

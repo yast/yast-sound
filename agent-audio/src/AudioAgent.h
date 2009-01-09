@@ -22,7 +22,6 @@
 #ifndef __AUDIOAGENT
 #define __AUDIOAGENT
 
-#include <Y2.h>
 #include <scr/SCRAgent.h>
 
 using std::string;

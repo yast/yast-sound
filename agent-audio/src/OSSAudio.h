@@ -10,8 +10,7 @@
 #ifndef __OSSAudio_h
 #define __OSSAudio_h
 
-#include <Y2.h>
-#include <scr/SCRAgent.h>
+#include <YCP.h>
 
 extern char *ossChannels[];
 extern int ossChannels_num;
