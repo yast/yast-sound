@@ -153,6 +153,11 @@
 
 		if (drv != "")
 		{
+		    if (drv == "snd-aoa")
+		    {
+			drv = "snd-aoa-fabric-layout";
+		    }
+
 		    drivers = add(drivers, drv);
 		}
 	    }
