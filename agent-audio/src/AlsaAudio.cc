@@ -1,10 +1,7 @@
 
-#include <math.h>
 #include "AlsaAudio.h"
 
-#include <Y2.h>
-#include <scr/SCRAgent.h>
-
+#include <y2util/y2log.h>
 
 #ifdef __sparc__
     #define __HAVE_ALSA 0

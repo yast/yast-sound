@@ -9,14 +9,10 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <sys/ioctl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <linux/soundcard.h>
 
-#include <Y2.h>
-#include <scr/SCRAgent.h>
+#include <y2util/y2log.h>
 
 #include "OSSAudio.h"
 

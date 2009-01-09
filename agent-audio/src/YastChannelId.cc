@@ -113,7 +113,7 @@ YastChannelId::YastChannelId(const std::string &yastID)
 		    channel_name = std::string(yastID.begin(), it);
 
 		    std::string channel_index_str(number_begin_it, number_end_it);
-		    channel_index = atoi(channel_index_str.c_str());
+		    channel_index = ::atoi(channel_index_str.c_str());
 		}
 	    }
 	}
