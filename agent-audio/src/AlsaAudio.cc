@@ -57,8 +57,9 @@
 				return YCPNull(); \
 			}
 
+#include "YastChannelId.h"
 
-YCPValue alsaGetVolume(int card_id, const string& channel)
+YCPValue alsaGetVolume(int card_id, const string& channel_name)
 {
     INIT_MIXER
 
@@ -67,11 +68,19 @@ YCPValue alsaGetVolume(int card_id, const string& channel)
 
     snd_mixer_selem_channel_id_t chn;
 
+    YastChannelId ch_id(channel_name);
+    std::string channel(ch_id.name());
+    unsigned ch_index = ch_id.index();
+
+    y2debug("Channel Id: '%s' => name: '%s', index: %u", channel_name.c_str(), channel.c_str(), ch_index);
 
     for (elem = snd_mixer_first_elem(handle); elem; elem = snd_mixer_elem_next(elem))
     {
 	snd_mixer_selem_get_id(elem, sid);
+
+	// is it the required channel?
 	if (snd_mixer_selem_id_get_name(sid) == channel
+	    && snd_mixer_selem_get_index(elem) == ch_index
 	    && snd_mixer_selem_is_active(elem)
 	    && snd_mixer_selem_has_playback_volume(elem))
 	{
@@ -96,11 +105,13 @@ YCPValue alsaGetVolume(int card_id, const string& channel)
 	}
     }
 
+    y2warning("Card %d: channel '%s' not found", card_id, channel_name.c_str());
+
     snd_mixer_close(handle);
     return YCPInteger((long long)0);
 }
 
-YCPValue alsaGetMute(int card_id, const string& channel)
+YCPValue alsaGetMute(int card_id, const string& channel_name)
 {
     INIT_MIXER
 
@@ -108,10 +119,17 @@ YCPValue alsaGetMute(int card_id, const string& channel)
 
     snd_mixer_selem_channel_id_t chn;
 
+    YastChannelId ch_id(channel_name);
+    std::string channel(ch_id.name());
+    unsigned ch_index = ch_id.index();
+
+    y2debug("Channel Id: '%s' => name: '%s', index: %u", channel_name.c_str(), channel.c_str(), ch_index);
+
     for (elem = snd_mixer_first_elem(handle); elem; elem = snd_mixer_elem_next(elem))
     {
         snd_mixer_selem_get_id(elem, sid);
         if (snd_mixer_selem_id_get_name(sid) == channel
+	    && snd_mixer_selem_get_index(elem) == ch_index
             && snd_mixer_selem_is_active(elem)
             && snd_mixer_selem_has_playback_switch(elem))
         {
@@ -128,21 +146,29 @@ YCPValue alsaGetMute(int card_id, const string& channel)
         }
     }
 
+    y2warning("Card %d: channel '%s' not found", card_id, channel_name.c_str());
+
     snd_mixer_close(handle);
     return YCPBoolean(false);
 }
 
-YCPBoolean alsaSetVolume(int card_id, const string& channel, int value)
+YCPBoolean alsaSetVolume(int card_id, const string& channel_name, int value)
 {
     INIT_MIXER
 
     long from, to, val;
 
+    YastChannelId ch_id(channel_name);
+    std::string channel(ch_id.name());
+    unsigned ch_index = ch_id.index();
+
+    y2debug("Channel Id: '%s' => name: '%s', index: %u", channel_name.c_str(), channel.c_str(), ch_index);
 
     for (elem = snd_mixer_first_elem(handle); elem; elem = snd_mixer_elem_next(elem))
     {
         snd_mixer_selem_get_id(elem, sid);
         if (snd_mixer_selem_id_get_name(sid) == channel
+	    && snd_mixer_selem_get_index(elem) == ch_index
             && snd_mixer_selem_is_active(elem)
             && snd_mixer_selem_has_playback_volume(elem))
         {
@@ -157,20 +183,27 @@ YCPBoolean alsaSetVolume(int card_id, const string& channel, int value)
         }
     }
 
+    y2warning("Card %d: channel '%s' not found", card_id, channel_name.c_str());
 
     snd_mixer_close(handle);
     return YCPBoolean(false);
 }
 
-YCPBoolean alsaSetMute(int card_id, const string& channel, bool value)
+YCPBoolean alsaSetMute(int card_id, const string& channel_name, bool value)
 {
     INIT_MIXER
 
+    YastChannelId ch_id(channel_name);
+    std::string channel(ch_id.name());
+    unsigned ch_index = ch_id.index();
+
+    y2debug("Channel Id: '%s' => name: '%s', index: %u", channel_name.c_str(), channel.c_str(), ch_index);
 
     for (elem = snd_mixer_first_elem(handle); elem; elem = snd_mixer_elem_next(elem))
     {
         snd_mixer_selem_get_id(elem, sid);
         if (snd_mixer_selem_id_get_name(sid) == channel
+	    && snd_mixer_selem_get_index(elem) == ch_index
             && snd_mixer_selem_is_active(elem)
             && snd_mixer_selem_has_playback_switch(elem))
         {
@@ -179,6 +212,8 @@ YCPBoolean alsaSetMute(int card_id, const string& channel, bool value)
 	    return YCPBoolean(true);
         }
     }
+
+    y2warning("Card %d: channel '%s' not found", card_id, channel_name.c_str());
 
     snd_mixer_close(handle);
     return YCPBoolean(false);
@@ -190,9 +225,10 @@ YCPList alsaGetChannels(int card_id)
 
     INIT_MIXER // well, this doesn't look like a c++ code... i'm sorry for that... see definition above
 
+    y2milestone("Sound card %d: reading channels", card_id);
+
     for (elem = snd_mixer_first_elem(handle); elem; elem = snd_mixer_elem_next(elem))
     {
-	snd_mixer_selem_get_id(elem, sid);
         if (!snd_mixer_selem_is_active(elem))
         {
 	    continue;
@@ -203,8 +239,12 @@ YCPList alsaGetChannels(int card_id)
 	    continue;
 	}
 
-	outlist->add(YCPString(snd_mixer_selem_id_get_name(sid)));
+	YastChannelId ch_id(snd_mixer_selem_get_name(elem), snd_mixer_selem_get_index(elem));
 
+	y2milestone("Found channel: name: '%s', index: %u, id: '%s'",
+	    ch_id.name().c_str(), ch_id.index(), ch_id.asString().c_str());
+
+	outlist->add(YCPString(ch_id.asString()));
     }
 
     snd_mixer_close(handle);
@@ -241,7 +281,7 @@ YCPValue alsaStore(int card)
 	cmd+=tmp;
     }
     cmd+=" > /dev/null 2>&1";
-    y2debug("executing '%s'", cmd.c_str());
+    y2milestone("executing '%s'", cmd.c_str());
     if(system(cmd.c_str())!=-1)
     {
 	return YCPBoolean(true);
@@ -263,7 +303,7 @@ YCPValue alsaRestore(int card)
 	cmd+=tmp;
     }
     cmd+=" > /dev/null 2>&1";
-    y2debug("executing '%s'", cmd.c_str());
+    y2milestone("executing '%s'", cmd.c_str());
     if(system(cmd.c_str()))
     {
         return YCPBoolean(true);

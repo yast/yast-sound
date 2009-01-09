@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Jan  9 09:26:30 CET 2009 - lslezak@suse.cz
+
+- make channel names unique - add channel index to channel name
+  if more channels have the same name, fixes UI syntax error
+  for some sound cards (bnc#407060)
+
+-------------------------------------------------------------------
 Fri Dec 19 15:18:05 CET 2008 - lslezak@suse.cz
 
 - removed the progress dialog at start up (bnc#447573)
