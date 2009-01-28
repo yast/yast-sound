@@ -489,11 +489,6 @@ define map HardwareDialog() {
     do {
 	SetItems();
 
-	if (!Mode::config())
-	{
-	    SCR::Execute(.audio.alsa.restore, 0, 0);
-	}
-
 	// initialize selected_card
 	if (selected_card == "")
 	{
