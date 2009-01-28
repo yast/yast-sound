@@ -184,11 +184,6 @@
 	    }
 	});
 
-        if (Sound::use_alsa && restore)
-        {
-            SCR::Execute(.audio.alsa.restore, 0, 0);
-        }
-
 	return ret;
     }
 

@@ -422,7 +422,6 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
 
     if (!Mode::config() && !Mode::autoinst())
     {
-	SCR::Execute(.audio.alsa.restore, 0 ,0);
 	SCR::Execute(.target.bash, "/usr/bin/killall aplay 2> /dev/null", $[]);
     }
     if (Sound::use_ui)
