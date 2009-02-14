@@ -21,11 +21,6 @@ Fri Jan  9 09:26:30 CET 2009 - lslezak@suse.cz
   for some sound cards (bnc#407060)
 
 -------------------------------------------------------------------
-Thu Dec 18 11:10:21 CET 2008 - ro@suse.de
-
-- fix build for non-alsa case (s390) 
-
--------------------------------------------------------------------
 Fri Dec 19 15:18:05 CET 2008 - lslezak@suse.cz
 
 - removed the progress dialog at start up (bnc#447573)
@@ -34,6 +29,11 @@ Fri Dec 19 15:18:05 CET 2008 - lslezak@suse.cz
   (bnc#440561, bnc#440559)
 - allow entering only ASCII characters in the kernel module options
   dialog (bnc#447018)
+
+-------------------------------------------------------------------
+Thu Dec 18 11:10:21 CET 2008 - ro@suse.de
+
+- fix build for non-alsa case (s390)
 
 -------------------------------------------------------------------
 Tue Dec  2 12:48:10 CET 2008 - lslezak@suse.cz
