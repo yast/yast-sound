@@ -2390,6 +2390,13 @@ $[
     ],
     "snd-hda-intel" : $[
       "description" : "Intel HDA driver",
+      "mixer" : $[
+        "Center" : 100,
+        "Front" : 100,
+        "LFE" : 100,
+        "Surround" : 100,
+        "PCM" : 100
+      ],
       "params" : $[
         "model" : $[
           "descr" : _("Use the given board model.")
