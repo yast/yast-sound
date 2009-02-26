@@ -34,6 +34,16 @@ $[
             "Wave":     100,
             "Music":    100
         ]
-    ]
-    
+    ],
+    "snd-hda-intel":
+    $[
+	"mixer":
+	$[
+	    "Front":	100,
+	    "Surround":	100,
+	    "Center":	100,
+	    "LFE":	100,
+	    "PCM":	100,
+	]
+    ],
 ]
