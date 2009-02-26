@@ -370,25 +370,27 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
 	    string master_elem = Sound::db_modules[modname, "main_volume"]:"Master";
 
 	    setVolume (master_elem, card_id, Sound::default_volume);
-	    setVolume ("Headphone", card_id, Sound::default_volume);
-	    setVolume ("Front", card_id, Sound::default_volume);
 
 	    map devs = Sound::db_modules[modname, "mixer"]:$[];
+
+	    setVolume ("Headphone", card_id, devs["Headphone"]:Sound::default_volume);
+	    setVolume ("Front", card_id, devs["Front"]:Sound::default_volume);
+
 	    if (haskey (devs, "PCM"))
 	    {
-		setVolume ("PCM", card_id, Sound::default_volume);
+		setVolume ("PCM", card_id, devs["PCM"]:Sound::default_volume);
 	    }
 	    if (haskey (devs, "Master Mono"))
 	    {
-		setVolume ("Master Mono", card_id, Sound::default_volume);
+		setVolume ("Master Mono", card_id, devs["Master Mono"]:Sound::default_volume);
 	    }
 	    if (haskey (devs, "iSpeaker"))
 	    {
-		setVolume ("iSpeaker", card_id, Sound::default_volume);
+		setVolume ("iSpeaker", card_id, devs["iSpeaker"]:Sound::default_volume);
 	    }
 	    if (haskey (devs, "Speaker"))
 	    {
-		setVolume ("Speaker", card_id, Sound::default_volume);
+		setVolume ("Speaker", card_id, devs["Speaker"]:Sound::default_volume);
 	    }
 
 

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Feb 26 12:49:21 CET 2009 - lslezak@suse.cz
+
+- set 100% volume for snd-hda-intel driver (bnc#477853),
+  (bnc#466428)
+
+-------------------------------------------------------------------
 Wed Jan 28 10:04:59 CET 2009 - lslezak@suse.cz
 
 - do not restore volume settings at start up (bnc#466456)
