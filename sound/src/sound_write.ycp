@@ -236,7 +236,7 @@ Enable or add an additional software repository containing the packages.
 	}
     }
 
-    // save config to /etc/modprobe.d/sound
+    // save config to /etc/modprobe.d/50-sound.conf
     SaveModulesEntry(save_info, []);
 
     sleep(10);

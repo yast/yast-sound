@@ -148,7 +148,7 @@
 
     /**
      * This is true, if sound data were read from /etc/modprobe.conf
-     * On write, they shoud be removed and written only to /etc/modprobe.d/sound
+     * On write, they shoud be removed and written only to /etc/modprobe.d/50-sound.conf
      */
     global boolean used_modprobe_conf	= false;
 

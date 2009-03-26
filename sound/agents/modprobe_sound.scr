@@ -26,5 +26,5 @@
 .modprobe_sound
 
 `ag_modules(
-    `ModulesConf("/etc/modprobe.d/sound")
+    `ModulesConf("/etc/modprobe.d/50-sound.conf")
 )

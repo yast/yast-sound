@@ -238,14 +238,14 @@
 	// remove the options for unused modules
 	list<string> configured_options = [];
 
-	if (SCR::Read(.target.size, "/etc/modprobe.d/sound") >=0 )
+	if (SCR::Read(.target.size, "/etc/modprobe.d/50-sound.conf") >=0 )
 	{
 	    configured_options = SCR::Dir(.modprobe_sound.options);
 	}
 	else
 	{
 	    // the file doesn't exist, create an empty file
-	    SCR::Execute(.target.bash, "/usr/bin/touch /etc/modprobe.d/sound");
+	    SCR::Execute(.target.bash, "/usr/bin/touch /etc/modprobe.d/50-sound.conf");
 	}
 
 	// must be called before SaveOneModulesEntry()
@@ -311,7 +311,7 @@
      * @param als list with old aliases
      */
     define void removeOldEntries(list als) ``{
-	if (SCR::Read(.target.size, "/etc/modprobe.d/sound") >=0 )
+	if (SCR::Read(.target.size, "/etc/modprobe.d/50-sound.conf") >=0 )
 	{
 	    maplist(string e, (list<string>) als, ``{
 		if (is_snd_alias(e) ||
@@ -329,7 +329,7 @@
      */
     define void RemoveOldConfiguration () ``{
 
-	y2milestone ("removing old sound configuration from /etc/modprobe.conf (it was already saved to /etc/modprobe.d/sound)");
+	y2milestone ("removing old sound configuration from /etc/modprobe.conf (it was already saved to /etc/modprobe.d/50-sound.conf)");
 
 	path mod		= .modules;
 	path mod_alias		= .modules.alias;
@@ -395,7 +395,7 @@
     }
 
     /**
-     * Saves all '/etc/modprobe.d/sound' entries
+     * Saves all '/etc/modprobe.d/50-sound.conf' entries
      * @param save_info cards save info
      * @param system sytem dependent part
      * @return map return struct: $["return": boolean, "err_msg": string]
@@ -411,7 +411,7 @@
 	list als=[];
 
         string err_msg = "";
-	if (SCR::Read(.target.size, "/etc/modprobe.d/sound") >=0 && contains(SCR::Dir(mod), "alias"))
+	if (SCR::Read(.target.size, "/etc/modprobe.d/50-sound.conf") >=0 && contains(SCR::Dir(mod), "alias"))
 	{
 	    als = (list)SCR::Read(mod_alias);
 	}

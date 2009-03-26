@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Mar 26 12:54:41 CET 2009 - lslezak@suse.cz
+
+- Use /etc/modprobe.d/50-sound.conf config file instead of
+  /etc/modprobe.d/sound (bnc#485942)
+
+-------------------------------------------------------------------
 Thu Feb 26 12:49:21 CET 2009 - lslezak@suse.cz
 
 - set 100% volume for snd-hda-intel driver (bnc#477853),
