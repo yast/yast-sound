@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Mar 31 19:00:20 CEST 2009 - lslezak@suse.cz
+
+- improved logging in alsa-agent when a requested volume
+  setting failed due to an unsupported operation
+  (e.g. missing mute switch)
+
+-------------------------------------------------------------------
 Thu Mar 26 12:54:41 CET 2009 - lslezak@suse.cz
 
 - Use /etc/modprobe.d/50-sound.conf config file instead of
