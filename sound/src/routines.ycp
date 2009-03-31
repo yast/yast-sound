@@ -410,6 +410,37 @@
 		else return it;
 	    });
 	}
+
+	if (is(vol_settings, list<list<map> >))
+	{
+	    y2milestone("AutoYast data detected, converting...");
+	    /* convert
+		[
+		    [ $["mute":false, "name":"Master", "volume":96], ... ]
+		    [ ... ]
+		]
+	     to
+		[
+		    [ ["PCM", 32, false], ["Master", 100, true]],
+		    [ [....], .....                            ]
+		]
+	    */
+
+	    list cnv_vol_settings = maplist(list<map> card_setting, (list<list<map> >)vol_settings,
+		{
+		    return maplist(map channel_config, card_setting,
+			{
+			    return [ channel_config["name"]:"", channel_config["volume"]:0, channel_config["mute"]:true ];
+			}
+		    );
+		}
+	    );
+
+	    y2milestone("Volume settings converted: %1 -> %2", vol_settings, cnv_vol_settings);
+
+	    vol_settings = cnv_vol_settings;
+	}
+
 	any item = vol_settings [0]:nil;
 	if (is (item, map))
 	{

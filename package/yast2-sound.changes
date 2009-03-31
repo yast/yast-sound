@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Mar 31 20:03:27 CEST 2009 - lslezak@suse.cz
+
+- convert Autoyast volume settings to the expected format
+
+-------------------------------------------------------------------
 Tue Mar 31 19:00:20 CEST 2009 - lslezak@suse.cz
 
 - improved logging in alsa-agent when a requested volume
