@@ -8,6 +8,7 @@ plugin_LTLIBRARIES = libpy2ag_audio.la
 noinst_LTLIBRARIES = liby2ag_audio.la
 
 liby2ag_audio_la_SOURCES =		\
+	YastChannelId.cc YastChannelId.h	\
 	OSSAudio.cc	OSSAudio.h	\
 	AudioAgent.cc	AudioAgent.h	\
 	AlsaAudio.cc	AlsaAudio.h

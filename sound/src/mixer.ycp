@@ -101,14 +101,32 @@
      * @param spec true-slider false-intfield
      * @return term widget
      */
-    define term volElement(string label, integer value, boolean spec) ``{
+    define term volElement(string channel_id, integer value, boolean spec)
+    {
+	string label = channel_id;
+
+	// remove the index from the channel ID if it's there
+	if (regexpmatch(channel_id, "^.*_#[0-9]+#$"))
+	{
+	    label = regexpsub(channel_id, "^(.*)_#[0-9]+#$", "\\1");
+	    string index_str = regexpsub(channel_id, "^.*_#([0-9]+)#$", "\\1");
+	    integer index = tointeger(index_str);
+
+	    if (index != nil)
+	    {
+		// add index + 1 to the channel label
+		// so there are channels "Speaker", "Speaker 2", "Speaker 3", ...
+		label = sformat("%1 %2", label, index + 1);
+	    }
+	}
+
 	if (UI::HasSpecialWidget(`Slider))
 	{
-	    return `Slider(`id(label), `opt(`notify), translateChannelName(label), 0, 100, value);
+	    return `Slider(`id(channel_id), `opt(`notify), translateChannelName(label), 0, 100, value);
 	}
 	else
 	{
-	    return `IntField(`id(label), `opt(`notify), translateChannelName(label), 0, 100, value);
+	    return `IntField(`id(channel_id), `opt(`notify), translateChannelName(label), 0, 100, value);
 	}
     }
 

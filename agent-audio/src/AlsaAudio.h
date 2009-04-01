@@ -32,29 +32,29 @@ using std::map;
 /** 
  *  volume setting
  *  @param card card id
- *  @param channel name eg. "Master"
+ *  @param channel_name name eg. "Master"
  *  @param value volume 0..100
  */
 
-YCPBoolean alsaSetVolume(int card, const string& channel, int value);
+YCPBoolean alsaSetVolume(int card, const string& channel_name, int value);
 
 /**
  * volume reading
  * @param card card id
- * @param channel channel name
+ * @param channel_name channel name
  */
 
-YCPValue alsaGetVolume(int card, const string& channel);
+YCPValue alsaGetVolume(int card, const string& channel_name);
 
 /**
  * setMute
  * @param card card id
- * @param channel channel name
+ * @param channel_name channel name
  * @param value boolean mute/unmute
  */
 
-YCPBoolean alsaSetMute(int card, const string& channel, bool value);
-YCPValue alsaGetMute(int card, const string& channel);
+YCPBoolean alsaSetMute(int card, const string& channel_name, bool value);
+YCPValue alsaGetMute(int card, const string& channel_name);
 
 /**
  * getChannels- list of available channels for card #id
