@@ -80,18 +80,30 @@ YCPValue alsaGetVolume(int card_id, const string& channel_name)
 
 	// is it the required channel?
 	if (snd_mixer_selem_id_get_name(sid) == channel
-	    && snd_mixer_selem_get_index(elem) == ch_index
-	    && snd_mixer_selem_is_active(elem)
-	    && snd_mixer_selem_has_playback_volume(elem))
+	    && snd_mixer_selem_get_index(elem) == ch_index)
 	{
+	    if (!snd_mixer_selem_is_active(elem))
+	    {
+		y2warning("Channel %s is not active", channel_name.c_str());
+		snd_mixer_close(handle);
+		return YCPBoolean(false);
+	    }
+	
+	    if (!snd_mixer_selem_has_playback_volume(elem))
+	    {
+		y2warning("Channel %s has no volume control", channel_name.c_str());
+		snd_mixer_close(handle);
+		return YCPBoolean(false);
+	    }
+	    
 	    snd_mixer_selem_get_playback_volume_range(elem, &from, &to);
 	    for (chn = (snd_mixer_selem_channel_id_t)0;
-                    chn <= SND_MIXER_SCHN_LAST;
-                    chn=(snd_mixer_selem_channel_id_t)((int)chn+(snd_mixer_selem_channel_id_t)1))
-            {
+		    chn <= SND_MIXER_SCHN_LAST;
+		    chn=(snd_mixer_selem_channel_id_t)((int)chn+(snd_mixer_selem_channel_id_t)1))
+	    {
 		if (!snd_mixer_selem_has_playback_channel(elem, chn))
-                      continue;
-                snd_mixer_selem_get_playback_volume(elem, chn, &left);
+		      continue;
+		snd_mixer_selem_get_playback_volume(elem, chn, &left);
 
 		if (to - from == 0)
 		{
@@ -101,7 +113,7 @@ YCPValue alsaGetVolume(int card_id, const string& channel_name)
 		value = (long long)(100.0 * ((double)(left - from) / (double)(to - from)));
 		snd_mixer_close(handle);
 		return YCPInteger(value);
-            }
+	    }
 	}
     }
 
@@ -129,20 +141,31 @@ YCPValue alsaGetMute(int card_id, const string& channel_name)
     {
         snd_mixer_selem_get_id(elem, sid);
         if (snd_mixer_selem_id_get_name(sid) == channel
-	    && snd_mixer_selem_get_index(elem) == ch_index
-            && snd_mixer_selem_is_active(elem)
-            && snd_mixer_selem_has_playback_switch(elem))
+	    && snd_mixer_selem_get_index(elem) == ch_index)
         {
-            for (chn = (snd_mixer_selem_channel_id_t)0;
-                    chn <= SND_MIXER_SCHN_LAST;
-                    chn=(snd_mixer_selem_channel_id_t)((int)chn+(snd_mixer_selem_channel_id_t)1))
-            {
-	//	if (
-                snd_mixer_selem_get_playback_switch(elem, chn, &left);
+            if (!snd_mixer_selem_is_active(elem))
+	    {
+		y2warning("Channel %s is not active", channel_name.c_str());
+		snd_mixer_close(handle);
+		return YCPBoolean(false);
+	    }
+
+	    if (!snd_mixer_selem_has_playback_switch(elem))
+	    {
+		y2warning("Channel %s has no mute switch", channel_name.c_str());
+		snd_mixer_close(handle);
+		return YCPBoolean(false);
+	    }
+
+	    for (chn = (snd_mixer_selem_channel_id_t)0;
+		    chn <= SND_MIXER_SCHN_LAST;
+		    chn=(snd_mixer_selem_channel_id_t)((int)chn+(snd_mixer_selem_channel_id_t)1))
+	    {
+		snd_mixer_selem_get_playback_switch(elem, chn, &left);
 
 		snd_mixer_close(handle);
-                return left ? YCPBoolean(false) : YCPBoolean(true);
-            }
+		return left ? YCPBoolean(false) : YCPBoolean(true);
+	    }
         }
     }
 
@@ -168,11 +191,23 @@ YCPBoolean alsaSetVolume(int card_id, const string& channel_name, int value)
     {
         snd_mixer_selem_get_id(elem, sid);
         if (snd_mixer_selem_id_get_name(sid) == channel
-	    && snd_mixer_selem_get_index(elem) == ch_index
-            && snd_mixer_selem_is_active(elem)
-            && snd_mixer_selem_has_playback_volume(elem))
+	    && snd_mixer_selem_get_index(elem) == ch_index)
         {
-            snd_mixer_selem_get_playback_volume_range(elem, &from, &to);
+            if (!snd_mixer_selem_is_active(elem))
+	    {
+		y2warning("Channel %s is not active", channel_name.c_str());
+		snd_mixer_close(handle);
+		return YCPBoolean(false);
+	    }
+
+	    if (!snd_mixer_selem_has_playback_volume(elem))
+	    {
+		y2warning("Channel %s has no volume control", channel_name.c_str());
+		snd_mixer_close(handle);
+		return YCPBoolean(false);
+	    }
+
+	    snd_mixer_selem_get_playback_volume_range(elem, &from, &to);
 
 	    val = (long)( (double)(value * (to - from)) / 100.0 );
 
@@ -203,14 +238,26 @@ YCPBoolean alsaSetMute(int card_id, const string& channel_name, bool value)
     {
         snd_mixer_selem_get_id(elem, sid);
         if (snd_mixer_selem_id_get_name(sid) == channel
-	    && snd_mixer_selem_get_index(elem) == ch_index
-            && snd_mixer_selem_is_active(elem)
-            && snd_mixer_selem_has_playback_switch(elem))
-        {
+	    && snd_mixer_selem_get_index(elem) == ch_index)
+	{
+            if (!snd_mixer_selem_is_active(elem))
+	    {
+		y2warning("Channel %s is not active", channel_name.c_str());
+		snd_mixer_close(handle);
+		return YCPBoolean(false);
+	    }
+
+	    if (!snd_mixer_selem_has_playback_switch(elem))
+	    {
+		y2warning("Channel %s has no mute switch", channel_name.c_str());
+		snd_mixer_close(handle);
+		return YCPBoolean(false);
+	    }
+
 	    snd_mixer_selem_set_playback_switch_all(elem, value ? 0 : 1);
 	    snd_mixer_close(handle);
 	    return YCPBoolean(true);
-        }
+	}
     }
 
     y2warning("Card %d: channel '%s' not found", card_id, channel_name.c_str());
