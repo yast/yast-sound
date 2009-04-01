@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Apr  1 14:19:56 CEST 2009 - lslezak@suse.cz
+
+- make channel names unique - add channel index to channel name
+  if more channels have the same name, fixes UI syntax error
+  for some sound cards (bnc#484073)
+
+-------------------------------------------------------------------
 Thu Feb 26 12:49:21 CET 2009 - lslezak@suse.cz
 
 - set 100% volume for snd-hda-intel driver (bnc#477853),
