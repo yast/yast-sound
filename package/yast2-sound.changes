@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Apr 10 15:34:29 CEST 2009 - lslezak@suse.cz
+
+- convert /etc/modprobe.d/sound to /etc/modprobe.d/50-sound.conf
+  during package update (bnc#485942)
+- 2.18.1
+
+-------------------------------------------------------------------
 Tue Mar 31 20:03:27 CEST 2009 - lslezak@suse.cz
 
 - convert Autoyast volume settings to the expected format
