@@ -1,7 +1,7 @@
 #
 # Makefile.am for sound/sound/config
 #
-# $Id:$
+# $Id$
 #
 
 schemafilesdir =  $(schemadir)/autoyast/rnc
