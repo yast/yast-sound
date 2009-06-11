@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Jun 11 13:50:24 CEST 2009 - lslezak@suse.cz
+
+- start ALSA during autoyast configuration, needed to set up
+  volume settings (bnc#253585)
+- 2.13.23
+
+-------------------------------------------------------------------
 Mon Mar  3 12:36:38 CET 2008 - lslezak@suse.cz
 
 - added ICH9 and ICH10 audio to the database (#365079)

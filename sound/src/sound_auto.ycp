@@ -147,7 +147,6 @@
 		import "Progress";
 		Progress::off();
 		map settings = Sound::Export();
-		Sound::write_only = true;
 		// detect the cards on the system, so we could write them
 		// correctly:
 		settings = UpdateCardsToTargetSystem (settings);
