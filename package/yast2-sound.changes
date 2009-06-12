@@ -6,6 +6,11 @@ Thu Jun 11 13:50:24 CEST 2009 - lslezak@suse.cz
 - 2.13.23
 
 -------------------------------------------------------------------
+Tue Apr  7 00:44:58 CEST 2009 - ro@suse.de
+
+- buildfix: use patch from factory to fix build on s390,s390x 
+
+-------------------------------------------------------------------
 Mon Mar  3 12:36:38 CET 2008 - lslezak@suse.cz
 
 - added ICH9 and ICH10 audio to the database (#365079)
