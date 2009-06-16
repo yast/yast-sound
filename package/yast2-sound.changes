@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Jun 16 14:58:02 CEST 2009 - mvidner@suse.cz
+
+- Using autodocs-ycp.ami, which contains a fix for automake 1.11.
+
+-------------------------------------------------------------------
 Fri Apr 10 15:34:29 CEST 2009 - lslezak@suse.cz
 
 - convert /etc/modprobe.d/sound to /etc/modprobe.d/50-sound.conf
