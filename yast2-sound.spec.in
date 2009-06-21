@@ -17,7 +17,7 @@ Obsoletes:	y2c_sparc y2c_sprc yast2-db-sound y2d_snd
 Summary:	YaST2 - Sound Configuration
 
 %description
--
+This package contains the YaST2 component for sound card configuration.
 
 @PREP@
 
