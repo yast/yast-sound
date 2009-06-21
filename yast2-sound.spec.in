@@ -14,7 +14,7 @@ Obsoletes:	yast2-trans-sound yast2-trans-soundd y2c_snd y2t_snd y2t_sndd
 Provides:	y2c_sparc y2c_sprc yast2-db-sound y2d_snd
 Obsoletes:	y2c_sparc y2c_sprc yast2-db-sound y2d_snd
 
-Summary:	Yast2 - Sound configuration
+Summary:	YaST2 - Sound Configuration
 
 %description
 -
