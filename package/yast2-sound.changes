@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Jul 10 09:18:54 CEST 2009 - lslezak@suse.cz
+
+- updated the sound card database, this enables automatic
+  configuration for more devices (bnc#516046)
+- 2.13.24
+
+-------------------------------------------------------------------
 Thu Jun 11 13:50:24 CEST 2009 - lslezak@suse.cz
 
 - start ALSA during autoyast configuration, needed to set up
