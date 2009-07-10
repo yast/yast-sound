@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jul 10 13:48:02 CEST 2009 - lslezak@suse.cz
+
+- set "iSpeaker" channel volume (#251844)
+- 2.13.25
+
+-------------------------------------------------------------------
 Fri Jul 10 09:18:54 CEST 2009 - lslezak@suse.cz
 
 - updated the sound card database, this enables automatic
