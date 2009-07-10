@@ -135,6 +135,7 @@
 	setVolume ("Speaker", card_id, vol);
 	// Lenovo Thinkpad R61 (#309247)
 	setVolume ("Beep", card_id, vol);
+	setVolume ("iSpeaker", card_id, vol);
 
 	symbol ui = nil;
 	do
@@ -149,6 +150,7 @@
 		setVolume ("Master Mono", card_id, vol);
 		setVolume ("Front", card_id, vol);
 		setVolume ("Speaker", card_id, vol);
+		setVolume ("iSpeaker", card_id, vol);
 		setVolume ("Beep", card_id, vol);
 	    }
 	    else if (ui == `test)
@@ -378,6 +380,11 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
 	    {
 		setVolume ("Beep", card_id, Sound::default_volume);
 	    }
+	    if (haskey (devs, "iSpeaker"))
+	    {
+		setVolume ("iSpeaker", card_id, Sound::default_volume);
+	    }
+
 
 	    if (Sound::conf_joystick == true && Sound::use_ui)
 	    {
