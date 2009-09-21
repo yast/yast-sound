@@ -46,6 +46,20 @@ global boolean Read()
     // reset the modification flag
     modified = false;
 
+    if (Mode::installation())
+    {
+	y2milestone("Installation mode detected, PA status will be based on the desktop");
+
+	string sysconf = (string)SCR::Read(.sysconfig.displaymanager.DISPLAYMANAGER);
+	y2milestone("DISPLAYMANAGER: %1", sysconf);
+
+	pa_enabled = !regexpmatch(sysconf, "^kdm.*$");
+	if (pa_enabled == nil) pa_enabled = true;
+
+	y2milestone("PulseAudio enabled: %1", pa_enabled);
+	return true;
+    }
+
     if (FileUtils::Exists(pa_setup_script))
     {
 	map out = (map)SCR::Execute(.target.bash_output, pa_setup_script + " --status");
