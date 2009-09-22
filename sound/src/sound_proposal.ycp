@@ -33,6 +33,7 @@
 	if (force_reset)
 	{
 	    Sound::ForceReset();
+	    PulseAudio::Reset();
 	}
 
 	// Do not show any progress during Read()
@@ -42,15 +43,15 @@
 	if (! GetInstArgs::automatic_configuration())
 	    UI::OpenDialog(`VBox(`Label(_("Detecting sound cards..."))));
 
-	boolean success = Sound::Propose ();
+	Sound::Propose();
+	PulseAudio::Propose();
 
 	if (! GetInstArgs::automatic_configuration())
 	    UI::CloseDialog();
 
 	Progress::set(progress_orig);
 
-
-	string proposal = Sound::Summary ();
+	string proposal = Sound::Summary() + PulseAudio::Summary();
 
 	// Fill return map
 	ret =

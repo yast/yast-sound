@@ -47,20 +47,6 @@ global boolean Read()
     // reset the modification flag
     modified = false;
 
-    if (Mode::installation())
-    {
-	y2milestone("Installation mode detected, PA status will be based on the desktop");
-
-	string sysconf = (string)SCR::Read(.sysconfig.displaymanager.DISPLAYMANAGER);
-	y2milestone("DISPLAYMANAGER: %1", sysconf);
-
-	pa_enabled = !regexpmatch(sysconf, "^kdm.*$");
-	if (pa_enabled == nil) pa_enabled = true;
-
-	y2milestone("PulseAudio enabled: %1", pa_enabled);
-	return true;
-    }
-
     if (FileUtils::Exists(pa_setup_script))
     {
 	map out = (map)SCR::Execute(.target.bash_output, pa_setup_script + " --status");
@@ -79,12 +65,51 @@ global boolean Read()
     return true;
 }
 
+global boolean Propose()
+{
+    if (pa_enabled != nil)
+    {
+	y2milestone("PA is configured, skipping proposal");
+	return true;
+    }
+
+    y2milestone("Proposing PA status according to the current desktop...");
+
+    string sysconf = (string)SCR::Read(.sysconfig.displaymanager.DISPLAYMANAGER);
+    y2milestone("DISPLAYMANAGER: %1", sysconf);
+
+    pa_enabled = !regexpmatch(sysconf, "^kdm.*$");
+    if (pa_enabled == nil) pa_enabled = true;
+
+    modified = true;
+
+    y2milestone("PulseAudio enabled: %1", pa_enabled);
+    return true;
+}
+
 global boolean Write()
 {
     y2milestone("PulseAudio::Write(): pa_enabled: %1, modified: %2", pa_enabled, modified);
 
     if (pa_enabled != nil && modified)
     {
+	// always write the sysconfig to ensure that the setting
+	// is written regardless whether setup-pulseaudio is installed or not
+
+	// check whether PULSEAUDIO_ENABLE is already defined
+	boolean write_comment = SCR::Read(.sysconfig.sound.PULSEAUDIO_ENABLE) == nil;
+
+	SCR::Write(.sysconfig.sound.PULSEAUDIO_ENABLE, pa_enabled ? "yes" : "no");
+
+	if (write_comment)
+	{
+	    // TODO: add a reload command?
+	    SCR::Write(.sysconfig.sound.PULSEAUDIO_ENABLE.comment, "\n## Path:\tHardware/Soundcard/PulseAudio\n## Description:\tPulseAudio configuration\n## Type:\tyesno\n# Enable or disable PulseAudio system\n#\n");
+	}
+
+	// flush the changes
+	SCR::Write(.sysconfig.sound, nil);
+
 	if (FileUtils::Exists(pa_setup_script))
 	{
 	    y2milestone("%1 PulseAudio support", pa_enabled ? "Enabling" : "Disabling");
@@ -99,8 +124,12 @@ global boolean Write()
 	}
 	else
 	{
-	    y2error("PulseAudio setup script %1 is not present, cannot activate the configuration!", pa_setup_script);
-	    return false;
+	    y2warning("PulseAudio setup script %1 is not present, cannot configure applications", pa_setup_script);
+
+	    // reset the modification flag
+	    modified = false;
+
+	    return true;
 	}
     }
     else
