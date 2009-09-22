@@ -2,6 +2,7 @@
 Mon Sep 21 17:25:25 CEST 2009 - lslezak@suse.cz
 
 - Disable PulseAudio in KDE installations (bnc#537784)
+- 2.18.2
 
 -------------------------------------------------------------------
 Tue Jun 16 14:58:02 CEST 2009 - mvidner@suse.cz
