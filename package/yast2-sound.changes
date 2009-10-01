@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Oct  1 11:16:19 CEST 2009 - lslezak@suse.cz
+
+- convert all '_' to '-' in hwinfo driver name (bnc#290279)
+- 2.18.3 
+
+-------------------------------------------------------------------
 Mon Sep 21 17:25:25 CEST 2009 - lslezak@suse.cz
 
 - Disable PulseAudio in KDE installations (bnc#537784)
