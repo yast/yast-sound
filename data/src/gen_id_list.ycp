@@ -10,6 +10,8 @@
 
     string s	= (string) SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.pcimap");
 
+    if (s == nil) s = "";
+
     // pci map:
     // ========
     list<string> lpci_s	= splitstring(s, "\n");
@@ -25,6 +27,7 @@
 
     s = (string)
     SCR::Read(.target.string, "/lib/modules/"+kernel_ver+"/modules.isapnpmap");
+    if (s == nil) s = "";
 
     list<string> lpnp_s	= splitstring(s, "\n");
 
