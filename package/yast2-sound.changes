@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Oct 14 19:09:43 CEST 2009 - lslezak@suse.cz
+
+- added X-Fi driver to the soundcard database (bnc#546440)
+- 2.18.4
+
+-------------------------------------------------------------------
 Thu Oct  1 11:16:19 CEST 2009 - lslezak@suse.cz
 
 - convert all '_' to '-' in hwinfo driver name (bnc#290279)
