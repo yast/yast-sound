@@ -132,7 +132,7 @@
 
 	if (HasFonts(save_entry) && !FontsInstalled())
 	{
-	    /* Sound fonts installation */
+	    /* SoundFonts installation */
 	    InstallFonts("", false);
 	}
 
