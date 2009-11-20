@@ -468,8 +468,8 @@ define map HardwareDialog() {
 
     if (show_fonts)
     {
-	// menu item
-	extra_buttons = add(extra_buttons, [ `fonts, _("&Install soundfonts...") ]);
+	// menu item, do not translate "SoundFont" term (see http://en.wikipedia.org/wiki/Sound_font)
+	extra_buttons = add(extra_buttons, [ `fonts, _("&Install SoundFonts...") ]);
     }
 
     // dialog title

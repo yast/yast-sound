@@ -211,10 +211,12 @@ _("The sound configuration will be saved now."),
 	    ],
 
 	    "soundFontTitle":
-	    _("Install Soundfonts"),
+	    // do not translate "SoundFont" term (see http://en.wikipedia.org/wiki/Sound_font)
+	    _("Install SoundFonts"),
 
 	    "soundFontQuestion":
-_("Should YaST2 install the wavetable sound fonts from 
+	    // do not translate "SoundFont" term (see http://en.wikipedia.org/wiki/Sound_font)
+_("Should YaST2 install the wavetable SoundFont-files from 
 your Soundblaster Live! or AWE driver CD?\n"),
 
 	    "soundFontAppeal":
@@ -223,11 +225,13 @@ in the CD-ROM drive.
 "),
 
 	    "soundFontFinal":
-	    // To translators: the messaage below will look like this: "14 soundfont-files have been installed in /usr/lli/asdf"
-_("%1 soundfont-files have been installed in %2."),
+	    // To translators: the message below will look like this: "14 SoundFont-files have been installed in /usr/share/..."
+	    // do not translate "SoundFont" term (see http://en.wikipedia.org/wiki/Sound_font)
+_("%1 SoundFont-files have been installed in %2."),
 
 	    "soundFontNotFound":
-_("No Soundfont-files found."),
+// do not translate "SoundFont" term (see http://en.wikipedia.org/wiki/Sound_font)
+_("No SoundFont-files found."),
 
 	    "soundFontRetry":
 _("Would you like to change the CD and retry ?"),

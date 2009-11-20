@@ -835,7 +835,7 @@ module parameters, including invalid IO or IRQ parameters."), modname);
     }
 
     /**
-     *  checks whether sound fonts have already been installed
+     *  checks whether SoundFonts have already been installed
      *	@return boolean already installed/not installed
      *
      */
@@ -845,7 +845,7 @@ module parameters, including invalid IO or IRQ parameters."), modname);
     }
 
     /**
-     * return true if the sound card supports sound fonts
+     * return true if the sound card supports SoundFonts
      * @param save_entry save entry
      * @return boolean	card supports fonts/it doesn't
      */
@@ -853,7 +853,7 @@ module parameters, including invalid IO or IRQ parameters."), modname);
     define boolean HasFonts(map save_entry) ``{
 	if (Mode::config())
 	{
-	    // don't install sound fonts during autoinstallation config
+	    // don't install SoundFonts during autoinstallation config
 	    return false;
 	}
 
@@ -865,7 +865,7 @@ module parameters, including invalid IO or IRQ parameters."), modname);
     }
 
     /**
-     *  this small wizard will install sound fonts for soundblaster live/awe
+     *  this small wizard will install SoundFonts for soundblaster live/awe
      *  @param symlink is path to default.sf2 that is to be created
      *  @param dontask if true, skip the first messagebox
      *  @return void
@@ -933,7 +933,7 @@ module parameters, including invalid IO or IRQ parameters."), modname);
 	    string mpoint = mount_device(cdrom_device);
 	    y2milestone("Device mounted: %1", mpoint);
 
-	    // number of found sound font files
+	    // number of found SoundFont files
 	    integer cnt = 0;
 	    if (mpoint != nil)
 	    {
@@ -946,7 +946,7 @@ module parameters, including invalid IO or IRQ parameters."), modname);
 
 		y2milestone("Device unmounted: %1", umount_device(mpoint));
 
-		// restart ALSA after sound font copy
+		// restart ALSA after SoundFont copy
 		y2milestone("Restarting ALSA: %1",
 		    SCR::Execute(.target.bash, "/etc/init.d/alsasound reload"));
 	    }
