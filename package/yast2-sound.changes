@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Dec 30 16:16:00 UTC 2009 - lslezak@suse.cz
+
+- fixed SoundBlaster X-Fi support (bnc#560163)
+- 2.19.1
+
+-------------------------------------------------------------------
 Fri Nov 20 15:44:03 CET 2009 - lslezak@suse.cz
 
 - unified usage of "SoundFont" term (bnc#548898)
