@@ -17,9 +17,8 @@ X-SuSE-YaST-SortKey=
 X-SuSE-YaST-AutoInstResource=
 
 Icon=yast-joystick
-Exec=/sbin/yast2 joystick 
+Exec=xdg-su -c "/sbin/yast2 joystick"
 
 Name=Joystick
 GenericName=Configure a joystick attached to the sound card
-X-KDE-SubstituteUID=true
 StartupNotify=true
