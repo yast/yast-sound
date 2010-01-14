@@ -18,9 +18,8 @@ X-SuSE-YaST-AutoInstClonable=true
 X-SuSE-YaST-AutoInstSchema=sound.rnc
 
 Icon=yast-sound
-Exec=/sbin/yast2 sound
+Exec=xdg-su -c "/sbin/yast2 sound"
 
 Name=Sound
 GenericName=Configure your sound card
-X-KDE-SubstituteUID=true
 StartupNotify=true
