@@ -531,6 +531,9 @@ $[
       "CS5535, National Semiconductor",
       "CS5536, AMD"
     ],
+    83 : [
+      "X-Fi, Creative Labs"
+    ],
     100 : [
       "PowerPC, Apple"
     ],
@@ -786,9 +789,11 @@ $[
     4354 : $[
       2 : 22,
       4 : 22,
+      5 : 83,
       6 : 76,
       7 : 77,
       8 : 22,
+      11: 83,
       35128 : 24
     ],
     4358 : $[
@@ -1044,6 +1049,7 @@ $[
     80 : "snd-ad1889",
     81 : "snd-cs5535audio",
     82 : "snd-oxygen",
+    83 : "snd-ctxfi",
     100 : "snd-powermac",
     101 : "snd-aoa",
     102 : "snd_ps3"
@@ -3921,7 +3927,8 @@ $[
       "SB 1.0/SB 2.0/SB Pro",
       "SB AWE 32",
       "SB AWE 64 Gold",
-      "SB AWE 64"
+      "SB AWE 64",
+      "X-Fi"
     ],
     "Crystal" : [
       "3D"

@@ -20,4 +20,8 @@ $[
     $[
 	"description" : "PS3 Soundcard"
     ],
+    "snd-ctxfi":
+    $[
+	"description" : "Creative Labs X-Fi"
+    ],
 ]

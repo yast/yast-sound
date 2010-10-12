@@ -375,4 +375,5 @@
     ["snd-cs5535audio",	    "CS5535, National Semiconductor"],
     ["snd-cs5535audio",	    "CS5536, AMD"],
     ["snd_ps3",		    "PS3 Soundcard, Sony"],
+    ["snd-ctxfi",	    "X-Fi, Creative Labs"],
 ]
