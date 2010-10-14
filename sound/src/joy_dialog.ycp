@@ -409,9 +409,8 @@ and press some of its buttons several times.
 		cardname = card["name"]:"";
 	});
 
-	// dialog header
-	string caption = _("Joystick Configuration") +
-	    sformat (" - %1 (snd-card-%2)", cardname, card_id);
+	// dialog header - %1: card name (e.g "Soundblaster 16"), %2: card ID (a number)
+	string caption = sformat(_("Joystick Configuration - %1 (snd-card-%2)"), cardname, card_id);
 
 	string helptext =
 	// help text for joystick configuration 1/4
