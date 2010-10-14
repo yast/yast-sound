@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Oct 14 12:32:32 UTC 2010 - lslezak@suse.cz
+
+- make the joystick dialog label better translatable in RTL
+  languages (bnc#583209)
+
+-------------------------------------------------------------------
 Tue Oct 12 10:53:46 UTC 2010 - lslezak@suse.cz
 
 - added Creative X-Fi to sound card DB (bnc#613746)
