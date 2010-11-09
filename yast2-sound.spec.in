@@ -3,7 +3,7 @@
 @HEADER@
 Group:	System/YaST
 License: GPL v2 or later
-BuildRequires:	alsa-devel gcc-c++ doxygen perl-XML-Writer update-desktop-files yast2 yast2-core-devel yast2-devtools yast2-testsuite 
+BuildRequires:	alsa-devel gcc-c++ doxygen perl-XML-Writer update-desktop-files yast2 yast2-core-devel yast2-devtools yast2-testsuite kernel-default ruby
 
 # GetInstArgs::automatic_configuration
 Requires:	yast2 >= 2.16.46

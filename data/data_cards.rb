@@ -1,3 +1,5 @@
+# static file with predefined sound card names and vendors
+
 [
     ["snd-ad1816a",	    "FX-3D Plus, AOpen"],
     ["snd-ad1816a",	    "FX-3D Pro Radio, AOpen"],
@@ -26,7 +28,7 @@
     ["snd-als4000",	    "XWave4000, Labway"],
     ["snd-als4000",	    "ALS4000, Avance Logic"],
     ["snd-atiixp",	    "IXP150/200/250/300/400, ATI"],
-    ["snd-atiixp-modem",	    "IXP150/200/250/400 (modem), ATI"],
+    ["snd-atiixp-modem",    "IXP150/200/250/400 (modem), ATI"],
     ["snd-au8810",	    "Aureal Vortex AU8810, Aureal Semiconductor Inc."],
     ["snd-au8820",	    "Aureal Vortex AU8820, Aureal Semiconductor Inc."],
     ["snd-au8830",	    "Aureal Vortex AU8830, Aureal Semiconductor Inc."],
@@ -336,6 +338,10 @@
     ["snd-trident",	    "True Sound 4Dwave, CHIC"],
     ["snd-usb-audio",	    "USB Audio, Generic"],
     ["snd-usb-usx2y",	    "US122/224/428, Tascam"],
+    ["snd-usb-caiaq",	    "USB audio, caiaq"],
+    ["snd-ua101",	    "UA-101, Edirol"],
+    ["snd-ua101",	    "UA-1000, Edirol"],
+    ["snd-usb-us122l",	    "US-122L, Tascam"],
     ["snd-via82xx",	    "VT8233A/C, VIA"],
     ["snd-via82xx",	    "VT8235, VIA"],
     ["snd-via82xx",	    "VT8237, VIA"],

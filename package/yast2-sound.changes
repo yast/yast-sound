@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Nov  9 13:54:33 UTC 2010 - lslezak@suse.cz
+
+- build the soundcard database during package build - use
+  the existing ALSA drivers, the DB is always up to date
+  and is architecture dependent now
+- 2.20.0
+
+-------------------------------------------------------------------
 Thu Oct 14 12:32:32 UTC 2010 - lslezak@suse.cz
 
 - make the joystick dialog label better translatable in RTL
