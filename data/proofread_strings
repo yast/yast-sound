@@ -1,8 +1,0 @@
-"Enable VIA-workaround for %1 soundcard."	"Enable VIA work-around for %1 sound card."
-"ISA PnP detection for %1 soundcards"	"ISA PnP detection for %1 sound cards"
-"Capture IBL size for %1 soundcard."	"Capture IBL size for %1 sound card."
-"Enable workaround for buggy interrupts on some motherboards."	"Enable work-around for buggy interrupts on some motherboards."
-"Enable workaround for hardwares with problematic codec semaphores."	"Enable work-around for hardware with problematic codec semaphores"
-"Digital input rate for Bt87x soundcard"			"Digital input rate for Bt87x sound card"
-"Toggle power-management.  (0 = off, 1 = on, 2 = auto)"		"Toggle power management.  (0 = off, 1 = on, 2 = auto)"
-"Define reset timeout for cs8427 chip in msec resolution."	"Define reset time-out for cs8427 chip in msec resolution."
