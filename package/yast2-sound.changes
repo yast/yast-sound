@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Nov 25 13:12:31 UTC 2010 - lslezak@suse.cz
+
+- added PCI ID for Intel Cougar Point PCH (bnc#653787)
+- 2.13.26
+
+-------------------------------------------------------------------
 Fri Jul 10 13:48:02 CEST 2009 - lslezak@suse.cz
 
 - set "iSpeaker" channel volume (#251844)
