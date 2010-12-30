@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Dec 30 12:29:46 UTC 2010 - lslezak@suse.cz
+
+- updated sound card database (bnc#655331)
+- 2.17.16.1
+
+-------------------------------------------------------------------
 Wed Apr  1 14:19:56 CEST 2009 - lslezak@suse.cz
 
 - make channel names unique - add channel index to channel name
