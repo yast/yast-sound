@@ -73,14 +73,9 @@ global boolean Propose()
 	return true;
     }
 
-    y2milestone("Proposing PA status according to the current desktop...");
+    y2milestone("Proposing PA status to enabled");
 
-    string sysconf = (string)SCR::Read(.sysconfig.displaymanager.DISPLAYMANAGER);
-    y2milestone("DISPLAYMANAGER: %1", sysconf);
-
-    pa_enabled = !regexpmatch(sysconf, "^kdm.*$");
-    if (pa_enabled == nil) pa_enabled = true;
-
+    pa_enabled = true;
     modified = true;
 
     y2milestone("PulseAudio enabled: %1", pa_enabled);
