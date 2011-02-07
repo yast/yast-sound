@@ -307,7 +307,6 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
 	con, help, Label::BackButton(), Label::OKButton() );
 
     any	ui = nil; // value can be `next `abort... or string (channel name)
-    integer value = 0;
 
     UI::ChangeWidget (`id(`test), `Enabled, !Mode::config());
 
@@ -328,8 +327,7 @@ Press <B>Next</B> to save your volume settings, press <B>Back</B> to restore the
 	    // set volume
 	    if (Sound::use_alsa)
 	    {
-		setVolume ((string)ui, card_id, value);
-		value = (integer)UI::QueryWidget(`id(ui), `Value);
+		setVolume ((string)ui, card_id, (integer)UI::QueryWidget(`id(ui), `Value));
 	    }
 	    else
 	    {
