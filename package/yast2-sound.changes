@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Mon Feb  7 14:20:51 UTC 2011 - lslezak@suse.cz
+
+- fixed mixer (volume setting) dialog - yast used the previous
+  value for teh volume level so the value displayed in the UI and
+  the actual volume setting were not in sync when moving the
+  sliders (bnc#664094)
+- 2.20.2
+
+-------------------------------------------------------------------
 Wed Jan  5 13:15:44 UTC 2011 - lslezak@suse.cz
 
 - enable PulseAudio also in KDE installations (bnc#662260)
