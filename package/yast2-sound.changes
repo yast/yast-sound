@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Mon Feb  7 14:20:51 UTC 2011 - lslezak@suse.cz
+
+- fixed mixer (volume setting) dialog - yast used the previous
+  value for teh volume level so the value displayed in the UI and
+  the actual volume setting were not in sync when moving the
+  sliders (bnc#664094)
+
+-------------------------------------------------------------------
 Thu Oct 14 12:32:32 UTC 2010 - lslezak@suse.cz
 
 - make the joystick dialog label better translatable in RTL
