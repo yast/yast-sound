@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Apr 15 16:22:41 UTC 2011 - lslezak@localhost
+
+- 2.17.17
+
+-------------------------------------------------------------------
 Mon Feb  7 14:20:51 UTC 2011 - lslezak@suse.cz
 
 - fixed mixer (volume setting) dialog - yast used the previous
