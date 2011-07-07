@@ -534,6 +534,12 @@ $[
     83 : [
       "X-Fi, Creative Labs"
     ],
+    84 : [
+      "ASI5000, AudioScience",
+      "ASI6000, AudioScience",
+      "ASI87xx, AudioScience",
+      "ASI89xx, AudioScience"
+    ],
     100 : [
       "PowerPC, Apple"
     ],
@@ -706,6 +712,10 @@ $[
       28691 : 39,
       28696 : 63,
       29954 : 78
+    ],
+    4172 : $[
+      41222 : 84,
+      44128 : 84
     ],
     4173 : $[
       200708 : 102
@@ -1060,6 +1070,7 @@ $[
     81 : "snd-cs5535audio",
     82 : "snd-oxygen",
     83 : "snd-ctxfi",
+    84 : "snd-asihpi",
     100 : "snd-powermac",
     101 : "snd-aoa",
     102 : "snd_ps3"
@@ -1265,6 +1276,26 @@ $[
     ],
     "snd-aoa" : $[
       "description" : "Apple PowerPC on-board (Layout ID)"
+    ],
+    "snd-asihpi" : $[
+      "description" : "AudioScience ALSA ASI5000 ASI6000 ASI87xx ASI89xx",
+      "params" : $[
+        "build_info" : $[
+          "descr" : "built within ALSA source"
+        ],
+        "enable_hpi_hwdep" : $[
+          "allows" : "{{0,Disabled},{1,Enabled}}",
+          "default" : "0",
+          "descr" : "ALSA enable HPI hwdep for AudioScience soundcard",
+          "dialog" : "check"
+        ],
+        "hpi_debug_level" : $[
+          "descr" : "debug verbosity 0..5"
+        ],
+        "prealloc_stream_buf" : $[
+          "descr" : "preallocate size for per-adapter stream buffer"
+        ]
+      ]
     ],
     "snd-atiixp" : $[
       "description" : "ATI IXP AC97 controller",
@@ -3842,6 +3873,12 @@ $[
     "AudioTrak" : [
       "Prodigy 192",
       "Prodigy 7.1"
+    ],
+    "AudioScience" : [
+      "ASI5000",
+      "ASI6000",
+      "ASI87xx",
+      "ASI89xx"
     ],
     "Aureal Semiconductor Inc." : [
       "Aureal Vortex AU8810",
