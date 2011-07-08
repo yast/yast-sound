@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Jul  8 07:08:54 UTC 2011 - lslezak@suse.cz
+
+- AudioScience (snd-asihpi) driver requires alsa-firmware package
+
+-------------------------------------------------------------------
 Mon Feb  7 14:20:51 UTC 2011 - lslezak@suse.cz
 
 - fixed mixer (volume setting) dialog - yast used the previous
