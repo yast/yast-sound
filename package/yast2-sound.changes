@@ -2,6 +2,7 @@
 Fri Jul  8 07:08:54 UTC 2011 - lslezak@suse.cz
 
 - AudioScience (snd-asihpi) driver requires alsa-firmware package
+- 2.21.0
 
 -------------------------------------------------------------------
 Mon Feb  7 14:20:51 UTC 2011 - lslezak@suse.cz
