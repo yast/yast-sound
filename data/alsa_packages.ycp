@@ -31,7 +31,7 @@
 	"snd-mixart"   : [ "alsa-firmware" ],
 	"snd-emu10k1"  : [ "alsa-firmware", "awesfx" ],
 	"snd-sb16"     : [ "alsa-firmware", "alsa-tools" ],
-	"snb-sbawe"    : [ "alsa-firmware", "alsa-tools", "awesfx" ],
+	"snd-sbawe"    : [ "alsa-firmware", "alsa-tools", "awesfx" ],
 	"snd-wavefront": [ "alsa-firmware" ],
 	"snd-pcxhr"    : [ "alsa-firmware" ],
 	"snd-hdsp"     : [ "alsa-firmware" ],
