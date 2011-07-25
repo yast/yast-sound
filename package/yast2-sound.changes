@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Jul 25 13:36:08 UTC 2011 - lslezak@suse.cz
+
+- fixed hwinfo driver name conversion, fixed detection of sound
+  cards missing in the sound card database (bnc#706992)
+- 2.17.19
+
+-------------------------------------------------------------------
 Thu Jul  7 15:09:01 UTC 2011 - lslezak@suse.cz
 
 - updated sound card database (kernel 2.6.32.41-0.5)
