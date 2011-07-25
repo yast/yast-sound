@@ -678,11 +678,8 @@
 	    // use value from hwinfo if present
 	    modname = card["drivers",0,"modules",0,0]:"";
 
-	    // covert module name - hwinfo might use _ in module name prefix (e.g. snd_via82xx)
-	    if (substring(modname, 0, size("snd_")) == "snd_")
-	    {
-		modname = "snd-" + substring(modname, size("snd_"));
-	    }
+	    // convert module name - hwinfo might use _ in module name prefix (e.g. snd_via82xx)
+	    modname = mergestring(splitstring(modname,"_"),"-");
 
 	    if (modname != "")
 	    {
@@ -705,7 +702,7 @@
 
 	map ret = Sound::db_modules [modname]:$[];
 
-	if (ret != $[] && !haskey(ret, "name"))
+	if (!haskey(ret, "name"))
 	{
 	    // we must supply the 'name' key with the module name
 	    ret = add(ret, "name", modname);
