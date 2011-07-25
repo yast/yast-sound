@@ -733,7 +733,7 @@
 
 	map ret = Sound::db_modules [modname]:$[];
 
-	if (ret != $[] && !haskey(ret, "name"))
+	if (!haskey(ret, "name"))
 	{
 	    // we must supply the 'name' key with the module name
 	    ret = add(ret, "name", modname);
