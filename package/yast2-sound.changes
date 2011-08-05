@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Aug  5 12:35:15 CEST 2011 - tgoettlicher@suse.de
+
+- fixed .desktop file (bnc #681249)
+
+-------------------------------------------------------------------
 Mon Jul 25 13:36:08 UTC 2011 - lslezak@suse.cz
 
 - fixed detection of sound cards missing in the sound card database
