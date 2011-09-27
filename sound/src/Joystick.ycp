@@ -251,8 +251,7 @@
      * Stop joystick service
      */
     global define boolean Stop() ``{
-	return
-	    (SCR::Execute(.target.bash, "/etc/init.d/joystick stop", $[]) == 0);
+	return Service::Stop("joystick");
     }
 
     /**
@@ -268,7 +267,8 @@
     global define boolean StartAndEnable() ``{
 
 	if (start == "enable")
-	    SCR::Execute(.target.bash, "/etc/init.d/joystick start", $[]);
+	    Service::Start("joystick");
+
 	Service::Adjust("joystick", start);
 	return true;
     }
