@@ -6,7 +6,8 @@ License: GPL v2 or later
 BuildRequires:	alsa-devel gcc-c++ doxygen perl-XML-Writer update-desktop-files yast2 yast2-core-devel yast2-devtools yast2-testsuite kernel-default ruby
 
 # GetInstArgs::automatic_configuration
-Requires:	yast2 >= 2.16.46
+# Wizard::SetDesktopTitleAndIcon
+Requires:	yast2 >= 2.21.22
 Requires:	alsa
 
 Provides:	yast2-config-sound yast2-agent-audio yast2-agent-audio-devel

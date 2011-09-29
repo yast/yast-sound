@@ -231,7 +231,7 @@
 
 	// create wizard dialog
 	Wizard::CreateDialog();
-	Wizard::SetDesktopIcon("joystick");
+	Wizard::SetDesktopTitleAndIcon("joystick");
 
 	Wizard::SetAbortButton(`abort, Label::CancelButton());
 
