@@ -28,7 +28,9 @@
     include "sound/routines.ycp";
 
     // notice about USB devices, used at several places
-    string usb_notice = _("USB joysticks do not need any configuration, just connect them.");
+    const string usb_notice = _("USB joysticks do not need any configuration, just connect them.");
+
+    const string gameport = "Gameport";
 
 /**
  * Update the sound card configuration of joystick
@@ -289,6 +291,32 @@ before pressing Next.
     }
 
     /*
+     * Get details about the joustick bus
+     * @param js Joystick device map
+     * @param soundcards List of detected soundcards
+     * @return string Bus description
+     */
+    string joystick_bus_details(map js, list<map> soundcards)
+    {
+	string ret = js["bus"]:"";
+
+	if (ret == gameport)
+	{
+	    string unique_key = js["parent_unique_key"]:"";
+
+	    map card = find(map c, soundcards, {return c["unique_key"]:"" == unique_key;});
+
+	    if (card != nil)
+	    {
+		// joystick details, %1 is the sound card name to which is the joystick connected
+		ret = sformat(_("%1 (%2)"), ret, card["model"]:"");
+	    }
+	}
+
+	return ret;
+    }
+
+    /*
      * Create content for the joystick overview table
      * @return list<map<string,any>> content for WizardHW::SetContents() function 
      */
@@ -318,17 +346,10 @@ before pressing Next.
 	    string bus = js["bus"]:"";
 
 	    // add the sound card name for gameport joysticks
-	    if (bus == "Gameport" && size(js["parent_unique_key"]:"") > 0)
+	    if (bus == gameport && size(js["parent_unique_key"]:"") > 0)
 	    {
+		bus = joystick_bus_details(js, soundcards);
 		string unique_key = js["parent_unique_key"]:"";
-
-		map card = find(map c, soundcards, {return c["unique_key"]:"" == unique_key;});
-
-		if (card != nil)
-		{
-		    // joystick details, %1 is the sound card name to which is the joystick connected
-		    bus = sformat("%1 (%2)", bus, card["model"]:"");
-		}
 
 		integer i = 0;
 		integer joy_index = nil;
@@ -381,7 +402,7 @@ before pressing Next.
 		y2milestone("Found inactive joystick configuration at index %1: %2", i, js);
 		string model = js["model"]:_("Unknown joystick model");
 		string unique_key = js["attached_to"]:"";
-		string bus = "Gameport";
+		string bus = gameport;
 
 		map card = find(map c, soundcards, {return c["unique_key"]:"" == unique_key;});
 
@@ -482,10 +503,15 @@ before pressing Next.
 	    `VSpacing(18),
 	    `VBox(
 		`HSpacing(50),
-		`VSpacing(1),
+		`VSpacing(0.5),
 		// Popup label
 		`Heading(_("Joystick Test")),
-		`VSpacing(1),
+		`VSpacing(0.5),
+		// label - joystick details (%1 is model name, %2 is bus name)
+		`Left(`Label(sformat(_("Joystick: %1, attached to: %2"), js["model"]:"",
+		    joystick_bus_details(js, (list<map>)SCR::Read(.probe.sound)))
+		)),
+		//`VSpacing(0.5),
 		joy_attrib,
 		`VSpacing(1),
 		`PushButton(`id(`done), `opt(`default), Label::OKButton()),
