@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Tue Oct 11 07:50:58 UTC 2011 - lslezak@suse.cz
+
+- added support for USB joysticks, redesigned the main dialog
+  to support both USB and Gameport joysticks, updated the test
+  dialog (use sliders, fixed button and axes detection)
+  (bnc#695323)
+- 2.21.3
+
+-------------------------------------------------------------------
 Thu Sep 29 13:51:50 CEST 2011 - visnov@suse.cz
 
 - set dialog title
