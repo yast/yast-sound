@@ -138,9 +138,6 @@
      */
     global string curr_model = "";
 
-    // if joystick dialog should be started after sound card config
-    global boolean conf_joystick = true;
-
     /**
      * default value of volume for new card
      */

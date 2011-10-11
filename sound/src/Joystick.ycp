@@ -39,6 +39,27 @@
     // database entry
     global string generic_joystick_translated = _("Generic Analog Joystick");
 
+    list<map> detected_joysticks = [];
+
+    global list<map> Detected()
+    {
+	return detected_joysticks;
+    }
+
+    global void Detect()
+    {
+	detected_joysticks = (list<map>)SCR::Read(.probe.joystick);
+    }
+
+    /* Reverts the internal joystick configuration to the original state
+     * read by Read() function
+     */
+    global void Revert()
+    {
+	y2milestone("Reverting the joystick config back to: %1", joystick_backup);
+	joystick = joystick_backup;
+    }
+
     /**
      * Get list of all required joystick kernel modules
      * @return list list of modules
@@ -68,6 +89,26 @@
 	y2milestone("Required joystick modules: %1", ret);
 
 	return ret;
+    }
+
+    string format_model_line(string model, string attached_to)
+    {
+	return sformat("# Model: %1, Attached to: %2\n", model, attached_to);
+    }
+
+    list<string> parse_model_line(string line)
+    {
+	string regexp = "^#[ \t]*Model: (.*),[ \t]*Attached to:[ \t]*(.*)$";
+
+	string model = regexpsub(line, regexp, "\\1");
+	string attached_to = regexpsub(line, regexp, "\\2");
+
+	if (model == nil) model = "";
+	if (attached_to == nil) attached_to = "";
+
+	y2milestone("Parsed model line: %1 -> model: %2, attached_to: %3", line, model, attached_to);
+
+	return [model, attached_to];
     }
 
     /**
@@ -107,6 +148,7 @@
 	    // read model comment
 	    string model = (string) SCR::Read(topath(
 		sformat(".sysconfig.joystick.JOYSTICK_MODULE_%1.comment",pos)));
+	    string attached_to = "";
 
 	    y2debug("Read model comment: %1", model);
 
@@ -144,28 +186,14 @@
 	    }
 	    else
 	    {
-		// remove comment char
-		if (substring(model, 0, 1) == "#")
-		{
-                    if (size(model) > 1)
-		    {
-			model = substring(model, 1);
-		    }
-		    else
-		    {
-			model = "";
-		    }
-		}
+		list<string> info = parse_model_line(model);
 
-		// remove new line char
-		if (size(model) > 1 &&
-		    substring(model, size(model) - 1, 1) == "\n")
-		{
-		    model = substring(model, 0, size(model) - 1);
-		}
+		model = info[0]:"";
+		attached_to = info[1]:"";
 	    }
 
-	    j = add(j, "model", model);
+	    j["model"] = model;
+	    j["attached_to"] = attached_to;
 
 	    joystick = add(joystick, j);
 
@@ -173,6 +201,8 @@
 	}
 
 	joystick_backup = joystick;
+
+	Detect();
 	return true;
     }
 
@@ -215,13 +245,14 @@
 
 	// write model comment
 	string model = j["model"]:"";
+	string attached_to = j["attached_to"]:"";
 
 	// add comment before first model
 	if (pos == 0)
 	{
 	    if (size(model) > 0)
 	    {
-	        model = module_comment + "\n#" + model + "\n";
+	        model = module_comment + "\n" + format_model_line(model, attached_to);
 	    }
 	    else
 	    {
@@ -232,7 +263,7 @@
 	{
 	    if (size(model) > 0)
 	    {
-	        model = "#" + model + "\n";
+	        model = format_model_line(model, attached_to);
 	    }
 	}
 

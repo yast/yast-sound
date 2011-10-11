@@ -174,23 +174,6 @@
 		    }
 		}
 	    }
-	    else if (ui == `next && Sound::conf_joystick && !Mode::config())
-	    {
-		symbol ret = joy_dialog(card_id, `next);
-		if (ret == `back)
-		{
-		    con = VolumeCon(save_entry, vol);
-		    // dialog header
-		    Wizard::SetContents (_("Sound Card Volume"), con,
-			help_text, true, true);
-		    continue;
-		}
-		else
-		{
-		    ui = ret;
-		    break;
-		}
-	    }
 	    else if (ui == `abort || ui == `cancel)
 	    {
 		if (ReallyAbort())
@@ -350,20 +333,7 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
 	}
 	if (!quick)
 	{
-	    while (true)
-	    {
-		ui = VolumeDialog (save_entry, finish, card_id);
-		if (ui != `joystick)
-		{
-		    break;
-		}
-		symbol s = joy_dialog (card_id, `next);
-		if (s == `abort || s == `cancel)
-		{
-		    ui = `abort;
-		    break;
-		}
-	    }
+	    ui = VolumeDialog (save_entry, finish, card_id);
 	}
 	else
 	{
@@ -393,11 +363,6 @@ define map sound_volume (map save_entry, integer card_id, boolean finish,
 		setVolume ("Speaker", card_id, devs["Speaker"]:Sound::default_volume);
 	    }
 
-
-	    if (Sound::conf_joystick == true && Sound::use_ui)
-	    {
-		joy_dialog(card_id, `next);
-	    }
 	    ui = `next;
 	}
 	if (!Mode::config() && !Mode::autoinst())

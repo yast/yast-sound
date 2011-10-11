@@ -47,11 +47,9 @@
      * @param name card model
      * @param cname alias for modules conf
      * @param cpos position of the card
-     * @param has_joy If true checkbox for joystick configuration is added
      * @return term with widget
      */
-    define term AutoconfDlg (string name, string cname, integer cpos,
-				    boolean has_joy) ``{
+    define term AutoconfDlg (string name, string cname, integer cpos) {
 	string clab = "";
 	if (cpos < 3)
 	{
@@ -62,10 +60,6 @@
 	    clab = "\n" + sformat(Sound::STRINGS["soundCount", 3]:"", cname,
 		cpos + 1);
 	}
-
-	term jcheckbox = (!has_joy) ? `Empty() :
-	    // push button label
-	    `Left (`CheckBox(`id(`joystick), _("&Configure joystick")));
 
 	term con = `VBox (
 	    `VSpacing (1),
@@ -87,11 +81,9 @@
                 `VSpacing (0.3),
                 `RadioButton (`id (`options), `opt (`hstretch, `notify),
 		    // radio button label - type of setup
-		    _("Advanced setup with possibility to change &options")),
-		`VSpacing (3),
-		jcheckbox
+		    _("Advanced setup with possibility to change &options"))
               ))
-	    ),
+	     ),
 	    `VStretch ()
         );
 	return con;
@@ -104,14 +96,12 @@
      * @param cname sound card alias for modules conf
      * @param cpos cards position
      * @param flags enable/disable radiobuttons accordingly
-     * @param has_joy sound card supports joystick
      * @return map symbol of next dialog
      */
-    define map DisplayName (string name, string cname, integer cpos,
-				   integer flags, boolean has_joy) ``{
+    define map DisplayName (string name, string cname, integer cpos, integer flags) {
 
 	string helptext	= Sound::STRINGS["DisplayName"]:"";
-	term con	= AutoconfDlg (name, cname, cpos, has_joy);
+	term con	= AutoconfDlg (name, cname, cpos);
 	// dialog header
 	Wizard::SetContents (_("Sound Card Configuration"), con,
 	    helptext, true, true);
@@ -165,122 +155,8 @@
 	    {
 		output = `next;
 	    }
-	    if (has_joy == true)
-	    {
-		Sound::conf_joystick =
-		    (boolean)UI::QueryWidget(`id(`joystick), `Value);
-	    }
-	    else
-	    {
-		Sound::conf_joystick = false;
-	    }
 	}
 	return $["ui" : output];
     }
-
-    /**
-     * quick conf dialog widget
-     * @param name card model
-     * @param cname card alias for module.conf
-     * @param cpos card position
-     * @param has_joy If true checkbox for joystick configuration is added
-     * @return term widget
-     */
-    define term QuickconfDlg (string name, string cname, integer cpos,
-				     boolean has_joy) ``{
-        string clab = "";
-        if (cpos < 3)
-        {
-            clab = "\n" + sformat(Sound::STRINGS["soundCount", cpos]:"", cname);
-        }
-        else
-        {
-            clab = "\n" + sformat(Sound::STRINGS["soundCount", 3]:"", cname, cpos + 1);
-        }
-
-	term jcheckbox = (!has_joy) ? `Empty() :
-	    // push button label
-	    `Left (`CheckBox(`id(`joystick), _("&Configure joystick")));
-
-        term con = `VBox (
-	    `VSpacing (1),
-            // this is the first part of message "The sound card 'cardname'
-	    // will be configured as the first snd card"
-            `Label (`opt (`hstretch), _("The sound card\n")),
-            `HBox (`HSpacing (5), `Label (`opt (`hstretch), name)),
-            `Label (`opt (`hstretch), clab),
-            `VSpacing (1),
-            `HBox (`HSpacing (5),
-	      `RadioButtonGroup (`id (`action),`VBox (
-		`RadioButton (`id (`quick), `opt (`hstretch, `notify),
-		    // radio button label - type of setup
-		    _("&Quick automatic setup"), true),
-                `VSpacing (0.3),
-                `RadioButton (`id (`normal), `opt (`hstretch, `notify),
-		    // radio button label - type of setup
-		    _("Normal &setup")),
-		`VSpacing (0.3),
-                `RadioButton (`id (`intro), `opt (`hstretch, `notify),
-		    // radio button label - type of setup
-		    _("&More detailed installation of sound cards")),
-		`VSpacing(3),
-		jcheckbox
-              ))
-	    ),
-	    `VStretch ()
-        );
-        return con;
-    }
-
-
-    /**
-     * quick config dialog (is shown when only one card has been detected0
-     * @param name card model
-     * @param cname alias for modules conf
-     * @param cpos position of the soud card
-     * @param has_joy set to true if configured card supports joystick
-     * @return map symbol for next dialog
-     */
-    define map quickConfig(string name, string cname, integer cpos,
-				  boolean has_joy) ``{
-
-        string helptext = Sound::STRINGS["quickConfig"]:"";
-        term con	= QuickconfDlg (name, cname, cpos, has_joy);
-	// dialog header
-        Wizard::SetContents (_("Sound Card Configuration"), con,
-	    helptext, true, true);
-        Wizard::RestoreNextButton();
-
-	symbol input = `quick;
-
-        do {
-	    if (input == `cancel || input == `abort)
-            {
-                if (ReallyAbort())
-                {
-                    return $["ui" : `abort];
-                }
-            }
-            input = (symbol) UI::UserInput();
-
-        } while (input != `next && input != `back);
-
-        symbol output = input;
-        if (input == `next)
-        {
-	    if (has_joy == true)
-	    {
-		Sound::conf_joystick =
-		    (boolean) UI::QueryWidget(`id(`joystick), `Value);
-	    }
-	    else
-	    {
-		Sound::conf_joystick = false;
-	    }
-            output = (symbol) UI::QueryWidget(`id(`action), `CurrentButton);
-        }
-        return $["ui" : output];
-    }
-
 
 }//EOF
