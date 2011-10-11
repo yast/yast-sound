@@ -33,12 +33,6 @@
     include "sound/joy_dialog.ycp";
     include "sound/write_routines.ycp";
 
-    // selected soundcard id
-    integer selected_card = nil;
-
-    // label for `next button in joystick configuration dialog
-    symbol label = `next;
-
     // abort block for read/write dialogs
     block<boolean> abort_block = ``{ return false; };
 
@@ -53,133 +47,11 @@
     }
 
     /**
-     * First cofiguration dialog - if more than one sound card which support
-     * joystick is found display them, if there is exactly one card skip to
-     * joystick selection, if no card was found ask user to start
-     * sound configuration module.
+     * Display joystick configuration - the main dialog
      * @return symbol Symbol of pressed button
      */
     define symbol joystick_configuration() ``{
-
-	// helptext
-	string helptext = _("<P>Two or more sound cards in your system support joysticks.</P>
-<P>To configure a joystick, select the sound card and press <B>Configure Joystick</B>.</P>
-");
-
-	if (label == `ok)
-	{
-	    // one joystick already configured - end
-	    return `next;
-	}
-
-	// get list of installed sound cards
-	list cards = Sound::GetSoundCardList();
-
-	// cards which support joysticks
-	list filtered = Sound::GetSoundCardListWithJoy();
-
-	y2milestone("Configured sound cards: %1", cards);
-	y2milestone("Cards with joystick support: %1", filtered);
-
-	if (Mode::test() == true)
-	{
-	    cards = [
-		$["card_no":0, "name":"VIA 82C686A/B"],
-		$["card_no":1, "name":"Sound Blaster Live!"]];
-	    filtered = [
-		$["card_no":0, "name":"VIA 82C686A/B"],
-		$["card_no":1, "name":"Sound Blaster Live!"]];
-	}
-	if (size(filtered) == 1)			// one sound card
-	{
-	    selected_card	= filtered[0, "card_no"]:0;
-	    label		= `ok;
-
-	    // skip to configuration dialog if exactly one card was found
-	    return `config;
-	}
-	else if (size(filtered) == 0)		// no sound card
-	{
-	    // dialog label
-	    Wizard::SetContents(_("Joystick Configuration"), `Empty(), "",
-	        false, false);
-
-	    string message = (size(cards) > 0) ?
-	        // popup message text
-	        _("The configured cards do not support the joystick.") :
-	        // popup message text
-	        _("No configured sound card was found.");
-
-	    // yesno popup message text
-	    message = message + "\n" + _("Start sound card configuration?");
-
-	    if (Popup::YesNoHeadline(
-	        // popup message headline
-	        _("No joystick port to configure was found."), message))
-	    {
-	        // start sound module - joystick can be configured there
-	        // so after sound config abort this module
-	        WFM::CallFunction("sound", []);
-	    }
-	    return `abort;
-	}
-	else					// more sound cards
-	{
-	    list tcont = maplist (map card, (list<map>) filtered, ``{
-	        map jconf	= Joystick::joystick[ card["card_no"]:0 ]:$[];
-	        string jmodel	= jconf["model"]:"";
-
-	        // translate generic joystick
-	        if (jmodel == Joystick::generic_joystick)
-		   jmodel = Joystick::generic_joystick_translated;
-
-	        return `item(
-		   `id(card["card_no"]:0),
-		   sformat("%1", card["card_no"]:0),
-		   card["name"]:"Sound card",
-		   jmodel
-	        );
-	    });
-
-	    term dialog = `VBox(
-	        `Table(`id(`cards), `header(
-		   // table header (number)
-		   _("No."),
-		   // table header (card name)
-		   _("Sound card"),
-		   // table header (joystick type)
-		   _("Joystick")), tcont
-		),
-	        // button label
-	        `PushButton(`id(`config), _("&Configure joystick"))
-	    );
-
-	    Wizard::SetContents(
-	        // dialog caption
-	        _("Configured Sound Cards with Joystick Support"),
-	        dialog, helptext, true, true);
-
-	    Wizard::SetNextButton(`next, Label::NextButton() );
-
-	    // preselect first card
-	    UI::ChangeWidget (`id(`cards),`CurrentItem,filtered[0,"card_no"]:0);
-	}
-	symbol ret = nil;
-
-	do
-	{
-	    ret = (symbol) UI::UserInput();
-	}
-	while (ret != `next && ret != `abort && ret != `back &&
-	       ret != `cancel && ret != `config);
-
-	if (ret == `cancel)
-	{
-	    ret = `abort;
-	}
-	selected_card = (integer) UI::QueryWidget(`id(`cards), `CurrentItem);
-
-	return ret;
+	return joystick_overview();
     }
 
     /**
@@ -198,42 +70,53 @@
 	return `next;
     }
 
+    // revert the joystick configuration back to the original state after pressing Abort
+    symbol revert_config()
+    {
+	if (Joystick::Changed())
+	{
+	    y2milestone("Reverting joystick configuration");
+	    Joystick::Revert();
+
+	    saveconfig();
+	}
+
+	// the Abort button has been pressed, just pass it further
+	return `abort;
+    }
+
 
     /**********************  MAIN  ************************/
     symbol StartGUI()
     {
 	// sequence of dialogs
 	map sequence = $[
-	    "ws_start" : "detect",
+	    "ws_start" : "config",
 
-	    "detect" : $[
+	    "config" : $[
 		`next	: "save",
-		`abort	: `abort,
-		`config	: "joystick"
-	    ],
-
-	    "joystick" : $[
-		`abort	: `abort,
-		`next	: "detect"
+		`abort	: "revert",
 	    ],
 
 	    "save" : $[
 		`next	: `ws_finish
+	    ],
+
+	    "revert" : $[
+		`abort	: `abort
 	    ]
 	];
 
 	// aliases for dialogs
 	map aliases = $[
-	    "detect"	: ``(joystick_configuration()),
-	    "joystick"	: [ ``(joy_dialog(selected_card, label)), true ],
-	    "save"		: ``(saveconfig())
+	    "config"	: ``(joystick_configuration()),
+	    "save"	: ``(saveconfig()),
+	    "revert"	: ``(revert_config())
 	];
 
 	// create wizard dialog
 	Wizard::CreateDialog();
 	Wizard::SetDesktopTitleAndIcon("joystick");
-
-	Wizard::SetAbortButton(`abort, Label::CancelButton());
 
 	// read sound card configuration
 	boolean progress_orig = Progress::set(false);

@@ -33,15 +33,8 @@ define symbol _showName (integer card_id, integer flags) ``{
 
     string modelname	= Sound::save_entry["model"]:"";
     string modname	= Sound::save_entry["module"]:"";
-    boolean has_joy	= false;
 
-    if (Sound::db_modules[modname, "joystick"]:$[] != $[])
-    {
-	has_joy = true;
-    }
-
-    map res	= DisplayName (
-	modelname, Sound::save_entry["alias"]:"", card_id, flags, has_joy);
+    map res	= DisplayName (modelname, Sound::save_entry["alias"]:"", card_id, flags);
 
     symbol ui	= res["ui"]:`back;
 
