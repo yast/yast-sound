@@ -3,7 +3,7 @@
 @HEADER@
 Group:	System/YaST
 License: GPL-2.0+
-BuildRequires:	alsa-devel gcc-c++ doxygen perl-XML-Writer update-desktop-files yast2 yast2-core-devel yast2-devtools yast2-testsuite kernel-default ruby
+BuildRequires:	alsa-devel gcc-c++ doxygen perl-XML-Writer update-desktop-files yast2 yast2-core-devel yast2-devtools yast2-testsuite kernel-default ruby libtool
 
 # GetInstArgs::automatic_configuration
 # Wizard::SetDesktopTitleAndIcon
