@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Nov 25 12:25:24 UTC 2011 - coolo@suse.com
+
+- add libtool as buildrequire to avoid implicit dependency
+
+-------------------------------------------------------------------
 Tue Oct 11 07:50:58 UTC 2011 - lslezak@suse.cz
 
 - added support for USB joysticks, redesigned the main dialog
