@@ -73,9 +73,13 @@
     import "Package";
     import "Mode";
     import "Report";
+    import "Directory";
 
     import "Sound";
     import "Joystick";
+
+    const string joy_cmd = Directory::bindir + "/joystickdrivers";
+    const string alsa_cmd = Directory::bindir + "/alsadrivers";
 
     define void logmixer(string when) {
 	// log mixer settings
@@ -259,12 +263,16 @@ Enable or add an additional software repository containing the packages.
     if (!Sound::write_only)
     {
 	// stop joystick before restarting ALSA
-	SCR::Execute(.target.bash, "/etc/init.d/joystick stop", $[]);
+	string cmd = joy_cmd + " unload";
+	y2milestone("Executing: %1", cmd);
+	SCR::Execute(.target.bash, cmd);
 
 	// restart ALSA
 	if (size(configuredcards) > 0)
 	{
-	    SCR::Execute(.target.bash, "/etc/init.d/alsasound reload", $[]);
+	    cmd = alsa_cmd + " reload";
+	    y2milestone("Executing: %1", cmd);
+	    SCR::Execute(.target.bash, cmd);
 	}
     }
 

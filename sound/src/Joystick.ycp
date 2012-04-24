@@ -14,6 +14,9 @@
 
     import "Mode";
     import "Service";
+    import "Directory";
+
+    const string joy_cmd = Directory::bindir + "/joystickdrivers";
 
     /**
      * joystick config datastructure (list of maps)
@@ -282,7 +285,9 @@
      * Stop joystick service
      */
     global define boolean Stop() ``{
-	return Service::Stop("joystick");
+	string cmd = joy_cmd + " unload";
+	y2milestone("Executing: %1", cmd);
+	return SCR::Execute(.target.bash, cmd) == 0;
     }
 
     /**
@@ -298,7 +303,11 @@
     global define boolean StartAndEnable() ``{
 
 	if (start == "enable")
-	    Service::Start("joystick");
+	{
+	    string cmd = joy_cmd + " load";
+	    y2milestone("Executing: %1", cmd);
+	    SCR::Execute(.target.bash, cmd);
+	}
 
 	Service::Adjust("joystick", start);
 	return true;

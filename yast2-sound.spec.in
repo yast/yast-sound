@@ -48,6 +48,8 @@ fi
 @desktopdir@/sound.desktop
 @desktopdir@/joystick.desktop
 @ybindir@/copyfonts
+@ybindir@/alsadrivers
+@ybindir@/joystickdrivers
 @moduledir@/Sound.*
 @moduledir@/Joystick.*
 @moduledir@/PulseAudio.*
