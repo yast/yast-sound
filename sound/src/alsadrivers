@@ -1,0 +1,188 @@
+#!/bin/sh
+#
+# This script is based on the original /etc/init.d/alsasound
+# and /usr/bin/setup-pulseaudio script.
+#
+# It was modified to a standalone script which works with systemd.
+#
+# From /etc/init.d/alsasound file:
+#
+# Copyright (c) by Jaroslav Kysela <perex@suse.cz> 
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# Modified to visually fit into SuSE 6.0+ by Philipp Thomas <pthomas@suse.de>
+# further improvements by Bernd Kaindl, Olaf Hering and Takashi Iwai.
+#
+#
+# Transformed to a standalone script by Ladislav Slezak, 2012
+#
+
+alsactl=/usr/sbin/alsactl
+asoundcfg=/var/lib/alsa/asound.state
+aconnect=/usr/bin/aconnect
+
+. /etc/sysconfig/sound
+
+#
+# insert sequencer modules
+#
+load_sequencer() {
+  test "$LOAD_SEQUENCER" = "yes" && modprobe -q snd-seq
+  if [ x"$LOAD_SEQUENCER" = xyes -a -r /proc/asound/seq/drivers ]; then
+    OLDIFS="$IFS"
+    IFS=","
+    while read t x c; do
+      echo "Loading module $t"
+      /sbin/modprobe $t
+    done < /proc/asound/seq/drivers
+    IFS="$OLDIFS"
+  fi
+}
+
+get_drivers() {
+  /sbin/modprobe -c | \
+    grep -E "^[[:space:]]*alias[[:space:]]+snd-card-[[:digit:]]" | sort -u | \
+    while read a b card; do
+	echo $card
+    done
+}
+
+#
+# insert all sound modules
+#
+load_modules() {
+  module_loaded=0
+  drivers=`get_drivers`
+  for i in $drivers; do
+    if [ $i != off ]; then
+      echo "Loading module $i"
+      /sbin/modprobe $i && module_loaded=1
+    fi
+  done
+
+  test $module_loaded -eq 0 && return 1
+  return 0
+}
+
+#
+# rest of start action
+#
+start_rest() {
+  load_sequencer
+  if [ x"$LOAD_OSS_EMUL_MODULES" = xyes ]; then
+    /sbin/modprobe snd-pcm-oss
+    test x"$LOAD_OSS_SEQ_MODULE" = xyes && /sbin/modprobe snd-seq-oss
+  fi
+}
+
+# manual load and force to store the status
+start_all() {
+    echo "Starting sound driver..."
+    load_modules && start_rest
+}
+
+do_kill() {
+  fuser $* /dev/admmidi* /dev/adsp* /dev/amidi* /dev/audio* /dev/dmfm* \
+     /dev/dmmidi* /dev/dsp* /dev/dspW* /dev/midi* /dev/mixer* /dev/music \
+     /dev/patmgr* /dev/sequencer* /dev/sndstat >/dev/null 2>&1
+  if [ -d /dev/snd ]; then
+    fuser $* /dev/snd/* >/dev/null 2>&1
+  fi
+}
+
+terminate() {
+  #
+  # Kill processes holding open sound devices
+  #
+  do_kill -TERM -k
+  sleep 1
+  do_kill -k
+
+  #
+  # remove all sequencer connections if any
+  #
+  if [ -f /proc/asound/seq/clients -a -x $aconnect ]; then
+    $aconnect --removeall
+  fi
+}
+
+# mute master to avoid clicks at unload/shutdown
+mute_system() {
+  /usr/bin/amixer set Master mute >/dev/null 2>&1
+}
+
+#
+# remove all sound modules
+#
+unload_modules() {
+  mute_system
+  mod=$(grep -m1 -E '^(snd[^ ]*|ac97_bus) [0-9]+ 0' /proc/modules)
+  while [ -n "$mod" ]; do
+      mod=${mod%% *}
+      echo "Removing module $mod"
+      /sbin/modprobe -r $mod
+      mod=$(grep -m1 -E '^(snd[^ ]*|ac97_bus) [0-9]+ 0' /proc/modules)
+  done
+}
+
+unload_all() {
+    echo "Shutting down sound driver..."
+
+    pa_disabled="no"
+    if grep -q "^[ \t]*autospawn[ \t]*=[ \t]*yes" /etc/pulse/client.conf; then
+	echo "Temporarily disabling PulseAudio autospawn"
+	sed -i -e "s|^[ \t]*autospawn.*|autospawn = no|g" /etc/pulse/client.conf
+	pa_disabled="yes"
+    fi
+
+    terminate
+    unload_modules
+
+    if [ $pa_disabled == "yes" ]; then
+	echo "Reenabling PulseAudio autospawn"
+	sed -i -e "s|^[ \t]*autospawn.*|autospawn = yes|g" /etc/pulse/client.conf
+    fi
+}
+
+stop_all() {
+    if [ -d /proc/asound ]; then
+	$alsactl -g -f $asoundcfg store
+        unload_all
+	echo
+    fi
+}
+
+# See how we were called.
+case "$1" in
+  load)
+	start_all
+	;;
+  unload)
+	test -d /proc/asound && unload_all
+	;;
+  reload)
+	stop_all
+	start_all
+	;;
+  *)
+	echo "Usage: $0 {load|unload|reload}"
+	echo
+	echo "This script loads/unloads ALSA kernel drivers configured in modprobe"
+	echo "configuration (usually stored in /etc/modprobe.d/50-sound.conf file)."
+        exit 1
+	;;
+esac
+

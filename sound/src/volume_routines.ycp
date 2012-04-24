@@ -195,8 +195,9 @@
 
 	if (Sound::use_alsa)
 	{
-	    SCR::Execute (.target.bash,
-		"/etc/init.d/alsasound unload > /dev/null 2>&1", $[]);
+	    string cmd = Directory::bindir + "/alsadrivers unload";
+	    y2milestone("Executing: %1", cmd);
+	    SCR::Execute(.target.bash, cmd);
 
 	    boolean aoa_used = false;
 	    foreach(map card, Sound::modules_conf,

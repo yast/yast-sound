@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Apr 24 14:16:09 UTC 2012 - lslezak@suse.cz
+
+- reimplemented driver reloading ("rcalsasound reload" does not
+  work with systemd) (bnc#751689)
+
+-------------------------------------------------------------------
 Thu Mar 29 16:04:11 CEST 2012 - jsuchome@suse.cz
 
 - merge proofread texts 

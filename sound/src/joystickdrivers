@@ -1,0 +1,87 @@
+#! /bin/bash
+#
+# This script is based on the original /etc/init.d/joystick initscript/
+#
+# It was modified to a standalone script which works with systemd.
+#
+# From /etc/init.d/joystick file:
+# Copyright (c) 2002 SuSE Linux AG Nuernberg, Germany.
+# 
+# Author: Takashi Iwai <tiwai@suse.de>, 2001
+#
+# Transformed to a standalone script by Ladislav Slezak, 2012
+#
+
+. /etc/sysconfig/joystick
+
+alsactl=/usr/sbin/alsactl
+if [ -x /sbin/lsmod ]; then
+    lsmod=/sbin/lsmod
+else
+    lsmod=/bin/lsmod
+fi
+
+# load joystick drivers
+function load () {
+    # first load joydev module
+    if [ -z "${JOYSTICK_MODULE_0}${JOYSTICK_MODULE_1}${JOYSTICK_MODULE_2}${JOYSTICK_MODULE_3}" ]; then
+	echo "No joystick configured"
+	return
+    fi
+
+    /sbin/modprobe joydev
+    for js in 0 1 2 3; do
+	# load gameport module
+	eval jsmod=\$GAMEPORT_MODULE_$js
+	if [ -n "$jsmod" -a "$jsmod" != off ]; then
+	    echo "Loading gameport module $jsmod"
+	    /sbin/modprobe $jsmod >/dev/null 2>&1
+	fi
+	# load joystick moulde
+	eval jsdev=\$JOYSTICK_MODULE_$js
+	eval jsdev_opts=\$JOYSTICK_MODULE_OPTION_$js
+	if [ -n "$jsdev" -a "$jsdev" != off ]; then
+	    echo "Loading joystick module $jsdev"
+	    /sbin/modprobe $jsdev $jsdev_opts >/dev/null 2>&1
+	fi
+    done
+}
+
+function unload () {
+    for js in 0 1 2 3; do
+	# remove gameport module
+	eval jsmod=\$GAMEPORT_MODULE_$js
+	if [ -n "$jsmod" -a "$jsmod" != off ]; then
+	    echo "Removing gameport module $jsmod"
+	    /sbin/modprobe -r $jsmod
+	fi
+	# remove joystick moulde
+	eval jsdev=\$JOYSTICK_MODULE_$js
+	if [ -n "$jsdev" -a "$jsdev" != off ]; then
+	    echo "Removing joystick module $jsdev"
+	    /sbin/modprobe -r $jsdev
+	fi
+    done
+}
+
+# See how we were called.
+case "$1" in
+    load)
+	echo "Loading joystick drivers..."
+	load
+        ;;
+    unload)
+        # Stop daemons.
+        echo "Removing joystick drivers..."
+	unload
+        ;;
+    reload)
+	unload
+	load
+	;;
+    *)
+	echo "Usage: $0 {load|unload|reload}"
+        exit 1
+	;;
+esac
+

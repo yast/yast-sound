@@ -947,8 +947,9 @@ module parameters, including invalid IO or IRQ parameters."), modname);
 		y2milestone("Device unmounted: %1", umount_device(mpoint));
 
 		// restart ALSA after SoundFont copy
-		y2milestone("Restarting ALSA: %1",
-		    SCR::Execute(.target.bash, "/etc/init.d/alsasound reload"));
+		string cmd = Directory::bindir + "/alsadrivers reload";
+		y2milestone("Executing: %1", cmd);
+		SCR::Execute(.target.bash, cmd);
 	    }
 
 	    // step4:

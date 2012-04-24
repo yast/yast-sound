@@ -38,7 +38,7 @@ module_DATA = Sound.ycp	\
 	PulseAudio.ycp	\
 	Joystick.ycp
 
-ybin_SCRIPTS = copyfonts
+ybin_SCRIPTS = copyfonts alsadrivers joystickdrivers
 
 YCPCFLAGS = -I.
 
