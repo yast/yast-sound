@@ -85,7 +85,7 @@
 	// log mixer settings
 	y2milestone("Mixer (%1): %2", when, SCR::Execute(.target.bash_output, "/usr/bin/amixer"));
 	y2milestone("volume_settings: %1", Sound::volume_settings);
-	y2milestone("asound size: %1", SCR::Read(.target.size, "/etc/asound.state"));
+	y2milestone("asound size: %1", SCR::Read(.target.size, Sound::asound_state()));
     }
 
     define boolean install_packages(list<string> modules)
@@ -279,7 +279,7 @@ Enable or add an additional software repository containing the packages.
     Progress::NextStage();
 
     // initialize mixer settings
-    if (Mode::installation() || SCR::Read(.target.size, "/etc/asound.state") == -1 || Sound::write_only)
+    if (Mode::installation() || SCR::Read(.target.size, Sound::asound_state()) == -1 || Sound::write_only)
     {
 	integer i = 0;
 	maplist (map e, (list<map>) save_info, ``{

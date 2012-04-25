@@ -204,6 +204,13 @@
     include "sound/read_routines.ycp";
     include "sound/routines.ycp";
 
+    // returns path to the asound.state file
+    global define string asound_state()
+    {
+	return "/var/lib/alsa/asound.state";
+    }
+
+
     // ----------- function definitions:
 
     /* tiwai: /usr/src/linux/Documentation/sound/alsa/Joystick.txt
