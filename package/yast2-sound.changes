@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Apr 25 10:55:40 UTC 2012 - lslezak@suse.cz
+
+- path to asound.state has been changed (now stored in /var/lib/alsa
+  instead of /etc)
+
+-------------------------------------------------------------------
 Tue Apr 24 14:16:09 UTC 2012 - lslezak@suse.cz
 
 - reimplemented driver reloading ("rcalsasound reload" does not
