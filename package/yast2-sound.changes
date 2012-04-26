@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Apr 26 08:28:45 UTC 2012 - lslezak@suse.cz
+
+- 2.22.1
+
+-------------------------------------------------------------------
 Wed Apr 25 10:55:40 UTC 2012 - lslezak@suse.cz
 
 - path to asound.state has been changed (now stored in /var/lib/alsa
