@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Apr 25 15:12:37 UTC 2012 - lslezak@suse.cz
+
+- do not restore mixer setting when displaying the main dialog
+  (bnc#740333)
+- 2.17.20
+
+-------------------------------------------------------------------
 Mon Jul 25 13:36:08 UTC 2011 - lslezak@suse.cz
 
 - fixed hwinfo driver name conversion, fixed detection of sound
