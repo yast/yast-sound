@@ -12,8 +12,6 @@
  *   Dan Meszaros <dmeszar@suse.cz>
  *   Jiri Suchomel <jsuchome@suse.cz>
  *
- * $Id$
- *
  * Installation of the sound card. If the sound card was not auto-detected ask user.
  *
  *

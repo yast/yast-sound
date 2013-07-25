@@ -3,8 +3,6 @@
  * Audio agent -- OSS functions
  *
  * Authors: Michal Svec <msvec@suse.cz>
- *
- * $Id$
  */
 
 #include <unistd.h>

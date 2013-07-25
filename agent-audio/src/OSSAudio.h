@@ -3,8 +3,6 @@
  * Audio agent -- OSS functions
  *
  * Authors: Michal Svec <msvec@suse.cz>
- *
- * $Id$
  */
 
 #ifndef __OSSAudio_h

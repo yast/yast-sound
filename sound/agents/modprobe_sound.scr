@@ -18,7 +18,6 @@
  *   Write(.modules.options, $["agp_try_unsupported":"0"], "agpgart")
  *   (true)
  *
- * $Id$
  *
  * <p>Reads/writes <tt>/etc/modprobe.conf</tt>. For more detail see its
  * own documentation.</p>

@@ -10,8 +10,6 @@
  *   Dan Meszaros <dmeszar@suse.cz>
  *   Ladislav Slezak <lslezak@suse.cz>
  *
- * $Id$
- *
  * YaST2 joystick configuration client
  *
  */

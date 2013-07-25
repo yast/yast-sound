@@ -12,7 +12,6 @@
  *   Dan Vesely <dan@suse.cz>
  *   Dan Meszaros <dmeszar@suse.cz>
  *
- * $Id$
  *
  * Parameters are given in a map with keys:
  *         "modules_conf" ... save info- list of configured cards:
