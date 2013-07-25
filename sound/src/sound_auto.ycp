@@ -11,8 +11,6 @@
  * Authors:
  *   Dan Meszaros <dmeszar@suse.cz>
  *
- * $Id$
- *
  * This is a client for autoinstallation. It takes its arguments,
  * goes through the configuration and return the setting.
  * Does not do any changes to the configuration.

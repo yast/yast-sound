@@ -15,7 +15,6 @@
  *   Write(.etc.chandev_conf.ctc0, "0x0600,0x0601,0,1")
  *   (true)
  *
- * $Id$
  */
 .audio
 

@@ -3,8 +3,6 @@
  * Audio agent -- OSS functions
  *
  * Authors: Michal Svec <msvec@suse.cz>
- *
- * $Id$
  */
 
 #include <unistd.h>
@@ -26,7 +24,7 @@ typedef struct {
 } stereovolume;
 
 /* channels' names, to be used for channel to nubmer mapping sometime */
-char *ossChannels[] = SOUND_DEVICE_LABELS;
+const char *ossChannels[] = SOUND_DEVICE_LABELS;
 int ossChannels_num = SOUND_MIXER_NRDEVICES;
 
 /**
@@ -65,18 +63,6 @@ int ossDevice(const string channel) {
     }
 }
 
-/**
- * @builtin SCR (`Write (.volume, integer volume)) -> bool
- * @builtin SCR (`Write (.volume.N, integer volume)) -> bool
- *
- * Set a master volume. If called with just volume, /dev/mixer
- * is used, otherwise /dev/mixerN is used as a device.
- *
- * This call returns true on success and false, if it fails.
- *
- * @example SCR (`Write (.volume, 50)) -> true
- * @example SCR (`Write (.volume.1, 50)) -> false
- */
 YCPBoolean ossSetVolume(const string card, const string channel, const int value) {
 
     string mixerfile = "/dev/mixer";
@@ -128,18 +114,6 @@ YCPBoolean ossSetVolume(const string card, const string channel, const int value
     return YCPBoolean (true);
 }
 
-/**
- * @builtin SCR (`Read (.volume)) -> integer
- * @builtin SCR (`Read (.volume.N)) -> integer
- *
- * Read a master volume. If called with just volume, /dev/mixer
- * is used, otherwise /dev/mixerN is used as a device.
- *
- * This call returns the volume on success and -1, if it fails.
- *
- * @example SCR (`Read (.volume)) -> 50
- * @example SCR (`Read (.volume.1)) -> -1
- */
 YCPValue ossGetVolume(const string card, const string channel) {
 
     string mixerfile = "/dev/mixer";

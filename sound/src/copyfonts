@@ -1,7 +1,6 @@
 #!/bin/bash
 # 
 # script for copying sound banks from sound blaster cd to localhost
-# $Id$
 # dan meszaros <dmeszar@suse.cz>
 
 # source directory

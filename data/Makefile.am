@@ -1,8 +1,6 @@
 #
 # Makefile.am for sound/data
 #
-# $Id$
-#
 
 SUBDIRS = doc
 

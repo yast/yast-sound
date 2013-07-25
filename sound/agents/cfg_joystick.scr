@@ -20,7 +20,6 @@
  *   Write(.joystick.GAMEPORT_MODULE_0, "emu10k1-gp")
  *   (true)
  *
- * $Id$
  *
  * Read/Sets the values defined in <tt>/etc/sysconfig/joystick</tt>
  * in an easy manner.

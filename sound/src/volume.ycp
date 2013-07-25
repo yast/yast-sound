@@ -14,9 +14,6 @@
  *   Dan Vesely <dan@suse.cz>
  *   Dan Meszaros <dmeszar@suse.cz>
  *
- *
- * $Id$
- *
  * Steps:
  *        1. try to insert kernel module
  *        2. on succes unmute and volume dialog
