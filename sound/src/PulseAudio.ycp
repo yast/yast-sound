@@ -23,8 +23,6 @@
  * Package:	PulseAudio configuration
  * Summary:	Configuration of PulseAudio in desktop applications
  * Authors:	Ladislav Slezák <lslezak@novell.com>
- *
- * $Id$
  */
 
 {

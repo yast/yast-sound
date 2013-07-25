@@ -1,13 +1,9 @@
 #
-# Makefile.am for y2a_audio/doc
-#
-# $Id$
+# Makefile.am for agent-audio/doc
 #
 
 SUBDIRS = autodocs
 
-htmldir = $(docdir)
-
-html_DATA = audio_agent.html
-EXTRA_DIST = $(html_DATA)
+agentdocdir = $(docdir)/agent-audio
+dist_agentdoc_DATA = audio_agent.md
 

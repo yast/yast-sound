@@ -1,6 +1,5 @@
 /**
  *
- *
  * File:
  *   sound_summary.ycp
  *
@@ -10,11 +9,7 @@
  * Authors:
  *   Dan Meszaros <dmeszar@suse.cz>
  *
- * $Id$
- *
  * Soud installation summary. returns list of already configured and not configured sound cards
- *
- * @param skipNotConfigured if set to true, list of notconfigured cards will be excluded
  *
  */
 

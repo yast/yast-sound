@@ -21,7 +21,6 @@
  *   Write(.alsa.LOAD_ALSA_SEQ, "no")
  *   (true)
  *
- * $Id$
  *
  * Read/Sets the values defined in <tt>/etc/sysconfig/alsa</tt>
  * in an easy manner.

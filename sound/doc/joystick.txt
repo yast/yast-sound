@@ -2,7 +2,6 @@
 #
 # Author: Takashi Iwai
 #
-# $Id$
 
 
 Joystick support on ALSA

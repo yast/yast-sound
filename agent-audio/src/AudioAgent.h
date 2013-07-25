@@ -13,8 +13,6 @@
  * Authors:
  *   dan.meszaros <dmeszar@suse.cz>
  *
- * $Id$
- *
  * interface for acces to alsa/oss sound system from ycp script
  */
 

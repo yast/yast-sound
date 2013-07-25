@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Jul 25 09:50:40 UTC 2013 - lslezak@suse.cz
+
+- documentation update
+- move development documentation to devel-doc subpackage
+- resolved gcc and doxygen warnings
+- 2.24.0
+
+-------------------------------------------------------------------
 Thu Apr 26 08:28:45 UTC 2012 - lslezak@suse.cz
 
 - 2.22.1

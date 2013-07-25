@@ -5,8 +5,6 @@
  * Authors:	Dan Meszaros <dmeszar@suse.cz>
  *		Ladislav Slezak <lslezak@suse.cz>
  *
- * $Id$
- *
  * Proposal function dispatcher for sound configuration.
  */
 
