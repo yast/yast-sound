@@ -24,7 +24,7 @@ typedef struct {
 } stereovolume;
 
 /* channels' names, to be used for channel to nubmer mapping sometime */
-char *ossChannels[] = SOUND_DEVICE_LABELS;
+const char *ossChannels[] = SOUND_DEVICE_LABELS;
 int ossChannels_num = SOUND_MIXER_NRDEVICES;
 
 /**

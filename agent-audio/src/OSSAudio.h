@@ -10,7 +10,7 @@
 
 #include <YCP.h>
 
-extern char *ossChannels[];
+extern const char *ossChannels[];
 extern int ossChannels_num;
 
 using std::string;
