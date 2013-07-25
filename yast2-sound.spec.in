@@ -22,6 +22,17 @@ Summary:	YaST2 - Sound Configuration
 %description
 This package contains the YaST2 component for sound card configuration.
 
+
+%package devel-doc
+Requires:       yast2-sound = %version
+Group:          System/YaST
+Summary:        YaST2 - Installation Server - Development Documentation
+
+%description devel-doc
+This package contains development documentation for using the API
+provided by this package.
+
+
 @PREP@
 
 @BUILD@
@@ -63,4 +74,13 @@ fi
 @plugindir@/libpy2ag_audio.so*
 @scrconfdir@/*.scr
 
-%doc @docdir@
+%dir @docdir@
+%doc @docdir@/README
+%doc @docdir@/COPYING
+
+%files devel-doc
+%doc @docdir@/autodocs
+%doc @docdir@/agent-audio
+%doc @docdir@/joystick-db.txt
+%doc @docdir@/sound_db.md
+
