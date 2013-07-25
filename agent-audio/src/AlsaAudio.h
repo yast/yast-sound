@@ -54,7 +54,7 @@ YCPBoolean alsaSetMute(int card, const string& channel_name, bool value);
 YCPValue alsaGetMute(int card, const string& channel_name);
 
 /**
- * getChannels- list of available channels for card #id
+ * getChannels- list of available channels for the card
  * @param card card id
  *
  */
