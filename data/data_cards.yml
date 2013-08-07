@@ -1,0 +1,765 @@
+# static file with predefined sound card names and vendors
+---
+- - snd-ad1816a
+  - FX-3D Plus, AOpen
+- - snd-ad1816a
+  - FX-3D Pro Radio, AOpen
+- - snd-ad1816a
+  - AD1815, Analog Devices
+- - snd-ad1816a
+  - AD1816A, Analog Devices
+- - snd-ad1816a
+  - AudioSystem EWS64S, TerraTec
+- - snd-ad1816a
+  - Base 64, TerraTec
+- - snd-ad1816a
+  - Sound-Boostar 16 3D, Highscreen
+- - snd-ad1816a
+  - Newcom SC-16 3D, Aztech systems
+- - snd-ad1816a
+  - Predator ISA, Shark
+- - snd-ad1848
+  - AD1847, Analog Devices
+- - snd-ad1848
+  - AD1848, Analog Devices
+- - snd-ad1848
+  - CS4248, Crystal Semiconductors
+- - snd-ali5451
+  - M1535(D), ALI
+- - snd-ali5451
+  - M5451, ALI
+- - snd-als100
+  - 3D Sound, Digimate
+- - snd-als100
+  - ALS100 - PRO16PNP, Avance Logic
+- - snd-als100
+  - ALS110, Avance Logic
+- - snd-als100
+  - ALS120, Avance Logic
+- - snd-als100
+  - ALS120, Avance Logic
+- - snd-als100
+  - ALS200, Avance Logic
+- - snd-als100
+  - MF1000, 3D Melody
+- - snd-als100
+  - RTL3000, RTL
+- - snd-als4000
+  - CoolSound 4000, Chic Techlonogy
+- - snd-als4000
+  - Miss Melody ALS4000, Best Union
+- - snd-als4000
+  - XWave4000, Labway
+- - snd-als4000
+  - ALS4000, Avance Logic
+- - snd-atiixp
+  - IXP150/200/250/300/400, ATI
+- - snd-atiixp-modem
+  - IXP150/200/250/400 (modem), ATI
+- - snd-au8810
+  - Aureal Vortex AU8810, Aureal Semiconductor Inc.
+- - snd-au8820
+  - Aureal Vortex AU8820, Aureal Semiconductor Inc.
+- - snd-au8830
+  - Aureal Vortex AU8830, Aureal Semiconductor Inc.
+- - snd-azt2320
+  - AZT2320, Aztech Systems
+- - snd-azt2320
+  - AZT2320, Aztech Systems
+- - snd-azt2320
+  - AZT3000, Aztech Systems
+- - snd-azt2320
+  - AZT3300, Aztech Systems
+- - snd-azt2320
+  - PRO16V, Aztech Systems
+- - snd-azt3328
+  - AZF3328, Aztech Systems
+- - snd-bt87x
+  - Bt878, Brooktree
+- - snd-bt87x
+  - Bt879, Brooktree
+- - snd-ca0106
+  - SB Audigy LS, Creative Labs
+- - snd-ca0106
+  - SB Live! 7.1 24bit, Creative Labs
+- - snd-ca0106
+  - SB CA0106 chip, Creative Labs
+- - snd-ca0106
+  - K8N Diamon MB 24bit, MSI
+- - snd-cmi8330
+  - CMI8330, C-Media
+- - snd-cmipci
+  - AV 510, AudioExecl
+- - snd-cmipci
+  - Aureon 5.1 Fun, TerraTec
+- - snd-cmipci
+  - Delta DiO 2448, M-Audio
+- - snd-cmipci
+  - Game Muse XL, Hercules
+- - snd-cmipci
+  - MD Mate, AudioExecl
+- - snd-cmipci
+  - Nightingale, Zoltrix
+- - snd-cmipci
+  - Sound Export Digital Surround, Trust
+- - snd-cmipci
+  - WinFast CMI-8738/PCI, Compustar
+- - snd-cmipci
+  - XWave7100, Labway
+- - snd-cmipci
+  - CMI8338A, C-Media
+- - snd-cmipci
+  - CMI8338B, C-Media
+- - snd-cmipci
+  - CMI8738, C-Media
+- - snd-cmipci
+  - CMI8738B, C-Media
+- - snd-cmipci
+  - CMI8768, C-Media
+- - snd-cs4231
+  - CS4231, Crystal Semiconductors
+- - snd-cs4232
+  - Maestro 32/96, TerraTec
+- - snd-cs4232
+  - Omnibook 5500, Hewlett Packard
+- - snd-cs4232
+  - PCA70PS, Philips
+- - snd-cs4232
+  - TBS-2000, Turtle Beach
+- - snd-cs4232
+  - Tropez Plus, Turtle Beach
+- - snd-cs4232
+  - CrystalWave 32, SIC
+- - snd-cs4236
+  - AW37, AOpen
+- - snd-cs4236
+  - Malibu, Turtle Beach
+- - snd-cs4236
+  - 3D, Crystal
+- - snd-cs4236
+  - 3D, NewClear
+- - snd-cs4236
+  - AW35/Pro, Acer
+- - snd-cs4236
+  - AW37, Acer
+- - snd-cs4236
+  - Aptiva 2137 E24, IBM
+- - snd-cs4236
+  - AudioSystem EWS64L/XL, TerraTec
+- - snd-cs4236
+  - CS4235, Crystal Semiconductors
+- - snd-cs4236
+  - CS4236, Crystal Semiconductors
+- - snd-cs4236
+  - CS4236B, Typhoon Soundsystem
+- - snd-cs4236
+  - CS4237, Crystal Semiconductors
+- - snd-cs4236
+  - CS4238, Crystal Semiconductors
+- - snd-cs4236
+  - CS4239, Crystal Semiconductors
+- - snd-cs4236
+  - Digital PC 5000 Onboard, Unknown
+- - snd-cs4236
+  - E1000 Onboard CS4236B, Gateway
+- - snd-cs4236
+  - HP6330 sound, Hewlett Packard
+- - snd-cs4236
+  - IntelliStation M Pro, IBM
+- - snd-cs4236
+  - Malibu, Turtle Beach
+- - snd-cs4236
+  - Marlin Spike Mobo CS4235, Intel
+- - snd-cs4236
+  - MaxiSound 16 PnP, Guillemot
+- - snd-cs4236
+  - Optiplex GX1, Dell
+- - snd-cs4236
+  - P5TX-LA sound, EliteGroup
+- - snd-cs4236
+  - PC 300PL sound, IBM
+- - snd-cs4236
+  - SC-70P, Gallant
+- - snd-cs4236
+  - Sound Maker 3DJ, Genius
+- - snd-cs4236
+  - TidalWave128, Crystal Computer
+- - snd-cs4236
+  - Workstation 400 sound, Dell
+- - snd-cs4236
+  - PR440FX Onboard, Intel
+- - snd-cs4281
+  - CS4281, Cirrus Logic
+- - snd-cs46xx
+  - AW230, AOpen
+- - snd-cs46xx
+  - AW320, AOpen
+- - snd-cs46xx
+  - DMAN PCI, M-Audio
+- - snd-cs46xx
+  - Game Fortissimo II, Hercules
+- - snd-cs46xx
+  - Game Theater XP, Hercules
+- - snd-cs46xx
+  - Santa Cruz, Turtle Beach
+- - snd-cs46xx
+  - SonicFury, VideoLogic
+- - snd-cs46xx
+  - Sound Fusion (CS4280), Cirrus Logic
+- - snd-cs46xx
+  - Sound Fusion (CS4610), Cirrus Logic
+- - snd-cs46xx
+  - Sound Fusion (CS4612), Cirrus Logic
+- - snd-cs46xx
+  - Sound Fusion (CS4615), Cirrus Logic
+- - snd-cs46xx
+  - Sound Fusion (CS4622), Cirrus Logic
+- - snd-cs46xx
+  - Sound Fusion (CS4624), Cirrus Logic
+- - snd-cs46xx
+  - Sound Fusion (CS4630), Cirrus Logic
+- - snd-dt019x
+  - ALS-007, Avance Logic
+- - snd-dt019x
+  - DT-019X, Diamond Technologies
+- - snd-dummy
+  - Dummy soundcard, ALSA
+- - snd-emu10k1
+  - SB Audigy, Creative Labs
+- - snd-emu10k1
+  - SB Live!/PCI512/E-mu APS, Creative Labs
+- - snd-emu10k1x
+  - SB Live! OEM, Dell/Creative Labs
+- - snd-ens1370
+  - HOT-255, Shuttle
+- - snd-ens1370
+  - AudioPCI-97 ES1370, Ensoniq
+- - snd-ens1370
+  - SB PCI64/128 (ES1370), Creative Labs
+- - snd-ens1371
+  - AudioPCI ES1371/73, Ensoniq
+- - snd-ens1371
+  - AudioPCI ES1373, Ensoniq
+- - snd-ens1371
+  - EV1938, Ectiva
+- - snd-ens1371
+  - Ectiva EV1938, Creative Labs
+- - snd-ens1371
+  - SB PCI64/128 (ES1371/73), Creative Labs
+- - snd-ens1371
+  - Vibra PCI128, Creative Labs
+- - snd-es1688
+  - ES1688 AudioDrive, ESS
+- - snd-es1688
+  - ES1688 PnP AudioDrive, ESS
+- - snd-es1688
+  - ES688 AudioDrive, ESS
+- - snd-es1688
+  - ES688 PnP AudioDrive, ESS
+- - snd-es18xx
+  - ES1868 PnP AudioDrive, ESS
+- - snd-es18xx
+  - ES1869 PnP AudioDrive, ESS
+- - snd-es18xx
+  - ES1878 PnP AudioDrive, ESS
+- - snd-es18xx
+  - ES1879 PnP AudioDrive, ESS
+- - snd-es18xx
+  - ES1887 AudioDrive, ESS
+- - snd-es18xx
+  - ES1887 PnP AudioDrive, ESS
+- - snd-es18xx
+  - ES1888 AudioDrive, ESS
+- - snd-es18xx
+  - ES1888 PnP AudioDrive, ESS
+- - snd-es1938
+  - AW180, AOpen
+- - snd-es1938
+  - Miss Melody Solo-1 Sound, Best Union
+- - snd-es1938
+  - 128i PCI, TerraTec
+- - snd-es1938
+  - ES1938, ESS
+- - snd-es1938
+  - ES1946, ESS
+- - snd-es1938
+  - ES1969, ESS
+- - snd-es1968
+  - AW300, AOpen
+- - snd-es1968
+  - Miss Melody Maestro Sound, Best Union
+- - snd-es1968
+  - MonsterSound MX400, Diamond Multimedia
+- - snd-es1968
+  - Sonic Impact S100 (model m2), Diamond Multimedia
+- - snd-es1968
+  - DMX, TerraTec
+- - snd-es1968
+  - Maestro 1, ESS
+- - snd-es1968
+  - Maestro 2, ESS
+- - snd-es1968
+  - Maestro 2e, ESS
+- - snd-es968
+  - AudioDrive ES968,ESS
+- - snd-fm801
+  - 3DS801A, A-trend
+- - snd-fm801
+  - 512i Digital, TerraTec
+- - snd-fm801
+  - ASONIC-8738, ASOUND
+- - snd-fm801
+  - AU10, Abit
+- - snd-fm801
+  - XWaveG5X QS3000A, Labway
+- - snd-fm801
+  - FM801, ForteMedia
+- - snd-fm801
+  - SoundMaker Live 5.1, Genius
+- - snd-gusclassic
+  - UltraSound Classic, Gravis
+- - snd-gusextreme
+  - UltraSound Extreme, Gravis
+- - snd-gusmax
+  - UltraSound MAX, Gravis
+- - snd-hda-intel
+  - ICH6 (HDA), Intel
+- - snd-hda-intel
+  - ICH6M (HDA), Intel
+- - snd-hda-intel
+  - ICH7 (HDA), Intel
+- - snd-hda-intel
+  - ESB2 (HDA), Intel
+- - snd-hda-intel
+  - ICH8 (HDA), Intel
+- - snd-hda-intel
+  - ICH9 (HDA), Intel
+- - snd-hda-intel
+  - ICH10 (HDA), Intel
+- - snd-hda-intel
+  - SB450, ATI
+- - snd-hda-intel
+  - VT8251, VIA
+- - snd-hda-intel
+  - M5461, ULI
+- - snd-hda-intel
+  - SIS966, SiS
+- - snd-hda-intel
+  - MCP51 (HDA), NVidia
+- - snd-hdsp
+  - HDSP-9632, RME
+- - snd-hdsp
+  - HDSP-9652, RME
+- - snd-hdsp
+  - Hammerfall-DSP, RME
+- - snd-ice1712
+  - Delta 410, M-Audio
+- - snd-ice1712
+  - Audiophile 24/96, M-Audio
+- - snd-ice1712
+  - DMX 6Fire, TerraTec
+- - snd-ice1712
+  - Delta 1010, M-Audio
+- - snd-ice1712
+  - Delta 1010LT, M-Audio
+- - snd-ice1712
+  - Delta 44, M-Audio
+- - snd-ice1712
+  - Delta 66, M-Audio
+- - snd-ice1712
+  - Delta DiO 2496, M-Audio
+- - snd-ice1712
+  - EWS 88D, TerraTec
+- - snd-ice1712
+  - EWS 88MT, TerraTec
+- - snd-ice1712
+  - EWX 24/96, TerraTec
+- - snd-ice1712
+  - Phase 88, TerraTec
+- - snd-ice1712
+  - EZ8, Event Electronics
+- - snd-ice1712
+  - Generic Envy24, ICEnsemble
+- - snd-ice1712
+  - Generic ICE1712, ICEnsemble
+- - snd-ice1712
+  - Mediastation, Lionstracs
+- - snd-ice1712
+  - Phase 88, TerraTec
+- - snd-ice1712
+  - SoundTrack DSP 24 Media 7.1, Hoontech
+- - snd-ice1712
+  - SoundTrack DSP 24 Value, Hoontech
+- - snd-ice1712
+  - SoundTrack DSP 24, Hoontech
+- - snd-ice1712
+  - VX442, Digigram
+- - snd-ice1724
+  - AUDIO2000, AMP Ltd
+- - snd-ice1724
+  - Aureon 5.1 Sky, TerraTec
+- - snd-ice1724
+  - Aureon 7.1 Space, TerraTec
+- - snd-ice1724
+  - Aureon 7.1 Universe, TerraTec
+- - snd-ice1724
+  - Phase 22, TerraTec
+- - snd-ice1724
+  - Phase 28, TerraTec
+- - snd-ice1724
+  - Generic Envy24HT, ICEnsemble
+- - snd-ice1724
+  - Generic Envy24PT, ICEnsemble
+- - snd-ice1724
+  - Generic ICE1724, ICEnsemble
+- - snd-ice1724
+  - K8X800 Pro II, Albatron
+- - snd-ice1724
+  - MS300, Pontis
+- - snd-ice1724
+  - Prodigy 192, AudioTrak
+- - snd-ice1724
+  - Prodigy 7.1, AudioTrak
+- - snd-ice1724
+  - Revolution 7.1, M-Audio
+- - snd-ice1724
+  - VT1720, VIA
+- - snd-ice1724
+  - VT1724, VIA
+- - snd-ice1724
+  - 9CJS, Chaintech
+- - snd-ice1724
+  - ZNF3-150, Chaintech
+- - snd-ice1724
+  - ZNF3-250, Chaintech
+- - snd-ice1724
+  - AV-710, Chaintech
+- - snd-ice1724
+  - SN25P, Shuttle
+- - snd-intel8x0
+  - 6300ESB, Intel
+- - snd-intel8x0
+  - 82801AA-ICH, Intel
+- - snd-intel8x0
+  - 82801BA-ICH2, Intel
+- - snd-intel8x0
+  - 82801CA-ICH3, Intel
+- - snd-intel8x0
+  - 82801DB-ICH4, Intel
+- - snd-intel8x0
+  - 82901AB-ICH0, Intel
+- - snd-intel8x0
+  - AMD768, AMD
+- - snd-intel8x0
+  - AMD8111, AMD
+- - snd-intel8x0
+  - CK804 Audio, NVidia
+- - snd-intel8x0
+  - CK8S Audio, NVidia
+- - snd-intel8x0
+  - ICH5, Intel
+- - snd-intel8x0
+  - ICH6 (AC97), Intel
+- - snd-intel8x0
+  - ICH7 (AC97), Intel
+- - snd-intel8x0
+  - ESB2 (AC97), Intel
+- - snd-intel8x0
+  - M5455, ALI
+- - snd-intel8x0
+  - MCP04 Audio, NVidia
+- - snd-intel8x0
+  - MX440, Intel
+- - snd-intel8x0
+  - SI7012, SiS
+- - snd-intel8x0
+  - nForce Audio, NVidia
+- - snd-intel8x0
+  - nForce2 Audio, NVidia
+- - snd-intel8x0
+  - nForce3 Audio, NVidia
+- - snd-intel8x0
+  - MCP51, NVidia
+- - snd-intel8x0m
+  - 7013, SiS
+- - snd-intel8x0m
+  - 82801AA-ICH (modem), Intel
+- - snd-intel8x0m
+  - 82801BA-ICH2 (modem), Intel
+- - snd-intel8x0m
+  - 82801CA-ICH3 (modem), Intel
+- - snd-intel8x0m
+  - 82801DB-ICH4 (modem), Intel
+- - snd-intel8x0m
+  - 82901AB-ICH0 (modem), Intel
+- - snd-intel8x0m
+  - AMD768 (modem), AMD
+- - snd-intel8x0m
+  - ICH5 (modem), Intel
+- - snd-intel8x0m
+  - MX440 (modem), Intel
+- - snd-intel8x0m
+  - NForce Modem, NVidia
+- - snd-intel8x0m
+  - NForce2 Modem, NVidia
+- - snd-intel8x0m
+  - NForce2s Modem, NVidia
+- - snd-intel8x0m
+  - NForce3 Modem, NVidia
+- - snd-interwave
+  - Dynasonic Pro, Dynasonix
+- - snd-interwave
+  - Dynasonic 3-D, Dynasonic
+- - snd-interwave
+  - PCA761AW, Philips
+- - snd-interwave
+  - Soundrage 32, STB
+- - snd-interwave
+  - MED3210, MED
+- - snd-interwave
+  - PCA761AW, Panasonic
+- - snd-interwave
+  - SoundRage32, STB
+- - snd-interwave
+  - UltraSound Plug & Play, Gravis
+- - snd-interwave-stb
+  - Ultrasound 32-Pro, STB
+- - snd-interwave-stb
+  - InterWave STB with TEA6330T, AMD
+- - snd-korg1212
+  - korg1212, KORG
+- - snd-maestro3
+  - Sonic Impact S100 (model m3), Diamond Multimedia
+- - snd-maestro3
+  - XWave512, Labway
+- - snd-maestro3
+  - Allegro PCI, ESS
+- - snd-maestro3
+  - Allegro-1 PCI, ESS
+- - snd-maestro3
+  - Canyon3D-2/LE PCI, ESS
+- - snd-maestro3
+  - ES1988, ESS
+- - snd-maestro3
+  - Maestro3 PCI, ESS
+- - snd-mixart
+  - miXart, Digigram
+- - snd-mtpav
+  - MidiTimePiece AV multiport MIDI, MOTU
+- - snd-nm256
+  - NM256AV, NeoMagic
+- - snd-nm256
+  - NM256ZX, NeoMagic
+- - snd-opl3sa2
+  - Tecra 8000, Toshiba
+- - snd-opl3sa2
+  - XWave128, Labway
+- - snd-opl3sa2
+  - AL440LX sound, Intel
+- - snd-opl3sa2
+  - MagicWave 3DX, NeoMagic
+- - snd-opl3sa2
+  - OPL3SA3, Yamaha
+- - snd-opl3sa2
+  - Sound Maker 3DX, Genius
+- - snd-opl3sa2
+  - YMF719E-S, Yamaha
+- - snd-opti92x-ad1848
+  - 82C924 (AD1848), OPTi
+- - snd-opti92x-ad1848
+  - 82C925 (AD1848), OPTi
+- - snd-opti92x-ad1848
+  - Mozart, OAK
+- - snd-opti92x-cs4231
+  - 82C924 (CS4231), OPTi
+- - snd-opti92x-cs4231
+  - 82C925 (CS4231), OPTi
+- - snd-opti93x
+  - HOT-241, Shuttle
+- - snd-opti93x
+  - HOT-245, Shuttle
+- - snd-opti93x
+  - 82C931/3, OPTi
+- - snd-pdaudiocf
+  - PDAudio-CF, Sound Core
+- - snd-powermac
+  - PowerPC, Apple
+- - snd-aoa
+  - PowerPC (Layout ID), Apple
+- - snd-rme32
+  - Digi32 PRO, RME
+- - snd-rme32
+  - Digi32, RME
+- - snd-rme32
+  - Digi32/8, RME
+- - snd-rme96
+  - Digi96, RME
+- - snd-rme96
+  - Digi96/8 PAD, RME
+- - snd-rme96
+  - Digi96/8 PRO, RME
+- - snd-rme96
+  - Digi96/8 PST, RME
+- - snd-rme96
+  - Digi96/8, RME
+- - snd-rme9652
+  - Hammerfall, RME
+- - snd-rme9652
+  - Hammerfall-Light, RME
+- - snd-sb16
+  - SB 16, Creative Labs
+- - snd-sb16
+  - SB Vibra16C, Creative Labs
+- - snd-sb16
+  - SB Vibra16CL, Creative Labs
+- - snd-sb16
+  - SB Vibra16S, Creative Labs
+- - snd-sb16
+  - SB Vibra16X, Creative Labs
+- - snd-sb8
+  - SB 1.0/SB 2.0/SB Pro, Creative Labs
+- - snd-sbawe
+  - SB AWE 32, Creative Labs
+- - snd-sbawe
+  - SB AWE 64 Gold, Creative Labs
+- - snd-sbawe
+  - SB AWE 64, Creative Labs
+- - snd-serial-u16550
+  - MIDI serial u16550, ALSA
+- - snd-sgalaxy
+  - Sound Galaxy, Aztech Systems
+- - snd-sonicvibes
+  - Daytona, Turtle Beach
+- - snd-sonicvibes
+  - Miss Melody S3 Sound, Best Union
+- - snd-sonicvibes
+  - Schubert 32 PCI, PINE
+- - snd-sonicvibes
+  - SonicVibes PCI, S3
+- - snd-trident
+  - 4DWave PCI, HIS
+- - snd-trident
+  - Miss Melody 4DWave PCI, Best Union
+- - snd-trident
+  - PCI 288-Q3DII, Aztech Systems
+- - snd-trident
+  - Sonicwave 4D, Jaton
+- - snd-trident
+  - True Sound 4D Wave-DX, Chic Techlonogy
+- - snd-trident
+  - 4DWave DX, Trident
+- - snd-trident
+  - 4DWave NX, Trident
+- - snd-trident
+  - 4DWave PCI, HIS
+- - snd-trident
+  - Miss Melody 4DWave PCI, Best Union
+- - snd-trident
+  - ONSpeed 4DWave PCI, Warpspeed
+- - snd-trident
+  - PCI 64-Q3D, Aztech Systems
+- - snd-trident
+  - Predator4D-PCI, Shark
+- - snd-trident
+  - SI7018 PCI Audio, SiS
+- - snd-trident
+  - SV 750, Addonics
+- - snd-trident
+  - SonicWave 4D, Jaton
+- - snd-trident
+  - SoundTrack Digital 4DWave NX, Hoontech
+- - snd-trident
+  - True Sound 4Dwave, CHIC
+- - snd-usb-audio
+  - USB Audio, Generic
+- - snd-usb-usx2y
+  - US122/224/428, Tascam
+- - snd-usb-caiaq
+  - USB audio, caiaq
+- - snd-ua101
+  - UA-101, Edirol
+- - snd-ua101
+  - UA-1000, Edirol
+- - snd-usb-us122l
+  - US-122L, Tascam
+- - snd-via82xx
+  - VT8233A/C, VIA
+- - snd-via82xx
+  - VT8235, VIA
+- - snd-via82xx
+  - VT8237, VIA
+- - snd-via82xx
+  - VT82C686A/B/C, VIA
+- - snd-via82xx-modem
+  - VT82C686A/B/C modem, VIA
+- - snd-virmidi
+  - Virtual rawmidi device, ALSA
+- - snd-vx222
+  - VX222/Mic, Digigram
+- - snd-vxpocket
+  - VXPocket V2, Digigram
+- - snd-vxpocket
+  - VXPocket 440, Digigram
+- - snd-wavefront
+  - Maui/Tropez/Tropez+, Turtle Beach
+- - snd-ymfpci
+  - 3DS724A, A-trend
+- - snd-ymfpci
+  - AW724/744/Pro, AOpen
+- - snd-ymfpci
+  - Labway D1X, Labway
+- - snd-ymfpci
+  - MaxiSound Fortissimo, Guillemot
+- - snd-ymfpci
+  - Miss Melody Samba Tornado, Best Union
+- - snd-ymfpci
+  - PK-UG-X013, NEC
+- - snd-ymfpci
+  - Satellite Pro 4200, Toshiba
+- - snd-ymfpci
+  - True Sound 724, Chic Techlonogy
+- - snd-ymfpci
+  - VAIO N505VX, Sony
+- - snd-ymfpci
+  - VAIO PCG-F480, Sony
+- - snd-ymfpci
+  - XWave Elite Value, Labway
+- - snd-ymfpci
+  - XWave192, Labway
+- - snd-ymfpci
+  - XWave320, Labway
+- - snd-ymfpci
+  - XWave5000/Pro, Labway
+- - snd-ymfpci
+  - XWave576, Labway
+- - snd-ymfpci
+  - XWave6000/Pro, Labway
+- - snd-ymfpci
+  - XWaveG5X, Labway
+- - snd-ymfpci
+  - XWaveJ8X, Labway
+- - snd-ymfpci
+  - YMF724, Yamaha
+- - snd-ymfpci
+  - YMF724F, Yamaha
+- - snd-ymfpci
+  - YMF740, Yamaha
+- - snd-ymfpci
+  - YMF740C, Yamaha
+- - snd-ymfpci
+  - YMF744, Yamaha
+- - snd-ymfpci
+  - YMF754, Yamaha
+- - snd-pcxhr
+  - PCXHR, Digigram
+- - snd-ad1889
+  - AD1889, Analog Devices
+- - snd-cs5535audio
+  - CS5535, National Semiconductor
+- - snd-cs5535audio
+  - CS5536, AMD
+- - snd_ps3
+  - PS3 Soundcard, Sony
+- - snd-ctxfi
+  - X-Fi, Creative Labs
+

@@ -120,10 +120,10 @@ and stored into the target DB file.
 
 These additional files are stored in data/ subdirectory:
 
-    data_cards.rb           sound card names
-    data_extra_ids.rb       additional vendor/device ids
-    data_joystick.rb        mapping "sound card driver" -> "joystick driver"
-    data_mixer.rb           extra mixer settings
+    data_cards.yml          sound card names
+    data_extra_id.yml       additional vendor/device ids
+    data_gameport.yml       mapping "sound card driver" -> "gameport driver"
+    data_mixer.yml          extra mixer settings
 
 Appendix A
 ----------
@@ -131,7 +131,7 @@ Appendix A
 'allows' module options syntax
 
     {0} stands for 0
-    {0,Disabled} is same as {0} (i don't know why this one was invented...)
+    {0,Disabled} is same as {0} (no idea why this was invented...)
     {1,Enabled} same as {1} (ditto)
     {0,5} stands for range 0,1,2,3,4,5
     {0,6,2} stands for range with step 2: 0,2,4,6

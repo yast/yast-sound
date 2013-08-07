@@ -44,11 +44,7 @@ module Yast
       end
 
       # check for database existence
-      if Sound.use_alsa &&
-          SCR.Read(
-            path(".target.size"),
-            Ops.add(Directory.datadir, "/sndcards.ycp")
-          ) == -1
+      if Sound.use_alsa && !File.exist?(Directory.datadir + "/sndcards.yml")
         # popup error message
         Report.Error(
           _("Sound card database not found. Please check your installation.")

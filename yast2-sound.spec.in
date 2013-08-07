@@ -69,8 +69,8 @@ fi
 @schemadir@/autoyast/rnc/sound.rnc
 
 # database
-@ydatadir@/sndcards.ycp
-@ydatadir@/alsa_packages.ycp
+@ydatadir@/sndcards.yml
+@ydatadir@/alsa_packages.yml
 
 # agents
 @plugindir@/libpy2ag_audio.so*

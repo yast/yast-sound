@@ -72,7 +72,7 @@ class AlsaModule
       ret << ModAlias.new(a) if a.match /^pci:/
     end
 
-    extra_ids = eval(File.read(File.join(File.dirname(__FILE__), 'data_extra_ids.rb')))
+    extra_ids = YAML.load_file "data_extra_id.yml"
     extra_ids.each do |id|
       ret << ModAlias.new("pci:v#{id[1]}d#{id[2]}sv*sd*") if id[0] == name
     end
