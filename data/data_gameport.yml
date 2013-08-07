@@ -1,0 +1,41 @@
+# static file with predefined gameport modules for kernel drivers
+# FIXME: snd-als4000 and snd-intel8x0 need snd_joystick option to enable joystick.
+---
+snd-als4000: 'off'
+snd-cmipci: 'off'
+snd-cs4281: 'off'
+snd-cs46xx: 'off'
+snd-emu10k1: emu10k1-gp
+snd-ens1370: 'off'
+snd-ens1371: 'off'
+snd-es1938: 'off'
+snd-es1968: 'off'
+snd-fm801: fm801-gp
+snd-intel8x0: ns558
+snd-sonicvibes: 'off'
+snd-trident: 'off'
+snd-via82xx: 'off'
+snd-ymfpci: 'off'
+snd-es1688: ns558
+snd-es18xx: ns558
+snd-cs4231: ns558
+snd-cs4232: ns558
+snd-cs4236: ns558
+snd-gusclassic: ns558
+snd-gusextreme: ns558
+snd-gusmax: ns558
+snd-interwave: ns558
+snd-interwave-stb: ns558
+snd-sb8: ns558
+snd-sb16: ns558
+snd-sbawe: ns558
+snd-opl3sa2: ns558
+snd-ad1816a: ns558
+snd-als100: ns558
+snd-azt2320: ns558
+snd-cmi8330: ns558
+snd-sgalaxy: ns558
+snd-opti92x-ad1848: ns558
+snd-opti92x-cs4231: ns558
+snd-opti93x: ns558
+snd-wavefront: ns558

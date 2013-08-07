@@ -205,7 +205,7 @@ module Yast
       end
     end
 
-    # returns the 'params' section from sndcards.ycp of the given module
+    # returns the 'params' section from sndcards.yml of the given module
     # @param [String] modname module name
     # @return [Hash] with params and their descriptions
     def get_module_params(modname)

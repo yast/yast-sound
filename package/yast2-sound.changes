@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Aug  7 08:20:36 UTC 2013 - lslezak@suse.cz
+
+- generate the sound card database in YAML format (instead of
+  obsolete YCP), use YAML data files
+- 3.0.1
+
+-------------------------------------------------------------------
 Wed Jul 31 08:40:14 UTC 2013 - yast-devel@opensuse.org
 
 - converted from YCP to Ruby by YCP Killer

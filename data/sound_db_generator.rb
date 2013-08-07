@@ -1,6 +1,8 @@
 # class for generating the sound card database
 
-class SoucardDBGenerator
+require 'yaml'
+
+class SoundCardDBGenerator
   private
 
   # generate the sound card names database
@@ -144,9 +146,9 @@ class SoucardDBGenerator
 
     amodules.reject!{|m| m.modaliases.size.zero? && !xtra_drivers.include?(m.name)}
 
-    card_addons = eval(File.read(File.join(File.dirname(__FILE__), 'data_cards.rb')))
-    joy_modules = eval(File.read(File.join(File.dirname(__FILE__), 'data_joystick.rb')))
-    mixer = eval(File.read(File.join(File.dirname(__FILE__), 'data_mixer.rb')))
+    card_addons = YAML.load_file "data_cards.yml"
+    joy_modules = YAML.load_file "data_gameport.yml"
+    mixer = YAML.load_file "data_mixer.yml"
 
     path.match /^\/lib\/modules\/([^\/]*)\//
     kernel_ver = $1
@@ -160,24 +162,10 @@ class SoucardDBGenerator
       "kernel" => kernel_ver
     }
 
-    # add a header with kernel version string and YCP wrapping
-    header = "/* This file was automatically generated for kernel version #{$1} */\n"
-    header +=<<EOF
+    # add a header with kernel version string
+    header = "# This file was automatically generated for kernel version #{$1}\n\n"
 
-{
-textdomain "sound_db";
-
-return
-EOF
-
-    footer =<<EOF
-;
-}
-EOF
-
-    # convert the Ruby structure to YCP format string
-    # add the header and the footer
-    header + sound_card_db.to_ycp + footer
+    header + sound_card_db.to_yaml
   end
 
 end
