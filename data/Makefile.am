@@ -4,15 +4,14 @@
 
 SUBDIRS = doc
 
-ydata_DATA = sndcards.ycp
+ydata_DATA = sndcards.yml
 
-sound_db_generator = alsa_drivers.rb data_cards.rb data_joystick.rb data_mixer.rb data_extra_ids.rb generate_soundcard_db.rb sound_db_generator.rb ycp_format.rb
+sound_db_generator = alsa_drivers.rb generate_soundcard_db.rb sound_db_generator.rb data_cards.yml data_extra_id.yml data_gameport.yml data_mixer.yml
 
-sndcards.ycp: $(sound_db_generator)
-	./generate_soundcard_db.rb > sndcards.ycp
-# verify the validity (syntax check)
-	ycpc -E -q sndcards.ycp
+sndcards.yml: $(sound_db_generator)
+	./generate_soundcard_db.rb > sndcards.yml
 
-CLEANFILES = sndcards.ycp
+CLEANFILES = sndcards.yml
 
 EXTRA_DIST = $(sound_db_generator)
+

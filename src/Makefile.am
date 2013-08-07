@@ -46,7 +46,7 @@ ybin_SCRIPTS = \
   bin/copyfonts
 
 ydata_DATA = \
-  data/alsa_packages.ycp
+  data/alsa_packages.yml
 
 desktop_DATA = \
   desktop/sound.desktop \

@@ -6,6 +6,7 @@
 # Authors:	Ladislav Slezak <lslezak@suse.cz>
 #
 require "yast"
+require "yaml"
 
 module Yast
   class SoundClass < Module
@@ -21,6 +22,7 @@ module Yast
       Yast.import "Label"
       Yast.import "String"
       Yast.import "Package"
+      Yast.import "Directory"
 
       # what sound system we're using (true=alsa, false=oss)
       @use_alsa = true
@@ -576,9 +578,8 @@ module Yast
       if @db_cards == nil || @db_cards == {}
         textdomain "sound_db"
         Builtins.y2debug("Reading card database")
-        sound_db = Convert.to_map(
-          Builtins.eval(SCR.Read(path(".target.yast2"), "sndcards.ycp"))
-        )
+
+	sound_db = YAML.load_file(Directory.datadir + "/sndcards.yml") rescue {}
 
         @db_cards = Ops.get_map(sound_db, "cards", {})
         @db_modules = Ops.get_map(sound_db, "modules", {})
@@ -597,9 +598,8 @@ module Yast
     # @return [void]
     def LoadPackageDatabase
       Builtins.y2milestone("Reading required packages database...")
-      @db_packages = Convert.to_map(
-        Builtins.eval(SCR.Read(path(".target.yast2"), "alsa_packages.ycp"))
-      )
+      @db_packages = YAML.load_file(Directory.datadir + "/alsa_packages.yml") rescue {}
+
       Builtins.y2milestone(
         "Loaded package list for %1 drivers",
         Builtins.size(@db_packages)
