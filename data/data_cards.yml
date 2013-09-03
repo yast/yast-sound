@@ -52,6 +52,14 @@
   - XWave4000, Labway
 - - snd-als4000
   - ALS4000, Avance Logic
+- - snd-asihpi
+  - ASI5000, AudioScience
+- - snd-asihpi
+  - ASI6000, AudioScience
+- - snd-asihpi
+  - ASI87xx, AudioScience
+- - snd-asihpi
+  - ASI89xx, AudioScience
 - - snd-atiixp
   - IXP150/200/250/300/400, ATI
 - - snd-atiixp-modem
