@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Sep  3 08:31:23 UTC 2013 - lslezak@suse.cz
+
+- added AudioScience cards to the manual card selection
+  (bnc#832097, fate#310119)
+- 3.0.2
+
+-------------------------------------------------------------------
 Wed Aug  7 08:20:36 UTC 2013 - lslezak@suse.cz
 
 - generate the sound card database in YAML format (instead of
