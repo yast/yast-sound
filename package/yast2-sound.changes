@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Sep 19 17:15:52 UTC 2013 - lslezak@suse.cz
+
+- do not use *.spec.in template, use *.spec file with RPM macros
+  instead
+- 3.1.0
+
+-------------------------------------------------------------------
 Tue Sep  3 08:31:23 UTC 2013 - lslezak@suse.cz
 
 - added AudioScience cards to the manual card selection
