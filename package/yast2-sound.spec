@@ -104,6 +104,7 @@ fi
 %{yast_scrconfdir}/*.scr
 
 %dir %{yast_docdir}
+%doc %{yast_docdir}/README
 %doc %{yast_docdir}/COPYING
 
 %files devel-doc
