@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Oct 17 14:17:11 UTC 2013 - lslezak@suse.cz
+
+- do not crash during sound card removal (bnc#845928)
+  (workaround for Ops.is() not working properly with typed maps
+  and arrays)
+
+-------------------------------------------------------------------
 Thu Sep 19 17:15:52 UTC 2013 - lslezak@suse.cz
 
 - do not use *.spec.in template, use *.spec file with RPM macros
