@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Oct 17 14:17:11 UTC 2013 - lslezak@suse.cz
+
+- do not crash during sound card removal (bnc#845928)
+  (workaround for Ops.is() not working properly with typed maps
+  and arrays)
+- 3.0.3
+
+-------------------------------------------------------------------
 Tue Sep  3 08:31:23 UTC 2013 - lslezak@suse.cz
 
 - added AudioScience cards to the manual card selection
