@@ -278,7 +278,7 @@ module Yast
           Convert.convert(save_info, :from => "list", :to => "list <map>")
         ) do |card|
           pos = Ops.add(pos, 1)
-          pos == card_id ? save_entry : card
+          pos == card_id ? deep_copy(save_entry) : deep_copy(card)
         end
       end
 
