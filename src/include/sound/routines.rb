@@ -447,7 +447,7 @@ module Yast
       end if Mode.autoinst(
       )
 
-      if Ops.is(vol_settings, "list <list <map>>")
+      if vol_settings.is_a?(Array) && vol_settings.first.is_a?(Array) && vol_settings.first.first.is_a?(Hash)
         Builtins.y2milestone("AutoYast data detected, converting...")
         # convert
         # 		[
