@@ -267,7 +267,9 @@ module Yast
             next
           end
 
-          keys_names = keys == "vendors" ? vendor_names : module_names
+          keys_names = keys == "vendors" ?
+            deep_copy(vendor_names) :
+            deep_copy(module_names)
 
           UI.ChangeWidget(Id(:sel_keys), :Items, keys_names)
 
