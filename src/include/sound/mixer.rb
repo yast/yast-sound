@@ -187,7 +187,7 @@ module Yast
       widget = VBox()
       spec = UI.HasSpecialWidget(:Slider)
       nchan = Ops.subtract(Builtins.size(channels), 2) # don't count in 'Master' and 'PCM'
-      ncols = 4
+      ncols = 3
 
       # how many channels per column
       chansPerCol = Builtins.tointeger(

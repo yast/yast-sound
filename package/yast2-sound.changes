@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Nov  6 14:35:50 UTC 2013 - lslezak@suse.cz
+
+- display only 3 columns in the volume dialog to make the window
+  narrower (bnc#848706)
+- 3.1.1
+
+-------------------------------------------------------------------
 Thu Oct 17 14:17:11 UTC 2013 - lslezak@suse.cz
 
 - do not crash during sound card removal (bnc#845928)
