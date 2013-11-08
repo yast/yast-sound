@@ -17,7 +17,7 @@
 
 
 Name:           yast2-sound
-Version:        3.1.1
+Version:        3.1.2
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -28,9 +28,8 @@ License:        GPL-2.0+
 BuildRequires:	alsa-devel gcc-c++ doxygen perl-XML-Writer update-desktop-files yast2 yast2-core-devel yast2-testsuite kernel-default ruby libtool
 BuildRequires:  yast2-devtools >= 3.0.6
 
-# GetInstArgs::automatic_configuration
-# Wizard::SetDesktopTitleAndIcon
-Requires:	yast2 >= 2.21.22
+# Fixed handling of Kernel modules loaded on boot
+Requires:	yast2 >= 3.1.3
 Requires:	alsa
 
 Provides:	yast2-config-sound yast2-agent-audio yast2-agent-audio-devel
