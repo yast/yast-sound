@@ -183,9 +183,6 @@ module Yast
     def RemovedUnusuedKernelModules
       # TODO: Needs deeper refactoring as knowledge of the data structure should
       #       not be needed.
-      #
-      # FIXME: Possible issue if the same module is used for another sound card
-      #        which stays configured and thus the module should be loaded.
       Sound.removed_info.reject{ |r| r.fetch("module", "").empty? }.each do |r|
         Kernel.RemoveModuleToLoad(r["module"])
       end
