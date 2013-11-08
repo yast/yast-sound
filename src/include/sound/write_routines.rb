@@ -127,47 +127,10 @@ module Yast
         ret = ret && SCR.Write(mod_alias_comment, modcomment)
 
         # load the module automatically on boot
-        if Ops.get_string(entry, "bus", "") != "pci" &&
-            Ops.get_string(entry, "bus", "") != "usb" &&
-            module_name != ""
+        if entry["bus"] != "pci" && entry["bus"] != "usb" && !module_name.empty?
           Builtins.y2milestone("The soundcard is not attached to PCI or USB")
-
-          on_boot_sysconfig = Convert.to_string(
-            SCR.Read(path(".sysconfig.kernel.MODULES_LOADED_ON_BOOT"))
-          )
-          Builtins.y2milestone(
-            "/etc/sysconfig/kernel:MODULES_LOADED_ON_BOOT: %1",
-            on_boot_sysconfig
-          )
-
-          on_boot_modules = Builtins.splitstring(on_boot_sysconfig, " ")
-          on_boot_modules = Builtins.filter(on_boot_modules) do |mod|
-            mod != nil && mod != ""
-          end
-          Builtins.y2milestone("Load modules: %1", on_boot_modules)
-
-          # add the module to sysconfig if it is missing
-          if !Builtins.contains(on_boot_modules, module_name)
-            Builtins.y2milestone(
-              "Adding %1 to MODULES_LOADED_ON_BOOT",
-              module_name
-            )
-            if on_boot_sysconfig != ""
-              on_boot_sysconfig = Ops.add(on_boot_sysconfig, " ")
-            end
-
-            on_boot_sysconfig = Ops.add(on_boot_sysconfig, module_name)
-            Builtins.y2milestone(
-              "New MODULES_LOADED_ON_BOOT value: %1",
-              on_boot_sysconfig
-            )
-
-            ret = ret &&
-              SCR.Write(
-                path(".sysconfig.kernel.MODULES_LOADED_ON_BOOT"),
-                on_boot_sysconfig
-              )
-          end
+          Kernel.AddModuleToLoad(module_name)
+          ret = Kernel.SaveModulesToLoad
         end
       end
       ret
@@ -215,63 +178,18 @@ module Yast
       nil
     end
 
-    def RemovedUnusuedModulesFromSysconfig
-      # remove unused modules from MODULES_LOADED_ON_BOOT
-      on_boot_sysconfig = Convert.to_string(
-        SCR.Read(path(".sysconfig.kernel.MODULES_LOADED_ON_BOOT"))
-      )
-      Builtins.y2milestone(
-        "/etc/sysconfig/kernel:MODULES_LOADED_ON_BOOT: %1",
-        on_boot_sysconfig
-      )
-
-      on_boot_modules = Builtins.splitstring(on_boot_sysconfig, " ")
-      on_boot_modules = Builtins.filter(on_boot_modules) do |mod|
-        mod != nil && mod != ""
+    # Removes Kernel modules formerly loaded for sound cards that are being
+    # removed now
+    def RemovedUnusuedKernelModules
+      # TODO: Needs deeper refactoring as knowledge of the data structure should
+      #       not be needed.
+      #
+      # FIXME: Possible issue if the same module is used for another sound card
+      #        which stays configured and thus the module should be loaded.
+      Sound.removed_info.reject{ |r| r.fetch("module", "").empty? }.each do |r|
+        Kernel.RemoveModuleToLoad(r["module"])
       end
-      Builtins.y2debug("Module list: %1", on_boot_modules)
-
-      removed_modules = Builtins.toset(Builtins.maplist(Sound.removed_info) do |card|
-        Ops.get_string(card, "module", "")
-      end)
-      removed_modules = Builtins.filter(removed_modules) do |mod|
-        mod != nil && mod != ""
-      end
-
-      modified = false
-      Builtins.foreach(removed_modules) do |removed_module|
-        # remove the module from sysconfig if it is there
-        if Builtins.contains(on_boot_modules, removed_module)
-          Builtins.y2milestone(
-            "Removing %1 from MODULES_LOADED_ON_BOOT",
-            removed_module
-          )
-
-          # remove the module
-          on_boot_modules = Builtins.filter(on_boot_modules) do |mod|
-            mod != removed_module
-          end
-          modified = true
-        end
-      end 
-
-
-      # write the change
-      if modified
-        on_boot_sysconfig = Builtins.mergestring(on_boot_modules, " ")
-        Builtins.y2milestone(
-          "New MODULES_LOADED_ON_BOOT value: %1",
-          on_boot_sysconfig
-        )
-        SCR.Write(
-          path(".sysconfig.kernel.MODULES_LOADED_ON_BOOT"),
-          on_boot_sysconfig
-        )
-      else
-        Builtins.y2milestone("Nothing removed from MODULES_LOADED_ON_BOOT")
-      end
-
-      nil
+      Kernel.SaveModulesToLoad
     end
 
     # saves modules options. this function has to collect parameters that use
@@ -313,7 +231,7 @@ module Yast
 
       # must be called before SaveOneModulesEntry()
       # to write the module back if it is used by another configured card!!
-      RemovedUnusuedModulesFromSysconfig()
+      RemovedUnusuedKernelModules()
 
       Builtins.foreach(configured_options) do |op|
         if !Builtins.contains(mods, op)
