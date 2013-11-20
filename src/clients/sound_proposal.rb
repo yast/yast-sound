@@ -16,7 +16,6 @@ module Yast
 
       Yast.import "Sound"
       Yast.import "Progress"
-      Yast.import "GetInstArgs"
       Yast.import "PulseAudio"
 
       Sound.installation = true
@@ -37,15 +36,12 @@ module Yast
         # Do not show any progress during Read()
         @progress_orig = Progress.set(false)
 
-        # Automatic configuration has its own progress
-        if !GetInstArgs.automatic_configuration
-          UI.OpenDialog(VBox(Label(_("Detecting sound cards..."))))
-        end
+        UI.OpenDialog(VBox(Label(_("Detecting sound cards..."))))
 
         Sound.Propose
         PulseAudio.Propose
 
-        UI.CloseDialog if !GetInstArgs.automatic_configuration
+        UI.CloseDialog
 
         Progress.set(@progress_orig)
 
@@ -81,8 +77,6 @@ module Yast
             "id"              => "sound_conf"
           }
       elsif @func == "Write"
-        # do not confirm package installation in the automatic mode
-        Sound.SetConfirmPackages(!GetInstArgs.automatic_configuration)
         Sound.Write
         PulseAudio.Write
       end
