@@ -3,7 +3,15 @@ Fri Feb 28 15:05:15 UTC 2014 - jreidinger@suse.com
 
 - Drop joystick for sound card ports as it is dropped also in
   alsa (BNC#865350)
+- improve excludearch to be only for SLE-12 as opensuse stil builds
+  working x86
 - 3.1.4
+
+-------------------------------------------------------------------
+Wed Jan 29 13:46:56 CET 2014 - ro@suse.de
+
+- set excludearch for i586 and s390 as SLE-12 does not build a
+  runnable kernel there
 
 -------------------------------------------------------------------
 Wed Nov 20 08:32:21 UTC 2013 - lslezak@suse.cz
