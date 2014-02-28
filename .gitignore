@@ -23,5 +23,6 @@ Makefile.am.common
 .dep
 tmp.*
 *.log
-*.ybc
 .deps
+data/sndcards.yml
+doc/autodocs/.yardoc/
