@@ -1,7 +1,7 @@
 #
 # spec file for package yast2-sound
 #
-# Copyright (c) 2013 SUSE LINUX Products GmbH, Nuernberg, Germany.
+# Copyright (c) 2014 SUSE LINUX Products GmbH, Nuernberg, Germany.
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -23,25 +23,53 @@ Release:        0
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
 
-Group:	        System/YaST
-License:        GPL-2.0+
-BuildRequires:	alsa-devel gcc-c++ doxygen perl-XML-Writer update-desktop-files yast2 yast2-core-devel yast2-testsuite kernel-default ruby libtool
+BuildRequires:  alsa-devel
+BuildRequires:  doxygen
+BuildRequires:  gcc-c++
+BuildRequires:  kernel-default
+BuildRequires:  libtool
+BuildRequires:  perl-XML-Writer
+BuildRequires:  ruby
+BuildRequires:  update-desktop-files
+BuildRequires:  yast2
+BuildRequires:  yast2-core-devel
 BuildRequires:  yast2-devtools >= 3.1.10
+BuildRequires:  yast2-testsuite
 
 # Fixed handling of Kernel modules loaded on boot
-Requires:	yast2 >= 3.1.3
-Requires:	alsa
+Requires:       alsa
+Requires:       yast2 >= 3.1.3
 
-Provides:	yast2-config-sound yast2-agent-audio yast2-agent-audio-devel
-Obsoletes:	yast2-config-sound yast2-agent-audio yast2-agent-audio-devel
-Provides:	yast2-trans-sound yast2-trans-soundd y2c_snd y2t_snd y2t_sndd
-Obsoletes:	yast2-trans-sound yast2-trans-soundd y2c_snd y2t_snd y2t_sndd
-Provides:	y2c_sparc y2c_sprc yast2-db-sound y2d_snd
-Obsoletes:	y2c_sparc y2c_sprc yast2-db-sound y2d_snd
+Provides:       yast2-agent-audio
+Provides:       yast2-agent-audio-devel
+Provides:       yast2-config-sound
+Obsoletes:      yast2-agent-audio
+Obsoletes:      yast2-agent-audio-devel
+Obsoletes:      yast2-config-sound
+Provides:       y2c_snd
+Provides:       y2t_snd
+Provides:       y2t_sndd
+Provides:       yast2-trans-sound
+Provides:       yast2-trans-soundd
+Obsoletes:      y2c_snd
+Obsoletes:      y2t_snd
+Obsoletes:      y2t_sndd
+Obsoletes:      yast2-trans-sound
+Obsoletes:      yast2-trans-soundd
+Provides:       y2c_sparc
+Provides:       y2c_sprc
+Provides:       y2d_snd
+Provides:       yast2-db-sound
+Obsoletes:      y2c_sparc
+Obsoletes:      y2c_sprc
+Obsoletes:      y2d_snd
+Obsoletes:      yast2-db-sound
 
 Requires:       yast2-ruby-bindings >= 1.0.0
 
-Summary:	YaST2 - Sound Configuration
+Summary:        YaST2 - Sound Configuration
+License:        GPL-2.0+
+Group:          System/YaST
 
 %description
 This package contains the YaST2 component for sound card configuration.
@@ -49,8 +77,8 @@ This package contains the YaST2 component for sound card configuration.
 
 %package devel-doc
 Requires:       yast2-sound = %version
-Group:          System/YaST
 Summary:        YaST2 - Sound Configuration - Development Documentation
+Group:          System/YaST
 
 %description devel-doc
 This package contains development documentation for using the API
@@ -68,13 +96,11 @@ provided by yast2-sound package.
 
 rm -rf %{buildroot}/%{yast_plugindir}/libpy2ag_audio.la
 
-
 %post
 # rename the config file to the new modprobe schema
 if test -e /etc/modprobe.d/sound; then
     mv -f /etc/modprobe.d/sound /etc/modprobe.d/50-sound.conf
 fi
-
 
 %files
 %defattr(-,root,root)
@@ -107,3 +133,4 @@ fi
 %doc %{yast_docdir}/agent-audio
 %doc %{yast_docdir}/sound_db.md
 
+%changelog
