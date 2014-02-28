@@ -33,7 +33,6 @@ module Yast
 
       Yast.import "Sound"
 
-      Yast.include include_target, "sound/joy_dialog.rb"
       Yast.include include_target, "sound/volume_routines.rb" # PlayTest, setVolume
       Yast.include include_target, "sound/routines.rb" # FontsInstalled, HasFonts, InstallFonts
     end
@@ -178,7 +177,7 @@ module Yast
             break
           end
         end
-      end while !Builtins.contains([:back, :next, :cancel, :joystick], ui)
+      end while !Builtins.contains([:back, :next, :cancel], ui)
       ui
     end
 

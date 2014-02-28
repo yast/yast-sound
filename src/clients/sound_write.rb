@@ -78,9 +78,7 @@ module Yast
       Yast.import "Directory"
 
       Yast.import "Sound"
-      Yast.import "Joystick"
 
-      @joy_cmd = Ops.add(Directory.bindir, "/joystickdrivers")
       @alsa_cmd = Ops.add(Directory.bindir, "/alsadrivers")
 
       # ==== MAIN ====
@@ -109,9 +107,7 @@ module Yast
         # progress bar item
         _("Start sound card"),
         # progress bar item
-        _("Store volume"),
-        # progress bar item
-        _("Store joystick settings")
+        _("Store volume")
       ]
 
       @stones2 = [
@@ -124,9 +120,7 @@ module Yast
         # progress bar item
         _("Starting sound card..."),
         # progress bar item
-        _("Storing volume settings..."),
-        # progress bar item
-        _("Storing joystick settings...")
+        _("Storing volume settings...")
       ]
 
       if @install && !Mode.autoinst
@@ -160,20 +154,10 @@ module Yast
       # in autoyast installation the packages are installed by autoyast
       # see sound_auto.ycp - it's called with "Packages" argument
       if !Mode.autoinst
-        # get required sound and joystick kernel modules
         @reqmodules = Sound.RequiredKernelModules
-        @reqjoymodules = Joystick.RequiredKernelModules
 
         @reqmodules = [] if @reqmodules == nil
 
-        @reqjoymodules = [] if @reqjoymodules == nil
-
-        # merge lists, remove duplicates
-        @reqmodules = Convert.convert(
-          Builtins.union(@reqmodules, @reqjoymodules),
-          :from => "list",
-          :to   => "list <string>"
-        )
 
         if Ops.greater_than(Builtins.size(@reqmodules), 0)
           # ensure that all required kernel modules are installed
@@ -201,18 +185,10 @@ module Yast
 
 
       @configuredcards = Sound.GetSoundCardList
-      if !Sound.write_only
-        # stop joystick before restarting ALSA
-        @cmd = Ops.add(@joy_cmd, " unload")
+      if !Sound.write_only && !@configuredcards.empty?
+        @cmd = Ops.add(@alsa_cmd, " reload")
         Builtins.y2milestone("Executing: %1", @cmd)
         SCR.Execute(path(".target.bash"), @cmd)
-
-        # restart ALSA
-        if Ops.greater_than(Builtins.size(@configuredcards), 0)
-          @cmd = Ops.add(@alsa_cmd, " reload")
-          Builtins.y2milestone("Executing: %1", @cmd)
-          SCR.Execute(path(".target.bash"), @cmd)
-        end
       end
 
       Progress.NextStage
@@ -251,9 +227,6 @@ module Yast
       # abort block for read/write dialogs
       @abort_block = lambda { false }
 
-      # write joystick configuration
-      Joystick.Write(@abort_block)
-
       if @install && !Mode.autoinst
         Progress.NextStage
         install_packages(@reqmodules)
@@ -264,7 +237,6 @@ module Yast
         Service.Finetune("alsasound", ["2", "3", "5"])
       else
         # disable sound service - it's not needed, no soundcard is present
-        Service.Adjust("joystick", "disable")
         Service.Adjust("alsasound", "disable")
       end
 

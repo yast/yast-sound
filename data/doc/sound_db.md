@@ -65,8 +65,6 @@ The keys:
     description (string):   used in 'manual card selection' dialog
     name (string):	    !optional. used in very special cases. see appendix A
 			    usually the module name is used as a default.
-    joystick (map):	    sound-driver-sensitive joystick settings
-			    see ./joystick_DB.txt
     mixer (map):	    some cards have special channels that needs to be
 			    unmuted/set when initialized.
 			    key is channel name, value means volume for this channel.
@@ -122,7 +120,6 @@ These additional files are stored in data/ subdirectory:
 
     data_cards.yml          sound card names
     data_extra_id.yml       additional vendor/device ids
-    data_gameport.yml       mapping "sound card driver" -> "gameport driver"
     data_mixer.yml          extra mixer settings
 
 Appendix A

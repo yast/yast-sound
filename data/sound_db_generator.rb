@@ -91,7 +91,7 @@ class SoundCardDBGenerator
   end
 
   # generate driver -> driver info (description, parameters) mapping
-  def self.generate_modules(amodules, joymodules, mixer)
+  def self.generate_modules(amodules, mixer)
     ret = {}
 
     amodules.each do |a|
@@ -99,11 +99,6 @@ class SoundCardDBGenerator
       mod = {}
 
       mod['description'] = a.description
-
-      # add joystick data if available
-      if joymodules.has_key? name
-        mod['joystick'] = { 'GAMEPORT_MODULE' => joymodules[name] }
-      end
 
       # add mixer data if available
       if mixer.has_key? name
@@ -147,7 +142,6 @@ class SoundCardDBGenerator
     amodules.reject!{|m| m.modaliases.size.zero? && !xtra_drivers.include?(m.name)}
 
     card_addons = YAML.load_file "data_cards.yml"
-    joy_modules = YAML.load_file "data_gameport.yml"
     mixer = YAML.load_file "data_mixer.yml"
 
     path.match /^\/lib\/modules\/([^\/]*)\//
@@ -157,7 +151,7 @@ class SoundCardDBGenerator
       "cards" => generate_cards(amodules, card_addons),
       "indices" => generate_indices(amodules),
       "mod_idx" => generate_module_indices(amodules),
-      "modules" => generate_modules(amodules, joy_modules, mixer),
+      "modules" => generate_modules(amodules, mixer),
       "vendors" => generate_vendors(amodules, card_addons),
       "kernel" => kernel_ver
     }

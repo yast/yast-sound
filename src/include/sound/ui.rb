@@ -20,7 +20,6 @@ module Yast
       Yast.import "UI"
       textdomain "sound"
       Yast.import "Sound"
-      Yast.import "Joystick"
       Yast.import "Wizard"
       Yast.import "Popup"
       Yast.import "Label"
@@ -29,9 +28,9 @@ module Yast
     #  dialog to be displayed when user presses 'Abort' button
     #	@return [Boolean] yes/no
     def ReallyAbort
-      config_changed = Sound.Changed || Joystick.Changed
+      config_changed = Sound.Changed
       Builtins.y2milestone(
-        "Sound or joystick config changed: %1",
+        "Sound config changed: %1",
         config_changed
       )
 

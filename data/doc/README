@@ -8,7 +8,6 @@ alsa_drivers.rb			collects data from drivers
 alsa_packages.ycp		static data - extra packages for drivers
 data_cards.rb			static data - sound card names
 data_extra_ids.rb		static data - extra PCI ids for drivers
-data_joystick.rb		static data - joystick data
 data_mixer.rb			static data - mixer settings for specific drivers
 generate_soundcard_db.rb	creates the database
 sndcards.ycp			generated sound card database

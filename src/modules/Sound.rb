@@ -131,30 +131,6 @@ module Yast
 
 
       # ----------- function definitions:
-
-      # tiwai: /usr/src/linux/Documentation/sound/alsa/Joystick.txt
-      # PCI Cards
-      # ---------
-      #
-      # For PCI cards, the joystick is enabled when the appropriate module
-      # option is specified.  Some drivers don't need options, and the
-      # joystick support is always enabled.  In the former ALSA version, there
-      # was a dynamic control API for the joystick activation.  It was
-      # changed, however, to the static module options because of the system
-      # stability and the resource management.
-      #
-      # The following PCI drivers support the joystick natively.
-      @joystick_configuration = {
-        "snd-als4000"  => { "joystick_port" => "1" },
-        "snd-azt3328"  => { "joystick" => "1" },
-        "snd-ens1370"  => { "joystick" => "1" },
-        "snd-ens1371"  => { "joystick_port" => "1" },
-        "snd-cmipci"   => { "joystick_port" => "1" },
-        "snd-es1968"   => { "joystick" => "1" },
-        "snd-intel8x0" => { "joystick" => "1" },
-        "snd-via82xx"  => { "joystick" => "1" },
-        "snd-ymfpci"   => { "joystick_port" => "1" }
-      }
       Sound()
     end
 
@@ -1161,13 +1137,6 @@ module Yast
       nil
     end
 
-    # Get joystick settings from sound database
-    # @param [String] modname name of sound module
-    # @return [Hash] map with options
-    def GetJoystickSettings(modname)
-      Ops.get_map(@db_modules, [modname, "joystick"], {})
-    end
-
     # store mixer settings
     def StoreMixer
       return if Builtins.size(SCR.Dir(path(".audio.alsa.cards"))) == 0
@@ -1325,47 +1294,6 @@ module Yast
       nil
     end
 
-    # Test whether sound card supports joystick
-    # @param [Fixnum] c_id id of sound card
-    # @return [Boolean] True if sound card c_id supports joystick
-    def HasJoystick(c_id)
-      return false if c_id == nil
-      if @use_alsa == true
-        entry = Ops.get(@modules_conf, c_id, {})
-        modname = Ops.get_string(entry, "module", "")
-
-        return Ops.get_map(@db_modules, [modname, "joystick"], {}) != {}
-      else
-        return false
-      end
-    end
-
-    # Return list of configured/proposed sound cards which support joystick
-    # @return [Array] list of maps: [$["card_no":0, "name":"Sound Blaster Live!"]]
-    def GetSoundCardListWithJoy
-      # get list of installed sound cards
-      cards = GetSoundCardList()
-
-      # cards which support joysticks
-      filtered = []
-
-      # remove cards without joystick support
-      Builtins.foreach(
-        Convert.convert(
-          cards,
-          :from => "list",
-          :to   => "list <map <string, any>>"
-        )
-      ) do |card|
-        cid = Ops.get_integer(card, "card_no", -2)
-        if cid != -2 && HasJoystick(cid) == true
-          filtered = Builtins.add(filtered, card)
-        end
-      end
-
-      deep_copy(filtered)
-    end
-
     def SetConfirmPackages(ask)
       Builtins.y2milestone("Confirm additional package installation: %1", ask)
       @confirm_packages = ask
@@ -1413,7 +1341,6 @@ module Yast
     publish :function => :CreateModprobeCommands, :type => "list ()"
     publish :function => :ProbeOldChip, :type => "string (string)"
     publish :function => :asound_state, :type => "string ()"
-    publish :variable => :joystick_configuration, :type => "map"
     publish :function => :Sound, :type => "void ()"
     publish :function => :DetectOldCards, :type => "boolean ()"
     publish :function => :DetectHardware, :type => "boolean ()"
@@ -1443,12 +1370,9 @@ module Yast
     publish :function => :Changed, :type => "boolean ()"
     publish :function => :GetSoundCardList, :type => "list ()"
     publish :function => :StoreUniqueKeys, :type => "void ()"
-    publish :function => :GetJoystickSettings, :type => "map (string)"
     publish :function => :StoreMixer, :type => "void ()"
     publish :function => :SetVolume, :type => "boolean (integer, string, integer)"
     publish :function => :InitMixer, :type => "void (integer, string)"
-    publish :function => :HasJoystick, :type => "boolean (integer)"
-    publish :function => :GetSoundCardListWithJoy, :type => "list ()"
     publish :function => :SetConfirmPackages, :type => "void (boolean)"
     publish :function => :ConfirmPackages, :type => "boolean ()"
   end
