@@ -29,7 +29,6 @@ module Yast
       Yast.import "Directory"
       Yast.import "Popup"
       Yast.import "Sound"
-      Yast.import "Joystick"
       Yast.import "Report"
       Yast.import "CommandLine"
       Yast.import "RichText"
@@ -239,8 +238,7 @@ module Yast
     # @return [Boolean] success
     def SoundRead
       Sound.use_ui = false
-      abort_block = lambda { false }
-      ret = Sound.Read(false) && Joystick.Read(abort_block)
+      ret = Sound.Read(false)
       # PulseAudio is optional, it may fail
       PulseAudio.Read
       ret

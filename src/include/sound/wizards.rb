@@ -19,7 +19,6 @@ module Yast
       Yast.import "Sequencer"
       Yast.import "Wizard"
       Yast.import "Sound"
-      Yast.import "Joystick"
 
       Yast.include include_target, "sound/card_wizard.rb"
       Yast.include include_target, "sound/read_routines.rb"
@@ -56,13 +55,6 @@ module Yast
           # popup question
           Popup.YesNo(_("Do you really want to delete this entry?"))
         return :next if !stop_programs
-
-        # remove joystick settings
-        if Ops.less_than(Sound.card_id, 4) &&
-            Ops.get(Joystick.joystick, Sound.card_id) != nil
-          Joystick.joystick = Builtins.remove(Joystick.joystick, Sound.card_id)
-          Ops.set(Joystick.joystick, 3, {})
-        end
 
         # we have to remember volume/mute settings because after a
         # card removal everything is muted and set to 0.
@@ -240,8 +232,6 @@ module Yast
 
       if !Mode.config && !Sound.installation
         return :abort if !Sound.Read(true)
-        abort = lambda { false }
-        Joystick.Read(abort)
         PulseAudio.Read
         Sound.StoreSettings
       end
@@ -308,7 +298,7 @@ module Yast
 
       if ui == :finish && !Mode.config
         if !Sound.installation &&
-            (Sound.Changed || Sound.GetModified || Joystick.Changed ||
+            (Sound.Changed || Sound.GetModified ||
               !Sound.AllRequiredPackagesInstalled)
           Sound.Write
         else

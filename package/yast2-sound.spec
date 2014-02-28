@@ -17,7 +17,7 @@
 
 
 Name:           yast2-sound
-Version:        3.1.3
+Version:        3.1.4
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -83,14 +83,10 @@ fi
 %dir %{yast_yncludedir}/sound
 %{yast_yncludedir}/sound/*.rb
 %{yast_clientdir}/sound*.rb
-%{yast_clientdir}/joystick.rb
 %{yast_desktopdir}/sound.desktop
-%{yast_desktopdir}/joystick.desktop
 %{yast_ybindir}/copyfonts
 %{yast_ybindir}/alsadrivers
-%{yast_ybindir}/joystickdrivers
 %{yast_moduledir}/Sound.*
-%{yast_moduledir}/Joystick.*
 %{yast_moduledir}/PulseAudio.*
 %{yast_schemadir}/autoyast/rnc/sound.rnc
 
@@ -109,6 +105,5 @@ fi
 %files devel-doc
 %doc %{yast_docdir}/autodocs
 %doc %{yast_docdir}/agent-audio
-%doc %{yast_docdir}/joystick-db.txt
 %doc %{yast_docdir}/sound_db.md
 

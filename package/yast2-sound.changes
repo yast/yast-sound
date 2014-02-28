@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Feb 28 15:05:15 UTC 2014 - jreidinger@suse.com
+
+- Drop joystick for sound card ports as it is dropped also in
+  alsa (BNC#865350)
+- 3.1.4
+
+-------------------------------------------------------------------
 Wed Nov 20 08:32:21 UTC 2013 - lslezak@suse.cz
 
 - removed automatic 2nd stage support (the 2nd stage has been

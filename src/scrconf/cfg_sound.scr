@@ -1,6 +1,6 @@
 /**
  * File:
- *   joystick.scr
+ *   sound.scr
  * Summary:
  *   SCR Agent for reading/writing /etc/sysconfig/alsa
  *   using the rc-agent
