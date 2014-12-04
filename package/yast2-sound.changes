@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Dec  4 09:51:38 UTC 2014 - jreidinger@suse.com
+
+- remove X-KDE-Library from desktop file (bnc#899104)
+
+-------------------------------------------------------------------
 Fri Feb 28 15:05:15 UTC 2014 - jreidinger@suse.com
 
 - Drop joystick for sound card ports as it is dropped also in
