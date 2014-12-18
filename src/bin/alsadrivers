@@ -151,7 +151,7 @@ unload_all() {
     terminate
     unload_modules
 
-    if [ $pa_disabled == "yes" ]; then
+    if [ $pa_disabled = "yes" ]; then
 	echo "Reenabling PulseAudio autospawn"
 	sed -i -e "s|^[ \t]*autospawn.*|autospawn = yes|g" /etc/pulse/client.conf
     fi
