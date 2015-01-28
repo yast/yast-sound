@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jan 28 08:53:14 UTC 2015 - lslezak@suse.cz
+
+- do not set any icon in Confirm.Detection() call
+- 3.1.7
+
+-------------------------------------------------------------------
 Thu Dec 18 18:33:08 UTC 2014 - lslezak@suse.cz
 
 - fixed bashism in "alsadrivers" script (authored by "Ledest")
