@@ -173,7 +173,7 @@ module Yast
       det_cards = []
 
       # Confirmation: label text (detecting hardware: xxx)
-      if !Confirm.Detection(_("Sound Cards"), "yast-sound")
+      if !Confirm.Detection(_("Sound Cards"), nil)
         det_cards = []
         Sound.skip_detection = true
       else
