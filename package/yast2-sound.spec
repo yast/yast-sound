@@ -25,7 +25,7 @@ Source0:        %{name}-%{version}.tar.bz2
 
 # XXX: SLE-12 build packages for x86 and s390, but no runnable kernel, so
 # this package cannot be build here. Remove when SLE stop doing it
-%if %suse_version == 1315
+%if %suse_version == 1315 && !0%{?is_opensuse}
 ExcludeArch:    %ix86 s390
 %endif
 
