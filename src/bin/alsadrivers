@@ -54,7 +54,7 @@ load_sequencer() {
 
 get_drivers() {
   /sbin/modprobe -c | \
-    grep -E "^[[:space:]]*alias[[:space:]]+snd-card-[[:digit:]]" | sort -u | \
+    grep -E "^[[:space:]]*alias[[:space:]]+snd[-_]card[-_][[:digit:]]" | sort -u | \
     while read a b card; do
 	echo $card
     done
