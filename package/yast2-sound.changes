@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Mar 23 16:47:36 UTC 2016 - cwh@suse.com
+
+- Fixed dependency on yast2 version that contains .proc.modules
+  agent (bsc#972310)
+
+-------------------------------------------------------------------
 Wed Oct  7 09:41:12 UTC 2015 - lslezak@suse.cz
 
 - do not check for %suse_version == 1315, the existing check for
