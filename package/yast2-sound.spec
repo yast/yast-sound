@@ -17,7 +17,7 @@
 
 
 Name:           yast2-sound
-Version:        3.1.8
+Version:        3.1.9
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -44,7 +44,8 @@ BuildRequires:  yast2-testsuite
 
 # Fixed handling of Kernel modules loaded on boot
 Requires:       alsa
-Requires:       yast2 >= 3.1.3
+# For proc_modules.scr
+Requires:       yast2 >= 3.1.180
 
 Provides:       yast2-agent-audio
 Provides:       yast2-agent-audio-devel
