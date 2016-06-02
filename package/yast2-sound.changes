@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jun  1 15:54:25 UTC 2016 - igonzalezsosa@suse.com
+
+- Drop yast2-sound-devel-doc package (fate#320356)
+- 3.1.10
+
+-------------------------------------------------------------------
 Wed Mar 23 16:47:36 UTC 2016 - cwh@suse.com
 
 - Fixed dependency on yast2 version that contains .proc.modules
