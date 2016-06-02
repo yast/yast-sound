@@ -17,7 +17,7 @@
 
 
 Name:           yast2-sound
-Version:        3.1.9
+Version:        3.1.10
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -81,17 +81,6 @@ Group:          System/YaST
 %description
 This package contains the YaST2 component for sound card configuration.
 
-
-%package devel-doc
-Requires:       yast2-sound = %version
-Summary:        YaST2 - Sound Configuration - Development Documentation
-Group:          System/YaST
-
-%description devel-doc
-This package contains development documentation for using the API
-provided by yast2-sound package.
-
-
 %prep
 %setup -n %{name}-%{version}
 
@@ -134,10 +123,5 @@ fi
 %dir %{yast_docdir}
 %doc %{yast_docdir}/README
 %doc %{yast_docdir}/COPYING
-
-%files devel-doc
-%doc %{yast_docdir}/autodocs
-%doc %{yast_docdir}/agent-audio
-%doc %{yast_docdir}/sound_db.md
 
 %changelog

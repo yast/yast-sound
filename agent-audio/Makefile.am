@@ -1,3 +1,3 @@
 #
 # Makefile.am for sound/agent-audio
-SUBDIRS = src conf doc testsuite
+SUBDIRS = src conf testsuite
