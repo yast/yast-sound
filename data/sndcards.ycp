@@ -531,6 +531,9 @@ $[
       "CS5535, National Semiconductor",
       "CS5536, AMD"
     ],
+    82 : [
+      "Xonar DGX, Asus"
+    ],
     83 : [
       "X-Fi, Creative Labs"
     ],
@@ -791,7 +794,8 @@ $[
       3476 : 78,
       3477 : 78,
       3478 : 78,
-      3479 : 78
+      3479 : 78,
+      4028 : 82
     ],
     4334 : $[
       16320 : 54,
@@ -3865,6 +3869,9 @@ $[
     "Apple" : [
       "PowerPC",
       "PowerPC (Layout ID)"
+    ],
+    "Asus" : [
+      "Xonar DGX"
     ],
     "AudioExecl" : [
       "AV 510",

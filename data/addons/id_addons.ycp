@@ -9,4 +9,6 @@
     // X-Fi
     ["snd-ctxfi",	    "0x01102",  "0x0000b"],
     ["snd-ctxfi",	    "0x01102",  "0x00005"],
+    // Asus Xonar DGX
+    ["snd-oxygen",	    "0x010de",  "0x0fbc"],
 ]
