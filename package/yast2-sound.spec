@@ -71,6 +71,7 @@ Obsoletes:      y2c_sparc
 Obsoletes:      y2c_sprc
 Obsoletes:      y2d_snd
 Obsoletes:      yast2-db-sound
+Obsoletes:      yast2-sound-devel-doc
 
 Requires:       yast2-ruby-bindings >= 1.0.0
 
