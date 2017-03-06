@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jun  8 07:19:40 UTC 2016 - lslezak@suse.cz
+
+- updated sound card database (added ASUS Xonar DGX) (bsc#982691)
+- 2.17.22
+
+-------------------------------------------------------------------
 Wed May  9 08:37:54 UTC 2012 - lslezak@suse.cz
 
 - do not restore mixer setting when closing the mixer dialog
