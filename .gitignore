@@ -25,4 +25,7 @@ tmp.*
 *.log
 .deps
 data/sndcards.yml
-doc/autodocs/.yardoc/
+/doc/autodocs/
+/.yardoc
+/testsuite/raw.tmp.*
+/coverage
