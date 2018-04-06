@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Apr  6 18:54:18 UTC 2018 - mfilka@suse.com
+
+- bnc#1087957 - version bump
+- 4.0.0
+
+-------------------------------------------------------------------
 Wed Jun  1 15:54:25 UTC 2016 - igonzalezsosa@suse.com
 
 - Drop yast2-sound-devel-doc package (fate#320356)
