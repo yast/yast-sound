@@ -14,6 +14,7 @@ X-SuSE-YaST-Geometry=
 X-SuSE-YaST-SortKey=
 X-SuSE-YaST-AutoInstClonable=true
 X-SuSE-YaST-AutoInstSchema=sound.rnc
+X-SuSE-YaST-Keywords=hardware,system,audio
 
 Icon=yast-sound
 Exec=xdg-su -c "/sbin/yast2 sound"
