@@ -17,7 +17,7 @@
 
 
 Name:           yast2-sound
-Version:        4.0.1
+Version:        4.0.2
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -120,6 +120,9 @@ fi
 # agents
 %{yast_plugindir}/libpy2ag_audio.so*
 %{yast_scrconfdir}/*.scr
+
+# icons
+%{_datadir}/icons/*
 
 %dir %{yast_docdir}
 %doc %{yast_docdir}/README
