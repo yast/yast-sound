@@ -10,9 +10,6 @@
 @YAST2-CHECKS-YCP@
 @YAST2-CHECKS-PROGRAM@
 
-
-
-
 ## special stuff
 AM_PATH_ALSA(0.9.0)
 
