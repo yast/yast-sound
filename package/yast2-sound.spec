@@ -122,7 +122,7 @@ fi
 %{yast_scrconfdir}/*.scr
 
 # icons
-%{_datadir}/icons/*
+%{yast_icondir}
 
 %dir %{yast_docdir}
 %doc %{yast_docdir}/README

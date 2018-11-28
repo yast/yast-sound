@@ -10,8 +10,8 @@
 @YAST2-CHECKS-YCP@
 @YAST2-CHECKS-PROGRAM@
 
-icondir=/usr/share/icons
-AC_SUBST(icondir)
+
+
 
 ## special stuff
 AM_PATH_ALSA(0.9.0)
