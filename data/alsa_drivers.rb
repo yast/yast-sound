@@ -1,3 +1,22 @@
+require "yast"
+require "yast2/execute"
+
+# Auxiliary module to run a command and get its output
+module Command
+  # Returns the output of the given command
+  #
+  # @param args [Array<String>, Array<Array<String>>] the command to execute and
+  #   its arguments. For a detailed description, see
+  #   https://www.rubydoc.info/github/openSUSE/cheetah/Cheetah#run-class_method
+  # @return [String] commmand output or an empty string if the command fails.
+  def self.output(*args)
+    Yast::Execute.locally!(*args, stdout: :capture)
+  rescue Cheetah::ExecutionFailed => error
+    puts error.message
+    ""
+  end
+end
+
 # handle modalias settings from modinfo output
 # parses the device ID string to Vendor and Device parts
 class ModAlias
@@ -60,29 +79,25 @@ class AlsaModule
 
   # read the description from the driver
   def description
-    `/sbin/modinfo -F description #{@mod_path}`.strip
+    Command::output("/sbin/modinfo", "-F", "description", @mod_path).strip
   end
 
   # read the device module aliases
   def modaliases
-    lst = `/sbin/modinfo -F alias #{@mod_path}`.split("\n")
-    ret = []
+    aliases = Command::output("/sbin/modinfo", "-F", "alias", @mod_path).split("\n")
+    aliases = aliases.grep(/^pci:/)
 
-    lst.each do |a|
-      ret << ModAlias.new(a) if a.match /^pci:/
-    end
+    mod_aliases = aliases.map { |a| ModAlias.new(a) }
 
-    extra_ids = YAML.load_file "data_extra_id.yml"
-    extra_ids.each do |id|
-      ret << ModAlias.new("pci:v#{id[1]}d#{id[2]}sv*sd*") if id[0] == name
-    end
+    extra_ids = YAML.load_file("data_extra_id.yml")
+    extra_ids = extra_ids.select { |id| id[0] == name }
 
-    ret
+    mod_aliases + extra_ids.map { |id| ModAlias.new("pci:v#{id[1]}d#{id[2]}sv*sd*") }
   end
 
   #  read the module parameters
   def params
-    lst = `/sbin/modinfo #{@mod_path}`.split("\n")
+    lst = Command::output("/sbin/modinfo", @mod_path).split("\n")
     ret = []
 
     lst.each do |a|
@@ -107,15 +122,10 @@ class AlsaModule
 
   # find all sound drivers below the given path
   def self.find_all(path)
-    ret = []
-    lst = `find #{path} -type f -name 'snd-*.ko'`.split("\n").sort{|p1, p2| 
-	p1.split('/').last <=> p2.split('/').last
-    }
+    files = Dir.glob(File.join(path, "**", "snd-*.ko")).select { |f| File.file?(f) }
 
-    lst.each do |m|
-      ret << AlsaModule.new(m)
-    end
+    files.sort! { |f1, f2| File.basename(f1) <=> File.basename(f2) }
 
-    ret
+    files.map { |f| AlsaModule.new(f) }
   end
 end
