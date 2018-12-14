@@ -84,7 +84,7 @@ class AlsaModule
   # read the device module aliases
   def modaliases
     aliases = Command::output("/sbin/modinfo", "-F", "alias", @mod_path).split("\n")
-    aliases = aliases.select { |a| a.match(/^pci:/) }
+    aliases = aliases.grep(/^pci:/)
 
     mod_aliases = aliases.map { |a| ModAlias.new(a) }
 
