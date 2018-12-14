@@ -122,12 +122,10 @@ class AlsaModule
 
   # find all sound drivers below the given path
   def self.find_all(path)
-    result = []
+    files = Dir.glob(File.join(path, "**", "snd-*.ko")).select { |f| File.file?(f) }
 
-    output = Command.output("find", path, "-type", "f", "-name", "snd-*.ko")
+    files.sort! { |f1, f2| File.basename(f1) <=> File.basename(f2) }
 
-    drivers = output.split("\n").sort { |p1, p2| p1.split('/').last <=> p2.split('/').last }
-
-    drivers.map { |d| AlsaModule.new(d) }
+    files.map { |f| AlsaModule.new(f) }
   end
 end
