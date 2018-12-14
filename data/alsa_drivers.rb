@@ -11,7 +11,8 @@ module Command
   # @return [String] commmand output or an empty string if the command fails.
   def self.output(*args)
     Yast::Execute.locally!(*args, stdout: :capture)
-  rescue Cheetah::ExecutionFailed
+  rescue Cheetah::ExecutionFailed => error
+    puts error.message
     ""
   end
 end
