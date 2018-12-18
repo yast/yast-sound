@@ -7,6 +7,7 @@
 #
 require "yast"
 require "yaml"
+require "shellwords"
 
 module Yast
   class SoundClass < Module
@@ -174,7 +175,7 @@ module Yast
     # @param [String] chip chip name
     # @return non-empty string with card options when card is present
     def ProbeOldChip(chip)
-      command = Builtins.sformat("/usr/sbin/alsaconf -p %1", chip)
+      command = Builtins.sformat("/usr/sbin/alsaconf -p %1", chip.shellescape)
       name = Ops.get_string(
         @db_modules,
         [Ops.add("snd-", chip), "description"],

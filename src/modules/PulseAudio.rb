@@ -27,6 +27,9 @@ require "yast"
 
 module Yast
   class PulseAudioClass < Module
+    # path to the configuration script
+    PA_SETUP_SCRIPT = "/usr/bin/setup-pulseaudio".freeze
+
     def main
       textdomain "sound"
 
@@ -37,20 +40,16 @@ module Yast
       @pa_enabled = nil
       @modified = false
 
-      # path to the configuration script
-      @pa_setup_script = "/usr/bin/setup-pulseaudio"
     end
 
     def Read
       # reset the modification flag
       @modified = false
 
-      if FileUtils.Exists(@pa_setup_script)
-        out = Convert.to_map(
-          SCR.Execute(
-            path(".target.bash_output"),
-            Ops.add(@pa_setup_script, " --status")
-          )
+      if FileUtils.Exists(PA_SETUP_SCRIPT)
+        out = SCR.Execute(
+          path(".target.bash_output"),
+          "#{PA_SETUP_SCRIPT} --status"
         )
         Builtins.y2milestone("Read status: %1", out)
 
@@ -66,7 +65,7 @@ module Yast
       else
         Builtins.y2warning(
           "PulseAudio setup script %1 is not present!",
-          @pa_setup_script
+          PA_SETUP_SCRIPT
         )
         return false
       end
@@ -124,20 +123,15 @@ module Yast
         # flush the changes
         SCR.Write(path(".sysconfig.sound"), nil)
 
-        if FileUtils.Exists(@pa_setup_script)
+        if FileUtils.Exists(PA_SETUP_SCRIPT)
           Builtins.y2milestone(
             "%1 PulseAudio support",
             @pa_enabled ? "Enabling" : "Disabling"
           )
 
-          out = Convert.to_map(
-            SCR.Execute(
-              path(".target.bash_output"),
-              Ops.add(
-                @pa_setup_script,
-                @pa_enabled ? " --enable" : " --disable"
-              )
-            )
+          out = SCR.Execute(
+            path(".target.bash_output"),
+            "#{PA_SETUP_SCRIPT} #{@pa_enabled ? "--enable" : " --disable"}"
           )
 
           Builtins.y2milestone("Write status: %1", out)
@@ -147,7 +141,7 @@ module Yast
         else
           Builtins.y2warning(
             "PulseAudio setup script %1 is not present, cannot configure applications",
-            @pa_setup_script
+            PA_SETUP_SCRIPT
           )
 
           # reset the modification flag

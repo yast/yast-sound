@@ -14,6 +14,8 @@
 #	Dan Meszaros <dmeszar@suse.cz>
 #	Jiri Suchomel <jsuchome@suse.cz>
 #
+require "shellwords"
+
 module Yast
   module SoundVolumeRoutinesInclude
     def initialize_sound_volume_routines(include_target)
@@ -43,8 +45,8 @@ module Yast
         if Arch.sparc
           cmd = Builtins.sformat(
             "/usr/bin/aumix -d /dev/mixer%1 -w %2",
-            cardid,
-            value
+            cardid.to_i,
+            value.to_i
           )
           SCR.Execute(path(".target.bash"), cmd, {})
         else
@@ -121,12 +123,12 @@ module Yast
       end
 
       command = !Sound.use_alsa ?
-        Builtins.sformat("/usr/bin/mpg123 -a /dev/dsp%1 %2", card_id, fname) :
+        Builtins.sformat("/usr/bin/mpg123 -a /dev/dsp%1 %2", card_id.to_i, fname.shellescape) :
         # unset ALSA_CONFIG_PATH (bnc#440981)
         Builtins.sformat(
           "ALSA_CONFIG_PATH= /usr/bin/aplay -q -N -D default:%1 %2 > /dev/null 2>&1",
-          card_id,
-          fname
+          card_id.to_i,
+          fname.shellescape
         )
 
       Builtins.y2milestone("Executing: %1", command)
@@ -156,7 +158,7 @@ module Yast
         snd = Builtins.sformat(
           "/sbin/modprobe snd snd_cards_limit=%1 snd_major=116",
           Builtins.size(Sound.modules_conf)
-        ) 
+        )
         #FIXME parameter names for OSS?
       end
 
@@ -211,7 +213,7 @@ module Yast
           if Builtins.haskey(modules, mod)
             SCR.Execute(
               path(".target.bash"),
-              Builtins.sformat("/sbin/rmmod -r %1", mod)
+              Builtins.sformat("/sbin/rmmod -r %1", mod.shellescape)
             )
           end
         end
@@ -224,6 +226,8 @@ module Yast
       out = Convert.to_map(
         SCR.Execute(
           path(".target.bash_output"),
+          # cannot escape it here as escaped glob return without asterisk expansion,
+          # but we provide input
           Builtins.sformat("echo -n %1", glob)
         )
       )
