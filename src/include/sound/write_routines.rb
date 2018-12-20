@@ -73,7 +73,7 @@ module Yast
       # remove the old configuration file
       if Ops.get_string(entry, "hwcfg", "") != ""
         rm = Ops.add(
-          "rm -f /etc/sysconfig/hardware/hwcfg-",
+          "/usr/bin/rm -f /etc/sysconfig/hardware/hwcfg-",
           Ops.get_string(entry, "hwcfg", "")
         )
         Builtins.y2milestone("Removing old configuration file: %1", rm)

@@ -14,6 +14,9 @@
 #   Dan Meszaros <dmeszar@suse.cz>
 #
 #
+
+require "shellwords"
+
 module Yast
   module SoundRoutinesInclude
     def initialize_sound_routines(include_target)
@@ -992,7 +995,7 @@ module Yast
           res = Convert.to_map(
             SCR.Execute(
               path(".target.bash_output"),
-              Ops.add(Ops.add(Directory.ybindir, "/copyfonts "), mpoint),
+              "#{File.join(Directory.ybindir, "/copyfonts")} #{mpoint.shellescape}",
               {}
             )
           )
