@@ -43,7 +43,7 @@ ydata_DATA = \
   data/alsa_packages.yml
 
 desktop_DATA = \
-  desktop/sound.desktop
+  desktop/org.openSUSE.YaST.Sound.desktop
 
 scalabledir = @icondir@/hicolor/scalable/apps
 scalable_DATA = \
