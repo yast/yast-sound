@@ -19,6 +19,7 @@ X-SuSE-YaST-Keywords=hardware,system,audio
 Icon=yast-sound
 Exec=xdg-su -c "/sbin/yast2 sound"
 
-Name=Sound
-GenericName=Configure your sound card
+Name=YaST Sound
+GenericName=Sound
+Comment=Configure your sound card
 StartupNotify=true
