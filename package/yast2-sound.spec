@@ -36,7 +36,7 @@ BuildRequires:  ruby
 BuildRequires:  update-desktop-files
 BuildRequires:  yast2
 BuildRequires:  yast2-core-devel
-BuildRequires:  yast2-devtools >= 3.1.10
+BuildRequires:  yast2-devtools >= 4.2.2
 BuildRequires:  yast2-testsuite
 
 # Fixed handling of Kernel modules loaded on boot
