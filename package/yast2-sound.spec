@@ -45,38 +45,7 @@ Requires:       alsa
 Requires:       yast2 >= 3.1.180
 Requires:       yast2-ruby-bindings >= 1.0.0
 
-Provides:       yast2-agent-audio
-Provides:       yast2-agent-audio-devel
-Provides:       yast2-config-sound
-Provides:       y2c_snd
-Provides:       y2t_snd
-Provides:       y2t_sndd
-Provides:       yast2-trans-sound
-Provides:       yast2-trans-soundd
-Provides:       y2c_sparc
-Provides:       y2c_sprc
-Provides:       y2d_snd
-Provides:       yast2-db-sound
-
-Obsoletes:      yast2-agent-audio
-Obsoletes:      yast2-agent-audio-devel
-Obsoletes:      yast2-config-sound
-Obsoletes:      y2c_snd
-Obsoletes:      y2t_snd
-Obsoletes:      y2t_sndd
-Obsoletes:      yast2-trans-sound
-Obsoletes:      yast2-trans-soundd
-Obsoletes:      y2c_sparc
-Obsoletes:      y2c_sprc
-Obsoletes:      y2d_snd
-Obsoletes:      yast2-db-sound
 Obsoletes:      yast2-sound-devel-doc
-
-# XXX: SLE-12 build packages for x86 and s390, but no runnable kernel, so
-# this package cannot be build here. Remove when SLE stop doing it
-%if !0%{?is_opensuse}
-ExcludeArch:    %ix86 s390
-%endif
 
 %description
 This package contains the YaST2 component for sound card configuration.
