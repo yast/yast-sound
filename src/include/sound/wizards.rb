@@ -228,7 +228,7 @@ module Yast
       Sound.use_ui = true
 
       Wizard.CreateDialog
-      Wizard.SetDesktopTitleAndIcon("sound")
+      Wizard.SetDesktopTitleAndIcon("org.opensuse.yast.Sound")
 
       if !Mode.config && !Sound.installation
         return :abort if !Sound.Read(true)

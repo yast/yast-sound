@@ -12,22 +12,19 @@
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 
 Name:           yast2-sound
-Version:        4.1.1
+Version:        4.2.0
 Release:        0
+Summary:        YaST2 - Sound Configuration
+License:        GPL-2.0-or-later
+Group:          System/YaST
+Url:            https://github.com/yast/yast-sound
 
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
-
-# XXX: SLE-12 build packages for x86 and s390, but no runnable kernel, so
-# this package cannot be build here. Remove when SLE stop doing it
-%if !0%{?is_opensuse}
-ExcludeArch:    %ix86 s390
-%endif
 
 BuildRequires:  alsa-devel
 BuildRequires:  doxygen
@@ -39,45 +36,16 @@ BuildRequires:  ruby
 BuildRequires:  update-desktop-files
 BuildRequires:  yast2
 BuildRequires:  yast2-core-devel
-BuildRequires:  yast2-devtools >= 3.1.10
+BuildRequires:  yast2-devtools >= 4.2.2
 BuildRequires:  yast2-testsuite
 
 # Fixed handling of Kernel modules loaded on boot
 Requires:       alsa
 # For proc_modules.scr
 Requires:       yast2 >= 3.1.180
-
-Provides:       yast2-agent-audio
-Provides:       yast2-agent-audio-devel
-Provides:       yast2-config-sound
-Obsoletes:      yast2-agent-audio
-Obsoletes:      yast2-agent-audio-devel
-Obsoletes:      yast2-config-sound
-Provides:       y2c_snd
-Provides:       y2t_snd
-Provides:       y2t_sndd
-Provides:       yast2-trans-sound
-Provides:       yast2-trans-soundd
-Obsoletes:      y2c_snd
-Obsoletes:      y2t_snd
-Obsoletes:      y2t_sndd
-Obsoletes:      yast2-trans-sound
-Obsoletes:      yast2-trans-soundd
-Provides:       y2c_sparc
-Provides:       y2c_sprc
-Provides:       y2d_snd
-Provides:       yast2-db-sound
-Obsoletes:      y2c_sparc
-Obsoletes:      y2c_sprc
-Obsoletes:      y2d_snd
-Obsoletes:      yast2-db-sound
-Obsoletes:      yast2-sound-devel-doc
-
 Requires:       yast2-ruby-bindings >= 1.0.0
 
-Summary:        YaST2 - Sound Configuration
-License:        GPL-2.0-or-later
-Group:          System/YaST
+Obsoletes:      yast2-sound-devel-doc
 
 %description
 This package contains the YaST2 component for sound card configuration.
@@ -90,8 +58,8 @@ This package contains the YaST2 component for sound card configuration.
 
 %install
 %yast_install
-
 rm -rf %{buildroot}/%{yast_plugindir}/libpy2ag_audio.la
+%yast_metainfo
 
 %post
 # rename the config file to the new modprobe schema
@@ -100,32 +68,20 @@ if test -e /etc/modprobe.d/sound; then
 fi
 
 %files
-%defattr(-,root,root)
-
-# sound
-%dir %{yast_yncludedir}/sound
-%{yast_yncludedir}/sound/*.rb
-%{yast_clientdir}/sound*.rb
-%{yast_desktopdir}/sound.desktop
-%{yast_ybindir}/copyfonts
-%{yast_ybindir}/alsadrivers
-%{yast_moduledir}/Sound.*
-%{yast_moduledir}/PulseAudio.*
-%{yast_schemadir}/autoyast/rnc/sound.rnc
-
+%{yast_yncludedir}
+%{yast_clientdir}
+%{yast_desktopdir}
+%{yast_metainfodir}
+%{yast_ybindir}
+%{yast_moduledir}
+%{yast_schemadir}
 # database
-%{yast_ydatadir}/sndcards.yml
-%{yast_ydatadir}/alsa_packages.yml
-
+%{yast_ydatadir}
 # agents
-%{yast_plugindir}/libpy2ag_audio.so*
-%{yast_scrconfdir}/*.scr
-
-# icons
+%{yast_plugindir}
+%{yast_scrconfdir}
 %{yast_icondir}
-
-%dir %{yast_docdir}
-%doc %{yast_docdir}/README
-%license %{yast_docdir}/COPYING
+%doc %{yast_docdir}
+%license COPYING
 
 %changelog
