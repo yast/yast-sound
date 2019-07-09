@@ -17,7 +17,7 @@
 
 
 Name:           yast2-sound
-Version:        4.2.0
+Version:        4.2.1
 Release:        0
 Summary:        YaST2 - Sound Configuration
 License:        GPL-2.0-or-later
@@ -25,6 +25,12 @@ Group:          System/YaST
 Url:            https://github.com/yast/yast-sound
 
 Source0:        %{name}-%{version}.tar.bz2
+
+# FIXME: SLE-12/15 builds packages for x86 and s390 (both 32 bit),
+# but no runnable kernel, so this package cannot be built there.
+%if !0%{?is_opensuse}
+ExcludeArch:    %ix86 s390
+%endif
 
 BuildRequires:  alsa-devel
 BuildRequires:  doxygen
