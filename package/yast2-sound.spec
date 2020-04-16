@@ -26,12 +26,6 @@ Url:            https://github.com/yast/yast-sound
 
 Source0:        %{name}-%{version}.tar.bz2
 
-# FIXME: SLE-12/15 builds packages for x86 and s390 (both 32 bit),
-# but no runnable kernel, so this package cannot be built there.
-%if !0%{?is_opensuse}
-ExcludeArch:    %ix86 s390
-%endif
-
 BuildRequires:  alsa-devel
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
