@@ -38,6 +38,7 @@ BuildRequires:  yast2-core-devel
 BuildRequires:  yast2-devtools >= 4.2.2
 BuildRequires:  yast2-testsuite
 
+# workaround for OS builds, see jsc#SLE-11862
 %ifnarch i586
 BuildRequires:  kernel-default
 %endif
