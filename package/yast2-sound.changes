@@ -1,5 +1,5 @@
 -------------------------------------------------------------------
-Wed Apr 29 14:19:50 UTC 2020 - jsrain@localhost
+Wed Apr 29 14:19:50 UTC 2020 - jsrain@suse.com
 
 - avoid attempts to build sound card database if no kernel
   available (related to jsc#SLE-11873)
