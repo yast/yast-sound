@@ -2,21 +2,26 @@ default namespace = "http://www.suse.com/1.0/yast2ns"
 namespace a = "http://relaxng.org/ns/compatibility/annotations/1.0"
 namespace config = "http://www.suse.com/1.0/configns"
 
-LOAD_ALSA_SEQ = element LOAD_ALSA_SEQ { text }
+include "common.rnc"
+
+LOAD_ALSA_SEQ = element LOAD_ALSA_SEQ { STRING }
 module_conf =
   element module_conf {
-      element alias         { text }? &
-      element model         { text }? &
-      element module        { text }? &
+    MAP,
+    (
+      element alias         { STRING }? &
+      element model         { STRING }? &
+      element module        { STRING }? &
       element options       { Anything* }? &
-      element unique_key    { text }? &
-      element bus           { text }? &
-      element bus_id        { text }? &
+      element unique_key    { STRING }? &
+      element bus           { STRING }? &
+      element bus_id        { STRING }? &
       element device_id     { INTEGER }? &
-      element hwcfg         { text }? &
+      element hwcfg         { STRING }? &
       element sub_device_id { INTEGER }? &
       element sub_vendor_id { INTEGER }? &
       element vendor_id     { INTEGER }?
+    )
   }
 modules_conf =
   element modules_conf {
@@ -25,20 +30,27 @@ modules_conf =
   }
 new =
   element new {
-    text
+    STRING
   }
 
-rc_vars = element rc_vars { LOAD_ALSA_SEQ* }
-snd_enable = element snd_enable { text }
-snd_index = element snd_index { text }
+rc_vars = element rc_vars { MAP, LOAD_ALSA_SEQ* }
+snd_enable = element snd_enable { STRING }
+snd_index = element snd_index { STRING }
 sound =
   element sound {
-    configure_detected? & modules_conf? & rc_vars? & volume_settings? & pulse_audio_status?
+    MAP,
+    (
+      configure_detected? &
+      modules_conf? &
+      rc_vars? &
+      volume_settings? &
+      pulse_audio_status?
+    )
   }
 pulse_audio_status = element pulse_audio_status { BOOLEAN }
-state = element state { text }
-unique_key = element unique_key { text }
-unknown-state = element unknown-state { text }
+state = element state { STRING }
+unique_key = element unique_key { STRING }
+unknown-state = element unknown-state { STRING }
 volume_component_settings =
   element volume_component_settings {
     attribute config:type { text }?,
@@ -48,9 +60,12 @@ volume_entry =
   element volume_entry {
     LIST,
     element volume_component {
+      MAP,
+      (
         element mute { BOOLEAN }? &
-        element name { text }? &
+        element name { STRING }? &
         element volume { INTEGER }?
+      )
     }*
   }
 volume_settings =
@@ -60,7 +75,7 @@ volume_settings =
   }
 configure_detected =
   element configure_detected { BOOLEAN }
-enable = element enable { text }
-index = element index { text }
-isapnp = element isapnp { text }
-joystick = element joystick { text }
+enable = element enable { STRING }
+index = element index { STRING }
+isapnp = element isapnp { STRING }
+joystick = element joystick { STRING }
