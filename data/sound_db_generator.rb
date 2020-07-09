@@ -144,7 +144,7 @@ class SoundCardDBGenerator
     card_addons = YAML.load_file "data_cards.yml"
     mixer = YAML.load_file "data_mixer.yml"
 
-    path.match /^\/lib\/modules\/([^\/]*)\//
+    path.match /^\/lib\/modules\/(\d+\.\d+)/
     kernel_ver = $1
 
     sound_card_db = {
