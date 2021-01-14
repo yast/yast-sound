@@ -19,7 +19,7 @@ jobs:
       run: zypper --non-interactive install alsa-devel kernel-default yast2 yast2-ruby-bindings yast2-testsuite
 
     - name: Package Build
-      run: yast-ci-ruby -o package
+      run: yast-ci-cpp
 
   # downloading the Docker image takes some time so bundling several fast
   # checks into one job avoids that overhead
