@@ -73,7 +73,7 @@ class AlsaModule
 
   #  get just the module name from the driver path
   def name
-    @mod_path.match /\/([^\/]*).ko.xz$/
+    @mod_path.match /\/([^\/]*).ko(?:.(?:xz|gz|zst))?$/
     return $1
   end
 
@@ -122,7 +122,11 @@ class AlsaModule
 
   # find all sound drivers below the given path
   def self.find_all(path)
-    files = Dir.glob(File.join(path, "**", "snd-*.ko.xz")).select { |f| File.file?(f) }
+    files = (Dir.glob(File.join(path, "**", "snd-*.ko"))
+             + Dir.glob(File.join(path, "**", "snd-*.ko.gz"))
+             + Dir.glob(File.join(path, "**", "snd-*.ko.xz"))
+             + Dir.glob(File.join(path, "**", "snd-*.ko.zst"))
+            ).select { |f| File.file?(f) }
 
     files.sort! { |f1, f2| File.basename(f1) <=> File.basename(f2) }
 
