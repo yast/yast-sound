@@ -28,6 +28,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         distro:  [ "tumbleweed", "leap_latest" ]
 
