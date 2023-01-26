@@ -1,6 +1,9 @@
-# YaST - The Sound Card Configuration Module #
+Obsoleted Module
+================
 
-[![Workflow Status](https://github.com/yast/yast-sound/workflows/CI/badge.svg?branch=master)](
-https://github.com/yast/yast-sound/actions?query=branch%3Amaster)
-[![Jenkins Status](https://ci.opensuse.org/buildStatus/icon?job=yast-yast-sound-master)](
-https://ci.opensuse.org/view/Yast/job/yast-yast-sound-master/)
+**This module is obsoleted and is not developed anymore.**
+
+GIT
+---
+
+Use the [*SLE-15-SP5*](../SLE-15-SP5) branch for SLE-15 maintenance.

@@ -1,3 +1,0 @@
-The sound module supports both ALSA and OSS sound systems,
-ALSA is used by default. Run 'yast2 sound .oss' to use OSS instead.
-
